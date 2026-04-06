@@ -4,51 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Entrada Estoque - Boteco 934</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 10px; margin: 0; }
-        .container { max-width: 600px; margin: auto; padding: 10px; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .card { background: #1c1c1e; padding: 20px; border-radius: 18px; border: 1px solid #333; margin-bottom: 20px; }
         
-        /* Ajuste do Scanner para Horizontal/Distante */
-        #reader { 
+        h3 { color: #30d158; margin-bottom: 25px; font-weight: bold; }
+        p { font-size: 14px; color: #8e8e93; margin-bottom: 10px; }
+        
+        /* Campo de Texto para Colar a Chave */
+        input[type="text"] { 
             width: 100%; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            background: #111; 
-            border: 2px solid #333; 
-            min-height: 250px; 
-            margin-bottom: 10px; 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: 1px solid #444; 
+            background: #2c2c2e; 
+            color: #30d158; 
+            font-size: 16px; 
+            margin-bottom: 15px; 
+            box-sizing: border-box;
+            text-align: center;
+            font-family: monospace;
         }
-        
-        .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; border-radius: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; box-sizing: border-box; }
+
+        .btn { display: block; width: 100%; padding: 20px; margin: 10px 0; border-radius: 15px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; box-sizing: border-box; }
         .btn-blue { background: #0a84ff; color: white; }
         .btn-green { background: #30d158; color: black; }
-        .btn-orange { background: #ff9f0a; color: black; }
         
-        #card-scan { display: none; background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #0a84ff; margin-top: 15px; }
         .item-produto { text-align: left; background: #2c2c2e; padding: 12px; margin: 6px 0; border-radius: 10px; border-left: 4px solid #30d158; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3 style="color: #30d158; margin: 15px 0;">📦 Gestão Boteco 934</h3>
+    <h3>📦 Gestão Boteco 934</h3>
 
-    <div id="reader"></div>
-    
-    <button id="btn-camera" class="btn btn-orange" onclick="iniciarScanner()">📸 LIGAR SCANNER HORIZONTAL</button>
-
-    <div id="card-scan">
-        <p style="font-size: 12px; color: #8e8e93; margin: 0;">Chave Identificada:</p>
-        <strong id="chave-num" style="color: #30d158; font-family: monospace; font-size: 13px;"></strong>
-        <a id="link-fsist" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
+    <div class="card">
+        <p>1º PASSO: COPIE A CHAVE NA CÂMERA E COLE AQUI:</p>
+        <input type="text" id="chave-input" placeholder="Cole os 44 números aqui">
+        <button onclick="irParaFsist()" class="btn btn-blue">BAIXAR XML NO FSIST</button>
     </div>
 
-    <hr style="border: 0.5px solid #222; margin: 25px 0;">
+    <div class="card">
+        <p>2º PASSO: JÁ BAIXOU O XML?</p>
+        <label for="xml-upload" class="btn btn-green">SELECIONAR XML BAIXADO</label>
+        <input type="file" id="xml-upload" accept=".xml" style="display:none" onchange="processarXML(this)">
+        <span id="nome-arquivo" style="display:block; margin-top:10px; color:#30d158; font-size:12px;"></span>
+    </div>
 
-    <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
-    <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
-    
     <div id="lista-produtos"></div>
 </div>
 
@@ -56,6 +59,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
 <script>
+    // Configurações do Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -67,42 +71,28 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const html5QrCode = new Html5Qrcode("reader");
-
-    function iniciarScanner() {
-        // Aumentei o retângulo para 350 de largura (quase a tela toda) 
-        // e deixei ele bem baixinho (100) para focar só na linha do código
-        const config = { 
-            fps: 25, 
-            qrbox: { width: 350, height: 100 }, 
-            aspectRatio: 1.0 
-        };
-
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            config, 
-            (decodedText) => {
-                document.getElementById('card-scan').style.display = 'block';
-                document.getElementById('chave-num').innerText = decodedText;
-                document.getElementById('link-fsist').href = "https://www.fsist.com.br/consultar-nfe?chave=" + decodedText;
-                document.getElementById('btn-camera').style.display = 'none';
-                if (navigator.vibrate) navigator.vibrate(100);
-                html5QrCode.stop();
-            }
-        ).catch(err => {
-            alert("Acesse os Ajustes do Safari e Permita a Câmera.");
-        });
+    // Abre o site FSist com a chave preenchida
+    function irParaFsist() {
+        const chave = document.getElementById('chave-input').value.replace(/\D/g, ''); // Limpa espaços e letras
+        if (chave.length >= 44) {
+            window.open("https://www.fsist.com.br/consultar-nfe?chave=" + chave, "_blank");
+        } else {
+            alert("A chave precisa ter 44 números.");
+            window.open("https://www.fsist.com.br", "_blank");
+        }
     }
 
-    window.onload = iniciarScanner;
-
-    function lerXML(input) {
+    // Processa o arquivo XML e mostra os itens
+    function processarXML(input) {
         if (input.files[0]) {
+            const arquivo = input.files[0];
+            document.getElementById('nome-arquivo').innerText = "Arquivo: " + arquivo.name;
+            
             const leitor = new FileReader();
             leitor.onload = function() {
                 const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                 const itens = xmlDoc.getElementsByTagName("det");
-                let html = "<h4>Produtos:</h4>";
+                let html = "<h4>Confira os itens:</h4>";
                 let produtos = [];
 
                 for (let i = 0; i < itens.length; i++) {
@@ -110,28 +100,33 @@
                     let nome = p.getElementsByTagName("xProd")[0].textContent;
                     let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
                     produtos.push({ nome, qtd });
-                    html += `<div class="item-produto"><b>${nome}</b> - ${qtd} un</div>`;
+                    html += `<div class="item-produto"><b>${nome}</b><br>Quantidade: ${qtd}</div>`;
                 }
+
                 document.getElementById('lista-produtos').innerHTML = html + 
-                `<button onclick='salvarNoFirebase(${JSON.stringify(produtos)})' class="btn btn-green">3. FINALIZAR LANÇAMENTO</button>`;
+                `<button onclick='salvarEstoque(${JSON.stringify(produtos)})' class="btn btn-green">3. CONFIRMAR E SALVAR NO BANCO</button>`;
             };
-            leitor.readAsText(input.files[0]);
+            leitor.readAsText(arquivo);
         }
     }
 
-    async function salvarNoFirebase(lista) {
+    // Salva no Firestore
+    async function salvarEstoque(lista) {
         try {
             for (let item of lista) {
                 await db.collection("estoque").doc(item.nome).set({
                     nome: item.nome,
                     quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                    ultima_entrada: new Date()
+                    data: new Date()
                 }, { merge: true });
             }
             alert("✅ Estoque Atualizado!");
             location.reload();
-        } catch (e) { alert("Erro ao salvar."); }
+        } catch (e) {
+            alert("Erro ao salvar.");
+        }
     }
 </script>
+
 </body>
 </html>
