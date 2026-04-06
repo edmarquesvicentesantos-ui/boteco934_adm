@@ -1,1 +1,64 @@
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada de Mercadoria - Boteco 934</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; padding: 15px; }
+        .container { max-width: 500px; margin: auto; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+        .btn-blue { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .item-lista { background: #333; padding: 10px; border-radius: 5px; margin-bottom: 5px; border-left: 5px solid #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📥 Entrada de Nota</h2>
+        
+        <p>1º Passo: Baixe o XML no site do FSist ou SEFAZ pelo celular.</p>
+        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">Abrir FSist no Celular</a>
+
+        <hr>
+
+        <p>2º Passo: Selecione o arquivo baixado para ler os itens.</p>
+        <label for="xmlInput" class="btn btn-success">ESCOLHER ARQUIVO XML</label>
+        <input type="file" id="xmlInput" accept=".xml" style="display: none;" onchange="lerXML(this)">
+
+        <div id="listaProdutos">
+            </div>
+    </div>
+
+    <script>
+        function lerXML(input) {
+            const arquivo = input.files[0];
+            const leitor = new FileReader();
+
+            leitor.onload = function() {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(leitor.result, "text/xml");
+                const itens = xmlDoc.getElementsByTagName("det");
+                
+                let html = "<h3>Produtos Encontrados:</h3>";
+                
+                for (let i = 0; i < itens.length; i++) {
+                    let prod = itens[i].getElementsByTagName("prod")[0];
+                    let nome = prod.getElementsByTagName("xProd")[0].textContent;
+                    let qtd = prod.getElementsByTagName("qCom")[0].textContent;
+                    let valor = prod.getElementsByTagName("vUnCom")[0].textContent;
+
+                    html += `
+                        <div class="item-lista">
+                            <strong>${nome}</strong><br>
+                            Qtd: ${qtd} | Unitário: R$ ${parseFloat(valor).toFixed(2)}
+                        </div>`;
+                }
+                document.getElementById("listaProdutos").innerHTML = html;
+            };
+            leitor.readAsText(arquivo);
+        }
+    </script>
+</body>
+</html>
