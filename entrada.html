@@ -2,36 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner 16 Pro Max - Boteco 934</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada - Boteco 934</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 15px; }
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #111; border: 2px solid #333; min-height: 300px; margin-top: 10px; }
-        .btn { display: block; width: 100%; padding: 20px; margin: 10px 0; border-radius: 15px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; }
-        .btn-orange { background: #ff9f0a; color: black; }
-        .btn-blue { background: #0a84ff; color: white; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 20px; }
+        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; color: white; }
+        .btn-blue { background: #0a84ff; }
         .btn-green { background: #30d158; color: black; }
-        #resultado { display: none; background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #0a84ff; margin-top: 15px; }
+        .btn-camera { background: #ff9f0a; color: black; }
     </style>
 </head>
 <body>
-    <h3 style="color: #30d158;">Estoque Boteco 934</h3>
+    <h3 style="color: #30d158;">📦 Estoque Boteco 934</h3>
 
-    <div id="reader"></div>
-    
-    <button id="btn-camera" class="btn btn-orange" onclick="ativarCamera()">📸 ATIVAR CÂMERAS DO IPHONE 16</button>
-
-    <div id="resultado">
-        <p style="font-size: 12px; color: #8e8e93;">Chave da Nota:</p>
-        <strong id="chave-exibida" style="color: #30d158; font-family: monospace;"></strong>
-        <a id="link-fsist" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML AGORA</a>
+    <div class="card">
+        <p>1. Use a câmera para ler a Chave:</p>
+        <label class="btn btn-camera">
+            📸 LER CÓDIGO DA NOTA
+            <input type="file" accept="image/*" capture="environment" style="display:none" onchange="alert('Dica: O iPhone 16 detecta o código na foto. Copie os números e use no site FSist.')">
+        </label>
+        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">IR PARA O SITE FSIST</a>
     </div>
 
-    <hr style="border: 0.5px solid #333; margin: 30px 0;">
-
-    <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
-    <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarXML(this)">
+    <div class="card">
+        <p>2. Selecione o XML baixado:</p>
+        <label for="xml" class="btn btn-green">ESCOLHER ARQUIVO XML</label>
+        <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarXML(this)">
+    </div>
 
     <div id="lista"></div>
 
@@ -39,41 +37,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Suas configurações do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
             projectId: "boteco934-afc3f",
             storageBucket: "boteco934-afc3f.firebasestorage.app",
-            messagingSenderId: "182023728304",
             appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        const html5QrCode = new Html5Qrcode("reader");
-
-        async function ativarCamera() {
-            try {
-                const config = { 
-                    fps: 20, 
-                    qrbox: { width: 300, height: 150 },
-                    aspectRatio: 1.0 
-                };
-
-                // No iPhone 16 Pro Max, 'environment' seleciona a câmera principal traseira
-                await html5QrCode.start({ facingMode: "environment" }, config, (text) => {
-                    document.getElementById('resultado').style.display = 'block';
-                    document.getElementById('chave-exibida').innerText = text;
-                    document.getElementById('link-fsist').href = "https://www.fsist.com.br/consultar-nfe?chave=" + text;
-                    document.getElementById('btn-camera').style.display = 'none';
-                    html5QrCode.stop();
-                });
-            } catch (err) {
-                // Se der erro de permissão, avisa o usuário como liberar
-                alert("⚠️ ATENÇÃO: No topo do Safari, clique no ícone 'AA' ou no 'Cadeado' e selecione 'Ajustes do Site' -> Câmera -> Permitir.");
-            }
-        }
 
         function processarXML(input) {
             if (input.files[0]) {
@@ -81,7 +53,7 @@
                 leitor.onload = function() {
                     const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                     const itens = xmlDoc.getElementsByTagName("det");
-                    let html = "<h4>Produtos:</h4>";
+                    let html = "<h4>Produtos Identificados:</h4>";
                     let produtos = [];
 
                     for (let i = 0; i < itens.length; i++) {
@@ -89,7 +61,7 @@
                         let nome = p.getElementsByTagName("xProd")[0].textContent;
                         let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
                         produtos.push({ nome, qtd });
-                        html += `<div style="text-align:left; background:#222; padding:12px; margin:5px; border-radius:10px; border-left:4px solid #30d158;">${nome} - ${qtd} un</div>`;
+                        html += `<div style="text-align:left; background:#2c2c2e; padding:12px; margin:5px; border-radius:10px; border-left:4px solid #30d158;">${nome} - ${qtd} un</div>`;
                     }
                     document.getElementById('lista').innerHTML = html + 
                     `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">CONFIRMAR NO ESTOQUE</button>`;
@@ -107,7 +79,7 @@
                         data: new Date()
                     }, { merge: true });
                 }
-                alert("✅ Estoque Atualizado!");
+                alert("✅ Sucesso! Estoque do Boteco 934 atualizado.");
                 location.reload();
             } catch (e) { alert("Erro ao salvar."); }
         }
