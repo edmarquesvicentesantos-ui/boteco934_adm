@@ -3,105 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Entrada - Boteco 934</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>Entrada Estoque - Boteco 934</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 10px; margin: 0; }
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #111; border: 2px solid #333; min-height: 280px; }
-        .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; border-radius: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 20px; margin: 0; }
+        .container { max-width: 500px; margin: auto; }
+        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        
+        h3 { color: #30d158; margin-bottom: 25px; }
+        p { font-size: 14px; color: #8e8e93; margin-bottom: 10px; }
+
+        /* Campo de Digitação */
+        input[type="text"] { 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: 1px solid #444; 
+            background: #2c2c2e; 
+            color: #30d158; 
+            font-size: 18px; 
+            text-align: center; 
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+
+        /* Botões */
+        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; text-align: center; box-sizing: border-box; }
         .btn-blue { background: #0a84ff; color: white; }
         .btn-green { background: #30d158; color: black; }
-        #resultado { display: none; background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #0a84ff; margin-top: 15px; }
+        
+        .item-produto { text-align: left; background: #2c2c2e; padding: 12px; margin: 6px 0; border-radius: 10px; border-left: 4px solid #30d158; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <h3 style="color: #30d158; margin: 15px 0;">📦 Estoque Boteco 934</h3>
+<div class="container">
+    <h3>📦 Gestão de Estoque</h3>
 
-    <div id="reader"></div>
-    
-    <div id="resultado">
-        <p style="font-size: 12px; color: #8e8e93;">Chave da Nota:</p>
-        <strong id="chave-num" style="color: #30d158; font-family: monospace; font-size: 13px;"></strong>
-        <button onclick="abrirSefaz()" class="btn btn-blue">1. BAIXAR XML (FSIST)</button>
+    <div class="card">
+        <p>1º PASSO: DIGITE OU COLE A CHAVE (44 números)</p>
+        <input type="text" id="chave-input" placeholder="0000 0000 0000..." maxlength="55">
+        <button onclick="irParaFsist()" class="btn btn-blue">BAIXAR XML NO FSIST</button>
     </div>
 
-    <hr style="border: 0.5px solid #222; margin: 25px 0;">
+    <div class="card">
+        <p>2º PASSO: SELECIONE O ARQUIVO BAIXADO</p>
+        <label for="xml" class="btn btn-green">ESCOLHER ARQUIVO XML</label>
+        <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
+        <div id="nome-arquivo" style="margin-top:10px; color:#30d158; font-size:12px;"></div>
+    </div>
 
-    <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
-    <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
-    
-    <div id="lista"></div>
+    <div id="lista-produtos"></div>
+</div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.firebasestorage.app",
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+<script>
+    // Suas configurações do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+        authDomain: "boteco934-afc3f.firebaseapp.com",
+        projectId: "boteco934-afc3f",
+        storageBucket: "boteco934-afc3f.firebasestorage.app",
+        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        const html5QrCode = new Html5Qrcode("reader");
-        let chaveIdentificada = "";
-
-        // Inicia a câmera direto para evitar o erro da imagem (image_b689e4.png)
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 20, qrbox: { width: 300, height: 120 } }, 
-            (text) => {
-                chaveIdentificada = text;
-                document.getElementById('resultado').style.display = 'block';
-                document.getElementById('chave-num').innerText = text;
-                if (navigator.vibrate) navigator.vibrate(100);
-                html5QrCode.stop();
-            }
-        ).catch(err => { alert("Permita a câmera no Safari para escanear."); });
-
-        function abrirSefaz() {
-            // Corrigindo o link para evitar o Erro 404 (image_c6dfa2.png)
-            window.open("https://www.fsist.com.br/consultar-nfe?chave=" + chaveIdentificada, "_blank");
+    // Função para limpar e abrir o FSist
+    function irParaFsist() {
+        const campo = document.getElementById('chave-input');
+        const chaveLimpa = campo.value.replace(/\s/g, ''); // Remove espaços se colar com espaços
+        
+        if (chaveLimpa.length >= 44) {
+            window.open("https://www.fsist.com.br/consultar-nfe?chave=" + chaveLimpa, "_blank");
+        } else {
+            alert("A chave precisa ter 44 números. Você digitou " + chaveLimpa.length);
+            window.open("https://www.fsist.com.br", "_blank");
         }
+    }
 
-        function lerXML(input) {
-            if (input.files[0]) {
-                const leitor = new FileReader();
-                leitor.onload = function() {
-                    const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
-                    const itens = xmlDoc.getElementsByTagName("det");
-                    let html = "<h4>Itens da Nota:</h4>";
-                    let produtos = [];
-                    for (let i = 0; i < itens.length; i++) {
-                        let p = itens[i].getElementsByTagName("prod")[0];
-                        let nome = p.getElementsByTagName("xProd")[0].textContent;
-                        let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
-                        produtos.push({ nome, qtd });
-                        html += `<div style="text-align:left; background:#222; padding:10px; margin:5px; border-radius:8px;">${nome} - ${qtd} un</div>`;
-                    }
-                    document.getElementById('lista').innerHTML = html + `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">3. CONFIRMAR NO ESTOQUE</button>`;
-                };
-                leitor.readAsText(input.files[0]);
-            }
-        }
+    // Lógica para ler o XML
+    function lerXML(input) {
+        if (input.files[0]) {
+            const arquivo = input.files[0];
+            document.getElementById('nome-arquivo').innerText = "Selecionado: " + arquivo.name;
+            
+            const leitor = new FileReader();
+            leitor.onload = function() {
+                const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
+                const itens = xmlDoc.getElementsByTagName("det");
+                let html = "<h4>Produtos na Nota:</h4>";
+                let produtos = [];
 
-        async function salvar(lista) {
-            try {
-                for (let item of lista) {
-                    await db.collection("estoque").doc(item.nome).set({
-                        nome: item.nome,
-                        quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                        data: new Date()
-                    }, { merge: true });
+                for (let i = 0; i < itens.length; i++) {
+                    let p = itens[i].getElementsByTagName("prod")[0];
+                    let nome = p.getElementsByTagName("xProd")[0].textContent;
+                    let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
+                    produtos.push({ nome, qtd });
+                    html += `<div class="item-produto"><b>${nome}</b> - ${qtd} un</div>`;
                 }
-                alert("✅ Estoque Atualizado!");
-                location.reload();
-            } catch (e) { alert("Erro ao salvar."); }
+                document.getElementById('lista-produtos').innerHTML = html + 
+                `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">3. LANÇAR NO BANCO</button>`;
+            };
+            leitor.readAsText(arquivo);
         }
-    </script>
+    }
+
+    // Salvar no Firebase
+    async function salvar(lista) {
+        try {
+            for (let item of lista) {
+                await db.collection("estoque").doc(item.nome).set({
+                    nome: item.nome,
+                    quantidade: firebase.firestore.FieldValue.increment(item.qtd),
+                    data: new Date()
+                }, { merge: true });
+            }
+            alert("✅ Estoque Atualizado!");
+            location.reload();
+        } catch (e) { alert("Erro ao salvar."); }
+    }
+</script>
+
 </body>
 </html>
