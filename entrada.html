@@ -2,81 +2,81 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrada - Boteco 934</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Entrada iPhone - Boteco 934</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; text-align: center; }
-        .card { background: #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #444; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 16px; text-decoration: none; }
-        .btn-blue { background: #007bff; color: white; }
-        .btn-green { background: #28a745; color: white; }
-        .item { background: #444; padding: 10px; margin-bottom: 5px; border-radius: 5px; text-align: left; border-left: 5px solid #28a745; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #000; color: white; padding: 15px; }
+        .card { background: #1c1c1e; padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #38383a; }
+        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: 17px; text-decoration: none; text-align: center; }
+        .btn-blue { background: #0a84ff; color: white; }
+        .btn-green { background: #30d158; color: white; }
+        .item { background: #2c2c2e; padding: 12px; margin-bottom: 8px; border-radius: 8px; text-align: left; border-left: 4px solid #30d158; }
     </style>
 </head>
 <body>
-    <h2>📥 Entrada de Mercadoria</h2>
+    <h2 style="margin-top:0;">📥 Entrada de Nota</h2>
     
     <div class="card">
-        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
-        <label for="xml" class="btn btn-green">2. ESCOLHER XML BAIXADO</label>
-        <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
+        <p style="color: #8e8e93; font-size: 14px;">Use para notas do Bar ou Boticário</p>
+        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">1. BUSCAR NOTA (FSIST)</a>
+        
+        <label for="xml" class="btn btn-green">2. SELECIONAR XML</label>
+        <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarNota(this)">
     </div>
 
-    <div id="lista"></div>
+    <div id="resultado"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Suas configurações reais do Boteco 934
         const firebaseConfig = {
-          apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-          authDomain: "boteco934-afc3f.firebaseapp.com",
-          projectId: "boteco934-afc3f",
-          storageBucket: "boteco934-afc3f.firebasestorage.app",
-          messagingSenderId: "182023728304",
-          appId: "1:182023728304:web:040a13bb6f61c9fff35f75",
-          measurementId: "G-HWT2RYRMRQ"
+            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.firebasestorage.app",
+            messagingSenderId: "182023728304",
+            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function lerXML(input) {
-            const leitor = new FileReader();
-            leitor.onload = function() {
-                const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
-                const itens = xmlDoc.getElementsByTagName("det");
-                let produtos = [];
-                let html = "<h3>Produtos Identificados:</h3>";
+        function processarNota(input) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const xml = new DOMParser().parseFromString(reader.result, "text/xml");
+                const itens = xml.getElementsByTagName("det");
+                let listaProdutos = [];
+                let resumoHtml = "<h3>Itens da Nota:</h3>";
 
                 for (let i = 0; i < itens.length; i++) {
-                    let p = itens[i].getElementsByTagName("prod")[0];
-                    let nome = p.getElementsByTagName("xProd")[0].textContent;
-                    let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
-                    produtos.push({ nome, qtd });
-                    html += `<div class="item"><b>${nome}</b><br>Quantidade: ${qtd}</div>`;
+                    let prod = itens[i].getElementsByTagName("prod")[0];
+                    let nome = prod.getElementsByTagName("xProd")[0].textContent;
+                    let qtd = parseFloat(prod.getElementsByTagName("qCom")[0].textContent);
+                    listaProdutos.push({ nome, qtd });
+                    resumoHtml += `<div class="item"><b>${nome}</b><br>Qtd: ${qtd}</div>`;
                 }
 
-                document.getElementById("lista").innerHTML = html + 
-                `<button class="btn btn-green" onclick='salvar(${JSON.stringify(produtos)})'>3. CONFIRMAR NO ESTOQUE</button>`;
+                document.getElementById("resultado").innerHTML = resumoHtml + 
+                `<button class="btn btn-green" onclick='confirmarEstoque(${JSON.stringify(listaProdutos)})'>3. LANÇAR NO ESTOQUE</button>`;
             };
-            leitor.readAsText(input.files[0]);
+            reader.readAsText(input.files[0]);
         }
 
-        async function salvar(lista) {
+        async function confirmarEstoque(lista) {
             try {
                 for (let item of lista) {
                     await db.collection("estoque").doc(item.nome).set({
                         nome: item.nome,
                         quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                        ultimaEntrada: new Date()
+                        data: new Date()
                     }, { merge: true });
                 }
-                alert("✅ Estoque do Boteco 934 Atualizado!");
+                alert("✅ Estoque Atualizado!");
                 location.reload();
             } catch (e) {
-                alert("❌ Erro ao salvar! Verifique as 'Rules' do Firestore.");
+                alert("❌ Erro de permissão no Firebase.");
             }
         }
     </script>
