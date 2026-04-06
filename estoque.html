@@ -3,45 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - ESTOQUE & XML</title>
+    <title>BOTECO 934 - ENGENHARIA DE LUCRO</title>
     <style>
-        :root { --bg: #0d1117; --card: #161b22; --accent: #ff8c00; --text: #c9d1d9; --success: #238636; --danger: #da3633; }
+        :root { --bg: #0d1117; --card: #161b22; --accent: #00ff41; --text: #c9d1d9; --danger: #ff4500; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); padding: 15px; padding-bottom: 80px; }
         .header { background: #000; padding: 15px; border-bottom: 3px solid var(--accent); text-align: center; margin: -15px -15px 20px -15px; }
         .win { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #30363d; }
-        h3 { color: var(--accent); font-size: 14px; margin-bottom: 15px; text-transform: uppercase; }
+        h3 { color: var(--accent); font-size: 14px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-xml { background: #238636; color: white; display: block; text-align: center; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; border: 1px solid #3fb950; }
         .file-input { display: none; }
-        .btn-xml { background: #58a6ff; color: white; display: block; text-align: center; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-        th, td { padding: 10px 5px; text-align: left; border-bottom: 1px solid #30363d; }
-        .val-destaque { color: var(--accent); font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th, td { padding: 12px 5px; text-align: left; border-bottom: 1px solid #30363d; }
+        .sugestao { color: var(--accent); font-weight: bold; font-size: 13px; }
+        .custo { color: #8b949e; text-decoration: line-through; font-size: 10px; }
     </style>
 </head>
 <body>
 
-<div class="header"><h1>BOTECO <span>934</span> - ESTOQUE</h1></div>
+<div class="header"><h1>BOTECO <span>934</span></h1></div>
 
 <div class="win">
-    <h3>📥 Importar Nota Fiscal (XML)</h3>
-    <label for="xmlFile" class="btn-xml">SELECIONAR XML DA NOTA</label>
+    <h3>📥 IMPORTAR NOTA FISCAL (XML)</h3>
+    <label for="xmlFile" class="btn-xml">LER XML E CALCULAR LUCRO</label>
     <input type="file" id="xmlFile" class="file-input" accept=".xml">
-    <div id="preview-xml"></div>
 </div>
 
+<div id="painel-resultados"></div>
+
 <div class="win">
-    <h3>📦 Itens Identificados na Nota</h3>
+    <h3>📦 ANALISE DE PREÇO DE VENDA</h3>
     <table>
         <thead>
             <tr>
-                <th>PRODUTO</th>
-                <th>QTD</th>
-                <th>VALOR UN.</th>
-                <th>TOTAL</th>
+                <th>ITEM</th>
+                <th>CUSTO UN.</th>
+                <th>SUGESTÃO (50%)</th>
+                <th>SUGESTÃO (100%)</th>
             </tr>
         </thead>
-        <tbody id="lista-estoque">
-            </tbody>
+        <tbody id="lista-estoque"></tbody>
     </table>
 </div>
 
@@ -51,7 +52,7 @@
     document.getElementById('xmlFile').addEventListener('change', function(e) {
         const reader = new FileReader();
         const lista = document.getElementById('lista-estoque');
-        lista.innerHTML = ""; // Limpa a lista anterior
+        lista.innerHTML = ""; 
 
         reader.onload = function() {
             const parser = new DOMParser();
@@ -59,44 +60,42 @@
             const produtos = xmlDoc.getElementsByTagName("det");
             
             for (let i = 0; i < produtos.length; i++) {
-                let nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
+                let nome = produtos[i].getElementsByTagName("xProd")[0].textContent.substring(0, 20);
                 let qtd = produtos[i].getElementsByTagName("qCom")[0].textContent;
-                let valorUn = produtos[i].getElementsByTagName("vUnCom")[0].textContent;
-                let valorTotalItem = (parseFloat(valorUn) * parseFloat(qtd)).toFixed(2);
+                let vUn = parseFloat(produtos[i].getElementsByTagName("vUnCom")[0].textContent);
                 
-                // Adiciona na tabela visual para conferência
+                // CÁLCULO DE MARGEM (Engenharia de Preço)
+                let preco50 = (vUn * 1.5).toFixed(2);
+                let preco100 = (vUn * 2.0).toFixed(2);
+                
                 let row = `<tr>
                     <td>${nome}</td>
-                    <td>${parseFloat(qtd)}</td>
-                    <td class="val-destaque">R$ ${parseFloat(valorUn).toFixed(2)}</td>
-                    <td>R$ ${valorTotalItem}</td>
+                    <td>R$ ${vUn.toFixed(2)}</td>
+                    <td class="sugestao">R$ ${preco50}</td>
+                    <td class="sugestao" style="color:#ff8c00">R$ ${preco100}</td>
                 </tr>`;
                 lista.innerHTML += row;
                 
-                // Envia para o Google Sheets com o valor unitário detalhado
-                salvarNoGoogle(nome, qtd, valorUn, valorTotalItem);
+                salvarNoGoogle(nome, qtd, vUn, (vUn * qtd).toFixed(2));
             }
-            alert("Nota processada e enviada para a planilha!");
+            alert("✅ Nota Importada e Lucro Calculado!");
         };
         reader.readAsText(e.target.files[0]);
     });
 
     function salvarNoGoogle(nome, qtd, vUn, vTotal) {
-        const dados = {
-            desc: nome,
-            valor: vTotal,
-            cat: "ESTOQUE (XML)",
-            tipo: "ENTRADA", // Mudei para entrada pois é compra
-            estoque: qtd + " un (R$ " + vUn + " cada)"
-        };
-
         fetch(GOOGLE_URL, {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify(dados)
+            body: JSON.stringify({
+                desc: nome,
+                valor: vTotal,
+                cat: "ESTOQUE (XML)",
+                tipo: "ENTRADA",
+                estoque: `${qtd} un (Custo: R$ ${vUn})`
+            })
         });
     }
 </script>
-
 </body>
 </html>
