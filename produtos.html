@@ -1,174 +1,75 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Produtos - Boteco 934</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; background: #0c0c0c; color: white; margin: 0; padding: 15px; }
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 600px) { .grid-container { grid-template-columns: 1fr; } }
-        
-        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        h3 { color: #ff9f0a; margin-top: 0; font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        
-        label { display: block; font-size: 11px; color: #8e8e93; margin-top: 10px; font-weight: bold; }
-        
-        input { 
-            width: 100%; padding: 12px; margin-top: 5px; 
-            background: #121212; border: 1px solid #444; 
-            color: white; border-radius: 8px; box-sizing: border-box; font-size: 15px;
-        }
+<div class="card" style="background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333;">
+    <h3 style="color: #ff9f0a; margin-top: 0;">BEBIDAS / CERVEJAS</h3>
+    
+    <label>NOME DO PRODUTO</label>
+    <input type="text" id="nome-cerv" class="input-dark" placeholder="Ex: Coca lata 350ml">
 
-        .row { display: flex; gap: 10px; }
-        .col { flex: 1; }
-
-        .lucro-destaque { background: #2c2c2e; padding: 10px; border-radius: 10px; margin-top: 15px; border: 1px dashed #30d158; }
-        .lucro-destaque label { color: #30d158; }
-        .lucro-destaque input { color: #30d158; font-weight: bold; border: none; background: transparent; font-size: 18px; }
-
-        .btn-salvar { 
-            width: 100%; padding: 16px; background: #28a745; color: white; 
-            border: none; border-radius: 10px; font-weight: bold; 
-            margin-top: 20px; cursor: pointer; font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="grid-container">
-    <div class="card">
-        <h3>BEBIDAS / CERVEJAS</h3>
-        
-        <label>NOME DO PRODUTO</label>
-        <input type="text" id="nome-cerv" placeholder="Coca Original lata 350ml">
-
-        <label>CÓDIGO (BIP)</label>
-        <input type="text" id="cod-cerv" placeholder="789...">
-
-        <div class="row">
-            <div class="col">
-                <label>CUSTO FARDO (R$)</label>
-                <input type="number" id="custo-fardo" oninput="calcularCerveja()" placeholder="68.68">
-            </div>
-            <div class="col">
-                <label>MARKUP (%)</label>
-                <input type="number" id="mkp-cerv" value="100" oninput="calcularCerveja()">
-            </div>
+    <div class="row" style="display: flex; gap: 10px;">
+        <div class="col" style="flex: 1;">
+            <label>CUSTO FARDO (R$)</label>
+            <input type="number" id="custo-fardo" class="input-dark" oninput="calcularTudo()" placeholder="0.00">
         </div>
-
-        <div class="lucro-destaque">
-            <div class="row">
-                <div class="col">
-                    <label>MARGEM REAL</label>
-                    <input type="text" id="margem-real-cerv" readonly value="0%">
-                </div>
-                <div class="col">
-                    <label>LUCRO BRUTO (R$)</label>
-                    <input type="text" id="lucro-reais-cerv" readonly value="R$ 0.00">
-                </div>
-            </div>
+        <div class="col" style="flex: 1;">
+            <label>MARKUP (O QUE VOCÊ SOMA %)</label>
+            <input type="number" id="markup-input" class="input-dark" value="100" oninput="calcularTudo()">
         </div>
-
-        <div class="row">
-            <div class="col">
-                <label>VDA FARDO</label>
-                <input type="text" id="vda-fardo" readonly>
-            </div>
-            <div class="col">
-                <label>VDA UN (SUGESTÃO)</label>
-                <input type="text" id="vda-un" readonly>
-            </div>
-        </div>
-
-        <button class="btn-salvar" onclick="salvar('cervejas')">SALVAR PRODUTO</button>
     </div>
 
-    <div class="card">
-        <h3 style="color: #0a84ff;">DESTILADOS</h3>
-        
-        <label>NOME DA GARRAFA</label>
-        <input type="text" id="nome-dest" placeholder="Whisky Red Label">
-
-        <div class="row">
-            <div class="col">
-                <label>CUSTO GARRAFA</label>
-                <input type="number" id="custo-garrafa" oninput="calcularDestilado()">
+    <div style="margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 1px solid #30d158;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div style="text-align: center; flex: 1;">
+                <label style="color: #30d158; font-size: 10px;">MARGEM DE LUCRO</label>
+                <div id="margem-final" style="font-size: 20px; font-weight: bold; color: #30d158;">0%</div>
             </div>
-            <div class="col">
-                <label>LITRAGEM (ML)</label>
-                <input type="number" id="ml-garrafa" value="1000" oninput="calcularDestilado()">
+            <div style="text-align: center; flex: 1; border-left: 1px solid #333;">
+                <label style="color: #30d158; font-size: 10px;">LUCRO NO FARDO</label>
+                <div id="lucro-dinheiro" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
             </div>
         </div>
-
-        <div class="lucro-destaque" style="border-color: #0a84ff;">
-            <div class="row">
-                <div class="col">
-                    <label style="color: #0a84ff;">MARGEM REAL</label>
-                    <input type="text" id="margem-real-dest" style="color: #0a84ff;" readonly value="0%">
-                </div>
-                <div class="col">
-                    <label style="color: #0a84ff;">LUCRO GARRAFA</label>
-                    <input type="text" id="lucro-reais-dest" style="color: #0a84ff;" readonly value="R$ 0.00">
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <label>PREÇO GARRAFA</label>
-                <input type="text" id="vda-garrafa" readonly>
-            </div>
-            <div class="col">
-                <label>PREÇO DOSE (50ml)</label>
-                <input type="text" id="vda-dose" readonly>
-            </div>
-        </div>
-
-        <button class="btn-salvar" style="background: #0a84ff;" onclick="salvar('destilados')">SALVAR DESTILADO</button>
     </div>
+
+    <div class="row" style="display: flex; gap: 10px; margin-top: 15px;">
+        <div class="col" style="flex: 1;">
+            <label>VALOR DE VENDA (FARDO)</label>
+            <input type="text" id="venda-fardo" class="input-dark" style="background: #2c2c2e; font-weight: bold;" readonly>
+        </div>
+        <div class="col" style="flex: 1;">
+            <label>VALOR POR UNIDADE</label>
+            <input type="text" id="venda-un" class="input-dark" style="background: #2c2c2e;" readonly>
+        </div>
+    </div>
+
+    <button onclick="salvar()" style="width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 15px; cursor: pointer;">
+        SALVAR NO SISTEMA
+    </button>
 </div>
 
 <script>
-function calcularCerveja() {
+function calcularTudo() {
+    // Pega os valores que você digitou
     let custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
-    let markup = parseFloat(document.getElementById('mkp-cerv').value) || 0;
+    let markup = parseFloat(document.getElementById('markup-input').value) || 0;
 
     if (custo > 0) {
-        let venda = custo * (1 + (markup / 100));
-        let lucro = venda - custo;
-        let margem = (lucro / venda) * 100;
+        // 1. Calcula o preço de venda baseado no seu Markup
+        let precoVenda = custo * (1 + (markup / 100));
+        
+        // 2. Calcula o lucro em dinheiro
+        let lucroReais = precoVenda - custo;
+        
+        // 3. Calcula a Margem de Lucro Real (Lucro dividido pela Venda)
+        let margemLucro = (lucroReais / precoVenda) * 100;
 
-        document.getElementById('vda-fardo').value = "R$ " + venda.toFixed(2);
-        document.getElementById('vda-un').value = "R$ " + (venda / 12).toFixed(2);
-        document.getElementById('margem-real-cerv').value = margem.toFixed(1) + "%";
-        document.getElementById('lucro-reais-cerv').value = "R$ " + lucro.toFixed(2);
+        // 4. Mostra na tela para você
+        document.getElementById('venda-fardo').value = "R$ " + precoVenda.toFixed(2);
+        document.getElementById('venda-un').value = "R$ " + (precoVenda / 12).toFixed(2);
+        
+        document.getElementById('margem-final').innerText = margemLucro.toFixed(1) + "%";
+        document.getElementById('lucro-dinheiro').innerText = "R$ " + lucroReais.toFixed(2);
     }
-}
-
-function calcularDestilado() {
-    let custo = parseFloat(document.getElementById('custo-garrafa').value) || 0;
-    let ml = parseFloat(document.getElementById('ml-garrafa').value) || 1000;
-    
-    // Supondo um markup fixo de 100% para destilados ou ajuste como preferir
-    if (custo > 0) {
-        let venda = custo * 2; 
-        let lucro = venda - custo;
-        let margem = (lucro / venda) * 100;
-        let doses = ml / 50;
-
-        document.getElementById('vda-garrafa').value = "R$ " + venda.toFixed(2);
-        document.getElementById('vda-dose').value = "R$ " + (venda / doses).toFixed(2);
-        document.getElementById('margem-real-dest').value = margem.toFixed(1) + "%";
-        document.getElementById('lucro-reais-dest').value = "R$ " + lucro.toFixed(2);
-    }
-}
-
-function salvar(tipo) {
-    alert("Produto salvo com sucesso no banco de dados do Boteco 934!");
-    // Aqui entra sua lógica do Firebase que já configuramos
 }
 </script>
 
-</body>
-</html>
+<style>
+    .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+</style>
