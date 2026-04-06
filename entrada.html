@@ -1,63 +1,82 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrada de Mercadoria - Boteco 934</title>
+    <title>Entrada Boteco 934</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; padding: 15px; }
-        .container { max-width: 500px; margin: auto; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; text-align: center; }
+        .card { background: #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #444; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 16px; text-decoration: none; }
         .btn-blue { background: #007bff; color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .item-lista { background: #333; padding: 10px; border-radius: 5px; margin-bottom: 5px; border-left: 5px solid #28a745; }
+        .btn-green { background: #28a745; color: white; }
+        .item { background: #444; padding: 10px; margin-bottom: 5px; border-radius: 5px; text-align: left; border-left: 5px solid #28a745; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>📥 Entrada de Nota</h2>
-        
-        <p>1º Passo: Baixe o XML no site do FSist ou SEFAZ pelo celular.</p>
-        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">Abrir FSist no Celular</a>
-
-        <hr>
-
-        <p>2º Passo: Selecione o arquivo baixado para ler os itens.</p>
-        <label for="xmlInput" class="btn btn-success">ESCOLHER ARQUIVO XML</label>
-        <input type="file" id="xmlInput" accept=".xml" style="display: none;" onchange="lerXML(this)">
-
-        <div id="listaProdutos">
-            </div>
+    <h2>📥 Entrada de Nota Fiscal</h2>
+    
+    <div class="card">
+        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
+        <label for="xml" class="btn btn-green">2. ESCOLHER XML BAIXADO</label>
+        <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
     </div>
 
+    <div id="lista"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+
     <script>
+        // Dados do seu projeto Boteco 934
+        const firebaseConfig = {
+            apiKey: "COLE_AQUI_A_SUA_API_KEY_DO_FIREBASE", 
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.appspot.com",
+            messagingSenderId: "182023728304",
+            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         function lerXML(input) {
-            const arquivo = input.files[0];
             const leitor = new FileReader();
-
             leitor.onload = function() {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(leitor.result, "text/xml");
+                const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                 const itens = xmlDoc.getElementsByTagName("det");
-                
-                let html = "<h3>Produtos Encontrados:</h3>";
-                
-                for (let i = 0; i < itens.length; i++) {
-                    let prod = itens[i].getElementsByTagName("prod")[0];
-                    let nome = prod.getElementsByTagName("xProd")[0].textContent;
-                    let qtd = prod.getElementsByTagName("qCom")[0].textContent;
-                    let valor = prod.getElementsByTagName("vUnCom")[0].textContent;
+                let produtos = [];
+                let html = "<h3>Produtos na Nota:</h3>";
 
-                    html += `
-                        <div class="item-lista">
-                            <strong>${nome}</strong><br>
-                            Qtd: ${qtd} | Unitário: R$ ${parseFloat(valor).toFixed(2)}
-                        </div>`;
+                for (let i = 0; i < itens.length; i++) {
+                    let p = itens[i].getElementsByTagName("prod")[0];
+                    let nome = p.getElementsByTagName("xProd")[0].textContent;
+                    let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
+                    produtos.push({ nome, qtd });
+                    html += `<div class="item"><b>${nome}</b><br>Quantidade: ${qtd}</div>`;
                 }
-                document.getElementById("listaProdutos").innerHTML = html;
+
+                document.getElementById("lista").innerHTML = html + 
+                `<button class="btn btn-green" onclick='salvar(${JSON.stringify(produtos)})'>3. CONFIRMAR NO ESTOQUE</button>`;
             };
-            leitor.readAsText(arquivo);
+            leitor.readAsText(input.files[0]);
+        }
+
+        async function salvar(lista) {
+            try {
+                for (let item of lista) {
+                    await db.collection("estoque").doc(item.nome).set({
+                        nome: item.nome,
+                        quantidade: firebase.firestore.FieldValue.increment(item.qtd),
+                        ultimaAtualizacao: new Date()
+                    }, { merge: true });
+                }
+                alert("✅ Estoque Atualizado com Sucesso!");
+                location.reload();
+            } catch (e) {
+                alert("❌ Erro ao salvar! Verifique se as 'Rules' do Banco estão abertas.");
+            }
         }
     </script>
 </body>
