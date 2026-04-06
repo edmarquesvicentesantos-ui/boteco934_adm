@@ -1,4 +1,3 @@
-// MARGEM PADRÃO DO NEGÓCIO
 const MARGEM_PADRAO = 30;
 
 function dinheiro(v){
@@ -16,20 +15,17 @@ function calcularTudo(){
 
     if(custo <= 0) return;
 
-    // PREÇO DE VENDA BASEADO NA MARGEM
     let vendaFardo = custo / (1 - (MARGEM_PADRAO/100));
     vendaFardo = arredondar(vendaFardo);
 
     let lucroFardo = vendaFardo - custo;
     let vendaUn    = vendaFardo / qtd;
 
-    // 💰 NOVO → CÁLCULO DO LUCRO POR UNIDADE
     let custoUn = custo / qtd;
     let lucroUn = vendaUn - custoUn;
 
     let markup = (lucroFardo / custo) * 100;
 
-    // ATUALIZA TELA
     document.getElementById('venda-fardo').value = dinheiro(vendaFardo);
     document.getElementById('venda-un').value    = dinheiro(vendaUn);
 
@@ -40,8 +36,6 @@ function calcularTudo(){
     document.getElementById('markup-real').innerText  = markup.toFixed(1) + "%";
 }
 
-
-// SALVAR PRODUTO NO BANCO LOCAL
 function salvarProduto(){
 
     let produto = {
