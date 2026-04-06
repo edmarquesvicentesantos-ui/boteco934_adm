@@ -2,37 +2,38 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrada Boteco 934</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scanner Pro - Boteco 934</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 20px; }
-        #reader { width: 100%; max-width: 500px; margin: auto; border-radius: 10px; overflow: hidden; background: #000; }
-        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; }
-        .btn-blue { background: #007bff; color: white; }
-        .btn-green { background: #28a745; color: white; }
-        #info-arquivo { background: #444; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; color: #30d158; font-weight: bold; }
-        #resultado-scan { background: #333; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; border: 1px solid #007bff; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 10px; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #1a1a1a; border: 2px solid #333; }
+        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; }
+        .btn-blue { background: #0a84ff; color: white; }
+        .btn-green { background: #30d158; color: black; }
+        #resultado-scan { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-top: 15px; display: none; border: 1px solid #0a84ff; }
+        #status-arquivo { display: none; background: #1c1c1e; border: 1px solid #30d158; padding: 15px; border-radius: 10px; margin: 15px 0; }
     </style>
 </head>
 <body>
-    <h2>📸 Scanner Boteco 934</h2>
+    <h3 style="color: #30d158;">Boteco 934 - Entrada</h3>
     
     <div id="reader"></div>
 
     <div id="resultado-scan">
-        <p>Chave Identificada:</p>
-        <strong id="chave-num" style="word-break: break-all;"></strong>
+        <p style="font-size: 13px; color: #8e8e93; margin-bottom: 5px;">Chave de Acesso:</p>
+        <strong id="chave-num" style="font-family: monospace; font-size: 14px; color: #30d158;"></strong>
         <a id="link-xml" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML AGORA</a>
     </div>
 
-    <hr style="margin: 25px 0; border: 0.5px solid #444;">
+    <hr style="border: 0.5px solid #222; margin: 20px 0;">
 
     <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
-    <input type="file" id="xml" accept=".xml" style="display:none" onchange="mostrarNomeArquivo(this)">
-    
-    <div id="info-arquivo">
-        📄 Arquivo: <span id="nome-arquivo"></span>
+    <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarXML(this)">
+
+    <div id="status-arquivo">
+        <span style="font-size: 12px; color: #8e8e93;">Arquivo:</span>
+        <span id="nome-exibido" style="display:block; color: #30d158; font-weight: bold;"></span>
     </div>
 
     <div id="lista-produtos"></div>
@@ -41,7 +42,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Suas chaves do Firebase
+        // Suas configurações reais
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -53,43 +54,48 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 1. Lógica do Scanner
+        // CONFIGURAÇÃO DO SCANNER PARA IPHONE
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 15, qrbox: { width: 300, height: 150 } };
+
+        // Inicia a câmera traseira automaticamente
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+
         function onScanSuccess(decodedText) {
-            if(decodedText.length >= 44) {
+            // A chave de nota tem 44 números, mas códigos de barras variam
+            if(decodedText.length >= 40) {
                 document.getElementById('resultado-scan').style.display = 'block';
                 document.getElementById('chave-num').innerText = decodedText;
                 document.getElementById('link-xml').href = "https://www.fsist.com.br/consultar-nfe?chave=" + decodedText;
-                html5QrcodeScanner.clear();
+                
+                // Vibra o celular ao ler (se suportado)
+                if (navigator.vibrate) navigator.vibrate(100);
+                
+                html5QrCode.stop(); // Para a câmera para economizar bateria
             }
         }
-        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
 
-        // 2. Lógica de Mostrar Nome e Ler XML
-        function mostrarNomeArquivo(input) {
-            if (input.files && input.files[0]) {
-                const nome = input.files[0].name;
-                document.getElementById('nome-arquivo').innerText = nome;
-                document.getElementById('info-arquivo').style.display = 'block';
+        function processarXML(input) {
+            if (input.files[0]) {
+                document.getElementById('nome-exibido').innerText = input.files[0].name;
+                document.getElementById('status-arquivo').style.display = 'block';
                 
-                // Começa a ler os produtos
                 const leitor = new FileReader();
                 leitor.onload = function() {
                     const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                     const itens = xmlDoc.getElementsByTagName("det");
-                    let html = "<h3>Produtos da Nota:</h3>";
+                    let html = "<h4>Itens Identificados:</h4>";
                     let produtos = [];
 
                     for (let i = 0; i < itens.length; i++) {
                         let p = itens[i].getElementsByTagName("prod")[0];
-                        let nomeP = p.getElementsByTagName("xProd")[0].textContent;
+                        let nome = p.getElementsByTagName("xProd")[0].textContent;
                         let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
-                        produtos.push({ nome: nomeP, qtd: qtd });
-                        html += `<div style="text-align:left; background:#333; padding:10px; margin:5px; border-radius:5px;">${nomeP} - Qtd: ${qtd}</div>`;
+                        produtos.push({ nome, qtd });
+                        html += `<div style="text-align:left; background:#222; padding:10px; margin:5px; border-radius:8px; border-left:4px solid #30d158;">${nome} - ${qtd} un</div>`;
                     }
-
                     document.getElementById('lista-produtos').innerHTML = html + 
-                    `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">3. CONFIRMAR ENTRADA</button>`;
+                    `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">3. CONFIRMAR NO ESTOQUE</button>`;
                 };
                 leitor.readAsText(input.files[0]);
             }
@@ -104,11 +110,9 @@
                         data: new Date()
                     }, { merge: true });
                 }
-                alert("✅ Sucesso! Estoque atualizado.");
+                alert("✅ Sucesso no Boteco 934!");
                 location.reload();
-            } catch (e) {
-                alert("❌ Erro ao salvar no banco.");
-            }
+            } catch (e) { alert("Erro ao salvar."); }
         }
     </script>
 </body>
