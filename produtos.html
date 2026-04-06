@@ -1,54 +1,72 @@
-const MARGEM_PADRAO = 30;
+<div class="card" style="background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; max-width: 450px; margin: auto;">
+    <h3 style="color: #ff9f0a; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;">BEBIDAS / CERVEJAS</h3>
+    
+    <label>NOME DO PRODUTO</label>
+    <input type="text" id="nome-cerv" class="input-dark" placeholder="Ex: Coca lata 350ml">
 
-function dinheiro(v){
-    return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-}
+    <label>CÓDIGO DE BARRAS (BIP)</label>
+    <input type="text" id="cod-barras" class="input-dark" placeholder="Aproxime o leitor ou digite">
 
-function arredondar(v){
-    return Math.ceil(v) - 0.01;
-}
+    <div class="row" style="display: flex; gap: 10px; margin-top: 10px;">
+        <div class="col" style="flex: 1;">
+            <label>CUSTO FARDO (R$)</label>
+            <input type="number" id="custo-fardo" class="input-dark" oninput="calcularTudo()" placeholder="0.00">
+        </div>
+        <div class="col" style="flex: 1;">
+            <label>MARKUP (%)</label>
+            <input type="number" id="markup-input" class="input-dark" value="100" oninput="calcularTudo()">
+        </div>
+    </div>
 
-function calcularTudo(){
+    <div style="margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 1px solid #30d158;">
+        <div style="display: flex; justify-content: space-between;">
+            <div style="text-align: center; flex: 1;">
+                <label style="color: #30d158; font-size: 10px; font-weight: bold;">MARGEM DE LUCRO</label>
+                <div id="margem-final" style="font-size: 22px; font-weight: bold; color: #30d158;">0%</div>
+            </div>
+            <div style="text-align: center; flex: 1; border-left: 1px solid #333;">
+                <label style="color: #30d158; font-size: 10px; font-weight: bold;">LUCRO NO FARDO</label>
+                <div id="lucro-dinheiro" style="font-size: 22px; font-weight: bold; color: #30d158;">R$ 0,00</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="row" style="display: flex; gap: 10px; margin-top: 15px;">
+        <div class="col" style="flex: 1;">
+            <label>VALOR DE VENDA (FARDO)</label>
+            <input type="text" id="venda-fardo" class="input-dark" style="background: #2c2c2e; font-weight: bold; color: #30d158;" readonly>
+        </div>
+        <div class="col" style="flex: 1;">
+            <label>VALOR POR UNIDADE</label>
+            <input type="text" id="venda-un" class="input-dark" style="background: #2c2c2e;" readonly>
+        </div>
+    </div>
+
+    <button onclick="salvar()" style="width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 16px;">
+        SALVAR PRODUTO NO BANCO
+    </button>
+</div>
+
+<script>
+function calcularTudo() {
     let custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
-    let qtd   = parseFloat(document.getElementById('qtd-fardo').value) || 12;
+    let markup = parseFloat(document.getElementById('markup-input').value) || 0;
 
-    if(custo <= 0) return;
+    if (custo > 0) {
+        let precoVenda = custo * (1 + (markup / 100));
+        let lucroReais = precoVenda - custo;
+        let margemLucro = (lucroReais / precoVenda) * 100;
 
-    let vendaFardo = custo / (1 - (MARGEM_PADRAO/100));
-    vendaFardo = arredondar(vendaFardo);
-
-    let lucroFardo = vendaFardo - custo;
-    let vendaUn    = vendaFardo / qtd;
-
-    let custoUn = custo / qtd;
-    let lucroUn = vendaUn - custoUn;
-
-    let markup = (lucroFardo / custo) * 100;
-
-    document.getElementById('venda-fardo').value = dinheiro(vendaFardo);
-    document.getElementById('venda-un').value    = dinheiro(vendaUn);
-
-    document.getElementById('lucro-dinheiro').innerText = dinheiro(lucroFardo);
-    document.getElementById('lucro-unidade').innerText  = dinheiro(lucroUn);
-
-    document.getElementById('margem-final').innerText = MARGEM_PADRAO + "%";
-    document.getElementById('markup-real').innerText  = markup.toFixed(1) + "%";
+        document.getElementById('venda-fardo').value = "R$ " + precoVenda.toFixed(2);
+        document.getElementById('venda-un').value = "R$ " + (precoVenda / 12).toFixed(2);
+        
+        document.getElementById('margem-final').innerText = margemLucro.toFixed(1) + "%";
+        document.getElementById('lucro-dinheiro').innerText = "R$ " + lucroReais.toFixed(2);
+    }
 }
+</script>
 
-function salvarProduto(){
-
-    let produto = {
-        nome: document.getElementById('nome-cerv').value,
-        codigo: document.getElementById('cod-barras').value,
-        custoFardo: document.getElementById('custo-fardo').value,
-        vendaFardo: document.getElementById('venda-fardo').value,
-        vendaUn: document.getElementById('venda-un').value
-    };
-
-    let banco = JSON.parse(localStorage.getItem("produtos") || "[]");
-    banco.push(produto);
-    localStorage.setItem("produtos", JSON.stringify(banco));
-
-    alert("Produto salvo com sucesso!");
-}
+<style>
+    .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+    .input-dark:focus { border-color: #30d158; }
+</style>
