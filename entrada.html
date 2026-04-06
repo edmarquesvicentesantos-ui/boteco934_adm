@@ -3,57 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Entrada Estoque - Boteco 934</title>
+    <title>Entrada Direta - Boteco 934</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: auto; }
-        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        body { font-family: -apple-system, sans-serif; background: #000; color: white; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 400px; margin: auto; }
+        h3 { color: #30d158; margin-bottom: 30px; }
         
-        h3 { color: #30d158; margin-bottom: 25px; }
-        p { font-size: 14px; color: #8e8e93; margin-bottom: 10px; }
-
-        /* Campo de Digitação */
-        input[type="text"] { 
+        .card { background: #1c1c1e; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        
+        label { display: block; text-align: left; font-size: 14px; color: #8e8e93; margin: 10px 0 5px 5px; }
+        
+        input { 
             width: 100%; 
-            padding: 18px; 
+            padding: 15px; 
             border-radius: 12px; 
             border: 1px solid #444; 
             background: #2c2c2e; 
-            color: #30d158; 
-            font-size: 18px; 
-            text-align: center; 
-            box-sizing: border-box;
+            color: white; 
+            font-size: 16px; 
+            box-sizing: border-box; 
             margin-bottom: 15px;
-            font-family: monospace;
+            outline: none;
         }
-
-        /* Botões */
-        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; text-align: center; box-sizing: border-box; }
-        .btn-blue { background: #0a84ff; color: white; }
-        .btn-green { background: #30d158; color: black; }
         
-        .item-produto { text-align: left; background: #2c2c2e; padding: 12px; margin: 6px 0; border-radius: 10px; border-left: 4px solid #30d158; font-size: 14px; }
+        input:focus { border-color: #30d158; }
+
+        .btn-lancar { 
+            width: 100%; 
+            padding: 18px; 
+            background: #30d158; 
+            color: black; 
+            border: none; 
+            border-radius: 15px; 
+            font-weight: bold; 
+            font-size: 18px; 
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+        
+        .btn-lancar:active { transform: scale(0.98); background: #28b84d; }
+
+        #status { margin-top: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>📦 Gestão de Estoque</h3>
+    <h3>📦 Entrada de Estoque</h3>
 
     <div class="card">
-        <p>1º PASSO: DIGITE OU COLE A CHAVE (44 números)</p>
-        <input type="text" id="chave-input" placeholder="0000 0000 0000..." maxlength="55">
-        <button onclick="irParaFsist()" class="btn btn-blue">BAIXAR XML NO FSIST</button>
+        <label>NOME DO PRODUTO (OU BOTICÁRIO)</label>
+        <input type="text" id="nome" placeholder="Ex: Cerveja Lata 350ml" autocomplete="off">
+
+        <label>QUANTIDADE QUE CHEGOU</label>
+        <input type="number" id="qtd" placeholder="Ex: 24" inputmode="numeric">
+
+        <button class="btn-lancar" onclick="lancarNoEstoque()">SALVAR NO ESTOQUE</button>
     </div>
 
-    <div class="card">
-        <p>2º PASSO: SELECIONE O ARQUIVO BAIXADO</p>
-        <label for="xml" class="btn btn-green">ESCOLHER ARQUIVO XML</label>
-        <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
-        <div id="nome-arquivo" style="margin-top:10px; color:#30d158; font-size:12px;"></div>
-    </div>
-
-    <div id="lista-produtos"></div>
+    <div id="status"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -71,59 +80,40 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Função para limpar e abrir o FSist
-    function irParaFsist() {
-        const campo = document.getElementById('chave-input');
-        const chaveLimpa = campo.value.replace(/\s/g, ''); // Remove espaços se colar com espaços
-        
-        if (chaveLimpa.length >= 44) {
-            window.open("https://www.fsist.com.br/consultar-nfe?chave=" + chaveLimpa, "_blank");
-        } else {
-            alert("A chave precisa ter 44 números. Você digitou " + chaveLimpa.length);
-            window.open("https://www.fsist.com.br", "_blank");
+    async function lancarNoEstoque() {
+        const nome = document.getElementById('nome').value.trim().toUpperCase();
+        const qtd = parseFloat(document.getElementById('qtd').value);
+        const status = document.getElementById('status');
+
+        if (!nome || isNaN(qtd)) {
+            alert("Preencha o nome e a quantidade corretamente!");
+            return;
         }
-    }
 
-    // Lógica para ler o XML
-    function lerXML(input) {
-        if (input.files[0]) {
-            const arquivo = input.files[0];
-            document.getElementById('nome-arquivo').innerText = "Selecionado: " + arquivo.name;
-            
-            const leitor = new FileReader();
-            leitor.onload = function() {
-                const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
-                const itens = xmlDoc.getElementsByTagName("det");
-                let html = "<h4>Produtos na Nota:</h4>";
-                let produtos = [];
+        status.innerHTML = "⏳ Lançando...";
 
-                for (let i = 0; i < itens.length; i++) {
-                    let p = itens[i].getElementsByTagName("prod")[0];
-                    let nome = p.getElementsByTagName("xProd")[0].textContent;
-                    let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
-                    produtos.push({ nome, qtd });
-                    html += `<div class="item-produto"><b>${nome}</b> - ${qtd} un</div>`;
-                }
-                document.getElementById('lista-produtos').innerHTML = html + 
-                `<button onclick='salvar(${JSON.stringify(produtos)})' class="btn btn-green">3. LANÇAR NO BANCO</button>`;
-            };
-            leitor.readAsText(arquivo);
-        }
-    }
-
-    // Salvar no Firebase
-    async function salvar(lista) {
         try {
-            for (let item of lista) {
-                await db.collection("estoque").doc(item.nome).set({
-                    nome: item.nome,
-                    quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                    data: new Date()
-                }, { merge: true });
-            }
-            alert("✅ Estoque Atualizado!");
-            location.reload();
-        } catch (e) { alert("Erro ao salvar."); }
+            // Atualiza ou cria o produto no Firebase somando a quantidade
+            await db.collection("estoque").doc(nome).set({
+                nome: nome,
+                quantidade: firebase.firestore.FieldValue.increment(qtd),
+                ultima_atualizacao: new Date()
+            }, { merge: true });
+
+            status.innerHTML = `<b style="color: #30d158;">✅ ${qtd} un de ${nome} adicionados!</b>`;
+            
+            // Limpa os campos para o próximo lançamento
+            document.getElementById('nome').value = "";
+            document.getElementById('qtd').value = "";
+            document.getElementById('nome').focus();
+
+            // Remove a mensagem de sucesso após 3 segundos
+            setTimeout(() => { status.innerHTML = ""; }, 3000);
+
+        } catch (e) {
+            console.error(e);
+            status.innerHTML = `<b style="color: #ff453a;">❌ Erro ao salvar. Verifique a internet.</b>`;
+        }
     }
 </script>
 
