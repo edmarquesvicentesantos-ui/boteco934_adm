@@ -3,38 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Pro - Boteco 934</title>
+    <title>Scanner Boteco 934</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 10px; }
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #1a1a1a; border: 2px solid #333; }
+        body { font-family: -apple-system, sans-serif; background: #121212; color: white; text-align: center; padding: 15px; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #1a1a1a; margin-bottom: 10px; border: 2px solid #333; min-height: 250px; }
         .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; }
         .btn-blue { background: #0a84ff; color: white; }
         .btn-green { background: #30d158; color: black; }
+        .btn-orange { background: #ff9f0a; color: black; }
         #resultado-scan { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-top: 15px; display: none; border: 1px solid #0a84ff; }
-        #status-arquivo { display: none; background: #1c1c1e; border: 1px solid #30d158; padding: 15px; border-radius: 10px; margin: 15px 0; }
     </style>
 </head>
 <body>
-    <h3 style="color: #30d158;">Boteco 934 - Entrada</h3>
+    <h3 style="color: #30d158; margin-bottom: 20px;">📦 Entrada de Estoque</h3>
     
     <div id="reader"></div>
+    
+    <button id="btn-ligar" class="btn btn-orange" onclick="iniciarCamera()">📸 LIGAR CÂMERA DO IPHONE</button>
 
     <div id="resultado-scan">
-        <p style="font-size: 13px; color: #8e8e93; margin-bottom: 5px;">Chave de Acesso:</p>
-        <strong id="chave-num" style="font-family: monospace; font-size: 14px; color: #30d158;"></strong>
-        <a id="link-xml" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML AGORA</a>
+        <p style="font-size: 13px; color: #8e8e93; margin-bottom: 5px;">Chave Identificada:</p>
+        <strong id="chave-num" style="font-family: monospace; font-size: 13px; color: #30d158;"></strong>
+        <a id="link-xml" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
     </div>
 
-    <hr style="border: 0.5px solid #222; margin: 20px 0;">
+    <hr style="border: 0.5px solid #333; margin: 30px 0;">
 
     <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
     <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarXML(this)">
-
-    <div id="status-arquivo">
-        <span style="font-size: 12px; color: #8e8e93;">Arquivo:</span>
-        <span id="nome-exibido" style="display:block; color: #30d158; font-weight: bold;"></span>
-    </div>
 
     <div id="lista-produtos"></div>
 
@@ -42,7 +39,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Suas configurações reais
+        // Configurações do seu Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -54,37 +51,33 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // CONFIGURAÇÃO DO SCANNER PARA IPHONE
         const html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 15, qrbox: { width: 300, height: 150 } };
 
-        // Inicia a câmera traseira automaticamente
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
-
-        function onScanSuccess(decodedText) {
-            // A chave de nota tem 44 números, mas códigos de barras variam
-            if(decodedText.length >= 40) {
+        function iniciarCamera() {
+            const config = { fps: 15, qrbox: { width: 320, height: 180 } };
+            
+            // Tenta forçar a câmera traseira (environment)
+            html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
                 document.getElementById('resultado-scan').style.display = 'block';
                 document.getElementById('chave-num').innerText = decodedText;
                 document.getElementById('link-xml').href = "https://www.fsist.com.br/consultar-nfe?chave=" + decodedText;
-                
-                // Vibra o celular ao ler (se suportado)
-                if (navigator.vibrate) navigator.vibrate(100);
-                
-                html5QrCode.stop(); // Para a câmera para economizar bateria
-            }
+                document.getElementById('btn-ligar').style.display = 'none'; // Esconde o botão após ler
+                html5QrCode.stop(); 
+            }).catch(err => {
+                alert("Erro: Clique em 'Permitir Câmera' ou recarregue a página.");
+            });
         }
+
+        // Tenta iniciar sozinho, se falhar, o botão laranja resolve
+        window.onload = iniciarCamera;
 
         function processarXML(input) {
             if (input.files[0]) {
-                document.getElementById('nome-exibido').innerText = input.files[0].name;
-                document.getElementById('status-arquivo').style.display = 'block';
-                
                 const leitor = new FileReader();
                 leitor.onload = function() {
                     const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                     const itens = xmlDoc.getElementsByTagName("det");
-                    let html = "<h4>Itens Identificados:</h4>";
+                    let html = "<h4>Produtos da Nota:</h4>";
                     let produtos = [];
 
                     for (let i = 0; i < itens.length; i++) {
@@ -110,7 +103,7 @@
                         data: new Date()
                     }, { merge: true });
                 }
-                alert("✅ Sucesso no Boteco 934!");
+                alert("✅ Estoque do Boteco 934 Atualizado!");
                 location.reload();
             } catch (e) { alert("Erro ao salvar."); }
         }
