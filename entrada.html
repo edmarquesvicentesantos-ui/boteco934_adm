@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrada Boteco 934</title>
+    <title>Entrada - Boteco 934</title>
     <style>
         body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; text-align: center; }
         .card { background: #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #444; }
@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <h2>📥 Entrada de Nota Fiscal</h2>
+    <h2>📥 Entrada de Mercadoria</h2>
     
     <div class="card">
         <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
@@ -28,14 +28,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Dados do seu projeto Boteco 934
+        // Suas configurações reais do Boteco 934
         const firebaseConfig = {
-            apiKey: "COLE_AQUI_A_SUA_API_KEY_DO_FIREBASE", 
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.appspot.com",
-            messagingSenderId: "182023728304",
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+          apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+          authDomain: "boteco934-afc3f.firebaseapp.com",
+          projectId: "boteco934-afc3f",
+          storageBucket: "boteco934-afc3f.firebasestorage.app",
+          messagingSenderId: "182023728304",
+          appId: "1:182023728304:web:040a13bb6f61c9fff35f75",
+          measurementId: "G-HWT2RYRMRQ"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -47,7 +48,7 @@
                 const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                 const itens = xmlDoc.getElementsByTagName("det");
                 let produtos = [];
-                let html = "<h3>Produtos na Nota:</h3>";
+                let html = "<h3>Produtos Identificados:</h3>";
 
                 for (let i = 0; i < itens.length; i++) {
                     let p = itens[i].getElementsByTagName("prod")[0];
@@ -69,13 +70,13 @@
                     await db.collection("estoque").doc(item.nome).set({
                         nome: item.nome,
                         quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                        ultimaAtualizacao: new Date()
+                        ultimaEntrada: new Date()
                     }, { merge: true });
                 }
-                alert("✅ Estoque Atualizado com Sucesso!");
+                alert("✅ Estoque do Boteco 934 Atualizado!");
                 location.reload();
             } catch (e) {
-                alert("❌ Erro ao salvar! Verifique se as 'Rules' do Banco estão abertas.");
+                alert("❌ Erro ao salvar! Verifique as 'Rules' do Firestore.");
             }
         }
     </script>
