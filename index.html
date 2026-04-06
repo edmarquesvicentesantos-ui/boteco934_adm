@@ -3,56 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - HUB CENTRAL</title>
+    <title>BOTECO 934 PRO</title>
     <style>
-        :root { --bg: #0d1117; --card: #161b22; --neon-green: #00ff41; --neon-blue: #00d2ff; --neon-gold: #ff8c00; --text: #c9d1d9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        :root { --bg: #050505; --card: #121212; --blue: #00d2ff; --green: #00ff41; --gold: #ff8c00; --text: #e0e0e0; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 { font-size: 28px; color: #fff; text-shadow: 0 0 10px var(--neon-green); }
-        .header p { color: #8b949e; font-size: 14px; margin-top: 5px; }
+        /* Cabeçalho Fixo */
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; background: #000; }
+        .header h1 { font-size: 20px; letter-spacing: 2px; color: var(--green); text-shadow: 0 0 10px rgba(0,255,65,0.3); }
 
-        .menu-container { width: 100%; max-width: 400px; display: grid; gap: 20px; }
+        /* Área de Conteúdo (Onde a mágica muda) */
+        #main-content { flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
+
+        /* Estilo dos Cards/Inputs */
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #222; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; }
+        button { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+
+        /* Barra de Navegação Inferior (Estilo App) */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; }
+        .nav-item { text-align: center; color: #666; text-decoration: none; font-size: 10px; transition: 0.3s; flex: 1; }
+        .nav-item i { font-size: 24px; display: block; margin-bottom: 4px; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active.venda { color: var(--blue); }
+        .nav-item.active.estoque { color: var(--green); }
+        .nav-item.active.boticario { color: var(--gold); }
+
+        .btn-xml { background: var(--green); color: #000; }
+        .btn-venda { background: var(--blue); color: #000; }
         
-        .menu-btn { 
-            display: flex; align-items: center; justify-content: center; 
-            padding: 25px; border-radius: 15px; border: 2px solid transparent;
-            text-decoration: none; color: #fff; font-weight: bold; font-size: 18px;
-            transition: 0.3s; background: var(--card); text-align: center;
-        }
-
-        /* Botão Financeiro (Vendas) */
-        .btn-financeiro { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
-        .btn-financeiro:active { background: var(--neon-blue); color: #000; }
-
-        /* Botão Estoque (XML) */
-        .btn-estoque { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
-        .btn-estoque:active { background: var(--neon-green); color: #000; }
-
-        /* Botão Boticário (Distribuidora) */
-        .btn-boticario { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 140, 0, 0.2); }
-        .btn-boticario:active { background: var(--neon-gold); color: #000; }
-
-        .footer { margin-top: 50px; font-size: 10px; color: #30363d; letter-spacing: 2px; }
+        .hidden { display: none; }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <div class="header">
-        <h1>BOTECO 934</h1>
-        <p>SISTEMA DE GESTÃO ESTRATÉGICA</p>
+        <h1>BOTECO 934 <small style="font-size: 10px; color: #555;">SISTEMA PRO</small></h1>
     </div>
 
-    <div class="menu-container">
-        <a href="financeiro.html" class="menu-btn btn-financeiro">💰 VENDAS / CAIXA</a>
+    <div id="main-content">
+        <div id="sec-vendas" class="content-section">
+            <div class="card">
+                <h3 style="color: var(--blue); margin-bottom:10px;">💰 LANÇAR VENDA</h3>
+                <input type="text" id="venda-prod" placeholder="Produto ou Código (Digitar)...">
+                <input type="number" id="venda-qtd" placeholder="Quantidade" value="1">
+                <button class="btn-venda" onclick="alert('Venda Lançada!')">CONFIRMAR NO CAIXA</button>
+            </div>
+        </div>
 
-        <a href="estoque.html" class="menu-btn btn-estoque">📥 ENTRADA DE NOTA (XML)</a>
+        <div id="sec-estoque" class="content-section hidden">
+            <div class="card">
+                <h3 style="color: var(--green); margin-bottom:10px;">📥 ENTRADA XML</h3>
+                <p style="font-size: 12px; color: #888; margin-bottom:15px;">Selecione a nota fiscal para atualizar custos e estoque.</p>
+                <input type="file" id="xml-input" style="display:none;">
+                <button class="btn-xml" onclick="document.getElementById('xml-input').click()">LER NOTA FISCAL</button>
+            </div>
+        </div>
 
-        <a href="#" class="menu-btn btn-boticario" onclick="alert('Módulo Boticário em Integração...')">💄 DISTRIBUIDOR BOTICÁRIO</a>
+        <div id="sec-boticario" class="content-section hidden">
+            <div class="card">
+                <h3 style="color: var(--gold); margin-bottom:10px;">💄 BOTICÁRIO</h3>
+                <p>Módulo de revenda em breve...</p>
+            </div>
+        </div>
     </div>
 
-    <div class="footer">PETROLINA - PE | GERCINO COELHO</div>
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active venda" onclick="showSection('vendas', this)">
+            <i class="fa-solid fa-cash-register"></i>VENDAS
+        </a>
+        <a href="#" class="nav-item estoque" onclick="showSection('estoque', this)">
+            <i class="fa-solid fa-boxes-stacked"></i>ESTOQUE
+        </a>
+        <a href="#" class="nav-item boticario" onclick="showSection('boticario', this)">
+            <i class="fa-solid fa-pills"></i>BOTICÁRIO
+        </a>
+    </nav>
 
+    <script>
+        function showSection(section, element) {
+            // Esconde todas as seções
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            // Mostra a selecionada
+            document.getElementById('sec-' + section).classList.remove('hidden');
+            
+            // Atualiza a cor do ícone na nav-bar
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
 </body>
 </html>
