@@ -2,83 +2,51 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Entrada iPhone - Boteco 934</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Boteco 934</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #000; color: white; padding: 15px; }
-        .card { background: #1c1c1e; padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #38383a; }
-        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: 17px; text-decoration: none; text-align: center; }
-        .btn-blue { background: #0a84ff; color: white; }
-        .btn-green { background: #30d158; color: white; }
-        .item { background: #2c2c2e; padding: 12px; margin-bottom: 8px; border-radius: 8px; text-align: left; border-left: 4px solid #30d158; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        #reader { width: 100%; max-width: 500px; margin: auto; border-radius: 10px; overflow: hidden; }
+        .btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; }
+        .btn-blue { background: #007bff; color: white; }
+        #resultado-scan { background: #333; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
-    <h2 style="margin-top:0;">📥 Entrada de Nota</h2>
+    <h2>📸 Scanner de Nota Fiscal</h2>
     
-    <div class="card">
-        <p style="color: #8e8e93; font-size: 14px;">Use para notas do Bar ou Boticário</p>
-        <a href="https://www.fsist.com.br" target="_blank" class="btn btn-blue">1. BUSCAR NOTA (FSIST)</a>
-        
-        <label for="xml" class="btn btn-green">2. SELECIONAR XML</label>
-        <input type="file" id="xml" accept=".xml" style="display:none" onchange="processarNota(this)">
+    <div id="reader"></div>
+
+    <div id="resultado-scan">
+        <p>Chave Identificada:</p>
+        <strong id="chave-num" style="color: #30d158; word-break: break-all;"></strong>
+        <a id="link-xml" href="#" target="_blank" class="btn btn-blue">BAIXAR XML DESTA NOTA</a>
+        <p style="font-size: 12px; color: #8e8e93;">Após baixar, use o botão verde de "Selecionar XML" abaixo.</p>
     </div>
 
-    <div id="resultado"></div>
+    <hr style="margin: 30px 0; border: 0.5px solid #444;">
 
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <label for="xml" style="background:#28a745;" class="btn">2. SELECIONAR XML BAIXADO</label>
+    <input type="file" id="xml" accept=".xml" style="display:none" onchange="alert('Arquivo carregado! Siga com o lançamento.')">
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.firebasestorage.app",
-            messagingSenderId: "182023728304",
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        function processarNota(input) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const xml = new DOMParser().parseFromString(reader.result, "text/xml");
-                const itens = xml.getElementsByTagName("det");
-                let listaProdutos = [];
-                let resumoHtml = "<h3>Itens da Nota:</h3>";
-
-                for (let i = 0; i < itens.length; i++) {
-                    let prod = itens[i].getElementsByTagName("prod")[0];
-                    let nome = prod.getElementsByTagName("xProd")[0].textContent;
-                    let qtd = parseFloat(prod.getElementsByTagName("qCom")[0].textContent);
-                    listaProdutos.push({ nome, qtd });
-                    resumoHtml += `<div class="item"><b>${nome}</b><br>Qtd: ${qtd}</div>`;
-                }
-
-                document.getElementById("resultado").innerHTML = resumoHtml + 
-                `<button class="btn btn-green" onclick='confirmarEstoque(${JSON.stringify(listaProdutos)})'>3. LANÇAR NO ESTOQUE</button>`;
-            };
-            reader.readAsText(input.files[0]);
-        }
-
-        async function confirmarEstoque(lista) {
-            try {
-                for (let item of lista) {
-                    await db.collection("estoque").doc(item.nome).set({
-                        nome: item.nome,
-                        quantidade: firebase.firestore.FieldValue.increment(item.qtd),
-                        data: new Date()
-                    }, { merge: true });
-                }
-                alert("✅ Estoque Atualizado!");
-                location.reload();
-            } catch (e) {
-                alert("❌ Erro de permissão no Firebase.");
+        function onScanSuccess(decodedText) {
+            // O código de barras da nota tem 44 números
+            if(decodedText.length >= 44) {
+                document.getElementById('resultado-scan').style.display = 'block';
+                document.getElementById('chave-num').innerText = decodedText;
+                
+                // Link direto para o FSist com a chave já preenchida
+                document.getElementById('link-xml').href = "https://www.fsist.com.br/consultar-nfe?chave=" + decodedText;
+                
+                // Para o scanner após ler com sucesso
+                html5QrcodeScanner.clear();
             }
         }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
     </script>
 </body>
 </html>
