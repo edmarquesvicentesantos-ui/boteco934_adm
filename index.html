@@ -3,97 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 PRO</title>
+    <title>BOTECO 934 GOLD PRO</title>
     <style>
-        :root { --bg: #050505; --card: #121212; --blue: #00d2ff; --green: #00ff41; --gold: #ff8c00; --red: #ff4b2b; --purple: #a855f7; --text: #e0e0e0; }
+        :root { 
+            --bg: #050505; 
+            --card: #121212; 
+            --gold-light: #ffd700; 
+            --gold-dark: #b8860b; 
+            --gold-gradient: linear-gradient(145deg, #ffd700, #b8860b);
+            --blue: #00d2ff; --green: #00ff41; --red: #ff4b2b; --purple: #a855f7; --text: #e0e0e0; 
+        }
         * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .header { padding: 12px; text-align: center; border-bottom: 1px solid #222; background: #000; position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-size: 18px; letter-spacing: 2px; color: var(--green); text-shadow: 0 0 10px rgba(0,255,65,0.2); }
+        /* TÍTULO EM OURO */
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; background: #000; position: sticky; top: 0; z-index: 100; }
+        .header h1 { 
+            font-size: 22px; 
+            font-weight: 900;
+            letter-spacing: 3px; 
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(218, 165, 32, 0.4);
+            text-transform: uppercase;
+        }
 
         #main-content { flex: 1; padding: 15px; overflow-y: auto; padding-bottom: 100px; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; }
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h3 { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+        
         input, select { width: 100%; padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; outline: none; }
         button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
 
-        /* Barra de Navegação Inferior (5 BOTÕES) */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 80px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { text-align: center; color: #555; text-decoration: none; font-size: 9px; transition: 0.3s; flex: 1; padding: 10px 0; }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 5px; }
+        /* Barra de Navegação Inferior */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 10px; }
+        .nav-item { text-align: center; color: #444; text-decoration: none; font-size: 9px; transition: 0.3s; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 5px; }
         
-        /* Cores Ativas por Seção */
+        /* Cores Ativas */
         .nav-item.active.venda { color: var(--blue); }
         .nav-item.active.estoque { color: var(--green); }
         .nav-item.active.relatorio { color: var(--red); }
-        .nav-item.active.boticario { color: var(--gold); }
+        .nav-item.active.boticario { color: var(--gold-light); }
         .nav-item.active.config { color: var(--purple); }
 
         .btn-venda { background: var(--blue); color: #000; }
         .btn-xml { background: var(--green); color: #000; }
         
         .hidden { display: none; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { background: #1a1a1a; padding: 15px; border-radius: 10px; text-align: center; border-left: 3px solid var(--red); }
+        .stat-box { background: #1a1a1a; padding: 15px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--gold-light); }
+        .gold-text { color: var(--gold-light); font-weight: bold; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <div class="header">
-        <h1>BOTECO 934 <span style="font-size: 10px; color: #666;">| GESTÃO PRO</span></h1>
+        <h1>BOTECO 934</h1>
     </div>
 
     <div id="main-content">
         <div id="sec-vendas" class="content-section">
             <div class="card">
-                <h3 style="color: var(--blue); margin-bottom:10px;"><i class="fa-solid fa-cart-shopping"></i> NOVA VENDA</h3>
+                <h3 style="color: var(--blue);"><i class="fa-solid fa-cart-shopping"></i> NOVA VENDA</h3>
                 <input type="text" id="venda-prod" placeholder="Produto (Digite nome ou código)...">
                 <input type="number" id="venda-qtd" placeholder="Quantidade" value="1">
-                <button class="btn-venda" onclick="alert('Venda Lançada!')">LANÇAR NO CAIXA</button>
+                <button class="btn-venda">LANÇAR NO CAIXA</button>
             </div>
         </div>
 
         <div id="sec-estoque" class="content-section hidden">
             <div class="card">
-                <h3 style="color: var(--green); margin-bottom:10px;"><i class="fa-solid fa-file-invoice"></i> ENTRADA DE NOTA</h3>
-                <p style="font-size: 12px; color: #888; margin-bottom:15px;">Importar XML para atualizar custos e estoque.</p>
+                <h3 style="color: var(--green);"><i class="fa-solid fa-file-invoice"></i> ENTRADA DE NOTA</h3>
                 <input type="file" id="xml-input" style="display:none;">
                 <button class="btn-xml" onclick="document.getElementById('xml-input').click()">SUBIR ARQUIVO XML</button>
             </div>
         </div>
 
         <div id="sec-relatorio" class="content-section hidden">
-            <h3 style="color: var(--red); margin-bottom:15px;">📊 DESEMPENHO HOJE</h3>
-            <div class="stat-grid">
+            <h3 class="gold-text" style="margin-bottom:15px; text-align:center;">📊 RESUMO DO DIA</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div class="stat-box">
                     <small>VENDAS</small><br>
-                    <strong style="font-size: 20px;">R$ 0,00</strong>
+                    <strong style="font-size: 18px; color: #fff;">R$ 0,00</strong>
                 </div>
-                <div class="stat-box" style="border-color: var(--green);">
+                <div class="stat-box">
                     <small>LUCRO</small><br>
-                    <strong style="font-size: 20px; color: var(--green);">R$ 0,00</strong>
+                    <strong style="font-size: 18px; color: var(--green);">R$ 0,00</strong>
                 </div>
-            </div>
-            <div class="card" style="margin-top:15px;">
-                <p style="font-size: 13px;">Clique para ver o relatório completo no Google Sheets.</p>
             </div>
         </div>
 
         <div id="sec-boticario" class="content-section hidden">
-            <div class="card">
-                <h3 style="color: var(--gold); margin-bottom:10px;"><i class="fa-solid fa-gem"></i> REVENDA BOTICÁRIO</h3>
-                <p>Módulo de vendas e estoque de cosméticos.</p>
-                <button style="background: var(--gold); color: #000; margin-top: 15px;">CONSULTAR PRODUTOS</button>
+            <div class="card" style="border-color: var(--gold-dark);">
+                <h3 style="color: var(--gold-light);"><i class="fa-solid fa-gem"></i> REVENDA BOTICÁRIO</h3>
+                <p style="margin: 10px 0; font-size: 14px;">Controle de perfumes e cosméticos.</p>
+                <button style="background: var(--gold-gradient); color: #000;">ABRIR CATÁLOGO</button>
             </div>
         </div>
 
         <div id="sec-config" class="content-section hidden">
             <div class="card">
-                <h3 style="color: var(--purple); margin-bottom:10px;"><i class="fa-solid fa-gear"></i> AJUSTES</h3>
-                <button style="background: #333; color: #fff; margin-bottom: 10px;">CADASTRAR PRODUTO NA MÃO</button>
-                <button style="background: #333; color: #fff;">SINCRONIZAR PLANILHA</button>
+                <h3 style="color: var(--purple);"><i class="fa-solid fa-gear"></i> AJUSTES</h3>
+                <button style="background: #333; color: #fff; margin-top: 10px;">SINCRONIZAR PLANILHA</button>
             </div>
         </div>
     </div>
@@ -106,7 +120,7 @@
             <i class="fa-solid fa-boxes-packing"></i>ESTOQUE
         </a>
         <a href="#" class="nav-item relatorio" onclick="showSection('relatorio', this)">
-            <i class="fa-solid fa-chart-line"></i>RELATÓRIO
+            <i class="fa-solid fa-chart-line"></i>DADOS
         </a>
         <a href="#" class="nav-item boticario" onclick="showSection('boticario', this)">
             <i class="fa-solid fa-spray-can-sparkles"></i>BOTICÁRIO
