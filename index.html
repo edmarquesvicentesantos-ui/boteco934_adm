@@ -2,7 +2,12 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Boteco 934">
+    
     <title>BOTECO 934 GOLD PRO</title>
     <style>
         :root { 
@@ -14,142 +19,70 @@
             --blue: #00d2ff; --green: #00ff41; --red: #ff4b2b; --purple: #a855f7; --text: #e0e0e0; 
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top); }
         
-        /* TÍTULO PRINCIPAL EM OURO */
-        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; background: #000; position: sticky; top: 0; z-index: 100; }
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; background: #000; }
         .header h1 { 
-            font-size: 22px; 
-            font-weight: 900;
-            letter-spacing: 3px; 
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(218, 165, 32, 0.4);
-            text-transform: uppercase;
+            font-size: 22px; font-weight: 900; letter-spacing: 3px; 
+            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(218, 165, 32, 0.4); text-transform: uppercase;
         }
 
         #main-content { flex: 1; padding: 15px; overflow-y: auto; padding-bottom: 100px; }
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; }
+        .gold-title { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; text-transform: uppercase; font-size: 14px; display: block; margin-bottom: 10px; }
+        
+        input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; outline: none; }
+        button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; background: var(--gold-gradient); color: #000; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
-        /* TÍTULOS DOS CARDS EM OURO */
-        .gold-title { 
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        input, select { width: 100%; padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; outline: none; }
-        button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-
-        /* BARRA DE NAVEGAÇÃO COM NOMES EM OURO */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 10px; }
-        .nav-item { text-align: center; text-decoration: none; transition: 0.3s; flex: 1; }
-        
-        /* ÍCONES COMEÇAM APAGADOS */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { text-align: center; text-decoration: none; flex: 1; }
         .nav-item i { font-size: 22px; display: block; margin-bottom: 5px; color: #444; }
+        .nav-item span { font-size: 9px; font-weight: bold; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
         
-        /* NOMES SEMPRE EM OURO */
-        .nav-item span { 
-            font-size: 9px; 
-            font-weight: bold;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-        }
-        
-        /* EFEITO QUANDO CLICA (ÍCONE BRILHA) */
         .nav-item.active.venda i { color: var(--blue); text-shadow: 0 0 10px var(--blue); }
         .nav-item.active.estoque i { color: var(--green); text-shadow: 0 0 10px var(--green); }
         .nav-item.active.relatorio i { color: var(--red); text-shadow: 0 0 10px var(--red); }
         .nav-item.active.boticario i { color: var(--gold-light); text-shadow: 0 0 10px var(--gold-light); }
         .nav-item.active.config i { color: var(--purple); text-shadow: 0 0 10px var(--purple); }
 
-        .btn-action { background: #1a1a1a; color: #fff; border: 1px solid #333; }
-        .btn-confirm { background: var(--gold-gradient); color: #000; }
-        
         .hidden { display: none; }
-        .stat-box { background: #1a1a1a; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid var(--gold-dark); }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="header">
-        <h1>BOTECO 934</h1>
-    </div>
+    <div class="header"><h1>BOTECO 934</h1></div>
 
     <div id="main-content">
         <div id="sec-vendas" class="content-section">
             <div class="card">
                 <span class="gold-title"><i class="fa-solid fa-cart-shopping"></i> LANÇAR VENDA</span>
-                <input type="text" id="venda-prod" placeholder="Produto ou Código...">
-                <input type="number" id="venda-qtd" placeholder="Quantidade" value="1">
-                <button class="btn-confirm">CONFIRMAR NO CAIXA</button>
+                <input type="text" placeholder="Produto...">
+                <input type="number" value="1">
+                <button>CONFIRMAR VENDA</button>
             </div>
         </div>
-
         <div id="sec-estoque" class="content-section hidden">
-            <div class="card">
-                <span class="gold-title"><i class="fa-solid fa-file-invoice"></i> ENTRADA DE NOTA</span>
-                <input type="file" id="xml-input" style="display:none;">
-                <button class="btn-confirm" onclick="document.getElementById('xml-input').click()">LER XML DA NOTA</button>
-            </div>
+            <div class="card"><span class="gold-title">📥 ENTRADA XML</span><button>LER NOTA</button></div>
         </div>
-
         <div id="sec-relatorio" class="content-section hidden">
-            <span class="gold-title" style="text-align:center; display:block;">📊 RESUMO FINANCEIRO</span>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="stat-box">
-                    <small style="color: #888;">VENDAS</small><br>
-                    <strong style="font-size: 18px;">R$ 0,00</strong>
-                </div>
-                <div class="stat-box">
-                    <small style="color: #888;">LUCRO</small><br>
-                    <strong style="font-size: 18px; color: var(--green);">R$ 0,00</strong>
-                </div>
-            </div>
+            <div class="card"><span class="gold-title">📊 DADOS HOJE</span><p>R$ 0,00</p></div>
         </div>
-
         <div id="sec-boticario" class="content-section hidden">
-            <div class="card" style="border-color: var(--gold-dark);">
-                <span class="gold-title"><i class="fa-solid fa-gem"></i> REVENDA BOTICÁRIO</span>
-                <button class="btn-confirm">ABRIR CATÁLOGO</button>
-            </div>
+            <div class="card"><span class="gold-title">💄 BOTICÁRIO</span><button>CATÁLOGO</button></div>
         </div>
-
         <div id="sec-config" class="content-section hidden">
-            <div class="card">
-                <span class="gold-title"><i class="fa-solid fa-gear"></i> CONFIGURAÇÕES</span>
-                <button class="btn-action">SINCRONIZAR DADOS</button>
-            </div>
+            <div class="card"><span class="gold-title">⚙️ AJUSTES</span><button style="background:#333; color:#fff">SINCRONIZAR</button></div>
         </div>
     </div>
 
     <nav class="nav-bar">
-        <a href="#" class="nav-item active venda" onclick="showSection('vendas', this)">
-            <i class="fa-solid fa-dollar-sign"></i><span>Vendas</span>
-        </a>
-        <a href="#" class="nav-item estoque" onclick="showSection('estoque', this)">
-            <i class="fa-solid fa-boxes-packing"></i><span>Estoque</span>
-        </a>
-        <a href="#" class="nav-item relatorio" onclick="showSection('relatorio', this)">
-            <i class="fa-solid fa-chart-line"></i><span>Dados</span>
-        </a>
-        <a href="#" class="nav-item boticario" onclick="showSection('boticario', this)">
-            <i class="fa-solid fa-spray-can-sparkles"></i><span>Boticário</span>
-        </a>
-        <a href="#" class="nav-item config" onclick="showSection('config', this)">
-            <i class="fa-solid fa-sliders"></i><span>Ajustes</span>
-        </a>
+        <a href="#" class="nav-item active venda" onclick="showSection('vendas', this)"><i class="fa-solid fa-dollar-sign"></i><span>Vendas</span></a>
+        <a href="#" class="nav-item estoque" onclick="showSection('estoque', this)"><i class="fa-solid fa-boxes-packing"></i><span>Estoque</span></a>
+        <a href="#" class="nav-item relatorio" onclick="showSection('relatorio', this)"><i class="fa-solid fa-chart-line"></i><span>Dados</span></a>
+        <a href="#" class="nav-item boticario" onclick="showSection('boticario', this)"><i class="fa-solid fa-spray-can-sparkles"></i><span>Boticário</span></a>
+        <a href="#" class="nav-item config" onclick="showSection('config', this)"><i class="fa-solid fa-sliders"></i><span>Ajustes</span></a>
     </nav>
 
     <script>
