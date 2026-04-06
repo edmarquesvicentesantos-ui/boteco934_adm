@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOTECO 934 - HUB CENTRAL</title>
+    <style>
+        :root { --bg: #0d1117; --card: #161b22; --neon-green: #00ff41; --neon-blue: #00d2ff; --neon-gold: #ff8c00; --text: #c9d1d9; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 28px; color: #fff; text-shadow: 0 0 10px var(--neon-green); }
+        .header p { color: #8b949e; font-size: 14px; margin-top: 5px; }
+
+        .menu-container { width: 100%; max-width: 400px; display: grid; gap: 20px; }
+        
+        .menu-btn { 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 25px; border-radius: 15px; border: 2px solid transparent;
+            text-decoration: none; color: #fff; font-weight: bold; font-size: 18px;
+            transition: 0.3s; background: var(--card); text-align: center;
+        }
+
+        /* Botão Financeiro (Vendas) */
+        .btn-financeiro { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .btn-financeiro:active { background: var(--neon-blue); color: #000; }
+
+        /* Botão Estoque (XML) */
+        .btn-estoque { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
+        .btn-estoque:active { background: var(--neon-green); color: #000; }
+
+        /* Botão Boticário (Distribuidora) */
+        .btn-boticario { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 140, 0, 0.2); }
+        .btn-boticario:active { background: var(--neon-gold); color: #000; }
+
+        .footer { margin-top: 50px; font-size: 10px; color: #30363d; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>BOTECO 934</h1>
+        <p>SISTEMA DE GESTÃO ESTRATÉGICA</p>
+    </div>
+
+    <div class="menu-container">
+        <a href="financeiro.html" class="menu-btn btn-financeiro">💰 VENDAS / CAIXA</a>
+
+        <a href="estoque.html" class="menu-btn btn-estoque">📥 ENTRADA DE NOTA (XML)</a>
+
+        <a href="#" class="menu-btn btn-boticario" onclick="alert('Módulo Boticário em Integração...')">💄 DISTRIBUIDOR BOTICÁRIO</a>
+    </div>
+
+    <div class="footer">PETROLINA - PE | GERCINO COELHO</div>
+
+</body>
+</html>
