@@ -7,21 +7,25 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: -apple-system, sans-serif; background: #000; color: white; text-align: center; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; padding: 10px; }
+        .container { max-width: 600px; margin: auto; padding: 10px; }
         
-        /* Área da Câmera */
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #111; border: 2px solid #333; min-height: 280px; margin-bottom: 10px; }
+        /* Ajuste do Scanner para Horizontal/Distante */
+        #reader { 
+            width: 100%; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            background: #111; 
+            border: 2px solid #333; 
+            min-height: 250px; 
+            margin-bottom: 10px; 
+        }
         
-        /* Botões Estilo iOS */
         .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; border-radius: 14px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; text-decoration: none; box-sizing: border-box; }
         .btn-blue { background: #0a84ff; color: white; }
         .btn-green { background: #30d158; color: black; }
         .btn-orange { background: #ff9f0a; color: black; }
         
-        /* Cards de Informação */
-        .card-resultado { display: none; background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #0a84ff; margin-top: 15px; text-align: center; }
-        #nome-arquivo-selecionado { color: #30d158; font-weight: bold; margin: 10px 0; display: block; word-break: break-all; }
-        
+        #card-scan { display: none; background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #0a84ff; margin-top: 15px; }
         .item-produto { text-align: left; background: #2c2c2e; padding: 12px; margin: 6px 0; border-radius: 10px; border-left: 4px solid #30d158; font-size: 14px; }
     </style>
 </head>
@@ -32,13 +36,12 @@
 
     <div id="reader"></div>
     
-    <button id="btn-camera" class="btn btn-orange" onclick="iniciarScanner()">📸 ATIVAR SCANNER (IPHONE 16)</button>
+    <button id="btn-camera" class="btn btn-orange" onclick="iniciarScanner()">📸 LIGAR SCANNER HORIZONTAL</button>
 
-    <div id="card-scan" class="card-resultado">
+    <div id="card-scan">
         <p style="font-size: 12px; color: #8e8e93; margin: 0;">Chave Identificada:</p>
         <strong id="chave-num" style="color: #30d158; font-family: monospace; font-size: 13px;"></strong>
         <a id="link-fsist" href="#" target="_blank" class="btn btn-blue">1. BAIXAR XML NO FSIST</a>
-        <p style="font-size: 11px; color: #ff9f0a;">Após baixar, use o botão verde abaixo.</p>
     </div>
 
     <hr style="border: 0.5px solid #222; margin: 25px 0;">
@@ -46,8 +49,6 @@
     <label for="xml" class="btn btn-green">2. SELECIONAR XML BAIXADO</label>
     <input type="file" id="xml" accept=".xml" style="display:none" onchange="lerXML(this)">
     
-    <span id="nome-arquivo-selecionado"></span>
-
     <div id="lista-produtos"></div>
 </div>
 
@@ -55,7 +56,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 
 <script>
-    // Configurações do seu Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -67,13 +67,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Lógica do Scanner para o iPhone 16 Pro Max
     const html5QrCode = new Html5Qrcode("reader");
 
     function iniciarScanner() {
+        // Aumentei o retângulo para 350 de largura (quase a tela toda) 
+        // e deixei ele bem baixinho (100) para focar só na linha do código
         const config = { 
-            fps: 20, 
-            qrbox: { width: 320, height: 130 }, // Formato retangular para nota fiscal
+            fps: 25, 
+            qrbox: { width: 350, height: 100 }, 
             aspectRatio: 1.0 
         };
 
@@ -81,7 +82,6 @@
             { facingMode: "environment" }, 
             config, 
             (decodedText) => {
-                // Sucesso na leitura
                 document.getElementById('card-scan').style.display = 'block';
                 document.getElementById('chave-num').innerText = decodedText;
                 document.getElementById('link-fsist').href = "https://www.fsist.com.br/consultar-nfe?chave=" + decodedText;
@@ -90,24 +90,19 @@
                 html5QrCode.stop();
             }
         ).catch(err => {
-            alert("Clique no 'AA' ou 'Cadeado' na barra do Safari e selecione 'Ajustes do Site' -> Câmera -> Permitir.");
+            alert("Acesse os Ajustes do Safari e Permita a Câmera.");
         });
     }
 
-    // Tenta iniciar sozinho ao carregar
     window.onload = iniciarScanner;
 
-    // Lógica para ler e mostrar o XML selecionado
     function lerXML(input) {
         if (input.files[0]) {
-            const arquivo = input.files[0];
-            document.getElementById('nome-arquivo-selecionado').innerText = "📄 " + arquivo.name;
-            
             const leitor = new FileReader();
             leitor.onload = function() {
                 const xmlDoc = new DOMParser().parseFromString(leitor.result, "text/xml");
                 const itens = xmlDoc.getElementsByTagName("det");
-                let html = "<h4>Produtos na Nota:</h4>";
+                let html = "<h4>Produtos:</h4>";
                 let produtos = [];
 
                 for (let i = 0; i < itens.length; i++) {
@@ -115,17 +110,15 @@
                     let nome = p.getElementsByTagName("xProd")[0].textContent;
                     let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
                     produtos.push({ nome, qtd });
-                    html += `<div class="item-produto"><b>${nome}</b><br>Qtd: ${qtd}</div>`;
+                    html += `<div class="item-produto"><b>${nome}</b> - ${qtd} un</div>`;
                 }
-
                 document.getElementById('lista-produtos').innerHTML = html + 
                 `<button onclick='salvarNoFirebase(${JSON.stringify(produtos)})' class="btn btn-green">3. FINALIZAR LANÇAMENTO</button>`;
             };
-            leitor.readAsText(arquivo);
+            leitor.readAsText(input.files[0]);
         }
     }
 
-    // Salvar no Banco de Dados do Boteco 934
     async function salvarNoFirebase(lista) {
         try {
             for (let item of lista) {
@@ -135,13 +128,10 @@
                     ultima_entrada: new Date()
                 }, { merge: true });
             }
-            alert("✅ Estoque Atualizado com Sucesso!");
+            alert("✅ Estoque Atualizado!");
             location.reload();
-        } catch (e) {
-            alert("❌ Erro ao salvar no banco. Verifique sua conexão.");
-        }
+        } catch (e) { alert("Erro ao salvar."); }
     }
 </script>
-
 </body>
 </html>
