@@ -1,0 +1,78 @@
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+
+<script>
+// 1. Sua Configuração do Firebase (Mantenha a que você já usa)
+const firebaseConfig = {
+    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+    authDomain: "boteco934-afc3f.firebaseapp.com",
+    projectId: "boteco934-afc3f",
+    storageBucket: "boteco934-afc3f.firebasestorage.app",
+    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// 2. A Função de Cálculo que já está funcionando
+function calcularAgora() {
+    var custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
+    var qtd = parseFloat(document.getElementById('qtd-fardo').value) || 1;
+    var mkp = parseFloat(document.getElementById('markup-input').value) || 0;
+
+    if (custo > 0) {
+        var vendaTotal = custo * (1 + (mkp / 100));
+        var lucroFardo = vendaTotal - custo;
+        var margem = (lucroFardo / vendaTotal) * 100;
+        var lucroUn = lucroFardo / qtd;
+        var vendaUn = vendaTotal / qtd;
+
+        document.getElementById('res-margem').innerHTML = margem.toFixed(1) + "%";
+        document.getElementById('res-lucro-fardo').innerHTML = "R$ " + lucroFardo.toFixed(2);
+        document.getElementById('res-lucro-un').innerHTML = "R$ " + lucroUn.toFixed(2);
+        
+        document.getElementById('vda-fardo').value = "R$ " + vendaTotal.toFixed(2);
+        document.getElementById('vda-un').value = "R$ " + vendaUn.toFixed(2);
+    }
+}
+
+// 3. A Nova Função para SALVAR no Banco de Dados
+async function salvar() {
+    const nome = document.getElementById('nome-cerv').value.toUpperCase();
+    const codigo = document.getElementById('cod-barras').value;
+    const custo = document.getElementById('custo-fardo').value;
+    const vendaUn = document.getElementById('vda-un').value;
+    const margem = document.getElementById('res-margem').innerHTML;
+
+    if (!nome || !custo) {
+        alert("Por favor, preencha pelo menos o NOME e o CUSTO!");
+        return;
+    }
+
+    try {
+        // Salva na coleção "produtos" usando o código de barras como ID único
+        // Se não tiver código, ele gera um ID automático
+        const docRef = codigo ? db.collection("produtos").doc(codigo) : db.collection("produtos").doc();
+
+        await docRef.set({
+            nome: nome,
+            codigo_barras: codigo,
+            custo_fardo: custo,
+            preco_venda_unitario: vendaUn,
+            margem_real: margem,
+            data_cadastro: new Date()
+        }, { merge: true });
+
+        alert("✅ " + nome + " salvo com sucesso no Boteco 934!");
+        
+        // Limpa os campos para o próximo produto
+        document.getElementById('nome-cerv').value = "";
+        document.getElementById('cod-barras').value = "";
+        document.getElementById('custo-fardo').value = "";
+        calcularAgora(); // Reseta os painéis verdes
+
+    } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("❌ Erro ao salvar. Verifique sua internet.");
+    }
+}
+</script>
