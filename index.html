@@ -2,88 +2,88 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão Elite</title>
+    <title>Boteco 934 - PDV Elite</title>
     <style>
         :root {
-            --bg: #000000; --card: #000000; --gold: #d4af37; --green: #00ff88; --border: #1a1a1a; --gray: #666;
+            --bg: #000000; --gold: #d4af37; --green: #00ff88; --border: #1a1a1a; --gray: #888;
         }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px; }
-        .header h1 { color: var(--gold); margin: 0; font-size: 18px; letter-spacing: 3px; text-transform: uppercase; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding: 10px; margin-bottom: 15px; }
+        .header h1 { color: var(--gold); margin: 0; font-size: 18px; letter-spacing: 2px; }
 
-        .nav-tabs { display: flex; gap: 2px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 15px; background: #000; border: 1px solid var(--border); color: var(--gray); cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; }
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gray); cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; }
         .tab-btn.active { border-color: var(--gold); color: var(--gold); }
 
         .content-section { display: none; }
         .content-section.active { display: block; }
 
-        .box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 4px; margin-bottom: 15px; }
-        
         /* Grid das Mesas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-        .mesa-card { background: #000; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; position: relative; }
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        
+        /* CARD DA MESA ESTILO RECIBO */
+        .mesa-card { background: #050505; border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; min-height: 320px; overflow: hidden; }
         .mesa-card.ocupada { border-color: #ff4444; }
         .mesa-card.livre { border-color: var(--green); }
 
-        .cliente-nome { display: block; color: var(--gold); font-size: 11px; margin-top: 5px; font-weight: bold; height: 15px; text-transform: uppercase; }
-        .price-tag { font-size: 20px; font-weight: bold; margin: 8px 0; display: block; color: #fff; }
+        .mesa-header { background: #0a0a0a; padding: 10px; border-bottom: 1px solid var(--border); text-align: center; }
+        .mesa-header b { color: var(--gold); font-size: 14px; }
+        .cliente-info { display: block; color: #fff; font-size: 11px; margin-top: 2px; text-transform: uppercase; opacity: 0.8; }
 
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; font-size: 14px; outline: none; box-sizing: border-box; }
-        
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 2px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; margin-top: 5px; }
+        /* ÁREA DO CUPOM FISCAL */
+        .recibo-corpo { flex-grow: 1; padding: 10px; font-family: 'Courier New', monospace; font-size: 12px; color: #ccc; overflow-y: auto; max-height: 180px; background: #020202; }
+        .item-linha { display: flex; justify-content: space-between; border-bottom: 1px dashed #1a1a1a; padding: 4px 0; }
+        .item-qtd { color: var(--gold); margin-right: 5px; }
+
+        .mesa-footer { padding: 10px; background: #0a0a0a; border-top: 1px solid var(--border); }
+        .total-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .total-label { font-size: 10px; color: var(--gray); text-transform: uppercase; }
+        .total-valor { font-size: 18px; font-weight: bold; color: var(--green); }
+
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: #666; }
+        .btn-fechar { background: transparent; border: 1px solid #333; color: #666; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid var(--border); }
-        td { padding: 10px; border-bottom: 1px solid #0a0a0a; }
+        /* Estilo para Inputs */
+        .box-cadastro { background: #0a0a0a; padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; outline: none; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>BOTECO 934</h1>
-    <div id="relogio" style="color: var(--gold);"></div>
+    <div id="relogio" style="color: var(--gold); font-family: monospace;"></div>
 </div>
 
 <div class="nav-tabs">
-    <button class="tab-btn active" onclick="openTab('mesas')">Mesas</button>
-    <button class="tab-btn" onclick="openTab('vendas')">Cadastro Estoque</button>
+    <button class="tab-btn active" onclick="openTab('mesas')">Mesas / Atendimento</button>
+    <button class="tab-btn" onclick="openTab('estoque')">Estoque / Cadastro</button>
 </div>
 
 <div id="mesas" class="content-section active">
     <div class="grid-mesas" id="grid_mesas"></div>
 </div>
 
-<div id="vendas" class="content-section">
-    <div class="box">
-        <h3>Novo Produto / Precificação</h3>
-        <label>Código EAN</label>
-        <input type="text" id="scan_ean" placeholder="Passe o leitor...">
-        <label>Nome do Produto</label>
-        <input type="text" id="p_nome" placeholder="Ex: Skol Ambev">
-        <div style="display: flex; gap: 10px;">
-            <input type="number" id="p_venda" placeholder="Preço Venda Un.">
-            <button class="btn btn-gold" onclick="salvarProduto()" style="height: 45px;">Salvar</button>
-        </div>
-    </div>
-    <div class="box">
-        <h3>Produtos no Sistema (Ordem Alfabética)</h3>
-        <table id="tab_estoque">
-            <thead><tr><th>PRODUTO</th><th>PREÇO</th></tr></thead>
-            <tbody id="lista_estoque"></tbody>
-        </table>
+<div id="estoque" class="content-section">
+    <div class="box-cadastro">
+        <label>NOME DO PRODUTO</label>
+        <input type="text" id="p_nome" placeholder="Ex: COCA LATA">
+        <label>PREÇO DE VENDA (R$)</label>
+        <input type="number" id="p_venda" step="0.01">
+        <button class="btn btn-gold" onclick="salvarProduto()">CADASTRAR PRODUTO</button>
     </div>
 </div>
 
 <script>
     let estoque = [];
+    // Mesas agora guardam um Objeto para os Itens Consumidos
     let mesas = Array.from({ length: 8 }, (_, i) => ({ 
         id: i + 1, 
         status: 'Livre', 
         cliente: '', 
-        total: 0 
+        consumo: {} // Formato: { "PRODUTO": {qtd: 2, preco: 5.00} }
     }));
 
     function openTab(name) {
@@ -96,78 +96,103 @@
 
     function renderMesas() {
         const grid = document.getElementById('grid_mesas');
-        grid.innerHTML = mesas.map(m => `
-            <div class="mesa-card ${m.status === 'Livre' ? 'livre' : 'ocupada'}">
-                <b style="color:var(--gold)">MESA 0${m.id}</b>
-                <span class="cliente-nome">${m.cliente || ''}</span>
-                <span class="price-tag">R$ ${m.total.toFixed(2)}</span>
-                
-                <button class="btn btn-gold" onclick="abrirAtendimento(${m.id})">Lançar Item</button>
-                <button class="btn btn-outline" onclick="fecharMesa(${m.id})">Finalizar</button>
-            </div>
-        `).join('');
+        grid.innerHTML = mesas.map(m => {
+            let totalMesa = 0;
+            let itensHtml = "";
+            
+            // Lógica para agrupar e somar itens no recibo
+            for (let nome in m.consumo) {
+                const item = m.consumo[nome];
+                const subtotal = item.qtd * item.preco;
+                totalMesa += subtotal;
+                itensHtml += `
+                    <div class="item-linha">
+                        <span><span class="item-qtd">${item.qtd}x</span> ${nome}</span>
+                        <span>${subtotal.toFixed(2)}</span>
+                    </div>`;
+            }
+
+            return `
+                <div class="mesa-card ${m.status === 'Livre' ? 'livre' : 'ocupada'}">
+                    <div class="mesa-header">
+                        <b>MESA 0${m.id}</b>
+                        <span class="cliente-info">${m.cliente || '---'}</span>
+                    </div>
+                    
+                    <div class="recibo-corpo">
+                        ${itensHtml || '<div style="text-align:center; margin-top:50px; opacity:0.3">AGUARDANDO PEDIDO...</div>'}
+                    </div>
+
+                    <div class="mesa-footer">
+                        <div class="total-container">
+                            <span class="total-label">Subtotal</span>
+                            <span class="total-valor">R$ ${totalMesa.toFixed(2)}</span>
+                        </div>
+                        <button class="btn btn-gold" onclick="lancarItem(${m.id})">+ ADICIONAR ITEM</button>
+                        <button class="btn btn-fechar" onclick="fecharMesa(${m.id}, ${totalMesa})">FECHAR CONTA</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     function salvarProduto() {
         const nome = document.getElementById('p_nome').value.toUpperCase();
         const preco = parseFloat(document.getElementById('p_venda').value) || 0;
-        const ean = document.getElementById('scan_ean').value;
-
-        if(!nome) return;
-        estoque.push({ nome, preco, ean });
-        estoque.sort((a,b) => a.nome.localeCompare(b.nome)); // Ordem Alfabética
+        if(!nome || preco <= 0) return alert("Preencha os dados!");
         
-        renderEstoque();
+        estoque.push({ nome, preco });
+        estoque.sort((a,b) => a.nome.localeCompare(b.nome));
+        alert("Produto cadastrado!");
         document.getElementById('p_nome').value = '';
         document.getElementById('p_venda').value = '';
-        document.getElementById('scan_ean').value = '';
     }
 
-    function renderEstoque() {
-        document.getElementById('lista_estoque').innerHTML = estoque.map(p => `
-            <tr><td>${p.nome}</td><td style="color:var(--green)">R$ ${p.preco.toFixed(2)}</td></tr>
-        `).join('');
-    }
-
-    function abrirAtendimento(id) {
+    function lancarItem(id) {
         const m = mesas.find(x => x.id === id);
         
-        // Se a mesa estiver livre, pergunta o nome do cliente primeiro
         if(m.status === 'Livre') {
-            const nomeCli = prompt("Nome do Cliente para a Mesa 0" + id + ":");
-            if(nomeCli) m.cliente = nomeCli;
+            const nomeCli = prompt("Nome do Cliente:");
+            if(!nomeCli) return;
+            m.cliente = nomeCli;
+            m.status = 'Ocupada';
         }
 
-        // Gera a lista de produtos em ordem alfabética para o prompt
-        let listaMsg = "DIGITE O NOME OU CÓDIGO:\n\n";
-        estoque.forEach(p => listaMsg += `- ${p.nome} (R$ ${p.preco})\n`);
-
-        const busca = prompt(listaMsg);
-        if(!busca) return;
-
-        const p = estoque.find(x => x.nome.includes(busca.toUpperCase()) || x.ean === busca);
+        // Lista para o prompt
+        let menu = "PRODUTOS DISPONÍVEIS:\n";
+        estoque.forEach((p, index) => menu += `${index + 1}. ${p.nome} - R$ ${p.preco.toFixed(2)}\n`);
         
-        if(p) {
-            m.total += p.preco;
-            m.status = 'Ocupada';
+        const escolha = prompt(menu + "\nDigite o NOME exato do produto:");
+        if(!escolha) return;
+
+        const prod = estoque.find(p => p.nome === escolha.toUpperCase());
+        
+        if(prod) {
+            // Se já existe no consumo, aumenta a quantidade. Se não, cria.
+            if(m.consumo[prod.nome]) {
+                m.consumo[prod.nome].qtd += 1;
+            } else {
+                m.consumo[prod.nome] = { qtd: 1, preco: prod.preco };
+            }
             renderMesas();
         } else {
-            alert("Produto não encontrado!");
+            alert("Produto não encontrado! Digite o nome exatamente como cadastrado.");
         }
     }
 
-    function fecharMesa(id) {
-        const m = mesas.find(x => x.id === id);
-        if(confirm(`Fechar conta de ${m.cliente || 'Mesa 0'+id}?\nTotal: R$ ${m.total.toFixed(2)}`)) {
-            m.total = 0;
+    function fecharMesa(id, total) {
+        if(total === 0) return;
+        if(confirm(`Confirmar fechamento da mesa 0${id}?\nTotal: R$ ${total.toFixed(2)}`)) {
+            const m = mesas.find(x => x.id === id);
             m.status = 'Livre';
             m.cliente = '';
+            m.consumo = {};
             renderMesas();
         }
     }
 
     setInterval(() => {
-        document.getElementById('relogio').innerText = new Date().toLocaleTimeString();
+        document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR');
     }, 1000);
 
     renderMesas();
