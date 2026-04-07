@@ -2,104 +2,77 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Recibo Inteligente</title>
+    <title>Boteco 934 - Gestão Real</title>
     <style>
-        :root {
-            --bg: #000000; --gold: #d4af37; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444;
-        }
+        :root { --bg: #000; --gold: #d4af37; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
         body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding: 10px; margin-bottom: 15px; }
-        .header h1 { color: var(--gold); margin: 0; font-size: 18px; letter-spacing: 2px; }
-
         .nav-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: #666; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; }
         .tab-btn.active { border-color: var(--gold); color: var(--gold); }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
 
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
-        
-        /* MESA ESTILO RECIBO TOTAL */
-        .mesa-recibo { 
-            background: #050505; 
-            border: 1px solid var(--green); /* Inicia Verde (Livre) */
-            border-radius: 4px; 
-            display: flex; 
-            flex-direction: column; 
-            min-height: 380px; 
-            transition: 0.3s;
-        }
+        /* TABELA ESTOQUE */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th { color: var(--gold); text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+        td { padding: 10px; border-bottom: 1px solid #0a0a0a; }
+        .qtd-baixa { color: var(--danger); font-weight: bold; }
+
+        /* MESAS */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .mesa-recibo { background: #050505; border: 1px solid var(--green); border-radius: 6px; display: flex; flex-direction: column; min-height: 400px; position: relative; }
         .mesa-recibo.ocupada { border-color: var(--danger); }
-
-        .recibo-topo { 
-            padding: 10px; 
-            border-bottom: 1px dashed var(--border); 
-            text-align: center; 
-            background: #0a0a0a;
-        }
-        .recibo-topo b { color: var(--gold); font-size: 14px; display: block; }
-        .cliente-tag { color: #fff; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; min-height: 15px;}
-
-        .recibo-itens { 
-            flex-grow: 1; 
-            padding: 15px; 
-            font-family: 'Courier New', monospace; 
-            font-size: 13px; 
-            color: #aaa; 
-            overflow-y: auto; 
-        }
-        .linha-item { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px solid #111; padding-bottom: 2px; }
-        .qtd-item { color: var(--gold); margin-right: 8px; font-weight: bold; }
-
-        .recibo-rodape { 
-            padding: 15px; 
-            background: #0a0a0a; 
-            border-top: 2px dashed var(--border); 
-        }
-        .total-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .total-v { font-size: 22px; font-weight: bold; color: var(--green); }
-
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; margin-bottom: 5px; }
-        .btn-add { background: var(--gold); color: #000; }
-        .btn-fechar { background: transparent; border: 1px solid #333; color: #666; }
+        .recibo-itens { flex-grow: 1; padding: 15px; font-family: 'Courier New', monospace; font-size: 13px; color: #ccc; }
+        .busca-container { padding: 10px; background: #0a0a0a; border-top: 1px solid var(--border); }
+        .input-busca { width: 100%; padding: 10px; background: #000; border: 1px solid var(--gold); color: var(--gold); border-radius: 4px; outline: none; }
         
-        /* Cadastro simples */
-        .box-adm { background: #0a0a0a; padding: 20px; border: 1px solid var(--border); border-radius: 8px; }
+        .box-adm { background: #0a0a0a; padding: 20px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; }
         input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); margin-bottom: 10px; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>BOTECO 934 - PDV</h1>
-    <div id="relogio" style="color: var(--gold);"></div>
+    <h1 style="color:var(--gold); margin:0; font-size:18px;">BOTECO 934 - PDV</h1>
+    <div id="relogio" style="color:var(--gold); font-family:monospace;"></div>
 </div>
 
 <div class="nav-tabs">
-    <button class="tab-btn active" onclick="ver('mesas')">Mesas</button>
-    <button class="tab-btn" onclick="ver('adm')">Estoque</button>
+    <button class="tab-btn active" onclick="ver('mesas')">Frente de Caixa (Mesas)</button>
+    <button class="tab-btn" onclick="ver('estoque_tab')">Estoque / Cadastro</button>
 </div>
 
 <div id="mesas" class="content-section active">
     <div class="grid-mesas" id="grid_mesas"></div>
 </div>
 
-<div id="adm" class="content-section">
+<div id="estoque_tab" class="content-section">
     <div class="box-adm">
-        <h3>Cadastrar Produto</h3>
-        <input type="text" id="p_nome" placeholder="NOME DO PRODUTO (Ex: COCA LATA)">
-        <input type="number" id="p_preco" placeholder="PREÇO DE VENDA (R$)" step="0.01">
-        <button class="btn btn-add" onclick="addEstoque()">SALVAR NO SISTEMA</button>
+        <h3 style="color:var(--gold)">Novo Produto</h3>
+        <input type="text" id="p_ean" placeholder="Código de Barras">
+        <input type="text" id="p_nome" placeholder="Nome do Produto">
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="p_preco" placeholder="Preço Venda" step="0.01">
+            <input type="number" id="p_qtd" placeholder="Qtd em Estoque">
+        </div>
+        <button class="btn" style="background:var(--gold)" onclick="addEstoque()">Salvar no Banco de Dados</button>
+    </div>
+
+    <div class="box-adm">
+        <h3 style="color:var(--gold)">Inventário Atual</h3>
+        <table>
+            <thead><tr><th>EAN</th><th>PRODUTO</th><th>PREÇO</th><th>QTD ATUAL</th><th>AÇÃO</th></tr></thead>
+            <tbody id="lista_estoque_corpo"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    let estoque = [];
-    let mesas = Array.from({ length: 8 }, (_, i) => ({ 
-        id: i + 1, 
-        cliente: '', 
-        consumo: {}, 
-        status: 'Livre' 
-    }));
+    // Carrega dados salvos ou inicia vazio
+    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
+    let mesas = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
 
     function ver(id) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -107,107 +80,114 @@
         document.getElementById(id).classList.add('active');
         event.currentTarget.classList.add('active');
         if(id === 'mesas') desenharMesas();
+        if(id === 'estoque_tab') listarEstoque();
     }
+
+    function addEstoque() {
+        const ean = document.getElementById('p_ean').value;
+        const nome = document.getElementById('p_nome').value.toUpperCase();
+        const preco = parseFloat(document.getElementById('p_preco').value);
+        const qtd = parseInt(document.getElementById('p_qtd').value);
+
+        if(nome && preco && qtd >= 0) {
+            estoque.push({ ean, nome, preco, qtd });
+            estoque.sort((a,b) => a.nome.localeCompare(b.nome));
+            salvar();
+            listarEstoque();
+            alert("Produto Salvo!");
+            document.querySelectorAll('input').forEach(i => i.value = '');
+        }
+    }
+
+    function listarEstoque() {
+        const corpo = document.getElementById('lista_estoque_corpo');
+        corpo.innerHTML = estoque.map((p, index) => `
+            <tr>
+                <td>${p.ean || '---'}</td>
+                <td>${p.nome}</td>
+                <td>R$ ${p.preco.toFixed(2)}</td>
+                <td class="${p.qtd < 5 ? 'qtd-baixa' : ''}">${p.qtd} un</td>
+                <td><button onclick="removerItem(${index})" style="background:none; border:none; color:red; cursor:pointer;">✖</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function removerItem(i) { if(confirm("Excluir produto?")) { estoque.splice(i,1); salvar(); listarEstoque(); } }
+
+    function salvar() { localStorage.setItem('b934_estoque', JSON.stringify(estoque)); }
 
     function desenharMesas() {
         const grid = document.getElementById('grid_mesas');
         grid.innerHTML = mesas.map(m => {
             let soma = 0;
-            let itensLista = "";
-            
+            let itensHtml = "";
             for (let n in m.consumo) {
-                const item = m.consumo[n];
-                const sub = item.qtd * item.preco;
+                const it = m.consumo[n];
+                const sub = it.qtd * it.preco;
                 soma += sub;
-                itensLista += `
-                    <div class="linha-item">
-                        <span><span class="qtd-item">${item.qtd}x</span> ${n}</span>
-                        <span>${sub.toFixed(2)}</span>
-                    </div>`;
+                itensHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>${it.qtd}x ${n}</span><span>${sub.toFixed(2)}</span>
+                </div>`;
             }
-
             return `
-                <div class="mesa-recibo ${m.status === 'Ocupada' ? 'ocupada' : ''}" onclick="cliqueMesa(${m.id})">
-                    <div class="recibo-topo">
-                        <b>EXTRATO MESA 0${m.id}</b>
-                        <span class="cliente-tag">${m.cliente || 'CLIQUE P/ ABRIR'}</span>
+                <div class="mesa-recibo ${m.status === 'Ocupada' ? 'ocupada' : ''}">
+                    <div style="padding:10px; border-bottom:1px dashed #222; text-align:center;" onclick="setCliente(${m.id})">
+                        <b style="color:var(--gold)">MESA 0${m.id}</b><br>
+                        <small>${m.cliente || 'CLIQUE PARA NOME'}</small>
                     </div>
-                    
-                    <div class="recibo-itens">
-                        ${itensLista || '<div style="text-align:center;margin-top:80px;opacity:0.2">MESA VAZIA</div>'}
+                    <div class="recibo-itens">${itensHtml || '<div style="text-align:center; opacity:0.2; margin-top:100px;">VAZIA</div>'}</div>
+                    <div class="busca-container">
+                        <input type="text" class="input-busca" placeholder="Bipe o produto..." onchange="bipar(this, ${m.id})">
                     </div>
-
-                    <div class="recibo-rodape">
-                        <div class="total-box">
-                            <small style="color:#666">TOTAL</small>
-                            <span class="total-v">R$ ${soma.toFixed(2)}</span>
+                    <div style="padding:15px; background:#0a0a0a;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <small>TOTAL</small><span style="font-size:22px; color:var(--green); font-weight:bold;">R$ ${soma.toFixed(2)}</span>
                         </div>
-                        <button class="btn btn-add" onclick="event.stopPropagation(); lancar(${m.id})">+ ADICIONAR PRODUTO</button>
-                        <button class="btn btn-fechar" onclick="event.stopPropagation(); fechar(${m.id}, ${soma})">FECHAR CONTA</button>
+                        <button class="btn" style="background:transparent; border:1px solid #333; color:#666; margin-top:10px;" onclick="fechar(${m.id}, ${soma})">Fechar Conta</button>
                     </div>
                 </div>
             `;
         }).join('');
     }
 
-    function cliqueMesa(id) {
-        const m = mesas.find(x => x.id === id);
-        if(m.status === 'Livre') {
-            const nome = prompt("Nome do Cliente para Mesa 0" + id + ":");
-            if(nome) {
-                m.cliente = nome;
+    function bipar(input, mesaId) {
+        const busca = input.value.toUpperCase();
+        // Busca por EAN ou Nome
+        const p = estoque.find(x => x.ean === busca || x.nome === busca);
+        
+        if(p) {
+            if(p.qtd > 0) {
+                const m = mesas.find(x => x.id === mesaId);
+                if(!m.cliente) m.cliente = prompt("Nome do Cliente:");
+                
+                if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
+                else m.consumo[p.nome] = { qtd: 1, preco: p.preco };
+                
+                p.qtd--; // BAIXA NO ESTOQUE
+                m.status = 'Ocupada';
+                salvar();
                 desenharMesas();
-            }
-        }
+            } else { alert("ESTOQUE ZERADO PARA: " + p.nome); }
+        } else { alert("Produto não encontrado!"); }
+        input.value = ''; input.focus();
     }
 
-    function lancar(id) {
-        const m = mesas.find(x => x.id === id);
-        if(!m.cliente) {
-            const nome = prompt("Defina o nome do cliente primeiro:");
-            if(!nome) return;
-            m.cliente = nome;
-        }
-
-        let lista = "PRODUTOS:\n";
-        estoque.forEach((p, i) => lista += `${i+1}. ${p.nome} - R$ ${p.preco}\n`);
-        
-        const busca = prompt(lista + "\nQual produto?");
-        if(!busca) return;
-
-        const prod = estoque.find(p => p.nome === busca.toUpperCase());
-        if(prod) {
-            if(m.consumo[prod.nome]) m.consumo[prod.nome].qtd++;
-            else m.consumo[prod.nome] = { qtd: 1, preco: prod.preco };
-            m.status = 'Ocupada';
-            desenharMesas();
-        } else {
-            alert("Produto não cadastrado!");
-        }
+    function setCliente(id) { 
+        const m = mesas.find(x => x.id === id); 
+        const n = prompt("Nome do Cliente:"); 
+        if(n) { m.cliente = n; desenharMesas(); } 
     }
 
     function fechar(id, total) {
-        if(total === 0) return;
-        if(confirm(`Fechar Mesa 0${id}?\nTotal: R$ ${total.toFixed(2)}`)) {
+        if(total > 0 && confirm("Fechar conta?")) {
             const m = mesas.find(x => x.id === id);
             m.status = 'Livre'; m.cliente = ''; m.consumo = {};
             desenharMesas();
         }
     }
 
-    function addEstoque() {
-        const n = document.getElementById('p_nome').value.toUpperCase();
-        const p = parseFloat(document.getElementById('p_preco').value);
-        if(n && p) {
-            estoque.push({ nome: n, preco: p });
-            estoque.sort((a,b) => a.nome.localeCompare(b.nome));
-            alert("Salvo!");
-            document.getElementById('p_nome').value = '';
-            document.getElementById('p_preco').value = '';
-        }
-    }
-
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
+    listarEstoque();
     desenharMesas();
 </script>
 </body>
