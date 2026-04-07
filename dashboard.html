@@ -3,114 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Boteco 934</title>
+    <title>Despesas - Boteco 934</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .header { text-align: center; border-bottom: 2px solid #5856d6; padding-bottom: 10px; margin-bottom: 15px; }
-        .grid-relatorio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .box { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .valor { font-size: 18px; font-weight: bold; color: #30d158; margin-top: 5px; }
-        .btn-voltar { background: none; border: 1px solid #5856d6; color: #5856d6; padding: 8px 15px; border-radius: 8px; margin-top: 10px; font-weight: bold; cursor: pointer; }
-        canvas { background: #1c1c1e; border-radius: 12px; margin-top: 20px; padding: 10px; border: 1px solid #333; width: 100% !important; height: auto !important; }
-        .alerta-item { background: #2c0e0e; color: #ff453a; padding: 8px; border-radius: 5px; margin-top: 5px; font-size: 13px; border-left: 4px solid #ff453a; text-align: left; }
+        .header { text-align: center; border-bottom: 2px solid #ff453a; padding-bottom: 10px; margin-bottom: 15px; }
+        .card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
+        .input-dark { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
+        .btn-salvar { width: 100%; padding: 15px; background: #ff453a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .item-gasto { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #333; background: #121212; margin-bottom: 5px; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0; color: #5856d6;">INTELIGÊNCIA 934</h2>
-        <button class="btn-voltar" onclick="location.href='index.html'">⬅ VOLTAR AO INÍCIO</button>
+        <h2 style="margin:0; color: #ff453a;">SAÍDAS E GASTOS</h2>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid #ff453a; color:#ff453a; margin-top:10px; border-radius:5px; padding: 5px 10px;">VOLTAR</button>
     </div>
 
-    <div class="grid-relatorio">
-        <div class="box">
-            <div style="font-size: 11px; color: #8e8e93;">VENDAS TOTAIS</div>
-            <div id="venda-total" class="valor">R$ 0,00</div>
-        </div>
-        <div class="box">
-            <div style="font-size: 11px; color: #8e8e93;">LUCRO ESTIMADO</div>
-            <div id="lucro-total" class="valor">R$ 0,00</div>
-        </div>
+    <div class="card">
+        <label style="font-size: 12px; color: #8e8e93;">O QUE FOI PAGO?</label>
+        <input type="text" id="desp-nome" class="input-dark" placeholder="Ex: Gelo, Aluguel, Luz">
+        <label style="font-size: 12px; color: #8e8e93;">VALOR (R$)</label>
+        <input type="number" id="desp-valor" class="input-dark" placeholder="0.00" step="0.01">
+        <button onclick="salvarDespesa()" class="btn-salvar">REGISTRAR SAÍDA</button>
     </div>
 
-    <div class="box" style="margin-top: 10px;">
-        <div style="font-size: 11px; color: #8e8e93; margin-bottom: 10px;">ESTOQUE CRÍTICO ⚠️</div>
-        <div id="estoque-alerta">Verificando estoque...</div>
-    </div>
-
-    <h4 style="text-align: center; color: #8e8e93; margin-top: 25px;">DISTRIBUIÇÃO DE LUCRO</h4>
-    <canvas id="graficoLucro"></canvas>
+    <div id="lista-despesas"></div>
 
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
-            authDomain: "boteco934-afc3f.firebaseapp.com", 
-            projectId: "boteco934-afc3f", 
-            storageBucket: "boteco934-afc3f.firebasestorage.app", 
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        async function processarDados() {
-            let totalVendido = 0;
-            let totalLucroBebidas = 0;
-            let totalLucroBoticario = 0;
+        async function salvarDespesa() {
+            const nome = document.getElementById('desp-nome').value.toUpperCase();
+            const valor = document.getElementById('desp-valor').value;
+            if(!nome || !valor) return alert("Preencha a descrição e o valor!");
 
-            // 1. Soma todas as Vendas Realizadas
-            const vendasSnap = await db.collection("vendas_realizadas").get();
-            vendasSnap.forEach(doc => {
-                let v = doc.data();
-                totalVendido += parseFloat(v.valor || 0);
-                // Assume-se uma margem média de 30% para o lucro total rápido
-                totalLucroBebidas += (parseFloat(v.valor) * 0.35); 
-            });
-
-            // 2. Soma Lucro do Boticário
-            const botSnap = await db.collection("boticario").get();
-            botSnap.forEach(doc => {
-                let b = doc.data();
-                let lucroUn = parseFloat(b.venda || 0) - parseFloat(b.custo || 0);
-                totalLucroBoticario += lucroUn;
-            });
-
-            // Atualiza os números na tela
-            document.getElementById('venda-total').innerText = "R$ " + totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            document.getElementById('lucro-total').innerText = "R$ " + (totalLucroBebidas + totalLucroBoticario).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-
-            // 3. Alerta de Estoque (Simulado por enquanto baseado nos produtos cadastrados)
-            const prodSnap = await db.collection("produtos").limit(3).get();
-            let alertaHtml = "";
-            prodSnap.forEach(doc => {
-                alertaHtml += `<div class="alerta-item">Baixo: ${doc.data().nome}</div>`;
-            });
-            document.getElementById('estoque-alerta').innerHTML = alertaHtml || "Estoque em dia!";
-
-            // 4. Desenha o Gráfico
-            const ctx = document.getElementById('graficoLucro').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Bar/Bebidas', 'Boticário'],
-                    datasets: [{
-                        data: [totalLucroBebidas, totalLucroBoticario],
-                        backgroundColor: ['#5856d6', '#00a896'],
-                        borderColor: '#1c1c1e',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#fff', font: { size: 14 } } }
-                    }
-                }
-            });
+            try {
+                await db.collection("despesas").add({ nome, valor: parseFloat(valor), data: new Date() });
+                alert("✅ Despesa de R$ " + valor + " registrada!");
+                location.reload();
+            } catch (e) { alert("Erro ao salvar despesa!"); }
         }
 
-        processarDados();
+        db.collection("despesas").orderBy("data", "desc").limit(15).onSnapshot(snap => {
+            let h = "";
+            snap.forEach(doc => {
+                let d = doc.data();
+                h += `<div class="item-gasto"><span>${d.nome}</span><span style="color:#ff453a; font-weight:bold;">- R$ ${parseFloat(d.valor).toFixed(2)}</span></div>`;
+            });
+            document.getElementById('lista-despesas').innerHTML = h;
+        });
     </script>
 </body>
 </html>
