@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Sistema Pro</title>
+    <title>Boteco 934 - Gestão Pro</title>
     <style>
         :root {
             --bg: #050505; --card: #121212; --gold: #d4af37; --orange: #ff9800; --green: #00ff88; --border: #2a2a2a; --gray: #888;
@@ -35,7 +35,8 @@
         .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         .btn-gold { background: var(--gold); color: #000; }
         
-        .res-p { font-size: 11px; color: var(--green); margin-bottom: 10px; display: block; }
+        .res-p { font-size: 11px; color: var(--green); margin-bottom: 10px; display: block; font-weight: bold; }
+        .info-divisor { color: var(--orange); font-size: 10px; display: block; margin-top: -8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -61,11 +62,12 @@
     <div class="grid-2">
         <div class="box">
             <h3>Calculadora Inteligente</h3>
-            <label>Nome do Produto</label>
-            <input type="text" id="p_nome">
+            <label>Nome do Produto (Digite Ambev ou Amstel)</label>
+            <input type="text" id="p_nome" oninput="calcular()">
+            <span id="label_divisor" class="info-divisor">Divisor Padrão: 12</span>
             
             <div class="grid-2">
-                <div><label>Custo (Fardo/Garrafa)</label><input type="number" id="p_custo" oninput="calcular()"></div>
+                <div><label>Custo (Fardo/Caixa)</label><input type="number" id="p_custo" oninput="calcular()"></div>
                 <div><label>Markup %</label><input type="number" id="p_markup" value="50" oninput="calcular()"></div>
             </div>
 
@@ -83,7 +85,7 @@
             <div style="max-height: 400px; overflow-y: auto;">
                 <table>
                     <thead>
-                        <tr><th>EAN / PRODUTO</th><th>CUSTO</th><th>VENDA</th><th>LUCRO</th></tr>
+                        <tr><th>PRODUTO</th><th>CUSTO UN.</th><th>VENDA</th><th>LUCRO UN.</th></tr>
                     </thead>
                     <tbody id="lista_estoque"></tbody>
                 </table>
@@ -92,38 +94,13 @@
     </div>
 </div>
 
-<div id="mesas" class="content-section">
-    <div class="grid-2" id="grid_mesas"></div>
-</div>
-
-<div id="pendura" class="content-section">
-    <div class="box">
-        <h3>Cadastrar Cliente</h3>
-        <div class="grid-2">
-            <input type="text" id="c_nome" placeholder="Nome">
-            <input type="text" id="c_whats" placeholder="Zap (DDD)">
-        </div>
-        <button class="btn btn-gold" onclick="salvarCliente()">Cadastrar</button>
-    </div>
-    <div class="box"><table id="tab_clientes"></table></div>
-</div>
-
-<div id="dash" class="content-section">
-    <div class="grid-2">
-        <div class="box" style="border-left: 5px solid var(--green);">
-            <label>Lucro Estimado no Estoque</label>
-            <h2 id="d_lucro_e" style="color: var(--green);">R$ 0,00</h2>
-        </div>
-        <div class="box" style="border-left: 5px solid var(--orange);">
-            <label>Pendura Total</label>
-            <h2 id="d_pendura" style="color: var(--orange);">R$ 0,00</h2>
-        </div>
-    </div>
-</div>
+<div id="mesas" class="content-section"><div class="grid-2" id="grid_mesas"></div></div>
+<div id="pendura" class="content-section"><div class="box"><h3>Pendura</h3><table id="tab_clientes"></table></div></div>
+<div id="dash" class="content-section"><div class="grid-2"><div class="box"><label>Lucro Estoque</label><h2 id="d_lucro_e" style="color: var(--green);">R$ 0,00</h2></div></div></div>
 
 <script>
     let estoque = [];
-    let clientes = [];
+    let divisorAtual = 12;
 
     function openTab(name) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -133,26 +110,33 @@
     }
 
     function calcular() {
+        const nome = document.getElementById('p_nome').value.toLowerCase();
         const custo = parseFloat(document.getElementById('p_custo').value) || 0;
         const markup = parseFloat(document.getElementById('p_markup').value) || 0;
         const venda = parseFloat(document.getElementById('p_venda').value) || 0;
         
-        // Simulação: se for fardo de 12 ou garrafa (doses reais 18)
-        const divisor = document.getElementById('p_nome').value.toLowerCase().includes('dose') ? 18 : 12;
-        const cUnit = custo / divisor;
-        
+        // Lógica de Inteligência de Caixa
+        if (nome.includes('dose')) { divisorAtual = 18; }
+        else if (nome.includes('ambev')) { divisorAtual = 23; }
+        else if (nome.includes('amstel')) { divisorAtual = 24; }
+        else { divisorAtual = 12; }
+
+        document.getElementById('label_divisor').innerText = `Divisor Detectado: ${divisorAtual} unidades`;
+
+        const cUnit = custo / divisorAtual;
         const sugerido = cUnit * (1 + (markup / 100));
         const lucroReal = venda - cUnit;
 
         document.getElementById('p_sugerido').value = sugerido.toFixed(2);
-        document.getElementById('res_lucro').innerText = `Lucro Real p/ Unidade: R$ ${lucroReal.toFixed(2)} (Divisor: ${divisor})`;
+        document.getElementById('res_lucro').innerText = `Lucro Real p/ Unidade: R$ ${lucroReal.toFixed(2)}`;
     }
 
     function salvarProduto() {
         const p = {
             ean: document.getElementById('scan_ean').value || '---',
             nome: document.getElementById('p_nome').value.toUpperCase(),
-            custo: parseFloat(document.getElementById('p_custo').value) || 0,
+            custo_caixa: parseFloat(document.getElementById('p_custo').value) || 0,
+            divisor: divisorAtual,
             venda: parseFloat(document.getElementById('p_venda').value) || 0
         };
         if(!p.nome) return;
@@ -163,45 +147,32 @@
     }
 
     function renderEstoque() {
-        const html = estoque.map(p => `
-            <tr>
-                <td><small style="color:var(--gold)">${p.ean}</small><br>${p.nome}</td>
-                <td>R$ ${p.custo.toFixed(2)}</td>
+        const html = estoque.map(p => {
+            const cUn = p.custo_caixa / p.divisor;
+            const lucro = p.venda - cUn;
+            return `<tr>
+                <td><small>${p.ean}</small><br>${p.nome} (${p.divisor} un)</td>
+                <td>R$ ${cUn.toFixed(2)}</td>
                 <td style="color:var(--green)">R$ ${p.venda.toFixed(2)}</td>
-                <td>R$ ${(p.venda - (p.custo/12)).toFixed(2)}</td>
-            </tr>
-        `).join('');
+                <td>R$ ${lucro.toFixed(2)}</td>
+            </tr>`;
+        }).join('');
         document.getElementById('lista_estoque').innerHTML = html;
         
-        let lucroE = estoque.reduce((acc, p) => acc + (p.venda - (p.custo/12)), 0);
-        document.getElementById('d_lucro_e').innerText = `R$ ${lucroE.toFixed(2)}`;
-    }
-
-    function salvarCliente() {
-        clientes.push({ nome: document.getElementById('c_nome').value.toUpperCase(), whats: document.getElementById('c_whats').value, saldo: 0 });
-        renderClientes();
-    }
-
-    function renderClientes() {
-        let h = `<tr><th>NOME</th><th>SALDO</th></tr>`;
-        clientes.forEach(c => h += `<tr><td>${c.nome}</td><td style="color:var(--orange)">R$ ${c.saldo.toFixed(2)}</td></tr>`);
-        document.getElementById('tab_clientes').innerHTML = h;
+        let lucroTotal = estoque.reduce((acc, p) => acc + (p.venda - (p.custo_caixa / p.divisor)), 0);
+        document.getElementById('d_lucro_e').innerText = `R$ ${lucroTotal.toFixed(2)}`;
     }
 
     function focarNome() { document.getElementById('p_nome').focus(); }
     function limpar() { 
-        document.getElementById('scan_ean').value = ''; 
-        document.getElementById('p_nome').value = ''; 
-        document.getElementById('p_custo').value = ''; 
-        document.getElementById('p_venda').value = ''; 
+        document.querySelectorAll('input').forEach(i => { if(i.id !== 'p_markup') i.value = ''; });
         document.getElementById('scan_ean').focus();
+        document.getElementById('label_divisor').innerText = 'Divisor Padrão: 12';
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    
-    // Gerar 8 Mesas
     for(let i=1; i<=8; i++) {
-        document.getElementById('grid_mesas').innerHTML += `<div class="box" style="text-align:center"><b style="color:var(--gold)">MESA 0${i}</b><br><small>Livre</small><button class="btn btn-gold" style="margin-top:10px; height:30px; padding:0">Abrir</button></div>`;
+        document.getElementById('grid_mesas').innerHTML += `<div class="box" style="text-align:center"><b style="color:var(--gold)">MESA 0${i}</b><br><small>Livre</small></div>`;
     }
 </script>
 </body>
