@@ -3,218 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque Inteligente - Boteco 934</title>
+    <title>Cadastro Inteligente - Boteco 934</title>
     <style>
         :root {
             --bg-color: #0b0b0b;
-            --card-bg: #1a1a1a;
+            --card-bg: #141414;
             --accent-orange: #ff9800;
-            --text-gray: #ccc;
-            --success-green: #00ff88;
+            --text-gray: #aaa;
+            --success-green: #28a745;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
+        body { background: var(--bg-color); color: white; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 8px; }
+        
+        /* Sistema de Abas */
+        .tab-container { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 15px; background: #222; border: none; color: white; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        .tab.active { background: var(--accent-orange); color: black; }
+
+        .form-section { display: none; }
+        .form-section.active { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .full { grid-column: span 2; }
+        label { display: block; font-size: 11px; color: var(--text-gray); margin-bottom: 5px; }
+        input { width: 100%; background: #1e1e1e; border: 1px solid #333; color: white; padding: 12px; box-sizing: border-box; }
+        
+        .result-box { 
+            grid-column: span 2; background: #000; border: 1px solid var(--success-green); 
+            padding: 15px; text-align: center; margin-top: 10px;
         }
+        .result-box span { display: block; font-size: 22px; color: var(--success-green); font-weight: bold; }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .header-menu {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .btn-menu {
-            background: #333;
-            border: none;
-            color: white;
-            padding: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 12px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .btn-menu.active {
-            background: var(--accent-orange);
-            color: black;
-            font-weight: bold;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 4px;
-        }
-
-        .full-width { grid-column: span 2; }
-
-        label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-gray);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        input {
-            width: 100%;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            color: white;
-            padding: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-        }
-
-        input:focus { border-color: var(--accent-orange); }
-
-        .display-lucro {
-            grid-column: span 2;
-            border: 2px solid var(--success-green);
-            padding: 15px;
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .display-lucro span {
-            display: block;
-            color: var(--success-green);
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .display-lucro small {
-            color: var(--text-gray);
-        }
-
-        .btn-save {
-            grid-column: span 2;
-            background: var(--accent-orange);
-            color: black;
-            border: none;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .btn-save:hover { background: #e68a00; }
-
-        .actions-footer {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .btn-util {
-            background: transparent;
-            color: var(--text-gray);
-            border: 1px solid #444;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-size: 12px;
+        .btn-save { 
+            grid-column: span 2; background: var(--success-green); color: white; 
+            border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-menu">
-        <button class="btn-menu active">📦 PRODUTOS</button>
-        <button class="btn-menu">💰 VENDAS</button>
-        <button class="btn-menu">👥 CLIENTES</button>
+    <h2 style="text-align: center; color: var(--accent-orange); margin-top: 0;">CADASTRO DE ESTOQUE</h2>
+    
+    <div class="tab-container">
+        <button class="tab active" onclick="switchTab('mercadoria')">Mercadorias (Fardo/Unit)</button>
+        <button class="tab" onclick="switchTab('destilado')">Destilados (Doses)</button>
     </div>
 
-    <div class="form-grid">
-        <div class="full-width">
-            <label>Nome do Produto</label>
-            <input type="text" id="nomeProduto" placeholder="Ex: Coca-Cola Lata 350ml">
+    <div id="mercadoria" class="form-section active">
+        <div class="full">
+            <label>NOME DO PRODUTO</label>
+            <input type="text" id="m_nome" placeholder="Ex: Heineken LN">
         </div>
-
         <div>
-            <label>Custo do Fardo (R$)</label>
-            <input type="number" id="custoFardo" step="0.01" oninput="calcularPrecificacao()">
+            <label>CUSTO DO FARDO (R$)</label>
+            <input type="number" id="m_custoFardo" oninput="calcMercadoria()">
         </div>
-
         <div>
-            <label>Qtd no Fardo (Unidades)</label>
-            <input type="number" id="qtdFardo" oninput="calcularPrecificacao()">
+            <label>QTD NO FARDO</label>
+            <input type="number" id="m_qtd" oninput="calcMercadoria()">
         </div>
-
         <div>
-            <label>Markup Pretendido (%)</label>
-            <input type="number" id="markup" step="0.1" oninput="calcularPrecificacao()">
+            <label>MARKUP (%)</label>
+            <input type="number" id="m_markup" oninput="calcMercadoria()">
         </div>
-
-        <div>
-            <label>Preço Sugerido de Venda (Unidade)</label>
-            <input type="number" id="precoVenda" step="0.01" readonly>
+        <div class="result-box">
+            <label>PREÇO DE VENDA UNITÁRIO</label>
+            <span id="m_resVenda">R$ 0,00</span>
+            <small id="m_resLucro">Lucro: R$ 0,00</small>
         </div>
-
-        <div class="display-lucro">
-            <small>LUCRO POR UNIDADE / MARGEM REAL</small>
-            <span id="resultadoLucro">R$ 0,00</span>
-            <small id="resultadoMargem">Margem: 0%</small>
-        </div>
-
-        <button class="btn-save" onclick="salvarNoEstoque()">SALVAR NO ESTOQUE</button>
     </div>
 
-    <div class="actions-footer">
-        <button class="btn-util">📤 EXPORTAR JSON</button>
-        <button class="btn-util">📥 IMPORTAR LISTA</button>
+    <div id="destilado" class="form-section">
+        <div class="full">
+            <label>NOME DO DESTILADO</label>
+            <input type="text" id="d_nome" placeholder="Ex: Whisky Red Label">
+        </div>
+        <div>
+            <label>CUSTO DA GARRAFA (R$)</label>
+            <input type="number" id="d_custoGf" oninput="calcDestilado()">
+        </div>
+        <div>
+            <label>ML DA GARRAFA</label>
+            <input type="number" id="d_mlTotal" placeholder="Ex: 750" oninput="calcDestilado()">
+        </div>
+        <div>
+            <label>ML DA DOSE</label>
+            <input type="number" id="d_mlDose" value="50" oninput="calcDestilado()">
+        </div>
+        <div>
+            <label>MARKUP NA DOSE (%)</label>
+            <input type="number" id="d_markup" oninput="calcDestilado()">
+        </div>
+        <div class="result-box">
+            <label>PREÇO SUGERIDO POR DOSE</label>
+            <span id="d_resVenda">R$ 0,00</span>
+            <small id="d_resDoses">Rende: 0 doses</small>
+        </div>
     </div>
+
+    <button class="btn-save">SALVAR NO ESTOQUE</button>
 </div>
 
 <script>
-    function calcularPrecificacao() {
-        const custoFardo = parseFloat(document.getElementById('custoFardo').value) || 0;
-        const qtdFardo = parseInt(document.getElementById('qtdFardo').value) || 1;
-        const markup = parseFloat(document.getElementById('markup').value) || 0;
-
-        // 1. Calcula o custo por unidade
-        const custoUnidade = custoFardo / qtdFardo;
-
-        // 2. Calcula o preço de venda baseado no markup
-        // Fórmula: Custo * (1 + (Markup / 100))
-        const precoSugerido = custoUnidade * (1 + (markup / 100));
-        document.getElementById('precoVenda').value = precoSugerido.toFixed(2);
-
-        // 3. Calcula o Lucro Real em Reais
-        const lucroReais = precoSugerido - custoUnidade;
-
-        // 4. Calcula a Margem Real (Lucro / Preço de Venda)
-        const margemReal = precoSugerido > 0 ? (lucroReais / precoSugerido) * 100 : 0;
-
-        // Atualiza a tela
-        document.getElementById('resultadoLucro').innerText = `R$ ${lucroReais.toFixed(2)}`;
-        document.getElementById('resultadoMargem').innerText = `Margem Real: ${margemReal.toFixed(2)}%`;
+    function switchTab(type) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(type).classList.add('active');
     }
 
-    function salvarNoEstoque() {
-        const nome = document.getElementById('nomeProduto').value;
-        if(!nome) {
-            alert("Digite o nome do produto!");
-            return;
-        }
-        alert(`Produto ${nome} salvo com sucesso!`);
-        // Aqui você pode adicionar a lógica de LocalStorage que já estávamos usando.
+    function calcMercadoria() {
+        const custo = parseFloat(document.getElementById('m_custoFardo').value) || 0;
+        const qtd = parseInt(document.getElementById('m_qtd').value) || 1;
+        const markup = parseFloat(document.getElementById('m_markup').value) || 0;
+
+        const custoUnit = custo / qtd;
+        const venda = custoUnit * (1 + (markup / 100));
+        
+        document.getElementById('m_resVenda').innerText = `R$ ${venda.toFixed(2)}`;
+        document.getElementById('m_resLucro').innerText = `Lucro Unitário: R$ ${(venda - custoUnit).toFixed(2)}`;
+    }
+
+    function calcDestilado() {
+        const custoGf = parseFloat(document.getElementById('d_custoGf').value) || 0;
+        const mlGf = parseFloat(document.getElementById('d_mlTotal').value) || 1;
+        const mlDose = parseFloat(document.getElementById('d_mlDose').value) || 1;
+        const markup = parseFloat(document.getElementById('d_markup').value) || 0;
+
+        const numDoses = mlGf / mlDose;
+        const custoDose = custoGf / numDoses;
+        const vendaDose = custoDose * (1 + (markup / 100));
+
+        document.getElementById('d_resVenda').innerText = `R$ ${vendaDose.toFixed(2)}`;
+        document.getElementById('d_resDoses').innerText = `Rende ${numDoses.toFixed(1)} doses de ${mlDose}ml`;
     }
 </script>
 
