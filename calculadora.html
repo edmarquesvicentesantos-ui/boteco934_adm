@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>BOTECO 934 - GESTÃO TOTAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --red: #ff4444; --border: #1a1a1a; --text: #eee; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding: 10px; margin-bottom: 10px; }
+        .nav { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
+        .tab { flex: 1; padding: 15px; background: #000; border: 1px solid var(--border); color: #555; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; text-align: center; border-radius: 4px; min-width: 100px; }
+        .tab.active { border-color: var(--gold); color: var(--gold); background: #111; }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* ESTILO CALCULADORA */
+        .calc-container { background: var(--card); border: 1px solid var(--gold); padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+        .calc-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #222; }
+        .result-box { background: #000; padding: 15px; border-radius: 4px; border: 1px solid var(--green); margin-top: 10px; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+        
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--gold); }
+        label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; display: block; }
+
+        /* GRID MESAS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; min-height: 400px; display: flex; flex-direction: column; }
+        .mesa.ocupada { border-color: var(--red); }
+        .recibo { flex-grow: 1; padding: 15px; font-family: 'Courier New', monospace; font-size: 13px; }
+        
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-gold { background: var(--gold); color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="color:var(--gold); font-size:16px; margin:0;">BOTECO 934 - INTELIGÊNCIA</h1>
+    <div id="clock" style="font-family:monospace; color:var(--gold)"></div>
+</div>
+
+<div class="nav">
+    <div class="tab active" onclick="tab(event, 'v-mesas')">Frente de Caixa</div>
+    <div class="tab" onclick="tab(event, 'v-calc')">Calculadora Mix</div>
+    <div class="tab" onclick="tab(event, 'v-estoque')">Estoque</div>
+</div>
+
+<div id="v-calc" class="view">
+    <div class="calc-container">
+        <h3 style="color:var(--gold); margin-top:0; text-align:center;">SIMULADOR DE PRECIFICAÇÃO</h3>
+        
+        <div class="calc-group">
+            <label>Custo da Embalagem/Caixa (R$)</label>
+            <input type="number" id="c_custo_total" placeholder="Ex: 54.00" oninput="simular()">
+            
+            <label>Quantidade na Embalagem (Unidades)</label>
+            <input type="number" id="c_qtd_total" placeholder="Ex: 12 ou 24" oninput="simular()">
+            
+            <label>Preço de Venda Desejado (Por Unidade)</label>
+            <input type="number" id="c_venda_un" placeholder="Ex: 7.00" oninput="simular()">
+        </div>
+
+        <div class="result-box">
+            <div class="result-row"><span>Custo por Unidade:</span> <b id="res_custo_un" style="color:#fff">R$ 0,00</b></div>
+            <div class="result-row"><span>Markup (Sobre o custo):</span> <b id="res_markup" style="color:var(--gold)">0%</b></div>
+            <div class="result-row"><span>Margem de Lucro Real:</span> <b id="res_margem_real" style="color:var(--green)">0%</b></div>
+            <div class="result-row" style="margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                <span>Lucro Bruto por Unidade:</span> <b id="res_lucro_rs" style="color:var(--green)">R$ 0,00</b>
+            </div>
+        </div>
+        
+        <p style="font-size:10px; color:#555; text-align:center; margin-top:15px;">
+            * Lucro Real é a porcentagem que sobra do preço de venda após pagar o custo.
+        </p>
+    </div>
+</div>
+
+<div id="v-mesas" class="view active">
+    <div class="grid" id="grid_mesas"></div>
+</div>
+
+<div id="v-estoque" class="view">
+    <div style="background:#0a0a0a; padding:20px; border:1px solid var(--border); border-radius:8px;">
+        <input type="text" id="e_ean" placeholder="Código de Barras">
+        <input type="text" id="e_nome" placeholder="Nome do Produto">
+        <input type="number" id="e_preco" placeholder="Preço Venda R$" step="0.01">
+        <input type="number" id="e_qtd" placeholder="Qtd Inicial Estoque">
+        <button class="btn btn-gold" onclick="salvarProd()">Salvar Produto</button>
+    </div>
+</div>
+
+<script>
+    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
+    let mesas = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre', total: 0 }));
+
+    function tab(e, id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        e.currentTarget.classList.add('active');
+    }
+
+    // LOGICA DA CALCULADORA INTELIGENTE
+    function simular() {
+        const custoTotal = parseFloat(document.getElementById('c_custo_total').value) || 0;
+        const qtd = parseFloat(document.getElementById('c_qtd_total').value) || 0;
+        const vendaUn = parseFloat(document.getElementById('c_venda_un').value) || 0;
+
+        if (custoTotal > 0 && qtd > 0) {
+            const custoUn = custoTotal / qtd;
+            document.getElementById('res_custo_un').innerText = `R$ ${custoUn.toFixed(2)}`;
+
+            if (vendaUn > 0) {
+                const lucroRs = vendaUn - custoUn;
+                const markup = (lucroRs / custoUn) * 100;
+                const margemReal = (lucroRs / vendaUn) * 100;
+
+                document.getElementById('res_lucro_rs').innerText = `R$ ${lucroRs.toFixed(2)}`;
+                document.getElementById('res_markup').innerText = `${markup.toFixed(1)}%`;
+                document.getElementById('res_margem_real').innerText = `${margemReal.toFixed(1)}%`;
+            }
+        }
+    }
+
+    function renderMesas() {
+        const grid = document.getElementById('grid_mesas');
+        grid.innerHTML = mesas.map(m => {
+            let soma = 0;
+            let itensHtml = "";
+            for (let n in m.consumo) {
+                const it = m.consumo[n];
+                const sub = it.qtd * it.preco;
+                soma += sub;
+                itensHtml += `<div style="display:flex;justify-content:space-between"><span>${it.qtd}x ${n}</span><span>${sub.toFixed(2)}</span></div>`;
+            }
+            return `
+                <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
+                    <div style="padding:10px; border-bottom:1px dashed #222; text-align:center;">
+                        <b style="color:var(--gold)">MESA 0${m.id}</b><br><small>${m.cliente || 'LIVRE'}</small>
+                    </div>
+                    <div class="recibo">${itensHtml}</div>
+                    <div style="padding:10px;"><input type="text" placeholder="BIPAR..." onchange="bipar(this, ${m.id})"></div>
+                    <div style="padding:15px; background:#000; border-top:1px dashed var(--border);">
+                        <div style="display:flex; justify-content:space-between;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                        <button class="btn btn-gold" onclick="fecharMesa(${m.id}, ${soma})">FECHAR</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function bipar(input, mId) {
+        const val = input.value.toUpperCase();
+        const p = estoque.find(x => x.ean === val || x.nome === val);
+        if(p && p.qtd > 0) {
+            const m = mesas.find(x => x.id === mId);
+            if(!m.cliente) m.cliente = prompt("Cliente:");
+            if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
+            else m.consumo[p.nome] = { qtd: 1, preco: p.preco };
+            p.qtd--; m.status = 'Ocupada';
+            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+            renderMesas();
+        }
+        input.value = ''; input.focus();
+    }
+
+    function fecharMesa(id, total) {
+        if(total > 0 && confirm("Confirmar pagamento?")) {
+            const m = mesas.find(x => x.id === id);
+            m.status = 'Livre'; m.cliente = ''; m.consumo = {};
+            renderMesas();
+        }
+    }
+
+    function salvarProd() {
+        const n = document.getElementById('e_nome').value.toUpperCase();
+        const p = parseFloat(document.getElementById('e_preco').value);
+        const q = parseInt(document.getElementById('e_qtd').value);
+        const e = document.getElementById('e_ean').value;
+        if(n && p) {
+            estoque.push({ ean: e, nome: n, preco: p, qtd: q });
+            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+            alert("Salvo!");
+            document.querySelectorAll('input').forEach(i => i.value = '');
+        }
+    }
+
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    renderMesas();
+</script>
+</body>
+</html>
