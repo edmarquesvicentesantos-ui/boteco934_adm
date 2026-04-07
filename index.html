@@ -108,7 +108,21 @@
         <button class="btn-save">SALVAR NO ESTOQUE</button>
     </div>
 </div>
-
+<div class="lista-section">
+        <h3>Estoque em Ordem Alfabética</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>CÓD. BARRAS</th>
+                    <th>PRODUTO</th>
+                    <th>CUSTO</th>
+                    <th>VENDA</th>
+                    <th>LUCRO</th>
+                </tr>
+            </thead>
+            <tbody id="tabela"></tbody>
+        </table>
+    </div>
 <script>
     function mudarAba(id, btn) {
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
