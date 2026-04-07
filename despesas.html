@@ -12,22 +12,22 @@
         .card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
         .input-dark { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
         .btn-salvar { width: 100%; padding: 15px; background: #ff453a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .item-gasto { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; font-size: 14px; }
+        .item-gasto { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #333; background: #121212; margin-bottom: 5px; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0; color: #ff453a;">SAÍDAS / DESPESAS</h2>
-        <button onclick="location.href='index.html'" style="background:none; border:1px solid #ff453a; color:#ff453a; margin-top:10px; border-radius:5px;">VOLTAR</button>
+        <h2 style="margin:0; color: #ff453a;">SAÍDAS E GASTOS</h2>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid #ff453a; color:#ff453a; margin-top:10px; border-radius:5px; padding: 5px 10px;">VOLTAR</button>
     </div>
 
     <div class="card">
-        <label>DESCRIÇÃO (Ex: Luz, Aluguel, Gelo)</label>
-        <input type="text" id="desp-nome" class="input-dark" placeholder="O que pagou?">
-        <label>VALOR (R$)</label>
-        <input type="number" id="desp-valor" class="input-dark" placeholder="0.00">
-        <button onclick="salvarDespesa()" class="btn-salvar">REGISTRAR PAGAMENTO</button>
+        <label style="font-size: 12px; color: #8e8e93;">O QUE FOI PAGO?</label>
+        <input type="text" id="desp-nome" class="input-dark" placeholder="Ex: Gelo, Aluguel, Luz">
+        <label style="font-size: 12px; color: #8e8e93;">VALOR (R$)</label>
+        <input type="number" id="desp-valor" class="input-dark" placeholder="0.00" step="0.01">
+        <button onclick="salvarDespesa()" class="btn-salvar">REGISTRAR SAÍDA</button>
     </div>
 
     <div id="lista-despesas"></div>
@@ -40,20 +40,20 @@
         async function salvarDespesa() {
             const nome = document.getElementById('desp-nome').value.toUpperCase();
             const valor = document.getElementById('desp-valor').value;
-            if(!nome || !valor) return alert("Preencha tudo!");
+            if(!nome || !valor) return alert("Preencha a descrição e o valor!");
 
             try {
                 await db.collection("despesas").add({ nome, valor: parseFloat(valor), data: new Date() });
-                alert("Despesa registrada!");
+                alert("✅ Despesa de R$ " + valor + " registrada!");
                 location.reload();
-            } catch (e) { alert("Erro!"); }
+            } catch (e) { alert("Erro ao salvar despesa!"); }
         }
 
-        db.collection("despesas").orderBy("data", "desc").limit(10).onSnapshot(snap => {
+        db.collection("despesas").orderBy("data", "desc").limit(15).onSnapshot(snap => {
             let h = "";
             snap.forEach(doc => {
                 let d = doc.data();
-                h += `<div class="item-gasto"><span>${d.nome}</span><span style="color:#ff453a;">- R$ ${d.valor.toFixed(2)}</span></div>`;
+                h += `<div class="item-gasto"><span>${d.nome}</span><span style="color:#ff453a; font-weight:bold;">- R$ ${parseFloat(d.valor).toFixed(2)}</span></div>`;
             });
             document.getElementById('lista-despesas').innerHTML = h;
         });
