@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Boteco 934</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
+        .header { text-align: center; border-bottom: 2px solid #ff9f0a; padding-bottom: 10px; }
+        .grid-relatorio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .box { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .valor { font-size: 20px; font-weight: bold; color: #30d158; margin-top: 5px; }
+        .critico { color: #ff453a !important; font-weight: bold; }
+        canvas { background: #1c1c1e; border-radius: 12px; margin-top: 20px; padding: 10px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0; color: #ff9f0a;">RELATÓRIOS E LUCRO</h2>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid #ff9f0a; color:#ff9f0a; margin-top:10px; border-radius:5px;">VOLTAR</button>
+    </div>
+
+    <div class="grid-relatorio">
+        <div class="box">
+            <div style="font-size: 11px; color: #8e8e93;">TOTAL VENDAS (MÊS)</div>
+            <div id="venda-mes" class="valor">R$ 0,00</div>
+        </div>
+        <div class="box">
+            <div style="font-size: 11px; color: #8e8e93;">LUCRO LÍQUIDO</div>
+            <div id="lucro-total" class="valor" style="color: #30d158;">R$ 0,00</div>
+        </div>
+    </div>
+
+    <div class="box" style="margin-top: 10px; width: auto;">
+        <div style="font-size: 11px; color: #8e8e93;">ALERTA DE ESTOQUE BAIXO ⚠️</div>
+        <div id="estoque-alerta" style="font-size: 14px; margin-top: 10px;">Monitorando...</div>
+    </div>
+
+    <h4 style="text-align: center; color: #8e8e93; margin-top: 25px;">CERVEJA VS BOTICÁRIO</h4>
+    <canvas id="graficoLucro" width="400" height="300"></canvas>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Aqui o código vai buscar os dados e montar o gráfico
+        async function carregarRelatorios() {
+            // Exemplo de lógica (isso vai ler suas coleções do Firebase)
+            let lucroBebidas = 450.00; // Aqui faremos a soma real depois
+            let lucroBoticario = 280.00; 
+
+            document.getElementById('venda-mes').innerText = "R$ 2.450,00"; // Simulação
+            document.getElementById('lucro-total').innerText = "R$ " + (lucroBebidas + lucroBoticario).toFixed(2);
+            document.getElementById('estoque-alerta').innerHTML = "<span class='critico'>Skol Lata (Restam 4 un)</span>";
+
+            // Monta o Gráfico
+            const ctx = document.getElementById('graficoLucro').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bebidas', 'Boticário'],
+                    datasets: [{
+                        data: [lucroBebidas, lucroBoticario],
+                        backgroundColor: ['#ff9f0a', '#00a896'],
+                        borderColor: '#1c1c1e'
+                    }]
+                },
+                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+            });
+        }
+        carregarRelatorios();
+    </script>
+</body>
+</html>
