@@ -5,88 +5,82 @@
     <input type="text" id="nome-cerv" class="input-dark" placeholder="Ex: Coca lata 350ml">
 
     <label>CÓDIGO DE BARRAS (BIP)</label>
-    <input type="text" id="cod-barras" class="input-dark" placeholder="Aproxime o leitor ou digite">
+    <input type="text" id="cod-barras" class="input-dark">
 
     <div class="row" style="display: flex; gap: 10px; margin-top: 10px;">
         <div class="col" style="flex: 1;">
-            <label>CUSTO FARDO (R$)</label>
-            <input type="number" id="custo-fardo" class="input-dark" oninput="calcularTudo()" placeholder="0.00">
+            <label>CUSTO FARDO</label>
+            <input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularAgora()" placeholder="0.00">
         </div>
         <div class="col" style="flex: 1;">
             <label>QTD NO FARDO</label>
-            <input type="number" id="qtd-fardo" class="input-dark" value="12" oninput="calcularTudo()">
+            <input type="number" id="qtd-fardo" class="input-dark" value="12" onkeyup="calcularAgora()">
         </div>
         <div class="col" style="flex: 1;">
-            <label>MARKUP (%)</label>
-            <input type="number" id="markup-input" class="input-dark" value="100" oninput="calcularTudo()">
-        </div>
-    <div style="margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 1px solid #30d158;">
-        <div style="display: flex; justify-content: space-between; text-align: center;">
-            <div style="flex: 1;">
-                <label style="color: #30d158; font-size: 10px; font-weight: bold;">MARGEM DE LUCRO</label>
-                <div id="margem-final" style="font-size: 22px; font-weight: bold; color: #30d158;">0%</div>
-            </div>
-            <div style="flex: 1; border-left: 1px solid #333;">
-                <label style="color: #30d158; font-size: 10px; font-weight: bold;">LUCRO NO FARDO</label>
-                <div id="lucro-dinheiro" style="font-size: 22px; font-weight: bold; color: #30d158;">R$ 0,00</div>
-            </div>
+            <label>MARKUP %</label>
+            <input type="number" id="markup-input" class="input-dark" value="100" onkeyup="calcularAgora()">
         </div>
     </div>
 
-    <div style="margin-top: 10px; background: #000; padding: 12px; border-radius: 10px; border: 1px solid #30d158; display: flex; justify-content: space-between; align-items: center;">
-        <label style="color: #30d158; font-size: 12px; font-weight: bold; margin: 0;">LUCRO POR UNIDADE:</label>
-        <div id="lucro-unidade" style="color: #30d158; font-weight: bold; font-size: 18px;">R$ 0,00</div>
-    </div>
+    <div style="margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 2px solid #30d158;">
+        <div style="display: flex; justify-content: space-between; text-align: center;">
+            <div style="flex: 1;">
+                <label style="color: #30d158; font-size: 10px; font-weight: bold;">MARGEM REAL</label>
+                <div id="res-margem" style="font-size: 22px; font-weight: bold; color: #30d158;">0%</div>
+            </div>
+            <div style="flex: 1; border-left: 1px solid #333;">
+                <label style="color: #30d158; font-size: 10px; font-weight: bold;">LUCRO FARDO</label>
+                <div id="res-lucro-fardo" style="font-size: 22px; font-weight: bold; color: #30d158;">R$ 0,00</div>
+            </div>
+        </div>
+        <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; text-align: center;">
+            <label style="color: #30d158; font-size: 10px; font-weight: bold;">LUCRO POR UNIDADE</label>
+            <div id="res-lucro-un" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
+        </div>
     </div>
 
     <div class="row" style="display: flex; gap: 10px; margin-top: 15px;">
         <div class="col" style="flex: 1;">
-            <label>VENDA (FARDO)</label>
-            <input type="text" id="venda-fardo" class="input-dark" style="background: #2c2c2e; font-weight: bold; color: #30d158;" readonly>
+            <label>VENDA FARDO</label>
+            <input type="text" id="vda-fardo" class="input-dark" style="background: #2c2c2e; color: #30d158; font-weight: bold;" readonly>
         </div>
         <div class="col" style="flex: 1;">
-            <label>VENDA (UNIDADE)</label>
-            <input type="text" id="venda-un" class="input-dark" style="background: #2c2c2e;" readonly>
+            <label>VENDA UNIDADE</label>
+            <input type="text" id="vda-un" class="input-dark" style="background: #2c2c2e;" readonly>
         </div>
     </div>
 
-    <button onclick="salvar()" style="width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 16px;">
-        SALVAR PRODUTO NO BANCO
+    <button onclick="salvar()" style="width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer;">
+        SALVAR PRODUTO
     </button>
 </div>
 
 <script>
-function calcularTudo() {
-    let custoFardo = parseFloat(document.getElementById('custo-fardo').value) || 0;
-    let qtdFardo = parseFloat(document.getElementById('qtd-fardo').value) || 1;
-    let markup = parseFloat(document.getElementById('markup-input').value) || 0;
+function calcularAgora() {
+    // Pegando valores brutos
+    var custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
+    var qtd = parseFloat(document.getElementById('qtd-fardo').value) || 1;
+    var mkp = parseFloat(document.getElementById('markup-input').value) || 0;
 
-    if (custoFardo > 0) {
-        // Cálculo Preço de Venda
-        let precoVendaFardo = custoFardo * (1 + (markup / 100));
-        let precoVendaUn = precoVendaFardo / qtdFardo;
-        
-        // Cálculo de Lucro
-        let lucroTotalFardo = precoVendaFardo - custoFardo;
-        let lucroPorUnidade = lucroTotalFardo / qtdFardo;
-        
-        // Cálculo Margem Real (Lucro sobre a Venda)
-        let margemLucro = (lucroTotalFardo / precoVendaFardo) * 100;
+    if (custo > 0) {
+        // Cálculos
+        var vendaTotal = custo * (1 + (mkp / 100));
+        var lucroFardo = vendaTotal - custo;
+        var margem = (lucroFardo / vendaTotal) * 100;
+        var lucroUn = lucroFardo / qtd;
+        var vendaUn = vendaTotal / qtd;
 
-        // Atualização da Tela
-        document.getElementById('venda-fardo').value = "R$ " + precoVendaFardo.toFixed(2);
-        document.getElementById('vda-un').value = "R$ " + precoVendaUn.toFixed(2); // ID corrigido conforme o script
-        // Note: Se o campo acima for 'venda-un', use:
-        document.getElementById('venda-un').value = "R$ " + precoVendaUn.toFixed(2);
+        // Inserindo nos campos (IDs verificados)
+        document.getElementById('res-margem').innerHTML = margem.toFixed(1) + "%";
+        document.getElementById('res-lucro-fardo').innerHTML = "R$ " + lucroFardo.toFixed(2);
+        document.getElementById('res-lucro-un').innerHTML = "R$ " + lucroUn.toFixed(2);
         
-        document.getElementById('margem-final').innerText = margemLucro.toFixed(1) + "%";
-        document.getElementById('lucro-dinheiro').innerText = "R$ " + lucroTotalFardo.toFixed(2);
-        document.getElementById('lucro-unidade').innerText = "R$ " + lucroPorUnidade.toFixed(2);
+        document.getElementById('vda-fardo').value = "R$ " + vendaTotal.toFixed(2);
+        document.getElementById('vda-un').value = "R$ " + vendaUn.toFixed(2);
     }
 }
 </script>
 
 <style>
     .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-    .input-dark:focus { border-color: #30d158; }
 </style>
