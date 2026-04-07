@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Estoque e Precificação - Boteco 934</title>
+    <title>Boteco 934 - Gestão de Estoque</title>
     <style>
         :root {
             --bg: #0a0a0a;
@@ -13,81 +13,84 @@
             --border: #333;
         }
 
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        .container { max-width: 1200px; margin: auto; }
 
         .header { text-align: center; border-bottom: 2px solid var(--orange); padding-bottom: 10px; margin-bottom: 25px; }
-        .header h1 { margin: 0; font-size: 24px; color: var(--orange); letter-spacing: 2px; }
+        .header h1 { margin: 0; font-size: 24px; color: var(--orange); letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Grid Principal */
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
-        .box h3 { margin-top: 0; font-size: 14px; color: var(--orange); text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 15px; }
+        .box h3 { margin: 0; font-size: 14px; color: var(--orange); text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
-        /* Formulários */
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 5px; font-weight: bold; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 11px; color: var(--gray); font-weight: bold; text-transform: uppercase; }
         input { 
             width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); 
             color: #fff; font-size: 16px; box-sizing: border-box; border-radius: 4px;
         }
         input:focus { border-color: var(--orange); outline: none; }
 
+        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
         /* Dashboard de Resultados */
-        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .res-item { background: #0a0a0a; padding: 12px; border-radius: 4px; border-left: 3px solid var(--orange); }
-        .res-item.green { border-left-color: var(--green); }
-        .res-item small { display: block; font-size: 10px; color: var(--gray); text-transform: uppercase; }
-        .res-item span { font-size: 18px; font-weight: bold; }
+        .res-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .res-card { background: #0a0a0a; padding: 12px; border-radius: 4px; border-left: 3px solid var(--orange); }
+        .res-card.green { border-left-color: var(--green); }
+        .res-card small { display: block; font-size: 10px; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; }
+        .res-card b { font-size: 18px; color: #fff; }
 
-        .lucro-total { 
-            grid-column: span 2; background: #000; border: 1px solid var(--green); 
-            padding: 20px; text-align: center; margin-top: 10px; 
+        .total-profit { 
+            background: #000; border: 1px solid var(--green); padding: 15px; 
+            text-align: center; margin-top: 10px; border-radius: 4px;
         }
-        .lucro-total big { display: block; font-size: 32px; color: var(--green); font-weight: bold; }
+        .total-profit small { color: var(--gray); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .total-profit div { font-size: 28px; color: var(--green); font-weight: bold; }
 
-        .btn-salvar { 
+        .btn-save { 
             width: 100%; padding: 15px; background: var(--orange); color: #000; 
-            border: none; font-weight: bold; margin-top: 20px; cursor: pointer; border-radius: 4px;
-            text-transform: uppercase; transition: 0.3s;
+            border: none; font-weight: bold; cursor: pointer; border-radius: 4px;
+            text-transform: uppercase; transition: 0.3s; font-size: 14px;
         }
-        .btn-salvar:hover { background: var(--green); }
+        .btn-save:hover { background: var(--green); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>BOTECO 934 - GESTÃO DE ESTOQUE</h1>
+        <h1>Boteco 934 - Gestão de Estoque</h1>
     </div>
 
     <div class="main-grid">
         <div class="box">
-            <h3>Mercadorias (Fardos / Caixas)</h3>
+            <h3>Mercadorias (Tardos / Caixas)</h3>
             <div class="input-group">
                 <label>Nome do Produto</label>
                 <input type="text" id="m_nome" placeholder="Ex: Heineken 600ml">
             </div>
-            <div class="res-grid">
+            <div class="sub-grid">
                 <div class="input-group"><label>Custo do Fardo (R$)</label><input type="number" id="m_custo" oninput="calcM()"></div>
                 <div class="input-group"><label>Qtd no Fardo</label><input type="number" id="m_qtd" oninput="calcM()" value="12"></div>
+            </div>
+            <div class="sub-grid">
                 <div class="input-group"><label>Markup (%)</label><input type="number" id="m_markup" oninput="calcM()" value="50"></div>
                 <div class="input-group"><label>Preço Sugerido (Un)</label><input type="number" id="m_venda" readonly></div>
             </div>
 
-            <div class="res-grid">
-                <div class="res-item"><small>Custo Unitário</small><span id="m_c_unit">R$ 0,00</span></div>
-                <div class="res-item"><small>Margem Real</small><span id="m_margem">0%</span></div>
-                <div class="res-item green"><small>Lucro Unitário</small><span id="m_lucro_u">R$ 0,00</span></div>
-                <div class="res-item green"><small>Faturamento Fardo</small><span id="m_fat_f">R$ 0,00</span></div>
+            <div class="res-container">
+                <div class="res-card"><small>Custo Unitário</small><b id="m_c_unit">R$ 0,00</b></div>
+                <div class="res-card"><small>Margem Real</small><b id="m_margem">0%</b></div>
+                <div class="res-card green"><small>Lucro Unitário</small><b id="m_lucro_u">R$ 0,00</b></div>
+                <div class="res-card green"><small>Faturamento Fardo</small><b id="m_fat_f">R$ 0,00</b></div>
             </div>
 
-            <div class="lucro-total">
-                <small>LUCRO LÍQUIDO NO FARDO</small>
-                <big id="m_lucro_f">R$ 0,00</big>
+            <div class="total-profit">
+                <small>Lucro Líquido no Fardo</small>
+                <div id="m_lucro_f">R$ 0,00</div>
             </div>
-            <button class="btn-salvar">Salvar Mercadoria</button>
+            <button class="btn-save">Salvar Mercadoria</button>
         </div>
 
         <div class="box">
@@ -96,9 +99,11 @@
                 <label>Nome do Destilado</label>
                 <input type="text" id="d_nome" placeholder="Ex: Black Label">
             </div>
-            <div class="res-grid">
+            <div class="sub-grid">
                 <div class="input-group"><label>Custo Garrafa (R$)</label><input type="number" id="d_custo" oninput="calcD()"></div>
                 <div class="input-group"><label>ML Garrafa</label><input type="number" id="d_ml_g" oninput="calcD()" value="1000"></div>
+            </div>
+            <div class="sub-grid">
                 <div class="input-group"><label>ML Dose</label><input type="number" id="d_ml_d" oninput="calcD()" value="50"></div>
                 <div class="input-group"><label>Perda Real (%)</label><input type="number" id="d_perda" oninput="calcD()" value="10"></div>
             </div>
@@ -107,18 +112,18 @@
                 <input type="number" id="d_markup" oninput="calcD()" value="100">
             </div>
 
-            <div class="res-grid">
-                <div class="res-item"><small>Doses Reais</small><span id="d_total_d">0</span></div>
-                <div class="res-item"><small>Custo Real Dose</small><span id="d_c_dose">R$ 0,00</span></div>
-                <div class="res-item green"><small>Preço Sugerido Dose</small><span id="d_venda_d">R$ 0,00</span></div>
-                <div class="res-item green"><small>Lucro por Dose</small><span id="d_lucro_d">R$ 0,00</span></div>
+            <div class="res-container">
+                <div class="res-card"><small>Doses Reais</small><b id="d_total_d">0</b></div>
+                <div class="res-card"><small>Custo Real Dose</small><b id="d_c_dose">R$ 0,00</b></div>
+                <div class="res-card green"><small>Preço Sugerido Dose</small><b id="d_venda_d">R$ 0,00</b></div>
+                <div class="res-card green"><small>Lucro por Dose</small><b id="d_lucro_d">R$ 0,00</b></div>
             </div>
 
-            <div class="lucro-total">
-                <small>LUCRO LÍQUIDO NA GARRAFA</small>
-                <big id="d_lucro_g">R$ 0,00</big>
+            <div class="total-profit">
+                <small>Lucro Líquido na Garrafa</small>
+                <div id="d_lucro_g">R$ 0,00</div>
             </div>
-            <button class="btn-salvar">Salvar Destilado</button>
+            <button class="btn-save">Salvar Destilado</button>
         </div>
     </div>
 </div>
@@ -129,4 +134,42 @@
         const qtd = parseInt(document.getElementById('m_qtd').value) || 1;
         const markup = parseFloat(document.getElementById('m_markup').value) || 0;
 
-        const cUnit
+        const cUnit = custo / qtd;
+        const vUnit = cUnit * (1 + (markup / 100));
+        const lucroU = vUnit - cUnit;
+        const fatF = vUnit * qtd;
+        const lucroF = fatF - custo;
+        const margem = vUnit > 0 ? (lucroU / vUnit) * 100 : 0;
+
+        document.getElementById('m_venda').value = vUnit.toFixed(2);
+        document.getElementById('m_c_unit').innerText = `R$ ${cUnit.toFixed(2)}`;
+        document.getElementById('m_margem').innerText = `${margem.toFixed(1)}%`;
+        document.getElementById('m_lucro_u').innerText = `R$ ${lucroU.toFixed(2)}`;
+        document.getElementById('m_fat_f').innerText = `R$ ${fatF.toFixed(2)}`;
+        document.getElementById('m_lucro_f').innerText = `R$ ${lucroF.toFixed(2)}`;
+    }
+
+    function calcD() {
+        const custoG = parseFloat(document.getElementById('d_custo').value) || 0;
+        const mlG = parseFloat(document.getElementById('d_ml_g').value) || 1;
+        const mlD = parseFloat(document.getElementById('d_ml_d').value) || 1;
+        const perda = parseFloat(document.getElementById('d_perda').value) || 0;
+        const markup = parseFloat(document.getElementById('d_markup').value) || 0;
+
+        const mlUtil = mlG * (1 - (perda / 100));
+        const doses = mlUtil / mlD;
+        const cDose = custoG / doses;
+        const vDose = cDose * (1 + (markup / 100));
+        const lucroD = vDose - cDose;
+        const lucroG = (vDose * doses) - custoG;
+
+        document.getElementById('d_total_d').innerText = Math.floor(doses);
+        document.getElementById('d_c_dose').innerText = `R$ ${cDose.toFixed(2)}`;
+        document.getElementById('d_venda_d').innerText = `R$ ${vDose.toFixed(2)}`;
+        document.getElementById('d_lucro_d').innerText = `R$ ${lucroD.toFixed(2)}`;
+        document.getElementById('d_lucro_g').innerText = `R$ ${lucroG.toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
