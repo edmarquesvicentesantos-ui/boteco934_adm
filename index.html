@@ -2,98 +2,89 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Total Black Edition</title>
+    <title>Boteco 934 - Gestão Elite</title>
     <style>
         :root {
-            --bg: #000000; 
-            --card: #000000; /* Tudo Preto */
-            --gold: #d4af37; 
-            --orange: #ff9800; 
-            --green: #00ff88; 
-            --border: #1a1a1a; /* Borda sutil para separar os cards no preto */
-            --gray: #666;
+            --bg: #000000; --card: #000000; --gold: #d4af37; --green: #00ff88; --border: #1a1a1a; --gray: #666;
         }
         body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px; }
         .header h1 { color: var(--gold); margin: 0; font-size: 18px; letter-spacing: 3px; text-transform: uppercase; }
 
         .nav-tabs { display: flex; gap: 2px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 15px; background: #000; border: 1px solid var(--border); color: var(--gray); cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; transition: 0.3s; }
-        .tab-btn.active { border-color: var(--gold); color: var(--gold); background: #0a0a0a; }
+        .tab-btn { flex: 1; padding: 15px; background: #000; border: 1px solid var(--border); color: var(--gray); cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; }
+        .tab-btn.active { border-color: var(--gold); color: var(--gold); }
 
         .content-section { display: none; }
         .content-section.active { display: block; }
 
-        /* Cards Total Black */
-        .box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 4px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.05); }
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-
-        .mesa-card { background: #000; border: 1px solid var(--border); padding: 20px; border-radius: 8px; text-align: center; transition: 0.3s; }
-        .mesa-card.ocupada { border-color: #ff4444; box-shadow: inset 0 0 10px rgba(255, 68, 68, 0.1); }
+        .box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 4px; margin-bottom: 15px; }
+        
+        /* Grid das Mesas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .mesa-card { background: #000; border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; position: relative; }
+        .mesa-card.ocupada { border-color: #ff4444; }
         .mesa-card.livre { border-color: var(--green); }
 
-        /* Inputs Estilo Dark */
-        label { display: block; font-size: 9px; color: var(--gray); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
-        input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; outline: none; }
-        input:focus { border-color: var(--gold); }
+        .cliente-nome { display: block; color: var(--gold); font-size: 11px; margin-top: 5px; font-weight: bold; height: 15px; text-transform: uppercase; }
+        .price-tag { font-size: 20px; font-weight: bold; margin: 8px 0; display: block; color: #fff; }
 
-        /* Botões */
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 2px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; font-size: 14px; outline: none; box-sizing: border-box; }
+        
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 2px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: #000; }
-        .btn-gold:active { background: #b8962e; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; margin-top: 5px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: #666; }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid var(--border); font-size: 10px; }
+        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid var(--border); }
         td { padding: 10px; border-bottom: 1px solid #0a0a0a; }
-
-        .price-tag { font-size: 22px; font-weight: bold; margin: 10px 0; display: block; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>BOTECO 934</h1>
-    <div id="relogio" style="color: var(--gold); font-family: monospace;"></div>
+    <div id="relogio" style="color: var(--gold);"></div>
 </div>
 
 <div class="nav-tabs">
     <button class="tab-btn active" onclick="openTab('mesas')">Mesas</button>
-    <button class="tab-btn" onclick="openTab('vendas')">Estoque</button>
-    <button class="tab-btn" onclick="openTab('pendura')">Pendura</button>
+    <button class="tab-btn" onclick="openTab('vendas')">Cadastro Estoque</button>
 </div>
 
 <div id="mesas" class="content-section active">
-    <div class="grid-mesas" id="grid_mesas">
-        </div>
+    <div class="grid-mesas" id="grid_mesas"></div>
 </div>
 
 <div id="vendas" class="content-section">
     <div class="box">
-        <label>Código de Barras (EAN)</label>
-        <input type="text" id="scan_ean" onchange="focarNome()" placeholder="Aguardando leitor...">
-        <div class="grid-mesas" style="grid-template-columns: 1fr 1fr;">
-            <div>
-                <label>Produto</label>
-                <input type="text" id="p_nome" oninput="detectarDivisor()">
-                <label>Qtd na Caixa</label>
-                <input type="number" id="p_divisor" value="12">
-            </div>
-            <div>
-                <label>Custo Caixa</label>
-                <input type="number" id="p_custo" oninput="calcular()">
-                <label>Venda Unidade</label>
-                <input type="number" id="p_venda" oninput="calcular()">
-            </div>
+        <h3>Novo Produto / Precificação</h3>
+        <label>Código EAN</label>
+        <input type="text" id="scan_ean" placeholder="Passe o leitor...">
+        <label>Nome do Produto</label>
+        <input type="text" id="p_nome" placeholder="Ex: Skol Ambev">
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="p_venda" placeholder="Preço Venda Un.">
+            <button class="btn btn-gold" onclick="salvarProduto()" style="height: 45px;">Salvar</button>
         </div>
-        <button class="btn btn-gold" onclick="salvarProduto()">Salvar no Sistema</button>
+    </div>
+    <div class="box">
+        <h3>Produtos no Sistema (Ordem Alfabética)</h3>
+        <table id="tab_estoque">
+            <thead><tr><th>PRODUTO</th><th>PREÇO</th></tr></thead>
+            <tbody id="lista_estoque"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
     let estoque = [];
-    let mesas = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, status: 'Livre', total: 0, itens: [] }));
+    let mesas = Array.from({ length: 8 }, (_, i) => ({ 
+        id: i + 1, 
+        status: 'Livre', 
+        cliente: '', 
+        total: 0 
+    }));
 
     function openTab(name) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -107,52 +98,72 @@
         const grid = document.getElementById('grid_mesas');
         grid.innerHTML = mesas.map(m => `
             <div class="mesa-card ${m.status === 'Livre' ? 'livre' : 'ocupada'}">
-                <b style="color:var(--gold); font-size: 12px;">MESA 0${m.id}</b><br>
-                <span class="price-tag" style="color: ${m.total > 0 ? 'var(--orange)' : '#333'}">
-                    R$ ${m.total.toFixed(2)}
-                </span>
-                <button class="btn btn-gold" onclick="lancarItem(${m.id})">+ ITEM</button>
-                <button class="btn btn-outline" onclick="fecharMesa(${m.id})">FECHAR</button>
+                <b style="color:var(--gold)">MESA 0${m.id}</b>
+                <span class="cliente-nome">${m.cliente || ''}</span>
+                <span class="price-tag">R$ ${m.total.toFixed(2)}</span>
+                
+                <button class="btn btn-gold" onclick="abrirAtendimento(${m.id})">Lançar Item</button>
+                <button class="btn btn-outline" onclick="fecharMesa(${m.id})">Finalizar</button>
             </div>
         `).join('');
     }
 
-    function lancarItem(id) {
-        const m = mesas.find(x => x.id === id);
-        const busca = prompt("Nome do Produto ou Código de Barras:");
-        if(!busca) return;
+    function salvarProduto() {
+        const nome = document.getElementById('p_nome').value.toUpperCase();
+        const preco = parseFloat(document.getElementById('p_venda').value) || 0;
+        const ean = document.getElementById('scan_ean').value;
+
+        if(!nome) return;
+        estoque.push({ nome, preco, ean });
+        estoque.sort((a,b) => a.nome.localeCompare(b.nome)); // Ordem Alfabética
         
+        renderEstoque();
+        document.getElementById('p_nome').value = '';
+        document.getElementById('p_venda').value = '';
+        document.getElementById('scan_ean').value = '';
+    }
+
+    function renderEstoque() {
+        document.getElementById('lista_estoque').innerHTML = estoque.map(p => `
+            <tr><td>${p.nome}</td><td style="color:var(--green)">R$ ${p.preco.toFixed(2)}</td></tr>
+        `).join('');
+    }
+
+    function abrirAtendimento(id) {
+        const m = mesas.find(x => x.id === id);
+        
+        // Se a mesa estiver livre, pergunta o nome do cliente primeiro
+        if(m.status === 'Livre') {
+            const nomeCli = prompt("Nome do Cliente para a Mesa 0" + id + ":");
+            if(nomeCli) m.cliente = nomeCli;
+        }
+
+        // Gera a lista de produtos em ordem alfabética para o prompt
+        let listaMsg = "DIGITE O NOME OU CÓDIGO:\n\n";
+        estoque.forEach(p => listaMsg += `- ${p.nome} (R$ ${p.preco})\n`);
+
+        const busca = prompt(listaMsg);
+        if(!busca) return;
+
         const p = estoque.find(x => x.nome.includes(busca.toUpperCase()) || x.ean === busca);
         
         if(p) {
-            m.total += p.venda;
+            m.total += p.preco;
             m.status = 'Ocupada';
             renderMesas();
         } else {
-            alert("Produto não encontrado no estoque!");
+            alert("Produto não encontrado!");
         }
     }
 
     function fecharMesa(id) {
         const m = mesas.find(x => x.id === id);
-        if(m.total === 0) return alert("Mesa está vazia.");
-        
-        if(confirm(`Fechar Mesa 0${id}?\nTotal: R$ ${m.total.toFixed(2)}`)) {
+        if(confirm(`Fechar conta de ${m.cliente || 'Mesa 0'+id}?\nTotal: R$ ${m.total.toFixed(2)}`)) {
             m.total = 0;
             m.status = 'Livre';
+            m.cliente = '';
             renderMesas();
         }
-    }
-
-    function salvarProduto() {
-        const p = {
-            ean: document.getElementById('scan_ean').value,
-            nome: document.getElementById('p_nome').value.toUpperCase(),
-            venda: parseFloat(document.getElementById('p_venda').value) || 0
-        };
-        estoque.push(p);
-        alert("Produto Salvo!");
-        document.querySelectorAll('input').forEach(i => i.value = '');
     }
 
     setInterval(() => {
