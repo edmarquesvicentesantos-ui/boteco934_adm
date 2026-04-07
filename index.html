@@ -2,77 +2,99 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BOTECO 934 - SISTEMA ELITE</title>
+    <title>BOTECO 934 - SISTEMA COMPLETO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --card: #080808; --green: #00ff88; --red: #ff4444; --border: #1a1a1a; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
+        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --red: #ff4444; --border: #222; }
+        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
         
-        /* HEADER & TABS */
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding: 10px; margin-bottom: 10px; }
-        .nav { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 15px; background: #000; border: 1px solid var(--border); color: #555; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; text-align: center; border-radius: 4px; }
-        .tab.active { border-color: var(--gold); color: var(--gold); background: #0c0c0c; }
+        .nav { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
+        .tab { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: #555; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; text-align: center; border-radius: 4px; min-width: 90px; }
+        .tab.active { border-color: var(--gold); color: var(--gold); background: #111; }
 
-        /* GRID MESAS - ESTILO RECIBO */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* GRID MESAS */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 480px; transition: 0.3s; }
-        .mesa.ocupada { border-color: var(--red); box-shadow: 0 0 10px rgba(255, 0, 0, 0.1); }
+        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 450px; }
+        .mesa.ocupada { border-color: var(--red); }
+        .mesa-topo { padding: 10px; background: #111; text-align: center; border-bottom: 1px dashed #333; }
         
-        .mesa-topo { padding: 12px; background: #0e0e0e; border-bottom: 1px dashed var(--border); text-align: center; cursor: pointer; }
-        .mesa-topo b { color: var(--gold); font-size: 14px; letter-spacing: 2px; }
-        .cliente-n { display: block; font-size: 11px; margin-top: 5px; color: #aaa; text-transform: uppercase; }
+        .recibo-area { flex-grow: 1; padding: 15px; font-family: 'Courier New', monospace; font-size: 13px; color: #bbb; overflow-y: auto; }
+        .linha { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px solid #1a1a1a; }
 
-        .recibo { flex-grow: 1; padding: 15px; font-family: 'Courier New', monospace; font-size: 13px; color: #ddd; overflow-y: auto; max-height: 220px; }
-        .linha { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #111; }
+        /* CALCULADORA & ESTOQUE */
+        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
         
-        .controles { padding: 12px; background: #0a0a0a; border-top: 1px solid var(--border); }
-        .input-bip { width: 100%; padding: 12px; background: #000; border: 1px solid var(--gold); color: var(--gold); border-radius: 4px; font-weight: bold; outline: none; box-sizing: border-box; }
-        
-        .total-area { padding: 15px; background: #000; border-top: 2px dashed var(--border); }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .v-total { font-size: 26px; font-weight: bold; color: var(--green); }
-
-        /* MODAL PAGAMENTO */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: #0a0a0a; border: 1px solid var(--gold); padding: 25px; border-radius: 10px; width: 100%; max-width: 400px; }
-        
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
         .btn-gold { background: var(--gold); color: #000; }
-        .btn-green { background: var(--green); color: #000; font-size: 16px; }
-        .btn-cancel { background: transparent; color: #555; border: 1px solid #222; }
+        .btn-green { background: var(--green); color: #000; }
 
-        /* ESTOQUE */
-        .box-estoque { background: #0a0a0a; padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; }
+        /* MODAL */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #0a0a0a; border: 1px solid var(--gold); padding: 25px; border-radius: 10px; width: 100%; max-width: 400px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #222; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1 style="color:var(--gold); font-size:16px;">BOTECO 934 - PDV v2.0</h1>
+    <h1 style="color:var(--gold); font-size:16px; margin:0;">BOTECO 934 - PDV ELITE</h1>
     <div id="clock" style="font-family:monospace; color:var(--gold)"></div>
 </div>
 
 <div class="nav">
-    <div class="tab active" onclick="tab('v-mesas')">Mesas</div>
-    <div class="tab" onclick="tab('v-estoque')">Estoque</div>
+    <div class="tab active" onclick="tab(event, 'v-mesas')">Caixa</div>
+    <div class="tab" onclick="tab(event, 'v-calc')">Calculadora</div>
+    <div class="tab" onclick="tab(event, 'v-estoque')">Estoque</div>
+    <div class="tab" onclick="tab(event, 'v-relatorio')">Relatório</div>
 </div>
 
-<div id="v-mesas" class="view" style="display:block">
+<div id="v-mesas" class="view active">
     <div class="grid" id="grid_mesas"></div>
 </div>
 
-<div id="v-estoque" class="view" style="display:none">
-    <div class="box-estoque">
-        <h3 style="color:var(--gold); margin-top:0">Novo Produto</h3>
-        <input type="text" id="e_ean" placeholder="Bipe o Código de Barras">
-        <input type="text" id="e_nome" placeholder="Nome do Produto (Ex: Skol Lata)">
-        <div style="display:flex; gap:10px">
-            <input type="number" id="e_preco" placeholder="Venda R$" step="0.01">
-            <input type="number" id="e_qtd" placeholder="Qtd Estoque">
-        </div>
-        <button class="btn btn-gold" onclick="salvarProduto()">Cadastrar no Sistema</button>
+<div id="v-calc" class="view">
+    <div class="box" style="max-width: 400px; margin: auto;">
+        <h3 style="color:var(--gold); text-align:center;">MIX INTELIGENTE</h3>
+        <label>Custo Total (Caixa/Fardo)</label>
+        <input type="number" id="c_custo" oninput="simular()">
+        <label>Qtd de Unidades</label>
+        <input type="number" id="c_qtd" oninput="simular()">
+        <label>Preço Venda (Unidade)</label>
+        <input type="number" id="c_venda" oninput="simular()">
+        <div id="res_calc" style="background:#000; padding:15px; border:1px solid var(--green); border-radius:4px; font-size:13px;"></div>
+    </div>
+</div>
+
+<div id="v-estoque" class="view">
+    <div class="box">
+        <h3 style="color:var(--gold)">Cadastrar/Repor</h3>
+        <input type="text" id="e_ean" placeholder="Código de Barras">
+        <input type="text" id="e_nome" placeholder="Nome do Produto">
+        <input type="number" id="e_preco" placeholder="Preço de Venda R$">
+        <input type="number" id="e_qtd" placeholder="Qtd em Estoque">
+        <button class="btn btn-gold" onclick="salvarProd()">Salvar no Sistema</button>
+    </div>
+    <div class="box">
+        <table>
+            <thead><tr><th>PRODUTO</th><th>QTD</th><th>PREÇO</th></tr></thead>
+            <tbody id="lista_estoque"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="v-relatorio" class="view">
+    <div class="box">
+        <h3 style="color:var(--gold)">Vendas de Hoje</h3>
+        <div id="res_vendas_total" style="font-size:24px; color:var(--green); margin-bottom:15px;">R$ 0,00</div>
+        <div id="lista_vendas"></div>
+        <button class="btn" style="background:var(--red); color:#fff;" onclick="limparVendas()">Zerar Relatório do Dia</button>
     </div>
 </div>
 
@@ -81,117 +103,152 @@
 </div>
 
 <script>
-    let estoque = JSON.parse(localStorage.getItem('boteco_estoque')) || [];
-    let mesas = JSON.parse(localStorage.getItem('boteco_mesas')) || Array.from({ length: 8 }, (_, i) => ({ 
-        id: i + 1, cliente: '', consumo: {}, status: 'Livre', total: 0 
-    }));
+    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
+    let vendasDia = JSON.parse(localStorage.getItem('b934_vendas')) || [];
+    let mesas = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre', total: 0 }));
 
-    function tab(id) {
-        document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+    function tab(e, id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).style.display = 'block';
-        event.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active');
+        e.currentTarget.classList.add('active');
+        if(id === 'v-estoque') renderEstoque();
+        if(id === 'v-relatorio') renderRelatorio();
     }
 
-    function render() {
+    // --- LOGICA DE CAIXA ---
+    function renderMesas() {
         const grid = document.getElementById('grid_mesas');
         grid.innerHTML = mesas.map(m => {
-            let soma = 0;
-            let itensHtml = "";
-            for (let n in m.consumo) {
-                const it = m.consumo[n];
-                const sub = it.qtd * it.preco;
-                soma += sub;
-                itensHtml += `<div class="linha"><span>${it.qtd}x ${n}</span><span>${sub.toFixed(2)}</span></div>`;
+            let soma = 0; let itensH = "";
+            for(let n in m.consumo){
+                const it = m.consumo[n]; const sub = it.qtd * it.preco; soma += sub;
+                itensH += `<div class="linha"><span>${it.qtd}x ${n}</span><span>${sub.toFixed(2)}</span></div>`;
             }
             m.total = soma;
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
-                    <div class="mesa-topo" onclick="mudarCliente(${m.id})">
-                        <b>MESA 0${m.id}</b>
-                        <span class="cliente-n">${m.cliente || 'Livre - Toque p/ nome'}</span>
+                    <div class="mesa-topo" onclick="setCliente(${m.id})">
+                        <b style="color:var(--gold)">MESA 0${m.id}</b><br><small>${m.cliente || 'CLIQUE P/ NOME'}</small>
                     </div>
-                    <div class="recibo">${itensHtml || '<div style="text-align:center; opacity:0.1; margin-top:80px">BOTECO 934</div>'}</div>
-                    <div class="controles">
-                        <input type="text" class="input-bip" placeholder="BIPE OU NOME..." onchange="bipar(this, ${m.id})">
+                    <div class="recibo-area">${itensH || '<div style="text-align:center; opacity:0.1; margin-top:100px;">BOTECO 934</div>'}</div>
+                    <div style="padding:10px;"><input type="text" placeholder="BIPAR OU NOME..." onchange="bipar(this, ${m.id})"></div>
+                    <div style="padding:15px; border-top:1px dashed #333;">
+                        <div style="display:flex; justify-content:space-between;"><span>TOTAL</span><b style="color:var(--green); font-size:20px;">R$ ${soma.toFixed(2)}</b></div>
+                        <button class="btn btn-gold" onclick="abrirPg(${m.id})">FECHAR CONTA</button>
                     </div>
-                    <div class="total-area">
-                        <div class="total-row"><small>TOTAL</small><span class="v-total">R$ ${soma.toFixed(2)}</span></div>
-                        <button class="btn btn-gold" onclick="abrirPagamento(${m.id})">FECHAR CONTA</button>
-                    </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
-        localStorage.setItem('boteco_mesas', JSON.stringify(mesas));
     }
 
     function bipar(input, mId) {
         const val = input.value.toUpperCase();
         const p = estoque.find(x => x.ean === val || x.nome === val);
-        if(p) {
-            if(p.qtd <= 0) { alert("Estoque zerado!"); return; }
+        if(p && p.qtd > 0) {
             const m = mesas.find(x => x.id === mId);
             if(!m.cliente) m.cliente = "CLIENTE BALCÃO";
-            m.status = 'Ocupada';
             if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
             else m.consumo[p.nome] = { qtd: 1, preco: p.preco };
-            p.qtd--;
-            localStorage.setItem('boteco_estoque', JSON.stringify(estoque));
-            render();
-        } else { alert("Produto não encontrado!"); }
+            p.qtd--; m.status = 'Ocupada';
+            salvarTudo(); renderMesas();
+        }
         input.value = ''; input.focus();
     }
 
-    function abrirPagamento(id) {
-        const m = mesas.find(x => x.id === id);
-        if(m.total <= 0) return;
+    function abrirPg(id) {
+        const m = mesas.find(x => x.id === id); if(m.total <= 0) return;
         document.getElementById('modal').style.display = 'flex';
         document.getElementById('modal_content').innerHTML = `
-            <h2 style="color:var(--gold); margin:0 0 15px 0">FECHAMENTO MESA 0${id}</h2>
-            <div style="font-size:20px; margin-bottom:20px">Total: <b style="color:var(--green)">R$ ${m.total.toFixed(2)}</b></div>
-            <label style="font-size:10px; color:#666">DIVIDIR POR PESSOAS:</label>
-            <input type="number" id="div_p" value="1" oninput="calcDiv(${m.total})">
-            <div id="res_div" style="color:var(--gold); margin-bottom:15px; font-weight:bold">R$ ${m.total.toFixed(2)} cada</div>
-            <select id="f_pg"><option>PIX</option><option>DINHEIRO</option><option>CARTÃO</option></select>
-            <button class="btn btn-green" onclick="confirmarPg(${id})">CONFIRMAR E LIMPAR MESA</button>
-            <button class="btn btn-cancel" onclick="fecharM()">CANCELAR</button>
+            <h3 style="color:var(--gold)">FECHAR MESA 0${id}</h3>
+            <p>Total: <b>R$ ${m.total.toFixed(2)}</b></p>
+            <input type="text" id="tel_whats" placeholder="WhatsApp Cliente (DDD+Número)">
+            <select id="f_pg"><option>DINHEIRO</option><option>PIX</option><option>CARTÃO</option></select>
+            <button class="btn btn-green" onclick="finalizarPg(${id})">CONFIRMAR E ENVIAR WHATSAPP</button>
+            <button class="btn" style="background:#222; color:#888;" onclick="document.getElementById('modal').style.display='none'">CANCELAR</button>
         `;
     }
 
-    function calcDiv(t) {
-        const p = document.getElementById('div_p').value || 1;
-        document.getElementById('res_div').innerText = `R$ ${(t/p).toFixed(2)} cada`;
-    }
-
-    function confirmarPg(id) {
+    function finalizarPg(id) {
         const m = mesas.find(x => x.id === id);
-        m.status = 'Livre'; m.cliente = ''; m.consumo = {}; m.total = 0;
-        fecharM(); render();
+        const fpg = document.getElementById('f_pg').value;
+        const tel = document.getElementById('tel_whats').value;
+        
+        // Registrar Venda
+        vendasDia.push({ total: m.total, forma: fpg, data: new Date().toLocaleTimeString() });
+        
+        // Enviar WhatsApp
+        if(tel) {
+            let msg = `*BOTECO 934 - RECIBO*%0A%0A`;
+            for(let n in m.consumo) {
+                msg += `${m.consumo[n].qtd}x ${n} - R$ ${(m.consumo[n].qtd * m.consumo[n].preco).toFixed(2)}%0A`;
+            }
+            msg += `%0A*TOTAL: R$ ${m.total.toFixed(2)}*%0APagamento: ${fpg}%0A%0A_Obrigado pela preferência!_`;
+            window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${msg}`);
+        }
+
+        m.status = 'Livre'; m.cliente = ''; m.consumo = {}; 
+        document.getElementById('modal').style.display = 'none';
+        salvarTudo(); renderMesas();
     }
 
-    function fecharM() { document.getElementById('modal').style.display = 'none'; }
-
-    function mudarCliente(id) {
-        const m = mesas.find(x => x.id === id);
-        const n = prompt("Nome do Cliente:");
-        if(n) { m.cliente = n; render(); }
+    // --- CALCULADORA ---
+    function simular() {
+        const c = parseFloat(document.getElementById('c_custo').value) || 0;
+        const q = parseFloat(document.getElementById('c_qtd').value) || 0;
+        const v = parseFloat(document.getElementById('c_venda').value) || 0;
+        if(c > 0 && q > 0) {
+            const unit = c/q; const lucro = v - unit;
+            document.getElementById('res_calc').innerHTML = `
+                Custo Unidade: <b>R$ ${unit.toFixed(2)}</b><br>
+                Lucro Bruto: <b style="color:var(--green)">R$ ${lucro.toFixed(2)}</b><br>
+                Margem Real: <b>${((lucro/v)*100).toFixed(1)}%</b>`;
+        }
     }
 
-    function salvarProduto() {
+    // --- ESTOQUE E RELATORIO ---
+    function salvarProd() {
         const n = document.getElementById('e_nome').value.toUpperCase();
         const p = parseFloat(document.getElementById('e_preco').value);
         const q = parseInt(document.getElementById('e_qtd').value);
         const e = document.getElementById('e_ean').value;
         if(n && p) {
             estoque.push({ ean: e, nome: n, preco: p, qtd: q });
-            localStorage.setItem('boteco_estoque', JSON.stringify(estoque));
-            alert("Salvo!");
+            salvarTudo(); alert("Produto Salvo!");
             document.querySelectorAll('input').forEach(i => i.value = '');
         }
     }
 
+    function renderEstoque() {
+        document.getElementById('lista_estoque').innerHTML = estoque.map(p => `
+            <tr><td>${p.nome}</td><td>${p.qtd}</td><td>R$ ${p.preco.toFixed(2)}</td></tr>
+        `).join('');
+    }
+
+    function renderRelatorio() {
+        let total = 0;
+        document.getElementById('lista_vendas').innerHTML = vendasDia.map(v => {
+            total += v.total;
+            return `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #111;padding:5px 0;">
+                <span>${v.data} - ${v.forma}</span><b>R$ ${v.total.toFixed(2)}</b>
+            </div>`;
+        }).join('');
+        document.getElementById('res_vendas_total').innerText = `Total: R$ ${total.toFixed(2)}`;
+    }
+
+    function salvarTudo() {
+        localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+        localStorage.setItem('b934_vendas', JSON.stringify(vendasDia));
+    }
+
+    function limparVendas() { if(confirm("Zerar as vendas de hoje?")) { vendasDia = []; salvarTudo(); renderRelatorio(); } }
+
+    function setCliente(id) { 
+        const m = mesas.find(x => x.id === id); 
+        const n = prompt("Nome do Cliente:"); if(n) { m.cliente = n; renderMesas(); }
+    }
+
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-    render();
+    renderMesas();
 </script>
 </body>
 </html>
