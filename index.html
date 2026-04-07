@@ -2,160 +2,36 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Cadastro com Barcode</title>
+    <title>Boteco 934 - Sistema Integrado</title>
     <style>
         :root {
-            --bg: #0a0a0a; --card: #161616; --orange: #ff9800; --green: #00ff88; --gray: #a0a0a0; --border: #333;
+            --bg: #050505; --card: #121212; --gold: #d4af37; --orange: #ff9800; --green: #00ff88; --border: #2a2a2a;
         }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; }
-        .header { text-align: center; border-bottom: 2px solid var(--orange); padding-bottom: 10px; margin-bottom: 25px; }
-        .header h1 { margin: 0; font-size: 24px; color: var(--orange); text-transform: uppercase; letter-spacing: 2px; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        
+        /* Layout Superior */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
+        .header h1 { color: var(--gold); margin: 0; font-size: 22px; letter-spacing: 3px; }
+
+        /* Input de Código de Barras Gigante (Estilo PDV) */
+        .pdv-scan { background: var(--card); border: 2px solid var(--gold); padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .pdv-scan input { width: 80%; background: transparent; border: none; color: var(--gold); font-size: 30px; text-align: center; font-family: monospace; outline: none; }
+        .pdv-scan label { display: block; color: var(--gray); font-size: 12px; margin-bottom: 5px; text-transform: uppercase; }
 
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
-        .box h3 { margin: 0 0 15px 0; font-size: 14px; color: var(--orange); text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 10px; }
-
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        .box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; }
         
-        /* Destaque para o Código de Barras */
-        .barcode-field { border: 1px solid var(--orange) !important; color: var(--orange) !important; font-family: monospace; }
-        
-        input { 
-            width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); 
-            color: #fff; font-size: 15px; box-sizing: border-box; border-radius: 4px;
-        }
-        input:focus { border-color: var(--orange); outline: none; }
+        /* Tabela de Ordem Alfabética */
+        .lista-container { margin-top: 20px; height: 300px; overflow-y: auto; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1a1a1a; color: var(--gold); font-size: 11px; padding: 10px; text-align: left; position: sticky; top: 0; }
+        td { padding: 10px; border-bottom: 1px solid #222; font-size: 13px; }
+        tr:hover { background: #1a1a1a; cursor: pointer; }
 
-        .res-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .res-card { background: #0a0a0a; padding: 10px; border-radius: 4px; border-left: 3px solid var(--orange); }
-        .res-card.green { border-left-color: var(--green); }
-        .res-card small { display: block; font-size: 9px; color: var(--gray); text-transform: uppercase; }
-        .res-card b { font-size: 16px; }
+        /* Botões Estilizados */
+        .btn { padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; width: 100%; margin-top: 10px; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--orange); color: var(--orange); }
 
-        .btn-save { 
-            width: 100%; padding: 14px; background: var(--orange); color: #000; 
-            border: none; font-weight: bold; cursor: pointer; border-radius: 4px;
-            text-transform: uppercase; margin-top: 15px;
-        }
-
-        .lista-section { margin-top: 30px; background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: var(--orange); font-size: 11px; padding: 12px; border-bottom: 2px solid #222; }
-        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header"><h1>BOTECO 934 - CADASTRO E CÓDIGO DE BARRAS</h1></div>
-
-    <div class="main-grid">
-        <div class="box">
-            <h3>Mercadorias (Unidade / Boticário)</h3>
-            <div class="input-group">
-                <label>Código de Barras (EAN-13)</label>
-                <input type="text" id="m_barcode" class="barcode-field" placeholder="Passe o leitor ou digite..." autofocus>
-            </div>
-            <div class="input-group">
-                <label>Nome do Produto</label>
-                <input type="text" id="m_nome" placeholder="Ex: Heineken ou Perfume Boticário">
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group"><label>Custo Unitário (R$)</label><input type="number" id="m_custo" oninput="calcM()"></div>
-                <div class="input-group"><label>Preço Praticado (R$)</label><input type="number" id="m_venda" oninput="calcM()"></div>
-            </div>
-
-            <div class="res-container">
-                <div class="res-card green"><small>Lucro Unitário</small><b id="m_lucro_u">R$ 0,00</b></div>
-                <div class="res-card green"><small>Margem Real</small><b id="m_margem">0%</b></div>
-            </div>
-            <button class="btn-save" onclick="salvar('M')">Salvar no Estoque</button>
-        </div>
-
-        <div class="box">
-            <h3>Destilados (Garrafa / Dose)</h3>
-            <div class="input-group"><label>Código de Barras (Opcional)</label><input type="text" id="d_barcode" class="barcode-field"></div>
-            <div class="input-group"><label>Nome do Destilado</label><input type="text" id="d_nome"></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group"><label>Custo Garrafa</label><input type="number" id="d_custo" oninput="calcD()"></div>
-                <div class="input-group"><label>Preço Dose</label><input type="number" id="d_venda" oninput="calcD()"></div>
-            </div>
-            <div class="res-container">
-                <div class="res-card green"><small>Lucro p/ Garrafa</small><b id="d_lucro_g">R$ 0,00</b></div>
-                <div class="res-card"><small>Doses (c/ 10% perda)</small><b id="d_doses">18</b></div>
-            </div>
-            <button class="btn-save" onclick="salvar('D')">Salvar no Estoque</button>
-        </div>
-    </div>
-
-    <div class="lista-section">
-        <h3>Estoque em Ordem Alfabética</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>CÓD. BARRAS</th>
-                    <th>PRODUTO</th>
-                    <th>CUSTO</th>
-                    <th>VENDA</th>
-                    <th>LUCRO</th>
-                </tr>
-            </thead>
-            <tbody id="tabela"></tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    let estoque = [];
-
-    function calcM() {
-        const custo = parseFloat(document.getElementById('m_custo').value) || 0;
-        const venda = parseFloat(document.getElementById('m_venda').value) || 0;
-        const lucro = venda - custo;
-        const margem = venda > 0 ? (lucro / venda) * 100 : 0;
-        document.getElementById('m_lucro_u').innerText = `R$ ${lucro.toFixed(2)}`;
-        document.getElementById('m_margem').innerText = `${margem.toFixed(1)}%`;
-    }
-
-    function calcD() {
-        const custoG = parseFloat(document.getElementById('d_custo').value) || 0;
-        const vendaD = parseFloat(document.getElementById('d_venda').value) || 0;
-        const doses = 18; // 1000ml - 10% perda / 50ml dose
-        const lucroG = (vendaD * doses) - custoG;
-        document.getElementById('d_lucro_g').innerText = `R$ ${lucroG.toFixed(2)}`;
-    }
-
-    function salvar(tipo) {
-        const item = {
-            barcode: tipo === 'M' ? document.getElementById('m_barcode').value || '---' : document.getElementById('d_barcode').value || '---',
-            nome: (tipo === 'M' ? document.getElementById('m_nome').value : document.getElementById('d_nome').value).toUpperCase(),
-            custo: tipo === 'M' ? parseFloat(document.getElementById('m_custo').value) : parseFloat(document.getElementById('d_custo').value) / 18,
-            venda: tipo === 'M' ? parseFloat(document.getElementById('m_venda').value) : parseFloat(document.getElementById('d_venda').value)
-        };
-
-        if(!item.nome) return;
-        estoque.push(item);
-        estoque.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordem Alfabética
-        render();
-        // Limpar campos
-        if(tipo === 'M') { document.getElementById('m_barcode').value = ''; document.getElementById('m_nome').value = ''; document.getElementById('m_barcode').focus(); }
-    }
-
-    function render() {
-        const t = document.getElementById('tabela');
-        t.innerHTML = '';
-        estoque.forEach(i => {
-            t.innerHTML += `<tr>
-                <td style="color:var(--orange)">${i.barcode}</td>
-                <td>${i.nome}</td>
-                <td>R$ ${i.custo.toFixed(2)}</td>
-                <td style="color:var(--green)">R$ ${i.venda.toFixed(2)}</td>
-                <td>R$ ${(i.venda - i.custo).toFixed(2)}</td>
-            </tr>`;
-        });
-    }
-</script>
-</body>
-</html>
+        /* Badge de Status */
+        .badge
