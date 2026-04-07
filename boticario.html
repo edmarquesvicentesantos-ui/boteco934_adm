@@ -8,85 +8,53 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .header { text-align: center; color: #00a896; border-bottom: 2px solid #00a896; padding-bottom: 10px; margin-bottom: 15px; }
+        .btn-menu { padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; cursor: pointer; }
         .card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
         .input-dark { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
-        .painel-lucro { background: #000; border: 2px solid #30d158; border-radius: 10px; padding: 15px; text-align: center; margin-top: 10px; }
-        .btn-salvar { width: 100%; padding: 15px; background: #00a896; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-salvar { width: 100%; padding: 15px; background: #00a896; color: white; border: none; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h2 style="margin:0;">BOTICÁRIO @ BOTECO 934</h2>
-    <button onclick="location.href='index.html'" style="background:none; border:1px solid #00a896; color:#00a896; margin-top:10px; border-radius:5px; padding: 5px 10px;">VOLTAR</button>
-</div>
-
-<div class="card">
-    <label>NOME DO PRODUTO (Perfume/Creme)</label>
-    <input type="text" id="bot-nome" class="input-dark" placeholder="Ex: Malbec 100ml">
-
-    <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-            <label>PREÇO DE CUSTO</label>
-            <input type="number" id="bot-custo" class="input-dark" onkeyup="calcBoticario()" placeholder="0.00">
-        </div>
-        <div style="flex: 1;">
-            <label>PREÇO DE VENDA</label>
-            <input type="number" id="bot-venda" class="input-dark" onkeyup="calcBoticario()" placeholder="0.00">
-        </div>
-    </div>
-<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
-    <button onclick="location.href='index.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #ff9f0a; color: #000;">🍺 PRODUTOS</button>
-    <button onclick="location.href='vendas.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #333; color: #fff;">💰 VENDAS</button>
-    <button onclick="location.href='clientes.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #333; color: #fff;">👥 PENDURA</button>
-    
-    <button onclick="location.href='boticario.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #00a896; color: #fff;">✨ BOTICÁRIO</button>
-    <button onclick="location.href='despesas.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #ff453a; color: #fff;">📉 GASTOS</button>
-    <button onclick="location.href='dashboard.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #5856d6; color: #fff;">📊 LUCRO</button>
-</div>
-<hr style="border: 0; border-top: 1px solid #333; margin-bottom: 20px;">
-    <div class="painel-lucro">
-        <div style="font-size: 12px; color: #30d158;">LUCRO LÍQUIDO NESTA VENDA</div>
-        <div id="bot-res-lucro" style="font-size: 28px; font-weight: bold; color: #30d158;">R$ 0,00</div>
-        <div id="bot-res-porcent" style="font-size: 14px; color: #8e8e93;">Margem: 0%</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+        <button onclick="location.href='index.html'" class="btn-menu" style="background: #333; color: #fff;">🍺 PRODUTOS</button>
+        <button onclick="location.href='vendas.html'" class="btn-menu" style="background: #333; color: #fff;">💰 VENDAS</button>
+        <button onclick="location.href='clientes.html'" class="btn-menu" style="background: #333; color: #fff;">👥 PENDURA</button>
+        <button onclick="location.href='boticario.html'" class="btn-menu" style="background: #00a896; color: #fff;">✨ BOTICÁRIO</button>
+        <button onclick="location.href='despesas.html'" class="btn-menu" style="background: #333; color: #fff;">📉 GASTOS</button>
+        <button onclick="location.href='dashboard.html'" class="btn-menu" style="background: #333; color: #fff;">📊 LUCRO</button>
     </div>
 
-    <button onclick="salvarBoticario()" class="btn-salvar" style="margin-top: 15px;">CADASTRAR NO ESTOQUE</button>
-</div>
+    <div class="card">
+        <input type="text" id="bot-nome" class="input-dark" placeholder="Produto (Ex: Malbec)">
+        <input type="number" id="bot-custo" class="input-dark" placeholder="Custo R$">
+        <input type="number" id="bot-venda" class="input-dark" placeholder="Venda R$">
+        <button onclick="salvarBoticario()" class="btn-salvar">SALVAR NO ESTOQUE</button>
+    </div>
 
-<script>
-    const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    <div id="lista-boticario"></div>
 
-    function calcBoticario() {
-        let custo = parseFloat(document.getElementById('bot-custo').value) || 0;
-        let venda = parseFloat(document.getElementById('bot-venda').value) || 0;
-        
-        if (venda > 0) {
-            let lucro = venda - custo;
-            let margem = (lucro / venda) * 100;
-            document.getElementById('bot-res-lucro').innerHTML = "R$ " + lucro.toFixed(2);
-            document.getElementById('bot-res-porcent').innerHTML = "Margem: " + margem.toFixed(1) + "%";
-        }
-    }
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-    async function salvarBoticario() {
-        const nome = document.getElementById('bot-nome').value.toUpperCase();
-        const custo = document.getElementById('bot-custo').value;
-        const venda = document.getElementById('bot-venda').value;
-        if(!nome || !venda) return alert("Preencha Nome e Venda!");
-
-        try {
-            await db.collection("boticario").add({
-                nome: nome, custo: custo, venda: venda, data: new Date()
-            });
-            alert("✅ " + nome + " salvo no estoque Boticário!");
+        async function salvarBoticario() {
+            const nome = document.getElementById('bot-nome').value.toUpperCase();
+            const custo = document.getElementById('bot-custo').value;
+            const venda = document.getElementById('bot-venda').value;
+            await db.collection("boticario").add({ nome, custo, venda, data: new Date() });
             location.reload();
-        } catch (e) { alert("Erro ao salvar!"); }
-    }
-</script>
+        }
 
+        db.collection("boticario").onSnapshot(snap => {
+            let h = "";
+            snap.forEach(doc => {
+                let d = doc.data();
+                h += `<div style="padding:10px; border-bottom:1px solid #333;">${d.nome} - <span style="color:#00a896;">R$ ${d.venda}</span></div>`;
+            });
+            document.getElementById('lista-boticario').innerHTML = h;
+        });
+    </script>
 </body>
 </html>
