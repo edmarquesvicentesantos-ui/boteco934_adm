@@ -57,7 +57,10 @@
         <button class="tab active" onclick="mudarAba('mercadoria', this)">Fardos / Unidades</button>
         <button class="tab" onclick="mudarAba('destilado', this)">Destilados (Doses)</button>
     </div>
-
+<div class="input-group">
+                <label>Código de Barras (EAN-13)</label>
+                <input type="text" id="m_barcode" class="barcode-field" placeholder="Passe o leitor ou digite..." autofocus>
+            </div>
     <div id="mercadoria" class="panel active">
         <div class="grid">
             <div class="full"><label>PRODUTO</label><input type="text" id="m_nome" placeholder="Ex: Heineken"></div>
