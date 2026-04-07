@@ -33,13 +33,166 @@
         <button class="btn-menu" style="background: #00a896; color: #fff;" onclick="location.href='boticario.html'">Boticário</button>
     </div>
 
-    <div class="card">
-        <h4 style="margin:0 0 10px 0; color: #ff9f0a;">NOVO REGISTRO</h4>
-        <input type="text" id="cli-nome" class="input-dark" placeholder="Nome do Cliente">
-        <input type="number" id="cli-fone" class="input-dark" placeholder="WhatsApp (ex: 87988887766)">
-        <input type="number" id="cli-valor" class="input-dark" placeholder="Valor da Dívida R$ 0.00">
-        <button onclick="salvarPendura()" class="btn-salvar">PENDURAR AGORA</button>
+    <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDV - Boteco 934</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
+        .header { text-align: center; border-bottom: 2px solid #ff9f0a; padding-bottom: 10px; margin-bottom: 10px; }
+        
+        /* Grid de Mesas Ocupadas */
+        .painel-mesas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .mesa-card { background: #1c1c1e; border: 1px solid #ff9f0a; padding: 10px; border-radius: 12px; text-align: center; }
+        .mesa-nome { font-size: 12px; color: #ff9f0a; font-weight: bold; }
+        .mesa-total { font-size: 18px; font-weight: bold; color: #30d158; display: block; }
+
+        /* Lista de Produtos para Clicar */
+        .secao-titulo { font-size: 12px; color: #8e8e93; margin: 15px 0 5px; text-transform: uppercase; }
+        .grid-produtos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+        .btn-prod { background: #333; color: #fff; border: 1px solid #444; padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-prod:active { background: #ff9f0a; color: #000; }
+
+        /* Rodapé de Ações */
+        .footer-pdv { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; padding: 15px; border-top: 2px solid #ff9f0a; box-sizing: border-box; }
+        .btn-acao { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        
+        .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; box-sizing: border-box; }
+        .input-dark { width: 100%; padding: 15px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; margin-bottom: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0; color: #ff9f0a;">COMANDAS 934</h2>
+        <button onclick="location.href='index.html'" style="background:none; border:none; color:#8e8e93; font-size: 12px;">🏠 INÍCIO</button>
     </div>
+
+    <div id="lista-mesas" class="painel-mesas">
+        </div>
+
+    <div class="secao-titulo">ADICIONAR À MESA SELECIONADA:</div>
+    <div id="lista-produtos" class="grid-produtos">
+        </div>
+
+    <div style="height: 150px;"></div> <div class="footer-pdv">
+        <div id="mesa-foco" style="text-align: center; margin-bottom: 10px; color: #ff9f0a; font-weight: bold; font-size: 14px;">
+            SELECIONE UMA MESA ACIMA
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-acao" style="background: #ff9f0a; color: #000;" onclick="abrirNovaMesa()">+ NOVA MESA</button>
+            <button class="btn-acao" style="background: #30d158; color: #fff;" onclick="fecharComanda()">FECHAR CONTA</button>
+        </div>
+    </div>
+
+    <div id="modal-geral" class="modal">
+        <div id="conteudo-modal"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let mesaAtivaId = null;
+        let mesaAtivaNome = "";
+
+        // 1. CARREGAR PRODUTOS DO CADASTRO
+        db.collection("produtos").onSnapshot(snap => {
+            let html = "";
+            snap.forEach(doc => {
+                let p = doc.data();
+                let precoUn = (parseFloat(p.venda) / (parseInt(p.qtd_fardo) || 1)).toFixed(2);
+                html += `<button class="btn-prod" onclick="addProduto('${precoUn}', '${p.nome}')">${p.nome}<br>R$ ${precoUn}</button>`;
+            });
+            document.getElementById('lista-produtos').innerHTML = html;
+        });
+
+        // 2. CARREGAR MESAS OCUPADAS
+        db.collection("mesas_abertas").onSnapshot(snap => {
+            let html = "";
+            snap.forEach(doc => {
+                let m = doc.data();
+                let border = mesaAtivaId === doc.id ? "3px solid #30d158" : "1px solid #ff9f0a";
+                html += `
+                <div class="mesa-card" style="border: ${border}" onclick="selecionarMesa('${doc.id}', '${m.nome}')">
+                    <span class="mesa-nome">${m.nome}</span>
+                    <span class="mesa-total">R$ ${m.total.toFixed(2)}</span>
+                </div>`;
+            });
+            document.getElementById('lista-mesas').innerHTML = html;
+        });
+
+        function selecionarMesa(id, nome) {
+            mesaAtivaId = id;
+            mesaAtivaNome = nome;
+            document.getElementById('mesa-foco').innerText = "EDITANDO: " + nome;
+        }
+
+        async function addProduto(valor, nome) {
+            if(!mesaAtivaId) return alert("Selecione uma mesa primeiro!");
+            const ref = db.collection("mesas_abertas").doc(mesaAtivaId);
+            const doc = await ref.get();
+            const novoTotal = doc.data().total + parseFloat(valor);
+            await ref.update({ total: novoTotal });
+        }
+
+        function abrirNovaMesa() {
+            document.getElementById('modal-geral').style.display = "block";
+            document.getElementById('conteudo-modal').innerHTML = `
+                <h3 style="color:#ff9f0a">ABRIR MESA / CLIENTE</h3>
+                <input type="text" id="n-mesa" class="input-dark" placeholder="Nome da Mesa ou Cliente">
+                <button class="btn-acao" style="background:#ff9f0a" onclick="salvarMesa()">ABRIR AGORA</button>
+                <button class="btn-acao" style="background:#333; color:#fff" onclick="fecharModal()">CANCELAR</button>
+            `;
+        }
+
+        async function salvarMesa() {
+            const nome = document.getElementById('n-mesa').value.toUpperCase();
+            if(!nome) return;
+            await db.collection("mesas_abertas").add({ nome, total: 0, data: new Date() });
+            fecharModal();
+        }
+
+        function fecharComanda() {
+            if(!mesaAtivaId) return alert("Selecione a mesa para fechar!");
+            document.getElementById('modal-geral').style.display = "block";
+            document.getElementById('conteudo-modal').innerHTML = `
+                <h3 style="color:#30d158">FECHAR: ${mesaAtivaNome}</h3>
+                <button class="btn-acao" style="background:#00a896" onclick="finalizar('PIX')">PAGOU NO PIX</button>
+                <button class="btn-acao" style="background:#28a745" onclick="finalizar('DINHEIRO')">PAGOU EM DINHEIRO</button>
+                <button class="btn-acao" style="background:#5856d6" onclick="finalizar('CARTÃO')">CARTÃO</button>
+                <button class="btn-acao" style="background:#ff453a" onclick="location.href='clientes.html'">PENDURAR (FIADO)</button>
+                <button class="btn-acao" style="background:#333; color:#fff" onclick="fecharModal()">VOLTAR</button>
+            `;
+        }
+
+        async function finalizar(forma) {
+            const ref = db.collection("mesas_abertas").doc(mesaAtivaId);
+            const doc = await ref.get();
+            const dados = doc.data();
+
+            await db.collection("vendas_realizadas").add({
+                cliente: dados.nome,
+                valor: dados.total,
+                metodo: forma,
+                data: new Date()
+            });
+
+            await ref.delete();
+            mesaAtivaId = null;
+            document.getElementById('mesa-foco').innerText = "Mesa Finalizada!";
+            fecharModal();
+        }
+
+        function fecharModal() { document.getElementById('modal-geral').style.display = "none"; }
+    </script>
+</body>
+</html>
 
     <div id="lista-corpo">
         </div>
