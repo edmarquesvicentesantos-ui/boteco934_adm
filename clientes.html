@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendura - Boteco 934</title>
+    <title>Clientes - Boteco 934</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
@@ -11,10 +11,17 @@
         .btn-menu { padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; cursor: pointer; }
         .card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
         .input-dark { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
-        .btn-salvar { width: 100%; padding: 15px; background: #ff9f0a; color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
-        .cliente-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #333; background: #121212; margin-bottom: 8px; border-radius: 10px; align-items: center; }
-        .deuda { color: #ff453a; font-weight: bold; font-size: 18px; }
-        .btn-zap { background: #25d366; border: none; border-radius: 50%; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-salvar { width: 100%; padding: 15px; background: #ff9f0a; color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; width: 100%; }
+        
+        .cliente-row { background: #121212; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .info-cliente { flex: 1; }
+        .nome-cliente { font-size: 16px; font-weight: bold; color: #ff9f0a; text-transform: uppercase; }
+        .fone-cliente { font-size: 13px; color: #8e8e93; display: block; margin-top: 2px; }
+        
+        .acoes { display: flex; gap: 8px; }
+        .btn-acao { border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-cobrar { background: #25d366; color: white; }
+        .btn-lancar { background: #5856d6; color: white; }
     </style>
 </head>
 <body>
@@ -22,21 +29,21 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
         <button onclick="location.href='index.html'" class="btn-menu" style="background: #333; color: #fff;">🍺 PRODUTOS</button>
         <button onclick="location.href='vendas.html'" class="btn-menu" style="background: #333; color: #fff;">💰 VENDAS</button>
-        <button onclick="location.href='clientes.html'" class="btn-menu" style="background: #ff9f0a; color: #000;">👥 PENDURA</button>
+        <button onclick="location.href='clientes.html'" class="btn-menu" style="background: #ff9f0a; color: #000;">👥 CLIENTES</button>
         <button onclick="location.href='boticario.html'" class="btn-menu" style="background: #333; color: #fff;">✨ BOTICÁRIO</button>
         <button onclick="location.href='despesas.html'" class="btn-menu" style="background: #333; color: #fff;">📉 GASTOS</button>
         <button onclick="location.href='dashboard.html'" class="btn-menu" style="background: #333; color: #fff;">📊 LUCRO</button>
     </div>
 
     <div class="card">
-        <h4 style="margin:0 0 10px 0; color: #ff9f0a;">NOVO PENDURA</h4>
-        <input type="text" id="cli-nome" class="input-dark" placeholder="Nome do Cliente">
-        <input type="number" id="cli-fone" class="input-dark" placeholder="WhatsApp (ex: 87988887766)">
-        <input type="number" id="cli-valor" class="input-dark" placeholder="Valor R$ 0.00">
-        <button onclick="salvarPendura()" class="btn-salvar">REGISTRAR DÍVIDA</button>
+        <h4 style="margin:0 0 10px 0; color: #ff9f0a;">NOVO CONTATO</h4>
+        <input type="text" id="nome-contato" class="input-dark" placeholder="Nome do Cliente">
+        <input type="number" id="fone-contato" class="input-dark" placeholder="WhatsApp (DDD+Número)">
+        <button onclick="cadastrarCliente()" class="btn-salvar">SALVAR NA AGENDA</button>
     </div>
 
-    <div id="lista-corpo">
+    <h4 style="color: #8e8e93; margin-left: 5px;">AGENDA DE CLIENTES</h4>
+    <div id="lista-clientes-corpo">
         </div>
 
     <script>
@@ -44,45 +51,33 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        async function salvarPendura() {
-            const nome = document.getElementById('cli-nome').value.toUpperCase();
-            const fone = document.getElementById('cli-fone').value;
-            const valor = document.getElementById('cli-valor').value;
+        // 1. Cadastra o cliente na agenda
+        async function cadastrarCliente() {
+            const nome = document.getElementById('nome-contato').value.toUpperCase();
+            const fone = document.getElementById('fone-contato').value;
+            if(!nome || !fone) return alert("Preencha nome e Zap!");
             
-            if(!nome || !fone || !valor) return alert("Preencha tudo!");
-            
-            try {
-                await db.collection("pendura").add({ 
-                    nome, telefone: fone, valor: parseFloat(valor), data: new Date() 
-                });
-                alert("✅ Salvo!");
-                location.reload();
-            } catch (e) { alert("Erro ao salvar!"); }
+            await db.collection("agenda_clientes").add({ nome, fone, data: new Date() });
+            document.getElementById('nome-contato').value = "";
+            document.getElementById('fone-contato').value = "";
+            alert("✅ Cliente salvo!");
         }
 
-        db.collection("pendura").orderBy("data", "desc").onSnapshot((snapshot) => {
+        // 2. Mostra a lista de contatos visível
+        db.collection("agenda_clientes").orderBy("nome", "asc").onSnapshot(snap => {
             let html = "";
-            snapshot.forEach((doc) => {
-                let d = doc.data();
+            snap.forEach(doc => {
+                let c = doc.data();
                 html += `
-                <div class="cliente-item">
-                    <div style="flex: 1;">
-                        <div style="font-size:15px; font-weight:bold;">${d.nome}</div>
-                        <div style="font-size:12px; color:#8e8e93;">${d.telefone}</div>
-                        <div class="deuda">R$ ${parseFloat(d.valor).toFixed(2)}</div>
+                <div class="cliente-row">
+                    <div class="info-cliente">
+                        <span class="nome-cliente">${c.nome}</span>
+                        <span class="fone-cliente">📲 ${c.fone}</span>
                     </div>
-                    <button class="btn-zap" onclick="cobrarZap('${d.telefone}', '${d.nome}', '${d.valor}')">
-                        <span style="font-size:20px;">📲</span>
-                    </button>
+                    <div class="acoes">
+                        <button class="btn-acao btn-cobrar" onclick="cobrarZap('${c.fone}', '${c.nome}')">ZAP</button>
+                        <button class="btn-acao btn-lancar" onclick="lancarDivida('${doc.id}', '${c.nome}')">LANCAR</button>
+                    </div>
                 </div>`;
             });
-            document.getElementById('lista-corpo').innerHTML = html;
-        });
-
-        function cobrarZap(fone, nome, valor) {
-            let msg = `*BOTECO 934*%0A---------------------------%0AOlá, ${nome}!%0APassando para lembrar do seu consumo aqui no Boteco.%0A*Valor Pendente: R$ ${valor}*%0A---------------------------%0AAbraço!`;
-            window.open(`https://wa.me/55${fone}?text=${msg}`);
-        }
-    </script>
-</body>
-</html>
+            document
