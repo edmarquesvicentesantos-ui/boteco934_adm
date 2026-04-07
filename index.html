@@ -3,83 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão</title>
+    <title>Boteco 934 - Gestão Total</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .header { text-align: center; color: #ff9f0a; border-bottom: 2px solid #ff9f0a; padding: 10px; margin-bottom: 20px; }
-        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; max-width: 500px; margin: auto; }
-        label { display: block; margin-top: 10px; font-size: 12px; color: #8e8e93; }
+        .header { text-align: center; border-bottom: 2px solid #ff9f0a; padding-bottom: 10px; margin-bottom: 15px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .btn-menu { padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+        .card { background: #1c1c1e; padding: 15px; border-radius: 15px; border: 1px solid #333; max-width: 500px; margin: auto; }
         .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .input-dark:focus { border-color: #30d158; }
-        .row { display: flex; gap: 10px; margin-top: 10px; }
-        .col { flex: 1; }
-        .painel-verde { margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 2px solid #30d158; }
-        .resultado-texto { font-size: 22px; font-weight: bold; color: #30d158; }
-        .btn-salvar { width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 16px; }
+        .painel-verde { margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 2px solid #30d158; text-align: center; }
+        .resultado-texto { font-size: 24px; font-weight: bold; color: #30d158; }
+        .btn-salvar { width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="header"><h2 style="margin:0;">BOTECO 934</h2></div>
-    <div class="card">
-        <h3 style="color: #ff9f0a; margin-top: 0;">CADASTRO DE PRODUTOS</h3>
-        <label>NOME DO PRODUTO</label>
-        <input type="text" id="nome-prod" class="input-dark" placeholder="Ex: Cerveja Lata 350ml">
-        <label>CÓDIGO DE BARRAS (BIP)</label>
-        <input type="text" id="cod-barras" class="input-dark" placeholder="Aproxime o leitor">
-        <div class="row">
-            <div class="col"><label>CUSTO FARDO</label><input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularTudo()" placeholder="0.00"></div>
-            <div class="col"><label>QTD FARDO</label><input type="number" id="qtd-fardo" class="input-dark" value="12" onkeyup="calcularTudo()"></div>
-            <div class="col"><label>MARKUP %</label><input type="number" id="markup" class="input-dark" value="100" onkeyup="calcularTudo()"></div>
-        </div>
-        <div class="painel-verde">
-            <div style="display: flex; justify-content: space-between; text-align: center;">
-                <div style="flex: 1;"><label style="color: #30d158; font-weight: bold;">MARGEM REAL</label><div id="res-margem" class="resultado-texto">0%</div></div>
-                <div style="flex: 1; border-left: 1px solid #333;"><label style="color: #30d158; font-weight: bold;">LUCRO FARDO</label><div id="res-lucro-fardo" class="resultado-texto">R$ 0,00</div></div>
-            </div>
-            <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; text-align: center;">
-                <label style="color: #30d158; font-weight: bold;">LUCRO POR UNIDADE</label><div id="res-lucro-un" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col"><label>VENDA FARDO</label><input type="text" id="vda-fardo" class="input-dark" style="background: #2c2c2e; color: #30d158; font-weight: bold;" readonly></div>
-            <div class="col"><label>VENDA UNIDADE</label><input type="text" id="vda-un" class="input-dark" style="background: #2c2c2e;" readonly></div>
-        </div>
-        <button onclick="salvarNoFirebase()" class="btn-salvar">SALVAR NAS NUVENS</button>
+
+    <div class="header">
+        <h2 style="margin:0; color: #ff9f0a;">BOTECO 934</h2>
+        <p style="font-size: 10px; color: #8e8e93; margin: 5px 0;">PETROLINA - PE</p>
     </div>
+
+    <div class="menu-grid">
+        <button class="btn-menu" style="background: #ff9f0a; color: #000;" onclick="location.href='index.html'">Bebidas</button>
+        <button class="btn-menu" style="background: #333; color: #fff;" onclick="location.href='vendas.html'">Vendas/Mesas</button>
+        <button class="btn-menu" style="background: #333; color: #fff;" onclick="location.href='clientes.html'">Pendura/Zap</button>
+        <button class="btn-menu" style="background: #00a896; color: #fff;" onclick="location.href='boticario.html'">Boticário</button>
+    </div>
+
+    <div class="card">
+        <h3 style="color: #ff9f0a; margin-top: 0; text-align: center;">CADASTRO DE BEBIDAS</h3>
+        
+        <label style="font-size: 12px; color: #8e8e93;">NOME DO PRODUTO</label>
+        <input type="text" id="nome-prod" class="input-dark" placeholder="Ex: Skol Lata 350ml">
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 12px; color: #8e8e93;">CUSTO FARDO</label>
+                <input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularTudo()" placeholder="0.00">
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 12px; color: #8e8e93;">MARKUP %</label>
+                <input type="number" id="markup" class="input-dark" value="100" onkeyup="calcularTudo()">
+            </div>
+        </div>
+
+        <div class="painel-verde">
+            <div style="font-size: 12px; color: #30d158;">MARGEM REAL DE LUCRO</div>
+            <div id="res-margem" class="resultado-texto">0%</div>
+            <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
+                <div style="font-size: 12px; color: #8e8e93;">LUCRO POR UNIDADE</div>
+                <div id="res-lucro-un" style="font-size: 20px; color: #30d158; font-weight: bold;">R$ 0,00</div>
+            </div>
+        </div>
+
+        <button onclick="salvarBebida()" class="btn-salvar">SALVAR NO ESTOQUE</button>
+    </div>
+
     <script>
+        // Configuração do Firebase
         const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
         function calcularTudo() {
             let custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
-            let qtd = parseFloat(document.getElementById('qtd-fardo').value) || 1;
             let mkp = parseFloat(document.getElementById('markup').value) || 0;
             if (custo > 0) {
-                let vendaTotal = custo * (1 + (mkp / 100));
-                let lucroTotal = vendaTotal - custo;
-                let margem = (lucroTotal / vendaTotal) * 100;
-                let lucroUn = lucroTotal / qtd;
-                let vendaUn = vendaTotal / qtd;
+                let venda = custo * (1 + (mkp / 100));
+                let lucro = venda - custo;
+                let margem = (lucro / venda) * 100;
                 document.getElementById('res-margem').innerHTML = margem.toFixed(1) + "%";
-                document.getElementById('res-lucro-fardo').innerHTML = "R$ " + lucroTotal.toFixed(2);
-                document.getElementById('res-lucro-un').innerHTML = "R$ " + lucroUn.toFixed(2);
-                document.getElementById('vda-fardo').value = "R$ " + vendaTotal.toFixed(2);
-                document.getElementById('vda-un').value = "R$ " + vendaUn.toFixed(2);
+                document.getElementById('res-lucro-un').innerHTML = "R$ " + (lucro/12).toFixed(2);
             }
         }
-        async function salvarNoFirebase() {
+
+        async function salvarBebida() {
             const nome = document.getElementById('nome-prod').value.toUpperCase();
-            const cod = document.getElementById('cod-barras').value;
             const custo = document.getElementById('custo-fardo').value;
-            const vendaUn = document.getElementById('vda-un').value;
-            if(!nome || !custo) { alert("Preencha Nome e Custo!"); return; }
+            if(!nome || !custo) return alert("Preencha Nome e Custo!");
             try {
-                const docRef = cod ? db.collection("produtos").doc(cod) : db.collection("produtos").doc();
-                await docRef.set({ nome: nome, codigo: cod, custo_fardo: custo, venda_un: vendaUn, data: new Date() }, { merge: true });
+                await db.collection("produtos").add({ nome, custo, data: new Date() });
                 alert("✅ Salvo com sucesso!");
-                document.getElementById('nome-prod').value = ""; document.getElementById('cod-barras').value = ""; document.getElementById('custo-fardo').value = "";
+                location.reload();
             } catch (e) { alert("Erro ao salvar!"); }
         }
     </script>
