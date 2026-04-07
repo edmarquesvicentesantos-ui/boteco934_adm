@@ -2,142 +2,218 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro Inteligente - Boteco 934</title>
+    <title>Precificação Inteligente - Boteco 934</title>
     <style>
         :root {
-            --bg-color: #0b0b0b;
-            --card-bg: #141414;
-            --accent-orange: #ff9800;
-            --text-gray: #aaa;
-            --success-green: #28a745;
+            --bg: #0b0b0b;
+            --card: #141414;
+            --orange: #ff9800;
+            --green: #28a745;
+            --text: #ffffff;
+            --gray: #888;
         }
 
-        body { background: var(--bg-color); color: white; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 800px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 8px; }
-        
-        /* Sistema de Abas */
-        .tab-container { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; background: #222; border: none; color: white; cursor: pointer; text-transform: uppercase; font-weight: bold; }
-        .tab.active { background: var(--accent-orange); color: black; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
 
-        .form-section { display: none; }
-        .form-section.active { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        .full { grid-column: span 2; }
-        label { display: block; font-size: 11px; color: var(--text-gray); margin-bottom: 5px; }
-        input { width: 100%; background: #1e1e1e; border: 1px solid #333; color: white; padding: 12px; box-sizing: border-box; }
-        
-        .result-box { 
-            grid-column: span 2; background: #000; border: 1px solid var(--success-green); 
-            padding: 15px; text-align: center; margin-top: 10px;
+        /* Abas */
+        .tabs { display: flex; gap: 5px; margin-bottom: 2px; }
+        .tab-btn { 
+            flex: 1; padding: 15px; background: #222; border: none; color: var(--gray); 
+            cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 5px 5px 0 0;
         }
-        .result-box span { display: block; font-size: 22px; color: var(--success-green); font-weight: bold; }
+        .tab-btn.active { background: var(--orange); color: #000; }
 
-        .btn-save { 
-            grid-column: span 2; background: var(--success-green); color: white; 
-            border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        .panel { background: var(--card); padding: 25px; border: 1px solid #333; display: none; border-radius: 0 0 5px 5px; }
+        .panel.active { display: block; }
+
+        /* Grid de Entradas */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .full { grid-column: span 4; }
+        .half { grid-column: span 2; }
+
+        label { display: block; color: var(--gray); font-size: 11px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        input { 
+            width: 100%; padding: 12px; background: #1e1e1e; border: 1px solid #333; 
+            color: #fff; font-size: 16px; box-sizing: border-box; border-radius: 4px;
+        }
+        input:focus { border-color: var(--orange); outline: none; }
+
+        /* Dash de Resultados */
+        .results-area { 
+            margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; 
+        }
+        
+        .card-res { background: #000; border-left: 4px solid var(--orange); padding: 15px; border-radius: 4px; }
+        .card-res.green { border-left-color: var(--green); }
+        
+        .res-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #111; padding-bottom: 4px; }
+        .res-line span { color: var(--gray); }
+        .res-line b { color: #fff; }
+
+        .highlight-val { font-size: 24px; color: var(--green); font-weight: bold; display: block; margin-top: 5px; }
+
+        .btn-acao { 
+            width: 100%; padding: 18px; background: var(--green); color: white; 
+            border: none; font-weight: bold; margin-top: 20px; cursor: pointer; border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; color: var(--accent-orange); margin-top: 0;">CADASTRO DE ESTOQUE</h2>
-    
-    <div class="tab-container">
-        <button class="tab active" onclick="switchTab('mercadoria')">Mercadorias (Fardo/Unit)</button>
-        <button class="tab" onclick="switchTab('destilado')">Destilados (Doses)</button>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="mudarAba('mercadoria', this)">Mercadorias (Fardos)</button>
+        <button class="tab-btn" onclick="mudarAba('destilado', this)">Destilados (Doses)</button>
     </div>
 
-    <div id="mercadoria" class="form-section active">
-        <div class="full">
-            <label>NOME DO PRODUTO</label>
-            <input type="text" id="m_nome" placeholder="Ex: Heineken LN">
+    <div id="mercadoria" class="panel active">
+        <div class="grid">
+            <div class="full"><label>Nome do Produto</label><input type="text" id="m_nome" placeholder="Ex: Coca-Cola Lata"></div>
+            <div class="half"><label>Custo do Fardo (R$)</label><input type="number" id="m_custo" oninput="calcM()"></div>
+            <div class="half"><label>Quantidade no Fardo</label><input type="number" id="m_qtd" oninput="calcM()" value="12"></div>
+            <div class="half"><label>Preço de Venda Praticado (R$)</label><input type="number" id="m_venda" oninput="calcM()"></div>
+            <div class="half"><label>Ou Markup Desejado (%)</label><input type="number" id="m_markup" oninput="calcM_Markup()" value="50"></div>
         </div>
-        <div>
-            <label>CUSTO DO FARDO (R$)</label>
-            <input type="number" id="m_custoFardo" oninput="calcMercadoria()">
+
+        <div class="results-area">
+            <div class="card-res">
+                <label>Visão Unitária</label>
+                <div class="res-line"><span>Custo por Unidade:</span><b id="m_c_unit">R$ 0,00</b></div>
+                <div class="res-line"><span>Markup Real:</span><b id="m_mark_real">0%</b></div>
+                <div class="res-line"><span>Margem de Lucro:</span><b id="m_marg_real">0%</b></div>
+                <div class="res-line"><span>Lucro por Unidade:</span><b id="m_lucro_unit" style="color:var(--green)">R$ 0,00</b></div>
+            </div>
+            <div class="card-res green">
+                <label>Visão do Fardo Total</label>
+                <div class="res-line"><span>Custo Total:</span><b id="m_t_custo">R$ 0,00</b></div>
+                <div class="res-line"><span>Venda Total:</span><b id="m_t_venda">R$ 0,00</b></div>
+                <span>Lucro Total no Fardo:</span>
+                <span class="highlight-val" id="m_t_lucro">R$ 0,00</span>
+            </div>
         </div>
-        <div>
-            <label>QTD NO FARDO</label>
-            <input type="number" id="m_qtd" oninput="calcMercadoria()">
-        </div>
-        <div>
-            <label>MARKUP (%)</label>
-            <input type="number" id="m_markup" oninput="calcMercadoria()">
-        </div>
-        <div class="result-box">
-            <label>PREÇO DE VENDA UNITÁRIO</label>
-            <span id="m_resVenda">R$ 0,00</span>
-            <small id="m_resLucro">Lucro: R$ 0,00</small>
-        </div>
+        <button class="btn-acao">SALVAR NO ESTOQUE</button>
     </div>
 
-    <div id="destilado" class="form-section">
-        <div class="full">
-            <label>NOME DO DESTILADO</label>
-            <input type="text" id="d_nome" placeholder="Ex: Whisky Red Label">
+    <div id="destilado" class="panel">
+        <div class="grid">
+            <div class="full"><label>Nome do Destilado</label><input type="text" id="d_nome" placeholder="Ex: Red Label"></div>
+            <div><label>Custo Garrafa</label><input type="number" id="d_custo" oninput="calcD()"></div>
+            <div><label>ML Garrafa</label><input type="number" id="d_ml_g" oninput="calcD()" value="1000"></div>
+            <div><label>ML Dose</label><input type="number" id="d_ml_d" oninput="calcD()" value="50"></div>
+            <div><label>Perda Real (%)</label><input type="number" id="d_perda" oninput="calcD()" value="10"></div>
+            <div class="half"><label>Preço da Dose Praticado (R$)</label><input type="number" id="d_venda" oninput="calcD()"></div>
+            <div class="half"><label>Ou Markup na Dose (%)</label><input type="number" id="d_markup" oninput="calcD_Markup()" value="100"></div>
         </div>
-        <div>
-            <label>CUSTO DA GARRAFA (R$)</label>
-            <input type="number" id="d_custoGf" oninput="calcDestilado()">
-        </div>
-        <div>
-            <label>ML DA GARRAFA</label>
-            <input type="number" id="d_mlTotal" placeholder="Ex: 750" oninput="calcDestilado()">
-        </div>
-        <div>
-            <label>ML DA DOSE</label>
-            <input type="number" id="d_mlDose" value="50" oninput="calcDestilado()">
-        </div>
-        <div>
-            <label>MARKUP NA DOSE (%)</label>
-            <input type="number" id="d_markup" oninput="calcDestilado()">
-        </div>
-        <div class="result-box">
-            <label>PREÇO SUGERIDO POR DOSE</label>
-            <span id="d_resVenda">R$ 0,00</span>
-            <small id="d_resDoses">Rende: 0 doses</small>
-        </div>
-    </div>
 
-    <button class="btn-save">SALVAR NO ESTOQUE</button>
+        <div class="results-area">
+            <div class="card-res">
+                <label>Visão da Dose</label>
+                <div class="res-line"><span>Doses Reais (c/ perda):</span><b id="d_qtd_real">0</b></div>
+                <div class="res-line"><span>Custo Real da Dose:</span><b id="d_c_dose">R$ 0,00</b></div>
+                <div class="res-line"><span>Margem de Lucro:</span><b id="d_marg_real">0%</b></div>
+                <div class="res-line"><span>Lucro por Dose:</span><b id="d_lucro_dose" style="color:var(--green)">R$ 0,00</b></div>
+            </div>
+            <div class="card-res green">
+                <label>Visão da Garrafa Total</label>
+                <div class="res-line"><span>Custo Garrafa:</span><b id="d_t_custo">R$ 0,00</b></div>
+                <div class="res-line"><span>Venda Total Estimada:</span><b id="d_t_venda">R$ 0,00</b></div>
+                <span>Lucro Total na Garrafa:</span>
+                <span class="highlight-val" id="d_t_lucro">R$ 0,00</span>
+            </div>
+        </div>
+        <button class="btn-acao">SALVAR NO ESTOQUE</button>
+    </div>
 </div>
 
 <script>
-    function switchTab(type) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-        
-        event.currentTarget.classList.add('active');
-        document.getElementById(type).classList.add('active');
+    function mudarAba(aba, btn) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(aba).classList.add('active');
+        btn.classList.add('active');
     }
 
-    function calcMercadoria() {
-        const custo = parseFloat(document.getElementById('m_custoFardo').value) || 0;
-        const qtd = parseInt(document.getElementById('m_qtd').value) || 1;
-        const markup = parseFloat(document.getElementById('m_markup').value) || 0;
+    // Lógica Mercadoria
+    function calcM() {
+        let custo = parseFloat(document.getElementById('m_custo').value) || 0;
+        let qtd = parseInt(document.getElementById('m_qtd').value) || 1;
+        let venda = parseFloat(document.getElementById('m_venda').value) || 0;
 
-        const custoUnit = custo / qtd;
-        const venda = custoUnit * (1 + (markup / 100));
+        let cUnit = custo / qtd;
+        let markup = cUnit > 0 ? ((venda / cUnit) - 1) * 100 : 0;
+        document.getElementById('m_markup').value = markup.toFixed(1);
         
-        document.getElementById('m_resVenda').innerText = `R$ ${venda.toFixed(2)}`;
-        document.getElementById('m_resLucro').innerText = `Lucro Unitário: R$ ${(venda - custoUnit).toFixed(2)}`;
+        atualizarM(custo, qtd, cUnit, venda, markup);
     }
 
-    function calcDestilado() {
-        const custoGf = parseFloat(document.getElementById('d_custoGf').value) || 0;
-        const mlGf = parseFloat(document.getElementById('d_mlTotal').value) || 1;
-        const mlDose = parseFloat(document.getElementById('d_mlDose').value) || 1;
-        const markup = parseFloat(document.getElementById('d_markup').value) || 0;
+    function calcM_Markup() {
+        let custo = parseFloat(document.getElementById('m_custo').value) || 0;
+        let qtd = parseInt(document.getElementById('m_qtd').value) || 1;
+        let markup = parseFloat(document.getElementById('m_markup').value) || 0;
 
-        const numDoses = mlGf / mlDose;
-        const custoDose = custoGf / numDoses;
-        const vendaDose = custoDose * (1 + (markup / 100));
+        let cUnit = custo / qtd;
+        let venda = cUnit * (1 + (markup / 100));
+        document.getElementById('m_venda').value = venda.toFixed(2);
+        
+        atualizarM(custo, qtd, cUnit, venda, markup);
+    }
 
-        document.getElementById('d_resVenda').innerText = `R$ ${vendaDose.toFixed(2)}`;
-        document.getElementById('d_resDoses').innerText = `Rende ${numDoses.toFixed(1)} doses de ${mlDose}ml`;
+    function atualizarM(custo, qtd, cUnit, venda, markup) {
+        let lucroUnit = venda - cUnit;
+        let margem = venda > 0 ? (lucroUnit / venda) * 100 : 0;
+        
+        document.getElementById('m_c_unit').innerText = "R$ " + cUnit.toFixed(2);
+        document.getElementById('m_mark_real').innerText = markup.toFixed(1) + "%";
+        document.getElementById('m_marg_real').innerText = margem.toFixed(1) + "%";
+        document.getElementById('m_lucro_unit').innerText = "R$ " + lucroUnit.toFixed(2);
+        document.getElementById('m_t_custo').innerText = "R$ " + custo.toFixed(2);
+        document.getElementById('m_t_venda').innerText = "R$ " + (venda * qtd).toFixed(2);
+        document.getElementById('m_t_lucro').innerText = "R$ " + ((venda * qtd) - custo).toFixed(2);
+    }
+
+    // Lógica Destilado
+    function calcD() {
+        let custo = parseFloat(document.getElementById('d_custo').value) || 0;
+        let mlG = parseFloat(document.getElementById('d_ml_g').value) || 1;
+        let mlD = parseFloat(document.getElementById('d_ml_d').value) || 1;
+        let perda = parseFloat(document.getElementById('d_perda').value) || 0;
+        let venda = parseFloat(document.getElementById('d_venda').value) || 0;
+
+        let dosesReais = (mlG * (1 - (perda / 100))) / mlD;
+        let cDose = custo / dosesReais;
+        let markup = cDose > 0 ? ((venda / cDose) - 1) * 100 : 0;
+        document.getElementById('d_markup').value = markup.toFixed(1);
+
+        atualizarD(custo, dosesReais, cDose, venda, markup);
+    }
+
+    function calcD_Markup() {
+        let custo = parseFloat(document.getElementById('d_custo').value) || 0;
+        let mlG = parseFloat(document.getElementById('d_ml_g').value) || 1;
+        let mlD = parseFloat(document.getElementById('d_ml_d').value) || 1;
+        let perda = parseFloat(document.getElementById('d_perda').value) || 0;
+        let markup = parseFloat(document.getElementById('d_markup').value) || 0;
+
+        let dosesReais = (mlG * (1 - (perda / 100))) / mlD;
+        let cDose = custo / dosesReais;
+        let venda = cDose * (1 + (markup / 100));
+        document.getElementById('d_venda').value = venda.toFixed(2);
+
+        atualizarD(custo, dosesReais, cDose, venda, markup);
+    }
+
+    function atualizarD(custo, doses, cDose, venda, markup) {
+        let lucroDose = venda - cDose;
+        let margem = venda > 0 ? (lucroDose / venda) * 100 : 0;
+
+        document.getElementById('d_qtd_real').innerText = Math.floor(doses) + " doses";
+        document.getElementById('d_c_dose').innerText = "R$ " + cDose.toFixed(2);
+        document.getElementById('d_marg_real').innerText = margem.toFixed(1) + "%";
+        document.getElementById('d_lucro_dose').innerText = "R$ " + lucroDose.toFixed(2);
+        document.getElementById('d_t_custo').innerText = "R$ " + custo.toFixed(2);
+        document.getElementById('d_t_venda').innerText = "R$ " + (venda * doses).toFixed(2);
+        document.getElementById('d_t_lucro').innerText = "R$ " + ((venda * doses) - custo).toFixed(2);
     }
 </script>
 
