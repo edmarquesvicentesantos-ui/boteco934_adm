@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendas - Boteco 934</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
+        .header { text-align: center; color: #ff9f0a; border-bottom: 2px solid #ff9f0a; padding-bottom: 10px; margin-bottom: 15px; }
+        .mesa-card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
+        .btn-pagamento { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .pix { background: #32bcad; } .cartao { background: #007bff; } .dinheiro { background: #28a745; }
+        .input-venda { width: 100%; padding: 10px; background: #121212; border: 1px solid #444; color: #fff; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
+        .resumo { background: #000; border: 1px dashed #ff9f0a; padding: 10px; margin-top: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2 style="margin:0;">BOTECO 934 - VENDAS</h2>
+    <button onclick="location.href='index.html'" style="background:none; border:1px solid #ff9f0a; color:#ff9f0a; margin-top:10px; border-radius:5px;">VOLTAR CADASTRO</button>
+</div>
+
+<div class="mesa-card">
+    <h3 style="color:#ff9f0a; margin:0 0 10px 0;">Mesa / Cliente</h3>
+    <input type="text" id="cliente-nome" class="input-venda" placeholder="Nome do Cliente ou Nº Mesa">
+    
+    <label>VALOR TOTAL (R$)</label>
+    <input type="number" id="valor-total" class="input-venda" onkeyup="calcularDivisao()" placeholder="0.00">
+
+    <label>DIVIDIR POR QUANTAS PESSOAS?</label>
+    <input type="number" id="qtd-pessoas" class="input-venda" value="1" onkeyup="calcularDivisao()">
+
+    <div id="resultado-divisao" style="font-size: 18px; color: #30d158; font-weight: bold; text-align: center; margin: 10px 0;">
+        Cada um paga: R$ 0,00
+    </div>
+
+    <hr style="border: 0.5px solid #333;">
+
+    <button onclick="finalizar('DINHEIRO')" class="btn-pagamento dinheiro">PAGAMENTO EM DINHEIRO</button>
+    <button onclick="finalizar('PIX')" class="btn-pagamento pix">PAGAMENTO VIA PIX</button>
+    <button onclick="finalizar('CARTÃO')" class="btn-pagamento cartao">CARTÃO CRÉDITO/DÉBITO</button>
+    
+    <button onclick="enviarWhatsApp()" style="width: 100%; padding: 12px; margin-top: 15px; background: #25d366; color: white; border: none; border-radius: 8px; font-weight: bold;">
+        ENVIAR RECIBO WHATSAPP
+    </button>
+    
+    <button onclick="imprimirRecibo()" style="width: 100%; padding: 12px; margin-top: 8px; background: #555; color: white; border: none; border-radius: 8px; font-weight: bold;">
+        🖨️ IMPRIMIR RECIBO (Bluetooth)
+    </button>
+</div>
+
+<script>
+    function calcularDivisao() {
+        let total = parseFloat(document.getElementById('valor-total').value) || 0;
+        let pessoas = parseInt(document.getElementById('qtd-pessoas').value) || 1;
+        let cada = total / pessoas;
+        document.getElementById('resultado-divisao').innerHTML = "Cada um paga: R$ " + cada.toFixed(2);
+    }
+
+    function finalizar(tipo) {
+        let cliente = document.getElementById('cliente-nome').value || "Mesa Geral";
+        let total = document.getElementById('valor-total').value;
+        alert("✅ Venda de R$ " + total + " finalizada no " + tipo + " para: " + cliente);
+        // Aqui o dado será salvo no Firebase no futuro
+    }
+
+    function enviarWhatsApp() {
+        let cliente = document.getElementById('cliente-nome').value;
+        let total = document.getElementById('valor-total').value;
+        let texto = `*BOTECO 934*%0A---------------------------%0AOlá, ${cliente}!%0ASeu recibo de hoje:%0A*TOTAL: R$ ${total}*%0A---------------------------%0AObrigado pela preferência!`;
+        window.open(`https://wa.me/?text=${texto}`);
+    }
+
+    function imprimirRecibo() {
+        window.print(); // Comando simples que aciona a impressora conectada ao iPhone ou PC
+    }
+</script>
+
+</body>
+</html>
