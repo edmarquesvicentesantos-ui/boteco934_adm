@@ -21,90 +21,47 @@
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h2 style="margin:0;">BOTECO 934</h2>
-    </div>
-
+    <div class="header"><h2 style="margin:0;">BOTECO 934</h2></div>
     <div class="card">
         <h3 style="color: #ff9f0a; margin-top: 0;">CADASTRO DE PRODUTOS</h3>
-        
         <label>NOME DO PRODUTO</label>
         <input type="text" id="nome-prod" class="input-dark" placeholder="Ex: Cerveja Lata 350ml">
-
         <label>CÓDIGO DE BARRAS (BIP)</label>
         <input type="text" id="cod-barras" class="input-dark" placeholder="Aproxime o leitor">
-
         <div class="row">
-            <div class="col">
-                <label>CUSTO FARDO</label>
-                <input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularTudo()" placeholder="0.00">
-            </div>
-            <div class="col">
-                <label>QTD FARDO</label>
-                <input type="number" id="qtd-fardo" class="input-dark" value="12" onkeyup="calcularTudo()">
-            </div>
-            <div class="col">
-                <label>MARKUP %</label>
-                <input type="number" id="markup" class="input-dark" value="100" onkeyup="calcularTudo()">
-            </div>
+            <div class="col"><label>CUSTO FARDO</label><input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularTudo()" placeholder="0.00"></div>
+            <div class="col"><label>QTD FARDO</label><input type="number" id="qtd-fardo" class="input-dark" value="12" onkeyup="calcularTudo()"></div>
+            <div class="col"><label>MARKUP %</label><input type="number" id="markup" class="input-dark" value="100" onkeyup="calcularTudo()"></div>
         </div>
-
         <div class="painel-verde">
             <div style="display: flex; justify-content: space-between; text-align: center;">
-                <div style="flex: 1;">
-                    <label style="color: #30d158; font-weight: bold;">MARGEM REAL</label>
-                    <div id="res-margem" class="resultado-texto">0%</div>
-                </div>
-                <div style="flex: 1; border-left: 1px solid #333;">
-                    <label style="color: #30d158; font-weight: bold;">LUCRO FARDO</label>
-                    <div id="res-lucro-fardo" class="resultado-texto">R$ 0,00</div>
-                </div>
+                <div style="flex: 1;"><label style="color: #30d158; font-weight: bold;">MARGEM REAL</label><div id="res-margem" class="resultado-texto">0%</div></div>
+                <div style="flex: 1; border-left: 1px solid #333;"><label style="color: #30d158; font-weight: bold;">LUCRO FARDO</label><div id="res-lucro-fardo" class="resultado-texto">R$ 0,00</div></div>
             </div>
             <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; text-align: center;">
-                <label style="color: #30d158; font-weight: bold;">LUCRO POR UNIDADE</label>
-                <div id="res-lucro-un" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
+                <label style="color: #30d158; font-weight: bold;">LUCRO POR UNIDADE</label><div id="res-lucro-un" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
             </div>
         </div>
-
         <div class="row">
-            <div class="col">
-                <label>VENDA FARDO</label>
-                <input type="text" id="vda-fardo" class="input-dark" style="background: #2c2c2e; color: #30d158; font-weight: bold;" readonly>
-            </div>
-            <div class="col">
-                <label>VENDA UNIDADE</label>
-                <input type="text" id="vda-un" class="input-dark" style="background: #2c2c2e;" readonly>
-            </div>
+            <div class="col"><label>VENDA FARDO</label><input type="text" id="vda-fardo" class="input-dark" style="background: #2c2c2e; color: #30d158; font-weight: bold;" readonly></div>
+            <div class="col"><label>VENDA UNIDADE</label><input type="text" id="vda-un" class="input-dark" style="background: #2c2c2e;" readonly></div>
         </div>
-
         <button onclick="salvarNoFirebase()" class="btn-salvar">SALVAR NAS NUVENS</button>
     </div>
-
     <script>
-        // Configuração do seu Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.firebasestorage.app",
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
         function calcularTudo() {
             let custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
             let qtd = parseFloat(document.getElementById('qtd-fardo').value) || 1;
             let mkp = parseFloat(document.getElementById('markup').value) || 0;
-
             if (custo > 0) {
                 let vendaTotal = custo * (1 + (mkp / 100));
                 let lucroTotal = vendaTotal - custo;
                 let margem = (lucroTotal / vendaTotal) * 100;
                 let lucroUn = lucroTotal / qtd;
                 let vendaUn = vendaTotal / qtd;
-
                 document.getElementById('res-margem').innerHTML = margem.toFixed(1) + "%";
                 document.getElementById('res-lucro-fardo').innerHTML = "R$ " + lucroTotal.toFixed(2);
                 document.getElementById('res-lucro-un').innerHTML = "R$ " + lucroUn.toFixed(2);
@@ -112,29 +69,17 @@
                 document.getElementById('vda-un').value = "R$ " + vendaUn.toFixed(2);
             }
         }
-
         async function salvarNoFirebase() {
             const nome = document.getElementById('nome-prod').value.toUpperCase();
             const cod = document.getElementById('cod-barras').value;
             const custo = document.getElementById('custo-fardo').value;
             const vendaUn = document.getElementById('vda-un').value;
-
             if(!nome || !custo) { alert("Preencha Nome e Custo!"); return; }
-
             try {
                 const docRef = cod ? db.collection("produtos").doc(cod) : db.collection("produtos").doc();
-                await docRef.set({
-                    nome: nome,
-                    codigo: cod,
-                    custo_fardo: custo,
-                    venda_un: vendaUn,
-                    data: new Date()
-                }, { merge: true });
-
+                await docRef.set({ nome: nome, codigo: cod, custo_fardo: custo, venda_un: vendaUn, data: new Date() }, { merge: true });
                 alert("✅ Salvo com sucesso!");
-                document.getElementById('nome-prod').value = "";
-                document.getElementById('cod-barras').value = "";
-                document.getElementById('custo-fardo').value = "";
+                document.getElementById('nome-prod').value = ""; document.getElementById('cod-barras').value = ""; document.getElementById('custo-fardo').value = "";
             } catch (e) { alert("Erro ao salvar!"); }
         }
     </script>
