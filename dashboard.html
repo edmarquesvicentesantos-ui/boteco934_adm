@@ -3,93 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Real - Boteco 934</title>
+    <title>Dashboard - Boteco 934</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
-        .header { text-align: center; border-bottom: 2px solid #5856d6; padding-bottom: 10px; margin-bottom: 15px; }
-        .grid-relatorio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .box { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .valor { font-size: 18px; font-weight: bold; color: #30d158; margin-top: 5px; }
-        .alerta-gestao { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #444; margin-top: 10px; text-align: center; }
-        canvas { background: #1c1c1e; border-radius: 12px; margin-top: 15px; padding: 10px; border: 1px solid #333; width: 100% !important; height: auto !important; }
+        .btn-menu { padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; cursor: pointer; }
+        .box { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: center; margin-bottom: 10px; }
+        .valor { font-size: 18px; font-weight: bold; color: #30d158; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 style="margin:0; color: #5856d6;">SAÚDE DO BOTECO</h2>
-        <button onclick="location.href='index.html'" style="background:none; border:1px solid #5856d6; color:#5856d6; margin-top:10px; border-radius:5px; padding: 5px 10px;">VOLTAR</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+        <button onclick="location.href='index.html'" class="btn-menu" style="background: #333; color: #fff;">🍺 PRODUTOS</button>
+        <button onclick="location.href='vendas.html'" class="btn-menu" style="background: #333; color: #fff;">💰 VENDAS</button>
+        <button onclick="location.href='clientes.html'" class="btn-menu" style="background: #333; color: #fff;">👥 PENDURA</button>
+        <button onclick="location.href='boticario.html'" class="btn-menu" style="background: #333; color: #fff;">✨ BOTICÁRIO</button>
+        <button onclick="location.href='despesas.html'" class="btn-menu" style="background: #333; color: #fff;">📉 GASTOS</button>
+        <button onclick="location.href='dashboard.html'" class="btn-menu" style="background: #5856d6; color: #fff;">📊 LUCRO</button>
     </div>
 
-    <div class="grid-relatorio">
-        <div class="box">
-            <div style="font-size: 11px; color: #8e8e93;">VENDAS (MÊS)</div>
-            <div id="venda-total" class="valor">R$ 0,00</div>
-        </div>
-        <div class="box">
-            <div style="font-size: 11px; color: #8e8e93;">LUCRO LIMPO</div>
-            <div id="lucro-total" class="valor">R$ 0,00</div>
-        </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="box">VENDAS<br><span id="total-vendas" class="valor">R$ 0,00</span></div>
+        <div class="box">LUCRO LIMPO<br><span id="total-lucro" class="valor">R$ 0,00</span></div>
     </div>
 
-    <div class="alerta-gestao" id="alerta-box">
-        Monitorando saúde financeira...
-    </div>
-
-    <canvas id="graficoGestao"></canvas>
+    <canvas id="graficoResumo" style="margin-top:20px;"></canvas>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        async function processarFinanceiro() {
-            let vendas = 0;
-            let despesas = 0;
-            let custoEstimado = 0;
-
+        async function carregar() {
+            let vTotal = 0, dTotal = 0;
             const vSnap = await db.collection("vendas_realizadas").get();
-            vSnap.forEach(doc => { 
-                let val = parseFloat(doc.data().valor || 0);
-                vendas += val;
-                custoEstimado += (val * 0.55); // Média de 55% de custo sobre a venda
-            });
-
+            vSnap.forEach(d => vTotal += parseFloat(d.data().valor || 0));
             const dSnap = await db.collection("despesas").get();
-            dSnap.forEach(doc => { despesas += parseFloat(doc.data().valor || 0); });
+            dSnap.forEach(d => dTotal += parseFloat(d.data().valor || 0));
 
-            let lucroLiquido = vendas - custoEstimado - despesas;
-            let margemLiquida = (lucroLiquido / (vendas || 1)) * 100;
-            let cmvReal = (custoEstimado / (vendas || 1)) * 100;
+            let lucro = vTotal - (vTotal * 0.55) - dTotal;
+            document.getElementById('total-vendas').innerText = "R$ " + vTotal.toFixed(2);
+            document.getElementById('total-lucro').innerText = "R$ " + lucro.toFixed(2);
 
-            document.getElementById('venda-total').innerText = "R$ " + vendas.toFixed(2);
-            document.getElementById('lucro-total').innerText = "R$ " + lucroLiquido.toFixed(2);
-
-            // ALERTA DE GESTÃO (AULA NA PRÁTICA)
-            let corMargem = margemLiquida >= 15 ? "#30d158" : "#ff9f0a";
-            document.getElementById('alerta-box').innerHTML = `
-                <div style="color:${corMargem}; font-size:18px; font-weight:bold;">MARGEM LÍQUIDA: ${margemLiquida.toFixed(1)}%</div>
-                <div style="font-size:12px; color:#8e8e93; margin-top:5px;">CMV: ${cmvReal.toFixed(1)}% | GASTOS FIXOS: R$ ${despesas.toFixed(2)}</div>
-            `;
-
-            // GRÁFICO DE BARRAS
-            new Chart(document.getElementById('graficoGestao'), {
+            new Chart(document.getElementById('graficoResumo'), {
                 type: 'bar',
                 data: {
-                    labels: ['Vendas', 'Custo Bebida', 'Gastos Fixos', 'Lucro Limpo'],
-                    datasets: [{
-                        label: 'Financeiro R$',
-                        data: [vendas, custoEstimado, despesas, lucroLiquido],
-                        backgroundColor: ['#5856d6', '#ff9f0a', '#ff453a', '#30d158']
-                    }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#333' }, ticks: { color: '#fff' } } } }
+                    labels: ['Vendas', 'Gastos', 'Lucro'],
+                    datasets: [{ data: [vTotal, dTotal, lucro], backgroundColor: ['#5856d6', '#ff453a', '#30d158'] }]
+                }
             });
         }
-        processarFinanceiro();
+        carregar();
     </script>
 </body>
 </html>
