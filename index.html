@@ -36,7 +36,7 @@
         .btn-gold { background: var(--gold); color: #000; }
         
         .res-p { font-size: 11px; color: var(--green); margin-bottom: 10px; display: block; font-weight: bold; }
-        .info-divisor { color: var(--orange); font-size: 10px; display: block; margin-top: -8px; margin-bottom: 10px; }
+        .sugestao-caixa { background: #1a1500; border: 1px solid #443300; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -61,31 +61,41 @@
 
     <div class="grid-2">
         <div class="box">
-            <h3>Calculadora Inteligente</h3>
-            <label>Nome do Produto (Digite Ambev ou Amstel)</label>
-            <input type="text" id="p_nome" oninput="calcular()">
-            <span id="label_divisor" class="info-divisor">Divisor Padrão: 12</span>
+            <h3>Calculadora de Precificação</h3>
+            <label>Produto</label>
+            <input type="text" id="p_nome" oninput="detectarDivisor()" placeholder="Ex: Skol Ambev">
             
             <div class="grid-2">
-                <div><label>Custo (Fardo/Caixa)</label><input type="number" id="p_custo" oninput="calcular()"></div>
-                <div><label>Markup %</label><input type="number" id="p_markup" value="50" oninput="calcular()"></div>
+                <div><label>Qtd por Caixa</label><input type="number" id="p_divisor" oninput="calcular()" value="12"></div>
+                <div><label>Custo da Caixa (R$)</label><input type="number" id="p_custo" oninput="calcular()"></div>
             </div>
 
             <div class="grid-2">
-                <div><label>Sugerido (Un/Dose)</label><input type="number" id="p_sugerido" readonly style="color:var(--orange)"></div>
-                <div><label>Praticado (Venda)</label><input type="number" id="p_venda" oninput="calcular()"></div>
+                <div><label>Markup Unitário (%)</label><input type="number" id="p_markup" value="50" oninput="calcular()"></div>
+                <div><label>Sugerido Unidade</label><input type="number" id="p_sugerido" readonly style="color:var(--orange)"></div>
             </div>
 
-            <span class="res-p" id="res_lucro">Lucro Real: R$ 0,00</span>
+            <div class="sugestao-caixa">
+                <label style="color: var(--gold);">Venda da Caixa (Atacado)</label>
+                <div class="grid-2">
+                    <div><label>Markup Caixa %</label><input type="number" id="p_markup_caixa" value="20" oninput="calcular()"></div>
+                    <div><label>Sugerido Caixa</label><input type="number" id="p_sugerido_caixa" readonly style="color:var(--green); font-weight:bold; font-size:16px;"></div>
+                </div>
+            </div>
+
+            <label>Preço Praticado Unidade</label>
+            <input type="number" id="p_venda" oninput="calcular()" placeholder="Valor no balcão">
+
+            <span class="res-p" id="res_lucro">Lucro Real Unidade: R$ 0,00</span>
             <button class="btn btn-gold" onclick="salvarProduto()">Salvar no Estoque</button>
         </div>
 
         <div class="box">
             <h3>Estoque (Ordem Alfabética)</h3>
-            <div style="max-height: 400px; overflow-y: auto;">
+            <div style="max-height: 500px; overflow-y: auto;">
                 <table>
                     <thead>
-                        <tr><th>PRODUTO</th><th>CUSTO UN.</th><th>VENDA</th><th>LUCRO UN.</th></tr>
+                        <tr><th>PRODUTO</th><th>CUSTO UN.</th><th>VENDA UN.</th><th>SUG. CAIXA</th></tr>
                     </thead>
                     <tbody id="lista_estoque"></tbody>
                 </table>
@@ -100,7 +110,6 @@
 
 <script>
     let estoque = [];
-    let divisorAtual = 12;
 
     function openTab(name) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -109,26 +118,36 @@
         event.currentTarget.classList.add('active');
     }
 
-    function calcular() {
+    function detectarDivisor() {
         const nome = document.getElementById('p_nome').value.toLowerCase();
-        const custo = parseFloat(document.getElementById('p_custo').value) || 0;
-        const markup = parseFloat(document.getElementById('p_markup').value) || 0;
-        const venda = parseFloat(document.getElementById('p_venda').value) || 0;
+        let divisor = 12;
+        if (nome.includes('dose')) divisor = 18;
+        else if (nome.includes('ambev')) divisor = 23;
+        else if (nome.includes('amstel')) divisor = 24;
         
-        // Lógica de Inteligência de Caixa
-        if (nome.includes('dose')) { divisorAtual = 18; }
-        else if (nome.includes('ambev')) { divisorAtual = 23; }
-        else if (nome.includes('amstel')) { divisorAtual = 24; }
-        else { divisorAtual = 12; }
+        document.getElementById('p_divisor').value = divisor;
+        calcular();
+    }
 
-        document.getElementById('label_divisor').innerText = `Divisor Detectado: ${divisorAtual} unidades`;
+    function calcular() {
+        const custoCaixa = parseFloat(document.getElementById('p_custo').value) || 0;
+        const divisor = parseInt(document.getElementById('p_divisor').value) || 1;
+        const markupUn = parseFloat(document.getElementById('p_markup').value) || 0;
+        const markupCx = parseFloat(document.getElementById('p_markup_caixa').value) || 0;
+        const vendaUn = parseFloat(document.getElementById('p_venda').value) || 0;
 
-        const cUnit = custo / divisorAtual;
-        const sugerido = cUnit * (1 + (markup / 100));
-        const lucroReal = venda - cUnit;
+        const cUnit = custoCaixa / divisor;
+        
+        // Sugerido Unidade
+        const sugeridoUn = cUnit * (1 + (markupUn / 100));
+        document.getElementById('p_sugerido').value = sugeridoUn.toFixed(2);
 
-        document.getElementById('p_sugerido').value = sugerido.toFixed(2);
-        document.getElementById('res_lucro').innerText = `Lucro Real p/ Unidade: R$ ${lucroReal.toFixed(2)}`;
+        // Sugerido Caixa (Atacado)
+        const sugeridoCx = custoCaixa * (1 + (markupCx / 100));
+        document.getElementById('p_sugerido_caixa').value = sugeridoCx.toFixed(2);
+
+        const lucroRealUn = vendaUn - cUnit;
+        document.getElementById('res_lucro').innerText = `Lucro Real p/ Unidade: R$ ${lucroRealUn.toFixed(2)}`;
     }
 
     function salvarProduto() {
@@ -136,8 +155,9 @@
             ean: document.getElementById('scan_ean').value || '---',
             nome: document.getElementById('p_nome').value.toUpperCase(),
             custo_caixa: parseFloat(document.getElementById('p_custo').value) || 0,
-            divisor: divisorAtual,
-            venda: parseFloat(document.getElementById('p_venda').value) || 0
+            divisor: parseInt(document.getElementById('p_divisor').value) || 1,
+            venda: parseFloat(document.getElementById('p_venda').value) || 0,
+            sugerido_caixa: parseFloat(document.getElementById('p_sugerido_caixa').value) || 0
         };
         if(!p.nome) return;
         estoque.push(p);
@@ -149,12 +169,11 @@
     function renderEstoque() {
         const html = estoque.map(p => {
             const cUn = p.custo_caixa / p.divisor;
-            const lucro = p.venda - cUn;
             return `<tr>
                 <td><small>${p.ean}</small><br>${p.nome} (${p.divisor} un)</td>
                 <td>R$ ${cUn.toFixed(2)}</td>
                 <td style="color:var(--green)">R$ ${p.venda.toFixed(2)}</td>
-                <td>R$ ${lucro.toFixed(2)}</td>
+                <td style="color:var(--gold)">R$ ${p.sugerido_caixa.toFixed(2)}</td>
             </tr>`;
         }).join('');
         document.getElementById('lista_estoque').innerHTML = html;
@@ -164,16 +183,16 @@
     }
 
     function focarNome() { document.getElementById('p_nome').focus(); }
+    
     function limpar() { 
-        document.querySelectorAll('input').forEach(i => { if(i.id !== 'p_markup') i.value = ''; });
+        document.getElementById('scan_ean').value = '';
+        document.getElementById('p_nome').value = '';
+        document.getElementById('p_custo').value = '';
+        document.getElementById('p_venda').value = '';
         document.getElementById('scan_ean').focus();
-        document.getElementById('label_divisor').innerText = 'Divisor Padrão: 12';
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    for(let i=1; i<=8; i++) {
-        document.getElementById('grid_mesas').innerHTML += `<div class="box" style="text-align:center"><b style="color:var(--gold)">MESA 0${i}</b><br><small>Livre</small></div>`;
-    }
 </script>
 </body>
 </html>
