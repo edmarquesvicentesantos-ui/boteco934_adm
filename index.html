@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão Completa</title>
+    <title>Boteco 934 - Cadastro com Barcode</title>
     <style>
         :root {
             --bg: #0a0a0a; --card: #161616; --orange: #ff9800; --green: #00ff88; --gray: #a0a0a0; --border: #333;
@@ -18,104 +18,88 @@
 
         .input-group { margin-bottom: 12px; }
         label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        
+        /* Destaque para o Código de Barras */
+        .barcode-field { border: 1px solid var(--orange) !important; color: var(--orange) !important; font-family: monospace; }
+        
         input { 
             width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); 
             color: #fff; font-size: 15px; box-sizing: border-box; border-radius: 4px;
         }
         input:focus { border-color: var(--orange); outline: none; }
 
-        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
         .res-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .res-card { background: #0a0a0a; padding: 10px; border-radius: 4px; border-left: 3px solid var(--orange); }
         .res-card.green { border-left-color: var(--green); }
         .res-card small { display: block; font-size: 9px; color: var(--gray); text-transform: uppercase; }
-        .res-card b { font-size: 16px; color: #fff; }
-
-        .total-profit { 
-            background: #000; border: 1px solid var(--green); padding: 12px; 
-            text-align: center; margin-top: 10px; border-radius: 4px;
-        }
-        .total-profit small { color: var(--gray); font-size: 10px; text-transform: uppercase; display: block; }
-        .total-profit div { font-size: 24px; color: var(--green); font-weight: bold; }
+        .res-card b { font-size: 16px; }
 
         .btn-save { 
             width: 100%; padding: 14px; background: var(--orange); color: #000; 
             border: none; font-weight: bold; cursor: pointer; border-radius: 4px;
-            text-transform: uppercase; margin-top: 15px; font-size: 13px;
+            text-transform: uppercase; margin-top: 15px;
         }
 
-        /* Tabela */
-        .lista-section { margin-top: 30px; background: var(--card); padding: 20px; border: 1px solid var(--border); border-radius: 8px; }
+        .lista-section { margin-top: 30px; background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: var(--orange); font-size: 11px; padding: 12px; border-bottom: 2px solid #222; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
-        tr:hover { background: #1a1a1a; }
+        th { text-align: left; color: var(--orange); font-size: 11px; padding: 12px; border-bottom: 2px solid #222; }
+        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header"><h1>BOTECO 934 - GESTÃO DE ESTOQUE</h1></div>
+    <div class="header"><h1>BOTECO 934 - CADASTRO E CÓDIGO DE BARRAS</h1></div>
 
     <div class="main-grid">
         <div class="box">
-            <h3>Mercadorias (Fardos / Caixas)</h3>
-            <div class="input-group"><label>Produto</label><input type="text" id="m_nome" placeholder="Ex: Heineken 600ml"></div>
-            <div class="sub-grid">
-                <div class="input-group"><label>Custo Fardo (R$)</label><input type="number" id="m_custo" oninput="calcM()"></div>
-                <div class="input-group"><label>Qtd Fardo</label><input type="number" id="m_qtd" oninput="calcM()" value="12"></div>
+            <h3>Mercadorias (Unidade / Boticário)</h3>
+            <div class="input-group">
+                <label>Código de Barras (EAN-13)</label>
+                <input type="text" id="m_barcode" class="barcode-field" placeholder="Passe o leitor ou digite..." autofocus>
             </div>
-            <div class="sub-grid">
-                <div class="input-group"><label>Markup (%)</label><input type="number" id="m_markup" oninput="calcM()" value="60"></div>
-                <div class="input-group"><label>Preço Sugerido (Un)</label><input type="number" id="m_sugerido" readonly style="color:var(--orange); font-weight:bold;"></div>
+            <div class="input-group">
+                <label>Nome do Produto</label>
+                <input type="text" id="m_nome" placeholder="Ex: Heineken ou Perfume Boticário">
             </div>
-            <div class="input-group"><label>Preço Praticado (Venda Real)</label><input type="number" id="m_venda" oninput="calcM()"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="input-group"><label>Custo Unitário (R$)</label><input type="number" id="m_custo" oninput="calcM()"></div>
+                <div class="input-group"><label>Preço Praticado (R$)</label><input type="number" id="m_venda" oninput="calcM()"></div>
+            </div>
 
             <div class="res-container">
-                <div class="res-card"><small>Custo Unit.</small><b id="m_c_unit">R$ 0,00</b></div>
-                <div class="res-card green"><small>Lucro Unit.</small><b id="m_lucro_u">R$ 0,00</b></div>
+                <div class="res-card green"><small>Lucro Unitário</small><b id="m_lucro_u">R$ 0,00</b></div>
                 <div class="res-card green"><small>Margem Real</small><b id="m_margem">0%</b></div>
-                <div class="res-card"><small>Markup Real</small><b id="m_mark_real">0%</b></div>
             </div>
-            <div class="total-profit"><small>Lucro Líquido no Fardo</small><div id="m_lucro_f">R$ 0,00</div></div>
-            <button class="btn-save" onclick="salvar('M')">Salvar Mercadoria</button>
+            <button class="btn-save" onclick="salvar('M')">Salvar no Estoque</button>
         </div>
 
         <div class="box">
             <h3>Destilados (Garrafa / Dose)</h3>
-            <div class="input-group"><label>Destilado</label><input type="text" id="d_nome" placeholder="Ex: Red Label"></div>
-            <div class="sub-grid">
-                <div class="input-group"><label>Custo Garrafa (R$)</label><input type="number" id="d_custo" oninput="calcD()"></div>
-                <div class="input-group"><label>Perda Real (%)</label><input type="number" id="d_perda" oninput="calcD()" value="10"></div>
+            <div class="input-group"><label>Código de Barras (Opcional)</label><input type="text" id="d_barcode" class="barcode-field"></div>
+            <div class="input-group"><label>Nome do Destilado</label><input type="text" id="d_nome"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="input-group"><label>Custo Garrafa</label><input type="number" id="d_custo" oninput="calcD()"></div>
+                <div class="input-group"><label>Preço Dose</label><input type="number" id="d_venda" oninput="calcD()"></div>
             </div>
-            <div class="sub-grid">
-                <div class="input-group"><label>Markup (%)</label><input type="number" id="d_markup" oninput="calcD()" value="100"></div>
-                <div class="input-group"><label>Sugerido Dose</label><input type="number" id="d_sugerido" readonly style="color:var(--orange); font-weight:bold;"></div>
-            </div>
-            <div class="input-group"><label>Preço Praticado na Dose</label><input type="number" id="d_venda" oninput="calcD()"></div>
-
             <div class="res-container">
-                <div class="res-card"><small>Doses Reais</small><b id="d_qtd_d">0</b></div>
-                <div class="res-card green"><small>Lucro p/ Dose</small><b id="d_lucro_d">R$ 0,00</b></div>
-                <div class="res-card green"><small>Margem Real</small><b id="d_margem_d">0%</b></div>
-                <div class="res-card"><small>Custo Dose</small><b id="d_c_dose">R$ 0,00</b></div>
+                <div class="res-card green"><small>Lucro p/ Garrafa</small><b id="d_lucro_g">R$ 0,00</b></div>
+                <div class="res-card"><small>Doses (c/ 10% perda)</small><b id="d_doses">18</b></div>
             </div>
-            <div class="total-profit"><small>Lucro Líquido na Garrafa</small><div id="d_lucro_g">R$ 0,00</div></div>
-            <button class="btn-save" onclick="salvar('D')">Salvar Destilado</button>
+            <button class="btn-save" onclick="salvar('D')">Salvar no Estoque</button>
         </div>
     </div>
 
     <div class="lista-section">
-        <h3>Lista de Estoque (Ordem Alfabética)</h3>
+        <h3>Estoque em Ordem Alfabética</h3>
         <table>
             <thead>
                 <tr>
+                    <th>CÓD. BARRAS</th>
                     <th>PRODUTO</th>
                     <th>CUSTO</th>
-                    <th>PREÇO PRATICADO</th>
+                    <th>VENDA</th>
                     <th>LUCRO</th>
-                    <th>MARGEM %</th>
                 </tr>
             </thead>
             <tbody id="tabela"></tbody>
@@ -128,65 +112,48 @@
 
     function calcM() {
         const custo = parseFloat(document.getElementById('m_custo').value) || 0;
-        const qtd = parseInt(document.getElementById('m_qtd').value) || 1;
-        const markup = parseFloat(document.getElementById('m_markup').value) || 0;
         const venda = parseFloat(document.getElementById('m_venda').value) || 0;
-
-        const cUnit = custo / qtd;
-        const sugerido = cUnit * (1 + (markup / 100));
-        const lucroU = venda - cUnit;
-        const markReal = cUnit > 0 ? (lucroU / cUnit) * 100 : 0;
-        const margem = venda > 0 ? (lucroU / venda) * 100 : 0;
-
-        document.getElementById('m_sugerido').value = sugerido.toFixed(2);
-        document.getElementById('m_c_unit').innerText = `R$ ${cUnit.toFixed(2)}`;
-        document.getElementById('m_lucro_u').innerText = `R$ ${lucroU.toFixed(2)}`;
+        const lucro = venda - custo;
+        const margem = venda > 0 ? (lucro / venda) * 100 : 0;
+        document.getElementById('m_lucro_u').innerText = `R$ ${lucro.toFixed(2)}`;
         document.getElementById('m_margem').innerText = `${margem.toFixed(1)}%`;
-        document.getElementById('m_mark_real').innerText = `${markReal.toFixed(1)}%`;
-        document.getElementById('m_lucro_f').innerText = `R$ ${((venda * qtd) - custo).toFixed(2)}`;
     }
 
     function calcD() {
         const custoG = parseFloat(document.getElementById('d_custo').value) || 0;
-        const mlG = parseFloat(document.getElementById('d_ml_g')?.value || 1000);
-        const mlD = parseFloat(document.getElementById('d_ml_d')?.value || 50);
-        const perda = parseFloat(document.getElementById('d_perda').value) || 0;
-        const markup = parseFloat(document.getElementById('d_markup').value) || 0;
-        const venda = parseFloat(document.getElementById('d_venda').value) || 0;
-
-        const doses = (mlG * (1 - (perda / 100))) / mlD;
-        const cDose = custoG / doses;
-        const sugerido = cDose * (1 + (markup / 100));
-        const lucroD = venda - cDose;
-        const margem = venda > 0 ? (lucroD / venda) * 100 : 0;
-
-        document.getElementById('d_sugerido').value = sugerido.toFixed(2);
-        document.getElementById('d_qtd_d').innerText = Math.floor(doses);
-        document.getElementById('d_c_dose').innerText = `R$ ${cDose.toFixed(2)}`;
-        document.getElementById('d_lucro_d').innerText = `R$ ${lucroD.toFixed(2)}`;
-        document.getElementById('d_margem_d').innerText = `${margem.toFixed(1)}%`;
-        document.getElementById('d_lucro_g').innerText = `R$ ${((venda * doses) - custoG).toFixed(2)}`;
+        const vendaD = parseFloat(document.getElementById('d_venda').value) || 0;
+        const doses = 18; // 1000ml - 10% perda / 50ml dose
+        const lucroG = (vendaD * doses) - custoG;
+        document.getElementById('d_lucro_g').innerText = `R$ ${lucroG.toFixed(2)}`;
     }
 
     function salvar(tipo) {
-        let nome = tipo === 'M' ? document.getElementById('m_nome').value : document.getElementById('d_nome').value;
-        let venda = tipo === 'M' ? parseFloat(document.getElementById('m_venda').value) : parseFloat(document.getElementById('d_venda').value);
-        let custo = tipo === 'M' ? (parseFloat(document.getElementById('m_custo').value) / parseInt(document.getElementById('m_qtd').value)) : (parseFloat(document.getElementById('d_custo').value) / ((1000 * (1 - (parseFloat(document.getElementById('d_perda').value)/100))) / 50));
+        const item = {
+            barcode: tipo === 'M' ? document.getElementById('m_barcode').value || '---' : document.getElementById('d_barcode').value || '---',
+            nome: (tipo === 'M' ? document.getElementById('m_nome').value : document.getElementById('d_nome').value).toUpperCase(),
+            custo: tipo === 'M' ? parseFloat(document.getElementById('m_custo').value) : parseFloat(document.getElementById('d_custo').value) / 18,
+            venda: tipo === 'M' ? parseFloat(document.getElementById('m_venda').value) : parseFloat(document.getElementById('d_venda').value)
+        };
 
-        if(!nome || !venda) return alert("Preencha o nome e o preço praticado!");
-
-        estoque.push({ nome: nome.toUpperCase(), custo, venda });
-        estoque.sort((a, b) => a.nome.localeCompare(b.nome));
+        if(!item.nome) return;
+        estoque.push(item);
+        estoque.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordem Alfabética
         render();
+        // Limpar campos
+        if(tipo === 'M') { document.getElementById('m_barcode').value = ''; document.getElementById('m_nome').value = ''; document.getElementById('m_barcode').focus(); }
     }
 
     function render() {
         const t = document.getElementById('tabela');
         t.innerHTML = '';
         estoque.forEach(i => {
-            let lucro = i.venda - i.custo;
-            let margem = (lucro / i.venda) * 100;
-            t.innerHTML += `<tr><td>${i.nome}</td><td>R$ ${i.custo.toFixed(2)}</td><td style="color:var(--green)">R$ ${i.venda.toFixed(2)}</td><td>R$ ${lucro.toFixed(2)}</td><td>${margem.toFixed(1)}%</td></tr>`;
+            t.innerHTML += `<tr>
+                <td style="color:var(--orange)">${i.barcode}</td>
+                <td>${i.nome}</td>
+                <td>R$ ${i.custo.toFixed(2)}</td>
+                <td style="color:var(--green)">R$ ${i.venda.toFixed(2)}</td>
+                <td>R$ ${(i.venda - i.custo).toFixed(2)}</td>
+            </tr>`;
         });
     }
 </script>
