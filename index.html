@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque - Boteco 934</title>
+    <title>Estoque Inteligente - Boteco 934</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
         .btn-menu { padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; cursor: pointer; }
         .card { background: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
-        .input-dark { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
-        .btn-salvar { width: 100%; padding: 15px; background: #ff9f0a; color: #000; border: none; border-radius: 8px; font-weight: bold; }
+        .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .painel-verde { margin: 15px 0; background: #000; padding: 15px; border-radius: 12px; border: 2px solid #30d158; text-align: center; }
+        .resultado-texto { font-size: 24px; font-weight: bold; color: #30d158; }
+        .btn-salvar { width: 100%; padding: 15px; background: #ff9f0a; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
         
         /* Lista de Produtos */
-        .prod-row { background: #121212; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .prod-info b { color: #ff9f0a; text-transform: uppercase; }
-        .prod-preco { color: #30d158; font-weight: bold; }
-
+        .prod-row { background: #1c1c1e; border: 1px solid #333; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .prod-info b { color: #ff9f0a; text-transform: uppercase; font-size: 14px; }
+        .prod-valores { text-align: right; }
+        
         /* Backup Area */
-        .backup-area { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-backup { flex: 1; padding: 10px; font-size: 11px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; cursor: pointer; }
+        .backup-area { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-backup { flex: 1; padding: 10px; font-size: 11px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; cursor: pointer; text-align: center; }
+        label { font-size: 11px; color: #8e8e93; }
     </style>
 </head>
 <body>
@@ -35,83 +38,47 @@
     </div>
 
     <div class="card">
-        <h4 style="margin:0 0 10px 0; color: #ff9f0a;">CADASTRAR PRODUTO</h4>
-        <input type="text" id="p-nome" class="input-dark" placeholder="Nome (Ex: Skol 269ml)">
-        <div style="display:flex; gap:10px;">
-            <input type="number" id="p-custo" class="input-dark" placeholder="Custo Fardo">
-            <input type="number" id="p-venda" class="input-dark" placeholder="Venda Fardo">
+        <label>NOME DO PRODUTO</label>
+        <input type="text" id="p-nome" class="input-dark" placeholder="Ex: Heineken 600ml">
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="flex: 1;">
+                <label>CUSTO FARDO/CX</label>
+                <input type="number" id="p-custo" class="input-dark" oninput="calcularPelaMargem()" step="0.01">
+            </div>
+            <div style="flex: 1;">
+                <label>QTD NO FARDO</label>
+                <input type="number" id="p-qtd" class="input-dark" value="12" oninput="calcularPelaMargem()">
+            </div>
         </div>
-        <button onclick="salvarProduto()" class="btn-salvar">SALVAR PRODUTO</button>
-        
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div style="flex: 1;">
+                <label>MARKUP (%)</label>
+                <input type="number" id="p-markup" class="input-dark" value="100" oninput="calcularPelaMargem()">
+            </div>
+            <div style="flex: 1;">
+                <label>VENDA FARDO (R$)</label>
+                <input type="number" id="p-venda" class="input-dark" oninput="calcularPeloPreco()" step="0.01">
+            </div>
+        </div>
+
+        <div class="painel-verde">
+            <div style="font-size: 11px; color: #30d158;">LUCRO POR UNIDADE</div>
+            <div id="res-lucro-un" class="resultado-texto">R$ 0,00</div>
+            <div id="res-margem" style="font-size: 13px; color: #8e8e93; margin-top: 5px;">Margem Real: 0%</div>
+        </div>
+
+        <button onclick="salvarProduto()" class="btn-salvar">SALVAR NO ESTOQUE</button>
+
         <div class="backup-area">
-            <button class="btn-backup" onclick="exportarBackup()">📥 EXPORTAR BACKUP</button>
-            <label class="btn-backup" style="text-align:center;">
-                📤 IMPORTAR
+            <button class="btn-backup" onclick="exportarBackup()">📥 EXPORTAR JSON</button>
+            <label class="btn-backup">
+                📤 IMPORTAR LISTA
                 <input type="file" id="importFile" hidden onchange="importarBackup(event)">
             </label>
         </div>
     </div>
 
-    <h4 style="color: #8e8e93; margin-left: 5px;">ESTOQUE ATUAL</h4>
-    <div id="lista-estoque"></div>
-
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        async function salvarProduto() {
-            const nome = document.getElementById('p-nome').value.toUpperCase();
-            const custo = document.getElementById('p-custo').value;
-            const venda = document.getElementById('p-venda').value;
-            if(!nome || !custo || !venda) return alert("Preencha tudo!");
-            await db.collection("produtos").add({ nome, custo, venda, data: new Date() });
-            location.reload();
-        }
-
-        db.collection("produtos").orderBy("nome", "asc").onSnapshot(snap => {
-            let html = "";
-            snap.forEach(doc => {
-                let p = doc.data();
-                html += `
-                <div class="prod-row">
-                    <div class="prod-info">
-                        <b>${p.nome}</b><br>
-                        <small style="color:#8e8e93;">Custo: R$ ${parseFloat(p.custo).toFixed(2)}</small>
-                    </div>
-                    <div class="prod-preco">R$ ${parseFloat(p.venda).toFixed(2)}</div>
-                </div>`;
-            });
-            document.getElementById('lista-estoque').innerHTML = html;
-        });
-
-        // FUNÇÃO DE BACKUP (EXPORTAR)
-        async function exportarBackup() {
-            const snap = await db.collection("produtos").get();
-            const dados = [];
-            snap.forEach(doc => dados.push(doc.data()));
-            
-            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "backup_produtos_boteco934.json";
-            a.click();
-        }
-
-        // FUNÇÃO DE IMPORTAR (SUBIR LISTA GRANDE)
-        function importarBackup(event) {
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const lista = JSON.parse(e.target.result);
-                for(let p of lista) {
-                    await db.collection("produtos").add({ ...p, data: new Date() });
-                }
-                alert("✅ Lista Importada com Sucesso!");
-                location.reload();
-            };
-            reader.readAsText(event.target.files[0]);
-        }
-    </script>
-</body>
-</html>
+    <h4 style="color: #8e8e93; margin-left: 5px;">PRODUTOS CADASTRADOS</h4>
+    <div
