@@ -2,95 +2,140 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Boteco 934">
-    
-    <title>BOTECO 934 GOLD PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco 934 - Gestão</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { 
-            --bg: #050505; 
-            --card: #121212; 
-            --gold-light: #ffd700; 
-            --gold-dark: #b8860b; 
-            --gold-gradient: linear-gradient(145deg, #ffd700, #b8860b);
-            --blue: #00d2ff; --green: #00ff41; --red: #ff4b2b; --purple: #a855f7; --text: #e0e0e0; 
-        }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding-top: env(safe-area-inset-top); }
-        
-        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; background: #000; }
-        .header h1 { 
-            font-size: 22px; font-weight: 900; letter-spacing: 3px; 
-            background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(218, 165, 32, 0.4); text-transform: uppercase;
-        }
-
-        #main-content { flex: 1; padding: 15px; overflow-y: auto; padding-bottom: 100px; }
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #222; margin-bottom: 15px; }
-        .gold-title { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; text-transform: uppercase; font-size: 14px; display: block; margin-bottom: 10px; }
-        
-        input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; outline: none; }
-        button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; background: var(--gold-gradient); color: #000; }
-
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: #0a0a0a; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { text-align: center; text-decoration: none; flex: 1; }
-        .nav-item i { font-size: 22px; display: block; margin-bottom: 5px; color: #444; }
-        .nav-item span { font-size: 9px; font-weight: bold; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
-        
-        .nav-item.active.venda i { color: var(--blue); text-shadow: 0 0 10px var(--blue); }
-        .nav-item.active.estoque i { color: var(--green); text-shadow: 0 0 10px var(--green); }
-        .nav-item.active.relatorio i { color: var(--red); text-shadow: 0 0 10px var(--red); }
-        .nav-item.active.boticario i { color: var(--gold-light); text-shadow: 0 0 10px var(--gold-light); }
-        .nav-item.active.config i { color: var(--purple); text-shadow: 0 0 10px var(--purple); }
-
-        .hidden { display: none; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
+        .header { text-align: center; color: #ff9f0a; border-bottom: 2px solid #ff9f0a; padding: 10px; margin-bottom: 20px; }
+        .card { background: #1c1c1e; padding: 20px; border-radius: 15px; border: 1px solid #333; max-width: 500px; margin: auto; }
+        label { display: block; margin-top: 10px; font-size: 12px; color: #8e8e93; }
+        .input-dark { width: 100%; padding: 12px; margin-top: 5px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .input-dark:focus { border-color: #30d158; }
+        .row { display: flex; gap: 10px; margin-top: 10px; }
+        .col { flex: 1; }
+        .painel-verde { margin-top: 15px; background: #000; padding: 15px; border-radius: 12px; border: 2px solid #30d158; }
+        .resultado-texto { font-size: 22px; font-weight: bold; color: #30d158; }
+        .btn-salvar { width: 100%; padding: 18px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 16px; }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="header"><h1>BOTECO 934</h1></div>
+    <div class="header">
+        <h2 style="margin:0;">BOTECO 934</h2>
+    </div>
 
-    <div id="main-content">
-        <div id="sec-vendas" class="content-section">
-            <div class="card">
-                <span class="gold-title"><i class="fa-solid fa-cart-shopping"></i> LANÇAR VENDA</span>
-                <input type="text" placeholder="Produto...">
-                <input type="number" value="1">
-                <button>CONFIRMAR VENDA</button>
+    <div class="card">
+        <h3 style="color: #ff9f0a; margin-top: 0;">CADASTRO DE PRODUTOS</h3>
+        
+        <label>NOME DO PRODUTO</label>
+        <input type="text" id="nome-prod" class="input-dark" placeholder="Ex: Cerveja Lata 350ml">
+
+        <label>CÓDIGO DE BARRAS (BIP)</label>
+        <input type="text" id="cod-barras" class="input-dark" placeholder="Aproxime o leitor">
+
+        <div class="row">
+            <div class="col">
+                <label>CUSTO FARDO</label>
+                <input type="number" id="custo-fardo" class="input-dark" onkeyup="calcularTudo()" placeholder="0.00">
+            </div>
+            <div class="col">
+                <label>QTD FARDO</label>
+                <input type="number" id="qtd-fardo" class="input-dark" value="12" onkeyup="calcularTudo()">
+            </div>
+            <div class="col">
+                <label>MARKUP %</label>
+                <input type="number" id="markup" class="input-dark" value="100" onkeyup="calcularTudo()">
             </div>
         </div>
-</nav>
-        <div id="sec-estoque" class="content-section hidden">
-            <div class="card"><span class="gold-title">📥 ENTRADA XML</span><button>LER NOTA</button></div>
+
+        <div class="painel-verde">
+            <div style="display: flex; justify-content: space-between; text-align: center;">
+                <div style="flex: 1;">
+                    <label style="color: #30d158; font-weight: bold;">MARGEM REAL</label>
+                    <div id="res-margem" class="resultado-texto">0%</div>
+                </div>
+                <div style="flex: 1; border-left: 1px solid #333;">
+                    <label style="color: #30d158; font-weight: bold;">LUCRO FARDO</label>
+                    <div id="res-lucro-fardo" class="resultado-texto">R$ 0,00</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; text-align: center;">
+                <label style="color: #30d158; font-weight: bold;">LUCRO POR UNIDADE</label>
+                <div id="res-lucro-un" style="font-size: 20px; font-weight: bold; color: #30d158;">R$ 0,00</div>
+            </div>
         </div>
-        <div id="sec-relatorio" class="content-section hidden">
-            <div class="card"><span class="gold-title">📊 DADOS HOJE</span><p>R$ 0,00</p></div>
+
+        <div class="row">
+            <div class="col">
+                <label>VENDA FARDO</label>
+                <input type="text" id="vda-fardo" class="input-dark" style="background: #2c2c2e; color: #30d158; font-weight: bold;" readonly>
+            </div>
+            <div class="col">
+                <label>VENDA UNIDADE</label>
+                <input type="text" id="vda-un" class="input-dark" style="background: #2c2c2e;" readonly>
+            </div>
         </div>
-        <div id="sec-boticario" class="content-section hidden">
-            <div class="card"><span class="gold-title">💄 BOTICÁRIO</span><button>CATÁLOGO</button></div>
-        </div>
-        <div id="sec-config" class="content-section hidden">
-            <div class="card"><span class="gold-title">⚙️ AJUSTES</span><button style="background:#333; color:#fff">SINCRONIZAR</button></div>
-        </div>
+
+        <button onclick="salvarNoFirebase()" class="btn-salvar">SALVAR NAS NUVENS</button>
     </div>
-  <nav style="display: flex; justify-content: space-around; background: #1c1c1e; padding: 15px; border-bottom: 1px solid #333;">
-    <a href="vendas.html" style="color: #8e8e93; text-decoration: none; font-size: 12px;">VENDAS</a>
-    <a href="estoque.html" style="color: #8e8e93; text-decoration: none; font-size: 12px;">ESTOQUE</a>
-    <a href="produtos.html" style="color: #ff9f0a; text-decoration: none; font-size: 12px; font-weight: bold; border-bottom: 2px solid #ff9f0a;">PRODUTOS</a>
-    <a href="boticario.html" style="color: #8e8e93; text-decoration: none; font-size: 12px;">BOTICÁRIO</a>
-    <a href="dados.html" style="color: #8e8e93; text-decoration: none; font-size: 12px;">DADOS</a>
-    <a href="ajustes.html" style="color: #8e8e93; text-decoration: none; font-size: 12px;">AJUSTES</a>
 
     <script>
-        function showSection(section, element) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('sec-' + section).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            element.classList.add('active');
+        // Configuração do seu Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.firebasestorage.app",
+            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function calcularTudo() {
+            let custo = parseFloat(document.getElementById('custo-fardo').value) || 0;
+            let qtd = parseFloat(document.getElementById('qtd-fardo').value) || 1;
+            let mkp = parseFloat(document.getElementById('markup').value) || 0;
+
+            if (custo > 0) {
+                let vendaTotal = custo * (1 + (mkp / 100));
+                let lucroTotal = vendaTotal - custo;
+                let margem = (lucroTotal / vendaTotal) * 100;
+                let lucroUn = lucroTotal / qtd;
+                let vendaUn = vendaTotal / qtd;
+
+                document.getElementById('res-margem').innerHTML = margem.toFixed(1) + "%";
+                document.getElementById('res-lucro-fardo').innerHTML = "R$ " + lucroTotal.toFixed(2);
+                document.getElementById('res-lucro-un').innerHTML = "R$ " + lucroUn.toFixed(2);
+                document.getElementById('vda-fardo').value = "R$ " + vendaTotal.toFixed(2);
+                document.getElementById('vda-un').value = "R$ " + vendaUn.toFixed(2);
+            }
+        }
+
+        async function salvarNoFirebase() {
+            const nome = document.getElementById('nome-prod').value.toUpperCase();
+            const cod = document.getElementById('cod-barras').value;
+            const custo = document.getElementById('custo-fardo').value;
+            const vendaUn = document.getElementById('vda-un').value;
+
+            if(!nome || !custo) { alert("Preencha Nome e Custo!"); return; }
+
+            try {
+                const docRef = cod ? db.collection("produtos").doc(cod) : db.collection("produtos").doc();
+                await docRef.set({
+                    nome: nome,
+                    codigo: cod,
+                    custo_fardo: custo,
+                    venda_un: vendaUn,
+                    data: new Date()
+                }, { merge: true });
+
+                alert("✅ Salvo com sucesso!");
+                document.getElementById('nome-prod').value = "";
+                document.getElementById('cod-barras').value = "";
+                document.getElementById('custo-fardo').value = "";
+            } catch (e) { alert("Erro ao salvar!"); }
         }
     </script>
 </body>
