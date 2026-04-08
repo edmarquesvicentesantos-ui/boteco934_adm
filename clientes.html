@@ -2,14 +2,14 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BOTECO 934 - ELITE PRO</title>
+    <title>BOTECO 934 - MASTER ELITE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
 
     <style>
-        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
+        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; --blue: #44aaff; }
         body { background: var(--bg); color: #eee; font-family: -apple-system, sans-serif; margin: 0; padding: 0; }
         .navbar { background: #050505; border-bottom: 2px solid var(--gold); padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .view { padding: 15px; padding-bottom: 120px; }
@@ -22,18 +22,16 @@
         .fab-container { position: fixed; bottom: 30px; right: 25px; z-index: 3000; }
         .fab-main { width: 70px; height: 70px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; color: #000; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
         .fab-options { position: absolute; bottom: 85px; right: 0; display: none; flex-direction: column; gap: 12px; }
-        .fab-item { background: #1a1a1a; color: var(--gold); padding: 15px 25px; border-radius: 30px; border: 1px solid var(--gold); white-space: nowrap; font-weight: bold; }
+        .fab-item { background: #1a1a1a; color: var(--gold); padding: 15px 25px; border-radius: 30px; border: 1px solid var(--gold); white-space: nowrap; font-weight: bold; text-align: right; }
         .modal-full { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:4000; padding:20px; overflow-y: auto; }
         .modal-content { background: var(--card); border: 1px solid var(--gold); padding: 30px; border-radius: 20px; max-width: 450px; margin: 20px auto; }
-        .item-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #111; }
-        .sugestoes { background: #0a0a0a; border: 1px solid var(--gold); position: absolute; width: 95%; z-index: 100; max-height: 250px; overflow-y: auto; display: none; bottom: 120px; border-radius: 10px; }
-        .sugestao-item { padding: 15px; border-bottom: 1px solid #1a1a1a; color: var(--gold); }
+        .resumo-box { background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <div style="color:var(--gold); font-weight:bold; font-size:20px;">BOTECO 934 PRO</div>
+    <div style="color:var(--gold); font-weight:bold; font-size:20px;">BOTECO 934 MASTER</div>
     <div id="clock" style="color:var(--gold); font-family:monospace;"></div>
 </div>
 
@@ -41,31 +39,32 @@
 
 <div class="fab-container">
     <div class="fab-options" id="fab-menu">
-        <div class="fab-item" onclick="abrirModal('m-cliente')">👤 CLIENTES</div>
-        <div class="fab-item" onclick="abrirModal('m-estoque')">📦 ESTOQUE</div>
-        <div class="fab-item" onclick="abrirHistorico()">📜 HISTÓRICO VENDAS</div>
+        <div class="fab-item" onclick="abrirModal('m-cliente')">👥 CLIENTES</div>
+        <div class="fab-item" onclick="abrirModal('m-estoque')">📦 ESTOQUE/COMPRAS</div>
+        <div class="fab-item" onclick="abrirRelatorio()">📊 RELATÓRIO FINANCEIRO</div>
     </div>
     <div class="fab-main" onclick="toggleFab()">+</div>
 </div>
 
 <div id="m-estoque" class="modal-full">
     <div class="modal-content">
-        <h3>Gerenciar Estoque</h3>
-        <input type="text" id="e_ean" placeholder="BIPE O CÓDIGO" onchange="buscarProdutoNet()">
-        <input type="text" id="e_nome" placeholder="Produto">
-        <input type="number" id="e_preco" placeholder="Preço R$">
-        <input type="number" id="e_qtd" placeholder="Qtd em Estoque">
-        <button class="btn btn-gold" onclick="salvarProd()">SALVAR PRODUTO</button>
-        <div id="lista-estoque" style="margin-top:20px; max-height:200px; overflow-y:auto; font-size:12px;"></div>
-        <button class="btn" style="background:#222; margin-top:10px;" onclick="fecharModais()">FECHAR</button>
+        <h3 style="color:var(--gold)">Entrada de Mercadoria</h3>
+        <input type="text" id="e_nome" placeholder="Produto (Ex: Heineken)">
+        <input type="number" id="e_custo" placeholder="Preço de Custo (O que você pagou)">
+        <input type="number" id="e_preco" placeholder="Preço de Venda (O que o cliente paga)">
+        <input type="number" id="e_qtd" placeholder="Quantidade Comprada">
+        <button class="btn btn-gold" onclick="salvarCompra()">REGISTRAR COMPRA</button>
+        <hr style="border:0.5px solid #222; margin:20px 0;">
+        <div id="lista-estoque" style="max-height:200px; overflow-y:auto; font-size:12px;"></div>
+        <button class="btn" style="background:#222; margin-top:10px;" onclick="fecharModais()">VOLTAR</button>
     </div>
 </div>
 
-<div id="m-historico" class="modal-full">
+<div id="m-relatorio" class="modal-full">
     <div class="modal-content">
-        <h3>Vendas de Hoje</h3>
-        <div id="lista-vendas" style="text-align:left; font-size:13px;"></div>
-        <button class="btn btn-gold" style="margin-top:20px;" onclick="exportarVendas()">EXPORTAR EXCEL (CSV)</button>
+        <h3 style="color:var(--gold)">Financeiro Boteco 934</h3>
+        <div id="dados-financeiros"></div>
+        <button class="btn btn-gold" style="margin-top:20px;" onclick="exportarTudo()">EXPORTAR BACKUP GERAL</button>
         <button class="btn" style="background:#222; margin-top:10px;" onclick="fecharModais()">FECHAR</button>
     </div>
 </div>
@@ -77,30 +76,42 @@
     let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
     let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
     let vendas = JSON.parse(localStorage.getItem('b934_vendas')) || [];
+    let compras = JSON.parse(localStorage.getItem('b934_compras')) || [];
     let mesas = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
 
     function toggleFab() { const m = document.getElementById('fab-menu'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
     function abrirModal(id) { fecharModais(); document.getElementById(id).style.display = 'block'; if(id==='m-estoque') listarEstoque(); }
     function fecharModais() { document.querySelectorAll('.modal-full').forEach(m => m.style.display = 'none'); }
 
-    function salvarProd() {
-        const n = document.getElementById('e_nome').value.toUpperCase();
-        const p = parseFloat(document.getElementById('e_preco').value);
-        const q = parseInt(document.getElementById('e_qtd').value) || 0;
-        if(n && p) {
-            let index = estoque.findIndex(x => x.nome === n);
-            if(index > -1) estoque[index] = { ...estoque[index], preco: p, qtd: q };
-            else estoque.push({ ean: document.getElementById('e_ean').value, nome: n, preco: p, qtd: q });
+    function salvarCompra() {
+        const nome = document.getElementById('e_nome').value.toUpperCase();
+        const custo = parseFloat(document.getElementById('e_custo').value);
+        const preco = parseFloat(document.getElementById('e_preco').value);
+        const qtd = parseInt(document.getElementById('e_qtd').value);
+
+        if(nome && custo && preco && qtd) {
+            // Atualiza Estoque
+            let idx = estoque.findIndex(x => x.nome === nome);
+            if(idx > -1) {
+                estoque[idx].qtd += qtd;
+                estoque[idx].custo = custo; // Atualiza o último custo
+                estoque[idx].preco = preco;
+            } else {
+                estoque.push({ nome, custo, preco, qtd });
+            }
+            // Registra a Saída de Dinheiro (Compra)
+            compras.push({ data: new Date().toLocaleString(), nome, valor: custo * qtd });
+            
             localStorage.setItem('b934_estoque', JSON.stringify(estoque));
-            listarEstoque(); alert("ESTOQUE ATUALIZADO!");
+            localStorage.setItem('b934_compras', JSON.stringify(compras));
+            listarEstoque();
+            alert("COMPRA REGISTRADA!");
         }
     }
 
     function listarEstoque() {
-        document.getElementById('lista-estoque').innerHTML = estoque.map(p => `
-            <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #222;">
-                <span>${p.nome}</span> <b>Qtd: ${p.qtd}</b>
-            </div>`).join('');
+        document.getElementById('lista-estoque').innerHTML = "<b>Estoque Atual:</b><br>" + 
+        estoque.map(p => `<div style="padding:5px; border-bottom:1px solid #222;">${p.nome} | Qtd: ${p.qtd} | Venda: R$${p.preco}</div>`).join('');
     }
 
     function renderMesas() {
@@ -109,7 +120,7 @@
             let soma = 0; let itensH = "";
             for (let n in m.consumo) {
                 const it = m.consumo[n]; soma += (it.qtd * it.preco);
-                itensH += `<div class="item-row"><div><b>${it.qtd}x ${n}</b></div></div>`;
+                itensH += `<div style="padding:5px 0; border-bottom:1px solid #111;">${it.qtd}x ${n}</div>`;
             }
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
@@ -120,27 +131,35 @@
                             ${clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
                         </select>
                     </div>
-                    <div style="flex:1; padding:15px;">${itensH || '<small>Livre</small>'}</div>
-                    <div style="padding:10px; position:relative;">
-                        <input type="text" placeholder="BIPAR OU BUSCAR..." oninput="mostrarSugestao(this, ${m.id})">
-                        <div id="sug-${m.id}" class="sugestoes"></div>
+                    <div style="flex:1; padding:15px;">${itensH || '<center style="opacity:0.2">ABERTA</center>'}</div>
+                    <div style="padding:10px;">
+                        <input type="text" placeholder="PRODUTO..." oninput="mostrarSugestao(this, ${m.id})">
+                        <div id="sug-${m.id}" class="fab-options" style="display:none; position:relative; bottom:0; width:100%; background:#0a0a0a; border:1px solid var(--gold); z-index:200;"></div>
                     </div>
                     <div style="padding:15px; background:#111;">
-                        <div style="display:flex; justify-content:space-between;"><span>TOTAL</span><b>R$ ${soma.toFixed(2)}</b></div>
-                        <button class="btn btn-gold" onclick="abrirPagamento(${m.id}, ${soma})">FECHAR</button>
+                        <div style="display:flex; justify-content:space-between;"><span>TOTAL</span><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                        <button class="btn btn-gold" style="margin-top:10px; padding:12px;" onclick="abrirPagamento(${m.id}, ${soma})">FECHAR MESA</button>
                     </div>
                 </div>`;
         }).join('');
     }
 
-    function adicionarProd(nome, mId) {
+    function mostrarSugestao(input, mId) {
+        const div = document.getElementById(`sug-${mId}`);
+        const busca = input.value.toUpperCase();
+        if(busca.length < 2) { div.style.display = 'none'; return; }
+        const matches = estoque.filter(p => p.nome.includes(busca));
+        div.innerHTML = matches.map(p => `<div style="padding:15px; border-bottom:1px solid #222;" onclick="addProd('${p.nome}', ${mId})">${p.nome} (Estoque: ${p.qtd})</div>`).join('');
+        div.style.display = 'block';
+    }
+
+    function addProd(nome, mId) {
         const p = estoque.find(x => x.nome === nome);
-        if(p.qtd <= 0) { alert("PRODUTO ESGOTADO NO ESTOQUE!"); return; }
+        if(p.qtd <= 0) { alert("ESTOQUE ZERADO!"); return; }
         const m = mesas.find(x => x.id === mId);
         if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
-        else m.consumo[p.nome] = { qtd: 1, preco: p.preco };
+        else m.consumo[p.nome] = { qtd: 1, preco: p.preco, custo: p.custo };
         m.status = 'Ocupada';
-        document.querySelectorAll('.sugestoes').forEach(s => s.style.display = 'none');
         renderMesas();
     }
 
@@ -148,47 +167,80 @@
         const m = mesas.find(x => x.id === id);
         document.getElementById('m-pagamento').style.display = 'block';
         document.getElementById('pay_content').innerHTML = `
-            <h3>FECHAR MESA 0${id}</h3>
-            <h1>R$ ${total.toFixed(2)}</h1>
+            <h3>FINALIZAR MESA 0${id}</h3>
+            <h1 style="color:var(--green)">R$ ${total.toFixed(2)}</h1>
             <select id="forma_p"><option>PIX</option><option>DINHEIRO</option><option>DÉBITO</option><option>CRÉDITO</option><option>FIADO</option></select>
-            <button class="btn btn-gold" onclick="finalizarVenda(${id}, ${total})">CONFIRMAR</button>
+            <button class="btn btn-gold" onclick="confirmarVenda(${id}, ${total})">CONFIRMAR</button>
         `;
     }
 
-    function finalizarVenda(id, total) {
+    function confirmarVenda(id, total) {
         const m = mesas.find(x => x.id === id);
         const f = document.getElementById('forma_p').value;
-        
-        // BAIXA NO ESTOQUE E REGISTRO DE HISTÓRICO
-        for (let nome in m.consumo) {
-            let p = estoque.find(x => x.nome === nome);
-            if(p) p.qtd -= m.consumo[nome].qtd;
+        let custoTotalMesa = 0;
+
+        for (let n in m.consumo) {
+            let p = estoque.find(x => x.nome === n);
+            if(p) {
+                p.qtd -= m.consumo[n].qtd;
+                custoTotalMesa += (p.custo * m.consumo[n].qtd);
+            }
         }
-        
-        vendas.push({ data: new Date().toLocaleString(), cliente: m.cliente || 'Avulso', total: total, forma: f });
+
+        vendas.push({ 
+            data: new Date().toLocaleDateString(), 
+            total: total, 
+            custo: custoTotalMesa, 
+            lucro: total - custoTotalMesa, 
+            forma: f,
+            cliente: m.cliente || 'Avulso'
+        });
+
         localStorage.setItem('b934_vendas', JSON.stringify(vendas));
         localStorage.setItem('b934_estoque', JSON.stringify(estoque));
 
         if(f === 'FIADO' && m.cliente) {
             const c = clientes.find(x => x.nome === m.cliente);
-            window.open(`https://wa.me/55${c.whats}?text=Conta no Boteco: R$${total}`, '_blank');
+            window.open(`https://wa.me/55${c.whats}?text=Sua conta no Boteco 934: R$${total.toFixed(2)}`, '_blank');
         }
 
         m.status = 'Livre'; m.consumo = {}; m.cliente = '';
         fecharModais(); renderMesas();
     }
 
-    function abrirHistorico() {
-        abrirModal('m-historico');
-        let totalDia = vendas.reduce((a, b) => a + b.total, 0);
-        document.getElementById('lista-vendas').innerHTML = `<b>TOTAL ACUMULADO: R$ ${totalDia.toFixed(2)}</b><hr>` + 
-            vendas.map(v => `<div>${v.data.split(' ')[1]} - ${v.forma}: R$ ${v.total.toFixed(2)} (${v.cliente})</div>`).reverse().join('');
+    function abrirRelatorio() {
+        abrirModal('m-relatorio');
+        const f = document.getElementById('dados-financeiros');
+        const vTotal = vendas.reduce((a, b) => a + b.total, 0);
+        const cTotal = compras.reduce((a, b) => a + b.valor, 0);
+        const lucroBruto = vendas.reduce((a, b) => a + b.lucro, 0);
+
+        f.innerHTML = `
+            <div class="resumo-box">Entradas (Vendas): <b style="color:var(--green)">R$ ${vTotal.toFixed(2)}</b></div>
+            <div class="resumo-box">Saídas (Compras): <b style="color:var(--danger)">R$ ${cTotal.toFixed(2)}</b></div>
+            <div class="resumo-box" style="border-left-color:var(--blue)">Lucro Real sobre Vendas: <b style="color:var(--blue)">R$ ${lucroBruto.toFixed(2)}</b></div>
+            <hr>
+            <b>Últimas Vendas:</b><br>
+            ${vendas.slice(-5).map(v => `<small>${v.data} - ${v.forma}: R$${v.total.toFixed(2)}</small><br>`).reverse().join('')}
+        `;
     }
 
-    function exportarVendas() {
-        let csv = "DATA;CLIENTE;VALOR;FORMA\n" + vendas.map(v => `${v.data};${v.cliente};${v.total};${v.forma}`).join('\n');
-        let blob = new Blob(["\ufeff"+csv], {type: 'text/csv'});
-        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download="vendas_boteco.csv"; link.click();
+    function salvarCliente() {
+        let n = document.getElementById('c_nome').value;
+        if(n) {
+            clientes.push({ nome: n.toUpperCase(), whats: document.getElementById('c_whats').value.replace(/\D/g,'') });
+            localStorage.setItem('b934_clientes', JSON.stringify(clientes));
+            fecharModais(); renderMesas();
+        }
+    }
+
+    function exportarTudo() {
+        let dados = "TIPO;NOME;VALOR\n";
+        clientes.forEach(c => dados += `CLIENTE;${c.nome};${c.whats}\n`);
+        estoque.forEach(p => dados += `PRODUTO;${p.nome};${p.preco};${p.custo}\n`);
+        vendas.forEach(v => dados += `VENDA;${v.data};${v.total};${v.lucro}\n`);
+        let blob = new Blob(["\ufeff"+dados], {type:'text/csv'});
+        let link = document.createElement("a"); link.href=URL.createObjectURL(blob); link.download="financeiro_boteco.csv"; link.click();
     }
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
