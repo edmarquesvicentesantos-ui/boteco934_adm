@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BOTECO 934 - ELITE V5 (SEGURANÇA)</title>
+    <title>BOTECO 934 - ELITE V6 (WHATSAPP)</title>
     <style>
         :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
         body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
@@ -24,18 +24,15 @@
         .item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; }
         #modal-pg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2000; align-items:center; justify-content:center; }
         .modal-box { background:#0a0a0a; border:2px solid var(--gold); padding:25px; border-radius:10px; width:90%; max-width:400px; text-align:center; }
-        
         .sugestoes { background: #111; border: 1px solid var(--gold); position: absolute; width: calc(100% - 20px); z-index: 100; max-height: 150px; overflow-y: auto; display: none; bottom: 120px; left: 10px; }
         .sugestao-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #222; font-size: 13px; color: var(--gold); }
-        .sugestao-item:hover { background: var(--gold); color: #000; }
-        
         .aviso-erro { color: var(--danger); font-weight: bold; font-size: 12px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <div style="color:var(--gold); font-weight:bold; letter-spacing:1px;">BOTECO 934 - ELITE</div>
+    <div style="color:var(--gold); font-weight:bold;">BOTECO 934 - ELITE</div>
     <div id="clock" style="color:var(--gold); font-family:monospace; font-size:14px;"></div>
 </div>
 
@@ -50,11 +47,11 @@
 <div id="v-clientes" class="view">
     <div class="box">
         <h3>Novo Cliente</h3>
-        <input type="text" id="c_nome" placeholder="Nome do Cliente (ex: João Silva)">
-        <input type="text" id="c_whats" placeholder="WhatsApp">
-        <button class="btn btn-gold" onclick="salvarCliente()">Cadastrar e Organizar</button>
+        <input type="text" id="c_nome" placeholder="Nome do Cliente">
+        <input type="text" id="c_whats" placeholder="WhatsApp (ex: 87999999999)">
+        <button class="btn btn-gold" onclick="salvarCliente()">Cadastrar</button>
     </div>
-    <div class="box"><h3>Meus Clientes (A-Z)</h3><div id="lista_clientes_corpo"></div></div>
+    <div id="lista_clientes_corpo"></div>
 </div>
 
 <div id="v-estoque" class="view">
@@ -82,7 +79,6 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         if(e) e.currentTarget.classList.add('active');
-        if(id === 'v-clientes') renderClientes();
     }
 
     async function buscarProdutoNet() {
@@ -100,19 +96,21 @@
 
     function salvarCliente() {
         let n = document.getElementById('c_nome').value;
+        let w = document.getElementById('c_whats').value;
         if(n) {
-            clientes.push({ nome: formatarNome(n), whats: document.getElementById('c_whats').value });
+            clientes.push({ nome: formatarNome(n), whats: w.replace(/\D/g, '') });
             clientes.sort((a,b) => a.nome.localeCompare(b.nome));
             localStorage.setItem('b934_clientes', JSON.stringify(clientes));
             document.getElementById('c_nome').value = ''; 
-            renderClientes(); renderMesas();
+            document.getElementById('c_whats').value = '';
+            renderMesas(); renderClientes();
         }
     }
 
     function renderClientes() {
         const cont = document.getElementById('lista_clientes_corpo');
         clientes.sort((a,b) => a.nome.localeCompare(b.nome));
-        cont.innerHTML = clientes.map(c => `<div style="padding:10px; border-bottom:1px solid #222;"><b>${c.nome}</b></div>`).join('');
+        cont.innerHTML = clientes.map(c => `<div class="box"><b>${c.nome}</b><br><small>${c.whats}</small></div>`).join('');
     }
 
     function renderMesas() {
@@ -125,20 +123,20 @@
             }
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
-                    <div style="padding:10px; text-align:center; background:#050505; border-radius:8px 8px 0 0;">
+                    <div style="padding:10px; text-align:center;">
                         <b style="color:var(--gold)">MESA 0${m.id}</b><br>
-                        <select onchange="mesas.find(x=>x.id===${m.id}).cliente=this.value" style="font-size:12px; margin-top:5px;">
-                            <option value="">${m.cliente || '--- SELECIONAR CLIENTE ---'}</option>
+                        <select onchange="mesas.find(x=>x.id===${m.id}).cliente=this.value">
+                            <option value="">${m.cliente || '--- CLIENTE ---'}</option>
                             ${clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
                         </select>
                     </div>
-                    <div style="flex:1; padding:10px; overflow-y:auto;">${itensH || '<center style="opacity:0.2; margin-top:40px">Mesa Livre</center>'}</div>
+                    <div style="flex:1; padding:10px; overflow-y:auto;">${itensH || '<small>Livre</small>'}</div>
                     <div style="padding:10px;">
-                        <input type="text" placeholder="BUSCAR PRODUTO..." oninput="mostrarSugestao(this, ${m.id})" onchange="bipar(this, ${m.id})">
+                        <input type="text" placeholder="BIPAR OU BUSCAR..." oninput="mostrarSugestao(this, ${m.id})">
                         <div id="sug-${m.id}" class="sugestoes"></div>
                     </div>
-                    <div style="padding:15px; background:#111; border-top:1px solid #222;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                    <div style="padding:15px; background:#111;">
+                        <div style="display:flex; justify-content:space-between;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
                         <button class="btn btn-gold" onclick="abrirPagamento(${m.id}, ${soma})">FECHAR CONTA</button>
                     </div>
                 </div>`;
@@ -150,10 +148,8 @@
         const busca = input.value.toUpperCase();
         if(busca.length < 2) { lista.style.display = 'none'; return; }
         const matches = estoque.filter(p => p.nome.includes(busca));
-        if(matches.length > 0) {
-            lista.innerHTML = matches.map(p => `<div class="sugestao-item" onclick="adicionarAoConsumo('${p.nome}', ${mId})">${p.nome} - R$ ${p.preco.toFixed(2)}</div>`).join('');
-            lista.style.display = 'block';
-        } else { lista.style.display = 'none'; }
+        lista.innerHTML = matches.map(p => `<div class="sugestao-item" onclick="adicionarAoConsumo('${p.nome}', ${mId})">${p.nome} - R$ ${p.preco.toFixed(2)}</div>`).join('');
+        lista.style.display = 'block';
     }
 
     function adicionarAoConsumo(nomeProd, mId) {
@@ -163,13 +159,8 @@
         else m.consumo[p.nome] = { qtd: 1, preco: p.preco, foto: p.foto || 'https://via.placeholder.com/50' };
         m.status = 'Ocupada';
         document.querySelectorAll('.sugestoes').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('input[placeholder="BIPAR OU BUSCAR..."]').forEach(i => i.value = '');
         renderMesas();
-    }
-
-    function bipar(input, mId) {
-        const val = input.value.toUpperCase();
-        const p = estoque.find(x => x.ean === val);
-        if(p) { adicionarAoConsumo(p.nome, mId); input.value = ''; }
     }
 
     function abrirPagamento(id, total) {
@@ -178,10 +169,8 @@
         document.getElementById('modal-pg').style.display = 'flex';
         document.getElementById('modal_content').innerHTML = `
             <h3>FECHAR MESA 0${id}</h3>
-            <div style="color:#888; margin-bottom:10px;">Cliente: <b id="cliente-atual">${m.cliente || "NÃO SELECIONADO"}</b></div>
+            <div style="color:#888; margin-bottom:10px;">Cliente: <b>${m.cliente || "NÃO SELECIONADO"}</b></div>
             <h1 style="color:var(--green); margin:10px 0;">R$ ${total.toFixed(2)}</h1>
-            
-            <label style="font-size:10px; display:block; text-align:left;">FORMA DE PAGAMENTO:</label>
             <select id="forma_p" onchange="verificarTravaFiado('${m.cliente}')">
                 <option value="PIX">PIX</option>
                 <option value="DINHEIRO">DINHEIRO</option>
@@ -189,34 +178,38 @@
                 <option value="CRÉDITO">CARTÃO CRÉDITO</option>
                 <option value="FIADO" style="color:red">FIADO (PENDURA)</option>
             </select>
-            
             <div id="msg-erro" class="aviso-erro">⚠️ SELECIONE UM CLIENTE PARA FAZER FIADO!</div>
-            
-            <button id="btn-confirmar" class="btn btn-gold" onclick="finalizar(${id})">FINALIZAR VENDA</button>
+            <button id="btn-confirmar" class="btn btn-gold" onclick="finalizar(${id}, ${total})">FINALIZAR VENDA</button>
             <button class="btn" style="background:#222; margin-top:8px;" onclick="document.getElementById('modal-pg').style.display='none'">VOLTAR</button>
         `;
     }
 
     function verificarTravaFiado(nomeCliente) {
-        const forma = document.getElementById('forma_p').value;
+        const f = document.getElementById('forma_p').value;
         const btn = document.getElementById('btn-confirmar');
         const msg = document.getElementById('msg-erro');
-        
-        if(forma === 'FIADO' && (!nomeCliente || nomeCliente === "")) {
-            btn.disabled = true;
-            btn.style.opacity = "0.3";
-            msg.style.display = "block";
+        if(f === 'FIADO' && (!nomeCliente || nomeCliente === "")) {
+            btn.disabled = true; btn.style.opacity = "0.3"; msg.style.display = "block";
         } else {
-            btn.disabled = false;
-            btn.style.opacity = "1";
-            msg.style.display = "none";
+            btn.disabled = false; btn.style.opacity = "1"; msg.style.display = "none";
         }
     }
 
-    function finalizar(id) {
+    function finalizar(id, total) {
         const m = mesas.find(x => x.id === id);
         const f = document.getElementById('forma_p').value;
-        alert(`MESA ${id} FECHADA!\nPagamento: ${f}\nCliente: ${m.cliente || 'Avulso'}`);
+        
+        if(f === 'FIADO') {
+            const clienteObj = clientes.find(c => c.nome === m.cliente);
+            if(clienteObj && clienteObj.whats) {
+                const texto = encodeURIComponent(`*BOTECO 934 - AVISO DE CONTA*\n\nOlá ${m.cliente}, uma nova conta no valor de *R$ ${total.toFixed(2)}* foi registrada no seu fiado hoje.\n\n_Sistema Elite Boteco 934_`);
+                window.open(`https://wa.me/55${clienteObj.whats}?text=${texto}`, '_blank');
+            }
+            alert(`PENDURA REGISTRADO PARA ${m.cliente}!`);
+        } else {
+            alert(`PAGAMENTO EM ${f} CONFIRMADO!`);
+        }
+
         m.status = 'Livre'; m.cliente = ''; m.consumo = {};
         document.getElementById('modal-pg').style.display = 'none';
         renderMesas();
@@ -228,7 +221,7 @@
         if(n && p) {
             estoque.push({ ean: document.getElementById('e_ean').value, nome: n, preco: p, foto: document.getElementById('e_foto').value });
             localStorage.setItem('b934_estoque', JSON.stringify(estoque));
-            alert("PRODUTO CADASTRADO!");
+            alert("SALVO!");
             document.querySelectorAll('#v-estoque input').forEach(i => i.value = '');
         }
     }
