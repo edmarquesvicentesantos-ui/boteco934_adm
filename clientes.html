@@ -6,53 +6,21 @@
     <style>
         :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
         body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        
-        /* BARRA DE NAVEGAÇÃO FIXA (HOME SEMPRE VISÍVEL) */
-        .navbar { 
-            background: #050505; 
-            border-bottom: 2px solid var(--gold); 
-            padding: 10px 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+        .navbar { background: #050505; border-bottom: 2px solid var(--gold); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .nav-brand { color: var(--gold); font-weight: bold; font-size: 18px; letter-spacing: 1px; }
-        
         .nav-links { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: #000; }
-        .tab { 
-            padding: 12px 20px; 
-            background: #111; 
-            border: 1px solid var(--border); 
-            color: #777; 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            font-size: 11px; 
-            border-radius: 4px; 
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .tab { padding: 12px 20px; background: #111; border: 1px solid var(--border); color: #777; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; border-radius: 4px; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
         .tab.active { border-color: var(--gold); color: var(--gold); background: #1a1a1a; }
         .tab-home { background: var(--gold) !important; color: #000 !important; }
-
         .view { display: none; padding: 15px; }
         .view.active { display: block; }
-
-        /* CARDS E FORMULÁRIOS */
         .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 450px; }
         .mesa.ocupada { border-color: var(--danger); }
-        
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; font-size: 15px; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: #000; }
-        
         .foto-prod { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #222; }
         .item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; }
     </style>
@@ -72,19 +40,17 @@
     <div class="tab" onclick="tab(event, 'v-backup')">📂 PLANILHAS</div>
 </div>
 
-<div id="v-mesas" class="view active">
-    <div class="grid" id="grid_mesas"></div>
-</div>
+<div id="v-mesas" class="view active"><div class="grid" id="grid_mesas"></div></div>
 
 <div id="v-clientes" class="view">
     <div class="box">
         <h3 style="color:var(--gold)">Cadastrar Novo Cliente</h3>
-        <input type="text" id="c_nome" placeholder="Nome do Cliente">
+        <input type="text" id="c_nome" placeholder="Nome do Cliente (ex: joão silva)">
         <input type="text" id="c_whats" placeholder="WhatsApp / Contato">
-        <button class="btn btn-gold" onclick="salvarCliente()">Salvar Cliente</button>
+        <button class="btn btn-gold" onclick="salvarCliente()">Salvar e Organizar</button>
     </div>
     <div class="box">
-        <h3>Meus Clientes</h3>
+        <h3>Meus Clientes (Ordem Alfabética)</h3>
         <div id="lista_clientes_corpo"></div>
     </div>
 </div>
@@ -96,7 +62,7 @@
         <input type="text" id="e_nome" placeholder="Nome do Produto">
         <input type="number" id="e_preco" placeholder="Preço de Venda R$">
         <input type="number" id="e_qtd" placeholder="Quantidade inicial">
-        <input type="text" id="e_foto" placeholder="Link da imagem do produto">
+        <input type="text" id="e_foto" placeholder="Link da imagem">
         <button class="btn btn-gold" onclick="salvarProd()">Adicionar ao Estoque</button>
     </div>
 </div>
@@ -104,24 +70,17 @@
 <div id="v-calc" class="view">
     <div class="box" style="max-width:500px; margin:auto;">
         <h3 style="color:var(--gold); text-align:center;">CALCULADORA DE MARGEM</h3>
-        <label>Custo da Caixa/Lote</label>
-        <input type="number" id="calc_custo" oninput="calcularMargem()">
-        <label>Unidades no Lote</label>
-        <input type="number" id="calc_qtd" oninput="calcularMargem()">
-        <label>Preço de Venda Sugerido</label>
-        <input type="number" id="calc_venda" oninput="calcularMargem()">
-        
-        <div id="calc_resultado" style="margin-top:20px; padding:15px; background:#000; border:1px solid var(--green); border-radius:5px;">
-            Insera os valores para calcular...
-        </div>
+        <label>Custo da Caixa/Lote</label><input type="number" id="calc_custo" oninput="calcularMargem()">
+        <label>Unidades no Lote</label><input type="number" id="calc_qtd" oninput="calcularMargem()">
+        <label>Preço de Venda Sugerido</label><input type="number" id="calc_venda" oninput="calcularMargem()">
+        <div id="calc_resultado" style="margin-top:20px; padding:15px; background:#000; border:1px solid var(--green); border-radius:5px;">Aguardando valores...</div>
     </div>
 </div>
 
 <div id="v-backup" class="view">
     <div class="box">
         <h3 style="color:var(--gold)">Backup de Dados</h3>
-        <button class="btn btn-gold" style="margin-bottom:10px" onclick="exportarDados()">GERAR PLANILHA COMPLETA</button>
-        <button class="btn" style="background:#222; color:#777" onclick="limparTudo()">REINICIAR SISTEMA (LIMPAR TUDO)</button>
+        <button class="btn btn-gold" onclick="exportarDados()">GERAR PLANILHA COMPLETA</button>
     </div>
 </div>
 
@@ -129,6 +88,10 @@
     let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
     let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
     let mesas = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
+
+    function formatarNome(nome) {
+        return nome.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    }
 
     function tab(e, id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -139,30 +102,33 @@
     }
 
     function salvarCliente() {
-        const nome = document.getElementById('c_nome').value.toUpperCase();
-        const whats = document.getElementById('c_whats').value;
-        if(nome) {
-            clientes.push({ nome, whats });
+        let nInput = document.getElementById('c_nome').value;
+        let whats = document.getElementById('c_whats').value;
+        if(nInput) {
+            const nomeF = formatarNome(nInput);
+            clientes.push({ nome: nomeF, whats: whats });
+            clientes.sort((a, b) => a.nome.localeCompare(b.nome)); // ORDEM ALFABÉTICA
             localStorage.setItem('b934_clientes', JSON.stringify(clientes));
             document.getElementById('c_nome').value = '';
             document.getElementById('c_whats').value = '';
             renderClientes();
-            alert("Cliente cadastrado!");
+            alert("Cliente organizado!");
         }
     }
 
     function renderClientes() {
         const cont = document.getElementById('lista_clientes_corpo');
+        // Garante que a lista está sempre ordenada ao renderizar
+        clientes.sort((a, b) => a.nome.localeCompare(b.nome));
         cont.innerHTML = clientes.map(c => `
             <div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between">
                 <span><b>${c.nome}</b> - ${c.whats}</span>
-                <span style="color:var(--gold); cursor:pointer" onclick="whatsapp('${c.whats}')">WhatsApp</span>
+                <span style="color:var(--gold); cursor:pointer" onclick="window.open('https://wa.me/55${c.whats.replace(/\\D/g,'')}')">WhatsApp</span>
             </div>
         `).join('');
     }
 
-    function whatsapp(num) { if(num) window.open(`https://wa.me/55${num.replace(/\D/g,'')}`); }
-
+    // ... Resto das funções de estoque e mesas permanecem iguais ...
     function salvarProd() {
         const n = document.getElementById('e_nome').value.toUpperCase();
         const p = parseFloat(document.getElementById('e_preco').value);
@@ -185,12 +151,7 @@
             for (let n in m.consumo) {
                 const it = m.consumo[n];
                 soma += (it.qtd * it.preco);
-                itensHtml += `
-                    <div class="item-row">
-                        <img src="${it.foto}" class="foto-prod">
-                        <div style="flex:1"><b>${it.qtd}x ${n}</b></div>
-                        <div style="color:var(--gold)">R$ ${(it.qtd * it.preco).toFixed(2)}</div>
-                    </div>`;
+                itensHtml += `<div class="item-row"><img src="${it.foto}" class="foto-prod"><div style="flex:1"><b>${it.qtd}x ${n}</b></div><div style="color:var(--gold)">R$ ${(it.qtd * it.preco).toFixed(2)}</div></div>`;
             }
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
@@ -231,7 +192,7 @@
     }
 
     function fecharMesa(id, total) {
-        if(total > 0 && confirm("Fechar conta no valor de R$ " + total.toFixed(2) + "?")) {
+        if(total > 0 && confirm("Fechar conta de R$ " + total.toFixed(2) + "?")) {
             const m = mesas.find(x => x.id === id);
             m.status = 'Livre'; m.cliente = ''; m.consumo = {};
             renderMesas();
@@ -246,11 +207,7 @@
             const custoUn = c / q;
             const lucro = v - custoUn;
             const margem = (lucro / v) * 100;
-            document.getElementById('calc_resultado').innerHTML = `
-                Custo por Unidade: <b>R$ ${custoUn.toFixed(2)}</b><br>
-                Lucro por Unidade: <b style="color:var(--green)">R$ ${lucro.toFixed(2)}</b><br>
-                Margem de Lucro Real: <b style="color:var(--gold)">${margem.toFixed(1)}%</b>
-            `;
+            document.getElementById('calc_resultado').innerHTML = `Custo Un: <b>R$ ${custoUn.toFixed(2)}</b> | Lucro: <b style="color:var(--green)">R$ ${lucro.toFixed(2)}</b> | Margem: <b style="color:var(--gold)">${margem.toFixed(1)}%</b>`;
         }
     }
 
