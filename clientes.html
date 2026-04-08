@@ -1,30 +1,230 @@
-// FUNÇÃO QUE BUSCA O PRODUTO NA INTERNET
-async function buscarProdutoNet() {
-    const ean = document.getElementById('e_ean').value;
-    const campoNome = document.getElementById('e_nome');
-    
-    if (ean.length >= 8) { // Códigos de barra geralmente têm 8, 12 ou 13 dígitos
-        campoNome.placeholder = "Buscando na nuvem...";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>BOTECO 934 - SISTEMA ELITE V3</title>
+    <style>
+        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
+        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
         
-        try {
-            // Usando a API gratuita do OpenFoodFacts (funciona bem para bebidas e alimentos)
-            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
-            const data = await response.json();
+        .navbar { background: #050505; border-bottom: 2px solid var(--gold); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .nav-brand { color: var(--gold); font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: #000; }
+        
+        .tab { padding: 12px 20px; background: #111; border: 1px solid var(--border); color: #777; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; border-radius: 4px; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+        .tab.active { border-color: var(--gold); color: var(--gold); background: #1a1a1a; }
+        .tab-home { background: var(--gold) !important; color: #000 !important; }
 
-            if (data.status === 1) {
-                const produto = data.product;
-                // Preenche o nome e tenta pegar a foto
-                campoNome.value = produto.product_name ? produto.product_name.toUpperCase() : "";
-                if (produto.image_url) {
-                    document.getElementById('e_foto').value = produto.image_url;
+        .view { display: none; padding: 15px; }
+        .view.active { display: block; }
+
+        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 480px; }
+        .mesa.ocupada { border-color: var(--danger); }
+        
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; font-size: 15px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-cancel { background: #333; color: #fff; margin-top: 10px; }
+        
+        .foto-prod { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #222; }
+        .item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; }
+
+        #modal-pg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; padding:20px; }
+        .modal-box { background:#0a0a0a; border:2px solid var(--gold); padding:25px; border-radius:10px; width:100%; max-width:400px; text-align:center; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-brand">BOTECO 934</div>
+    <div id="clock" style="color:var(--gold); font-family:monospace;"></div>
+</div>
+
+<div class="nav-links">
+    <div class="tab tab-home" onclick="tab(event, 'v-mesas')">🏠 HOME (CAIXA)</div>
+    <div class="tab" onclick="tab(event, 'v-clientes')">👥 CLIENTES</div>
+    <div class="tab" onclick="tab(event, 'v-estoque')">📦 ESTOQUE</div>
+    <div class="tab" onclick="tab(event, 'v-backup')">📂 PLANILHAS</div>
+</div>
+
+<div id="v-mesas" class="view active">
+    <div class="grid" id="grid_mesas"></div>
+</div>
+
+<div id="v-clientes" class="view">
+    <div class="box">
+        <h3 style="color:var(--gold)">Novo Cliente</h3>
+        <input type="text" id="c_nome" placeholder="Nome (ex: edmarques vicente)">
+        <input type="text" id="c_whats" placeholder="WhatsApp">
+        <button class="btn btn-gold" onclick="salvarCliente()">Salvar e Organizar</button>
+    </div>
+    <div class="box"><h3>Lista A-Z</h3><div id="lista_clientes_corpo"></div></div>
+</div>
+
+<div id="v-estoque" class="view">
+    <div class="box">
+        <h3 style="color:var(--gold)">Cadastro de Produto</h3>
+        <label style="font-size:10px">BIPE O CÓDIGO (BUSCA AUTOMÁTICA)</label>
+        <input type="text" id="e_ean" placeholder="Código de Barras" onblur="buscarProdutoNet()">
+        <input type="text" id="e_nome" placeholder="Nome do Produto">
+        <input type="number" id="e_preco" placeholder="Preço de Venda R$">
+        <input type="number" id="e_qtd" placeholder="Quantidade">
+        <input type="text" id="e_foto" placeholder="Link da Foto">
+        <button class="btn btn-gold" onclick="salvarProd()">Adicionar ao Estoque</button>
+    </div>
+</div>
+
+<div id="v-backup" class="view">
+    <div class="box">
+        <h3>Exportar Dados</h3>
+        <button class="btn btn-gold" onclick="exportarDados()">BAIXAR BACKUP (CSV)</button>
+    </div>
+</div>
+
+<div id="modal-pg">
+    <div class="modal-box" id="modal_content"></div>
+</div>
+
+<script>
+    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
+    let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
+    let mesas = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
+
+    function formatarNome(n) { return n.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' '); }
+
+    function tab(e, id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(e) e.currentTarget.classList.add('active');
+        if(id === 'v-clientes') renderClientes();
+    }
+
+    async function buscarProdutoNet() {
+        const ean = document.getElementById('e_ean').value;
+        const campoN = document.getElementById('e_nome');
+        const campoF = document.getElementById('e_foto');
+        if(ean.length >= 8) {
+            campoN.placeholder = "Buscando na internet...";
+            try {
+                const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
+                const data = await res.json();
+                if(data.status === 1) {
+                    campoN.value = (data.product.product_name || "").toUpperCase();
+                    campoF.value = data.product.image_url || "";
+                    alert("Produto encontrado!");
                 }
-                alert("Produto localizado na rede!");
-            } else {
-                campoNome.placeholder = "Não encontrado. Digite manualmente.";
-            }
-        } catch (error) {
-            console.error("Erro na busca:", error);
-            campoNome.placeholder = "Erro na conexão. Digite manualmente.";
+            } catch(e) { console.error(e); }
         }
     }
-}
+
+    function salvarCliente() {
+        let n = document.getElementById('c_nome').value;
+        let w = document.getElementById('c_whats').value;
+        if(n) {
+            clientes.push({ nome: formatarNome(n), whats: w });
+            clientes.sort((a,b) => a.nome.localeCompare(b.nome));
+            localStorage.setItem('b934_clientes', JSON.stringify(clientes));
+            document.getElementById('c_nome').value = ''; renderClientes();
+        }
+    }
+
+    function renderClientes() {
+        const cont = document.getElementById('lista_clientes_corpo');
+        clientes.sort((a,b) => a.nome.localeCompare(b.nome));
+        cont.innerHTML = clientes.map(c => `<div style="padding:8px; border-bottom:1px solid #222;"><b>${c.nome}</b> - ${c.whats}</div>`).join('');
+    }
+
+    function renderMesas() {
+        const grid = document.getElementById('grid_mesas');
+        grid.innerHTML = mesas.map(m => {
+            let soma = 0; let itensH = "";
+            for (let n in m.consumo) {
+                const it = m.consumo[n]; soma += (it.qtd * it.preco);
+                itensH += `<div class="item-row"><img src="${it.foto}" class="foto-prod"><div><b>${it.qtd}x ${n}</b><br><small>R$ ${it.preco.toFixed(2)}</small></div></div>`;
+            }
+            return `
+                <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
+                    <div style="padding:15px; border-bottom:1px dashed #222; text-align:center;">
+                        <b style="color:var(--gold)">MESA 0${m.id}</b><br>
+                        <select onchange="vincularCliente(${m.id}, this.value)" style="margin-top:8px; font-size:12px">
+                            <option value="">${m.cliente || 'ESCOLHER CLIENTE'}</option>
+                            ${clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="flex:1; padding:10px; overflow-y:auto;">${itensH || '<center style="opacity:0.2; margin-top:50px">Vazia</center>'}</div>
+                    <div style="padding:10px;"><input type="text" placeholder="BIPAR..." onchange="bipar(this, ${m.id})"></div>
+                    <div style="padding:15px; background:#000; border-top:2px solid #111;">
+                        <div style="display:flex; justify-content:space-between; font-size:20px;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                        <button class="btn btn-gold" onclick="abrirPagamento(${m.id}, ${soma})">FECHAR CONTA</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function abrirPagamento(id, total) {
+        if(total <= 0) return;
+        document.getElementById('modal-pg').style.display = 'flex';
+        document.getElementById('modal_content').innerHTML = `
+            <h2 style="color:var(--gold)">MESA 0${id}</h2>
+            <div style="font-size:24px; margin:15px 0;">Total: <b style="color:var(--green)">R$ ${total.toFixed(2)}</b></div>
+            <label>DIVIDIR CONTA?</label>
+            <input type="number" id="div_p" value="1" oninput="document.getElementById('res_div').innerText = 'R$ ' + (${total}/this.value).toFixed(2) + ' cada'">
+            <div id="res_div" style="color:var(--gold); font-weight:bold; margin-bottom:15px;">R$ ${total.toFixed(2)} por pessoa</div>
+            <label>PAGAMENTO</label>
+            <select id="forma_p"><option>PIX</option><option>DINHEIRO</option><option>CARTÃO</option><option>FIADO (PENDURA)</option></select>
+            <button class="btn btn-gold" onclick="confirmarFechamento(${id})">CONFIRMAR</button>
+            <button class="btn btn-cancel" onclick="document.getElementById('modal-pg').style.display='none'">VOLTAR</button>
+        `;
+    }
+
+    function confirmarFechamento(id) {
+        const m = mesas.find(x => x.id === id);
+        m.status = 'Livre'; m.cliente = ''; m.consumo = {};
+        document.getElementById('modal-pg').style.display='none';
+        renderMesas();
+    }
+
+    function vincularCliente(mId, nome) { mesas.find(x => x.id === mId).cliente = nome; renderMesas(); }
+
+    function bipar(input, mId) {
+        const val = input.value.toUpperCase();
+        const p = estoque.find(x => x.ean === val || x.nome === val);
+        if(p) {
+            const m = mesas.find(x => x.id === mId);
+            if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
+            else m.consumo[p.nome] = { qtd: 1, preco: p.preco, foto: p.foto };
+            m.status = 'Ocupada'; renderMesas();
+        }
+        input.value = ''; input.focus();
+    }
+
+    function salvarProd() {
+        const n = document.getElementById('e_nome').value.toUpperCase();
+        const p = parseFloat(document.getElementById('e_preco').value);
+        const q = parseInt(document.getElementById('e_qtd').value);
+        const e = document.getElementById('e_ean').value;
+        const f = document.getElementById('e_foto').value || 'https://via.placeholder.com/50';
+        if(n && p) {
+            estoque.push({ ean: e, nome: n, preco: p, qtd: q, foto: f });
+            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+            alert("Salvo!"); document.querySelectorAll('#v-estoque input').forEach(i => i.value = '');
+        }
+    }
+
+    function exportarDados() {
+        let csv = "IDENTIFICADOR;NOME;VALOR\n";
+        clientes.forEach(c => csv += `CLIENTE;${c.nome};${c.whats}\n`);
+        estoque.forEach(p => csv += `PRODUTO;${p.nome};${p.preco}\n`);
+        let blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+        link.download = "boteco934_backup.csv"; link.click();
+    }
+
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    renderMesas();
+</script>
+</body>
+</html>
