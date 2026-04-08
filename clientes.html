@@ -2,85 +2,107 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BOTECO 934 - ELITE V6 (WHATSAPP)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOTECO 934 - ELITE MOBILE</title>
     <style>
         :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
-        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        .navbar { background: #050505; border-bottom: 2px solid var(--gold); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .nav-links { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: #000; }
-        .tab { padding: 12px 20px; background: #111; border: 1px solid var(--border); color: #777; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; border-radius: 4px; white-space: nowrap; }
-        .tab.active { border-color: var(--gold); color: var(--gold); }
-        .tab-home { background: var(--gold) !important; color: #000 !important; }
-        .view { display: none; padding: 15px; }
-        .view.active { display: block; }
-        .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 520px; position: relative; }
-        .mesa.ocupada { border-color: var(--danger); }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 5px; box-sizing: border-box; font-size: 14px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* NAVBAR COMPACTA */
+        .navbar { background: #050505; border-bottom: 2px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .nav-brand { color: var(--gold); font-weight: bold; font-size: 20px; }
+
+        /* GRID DE MESAS OTIMIZADO */
+        .view { padding: 10px; padding-bottom: 100px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        
+        .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 12px; display: flex; flex-direction: column; min-height: 450px; }
+        .mesa.ocupada { border-color: var(--danger); box-shadow: 0 0 10px rgba(255, 68, 68, 0.2); }
+
+        input, select { width: 100%; padding: 15px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 8px; margin-bottom: 8px; font-size: 16px; -webkit-appearance: none; }
+        
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 14px; }
         .btn-gold { background: var(--gold); color: #000; }
-        .foto-prod { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #222; }
-        .item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; }
-        #modal-pg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2000; align-items:center; justify-content:center; }
-        .modal-box { background:#0a0a0a; border:2px solid var(--gold); padding:25px; border-radius:10px; width:90%; max-width:400px; text-align:center; }
-        .sugestoes { background: #111; border: 1px solid var(--gold); position: absolute; width: calc(100% - 20px); z-index: 100; max-height: 150px; overflow-y: auto; display: none; bottom: 120px; left: 10px; }
-        .sugestao-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #222; font-size: 13px; color: var(--gold); }
-        .aviso-erro { color: var(--danger); font-weight: bold; font-size: 12px; margin-top: 10px; display: none; }
+
+        /* BOTÃO FLUTUANTE (ESTILO IPHONE) */
+        .fab-container { position: fixed; bottom: 25px; right: 25px; z-index: 3000; }
+        .fab-main { width: 65px; height: 65px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; }
+        .fab-options { position: absolute; bottom: 80px; right: 0; display: none; flex-direction: column; gap: 10px; }
+        .fab-item { background: #1a1a1a; color: var(--gold); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--gold); white-space: nowrap; font-weight: bold; text-align: right; cursor: pointer; }
+
+        /* MODAIS */
+        .modal-full { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:4000; padding:20px; overflow-y: auto; }
+        .modal-content { background: var(--card); border: 1px solid var(--gold); padding: 25px; border-radius: 15px; max-width: 500px; margin: 40px auto; }
+
+        .foto-prod { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+        .item-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #111; }
+        
+        .sugestoes { background: #111; border: 1px solid var(--gold); position: absolute; width: 90%; z-index: 100; max-height: 200px; overflow-y: auto; display: none; bottom: 110px; }
+        .sugestao-item { padding: 15px; border-bottom: 1px solid #222; color: var(--gold); font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <div style="color:var(--gold); font-weight:bold;">BOTECO 934 - ELITE</div>
-    <div id="clock" style="color:var(--gold); font-family:monospace; font-size:14px;"></div>
+    <div class="nav-brand">BOTECO 934 🏆</div>
+    <div id="clock" style="color:var(--gold); font-family:monospace;"></div>
 </div>
 
-<div class="nav-links">
-    <div class="tab tab-home" onclick="tab(event, 'v-mesas')">🏠 HOME (CAIXA)</div>
-    <div class="tab" onclick="tab(event, 'v-clientes')">👥 CLIENTES</div>
-    <div class="tab" onclick="tab(event, 'v-estoque')">📦 ESTOQUE</div>
+<div id="v-mesas" class="view">
+    <div class="grid" id="grid_mesas"></div>
 </div>
 
-<div id="v-mesas" class="view active"><div class="grid" id="grid_mesas"></div></div>
-
-<div id="v-clientes" class="view">
-    <div class="box">
-        <h3>Novo Cliente</h3>
-        <input type="text" id="c_nome" placeholder="Nome do Cliente">
-        <input type="text" id="c_whats" placeholder="WhatsApp (ex: 87999999999)">
-        <button class="btn btn-gold" onclick="salvarCliente()">Cadastrar</button>
+<div class="fab-container">
+    <div class="fab-options" id="fab-menu">
+        <div class="fab-item" onclick="abrirModal('m-cliente')">👥 NOVO CLIENTE</div>
+        <div class="fab-item" onclick="abrirModal('m-estoque')">📦 NOVO PRODUTO</div>
+        <div class="fab-item" onclick="exportarBackup()">📂 GERAR RELATÓRIO</div>
     </div>
-    <div id="lista_clientes_corpo"></div>
+    <div class="fab-main" onclick="toggleFab()">+</div>
 </div>
 
-<div id="v-estoque" class="view">
-    <div class="box">
-        <h3>Cadastrar Produto</h3>
+<div id="m-cliente" class="modal-full">
+    <div class="modal-content">
+        <h2 style="color:var(--gold)">Novo Cliente</h2>
+        <input type="text" id="c_nome" placeholder="Nome Completo">
+        <input type="tel" id="c_whats" placeholder="WhatsApp (DDD+Número)">
+        <button class="btn btn-gold" onclick="salvarCliente()">CADASTRAR</button>
+        <button class="btn" style="background:#222; color:#fff; margin-top:10px;" onclick="fecharModais()">FECHAR</button>
+    </div>
+</div>
+
+<div id="m-estoque" class="modal-full">
+    <div class="modal-content">
+        <h2 style="color:var(--gold)">Novo Produto</h2>
         <input type="text" id="e_ean" placeholder="BIPE O CÓDIGO" onchange="buscarProdutoNet()">
         <input type="text" id="e_nome" placeholder="Nome do Produto">
-        <input type="number" id="e_preco" placeholder="Preço R$">
-        <input type="text" id="e_foto" placeholder="Link da Imagem">
-        <button class="btn btn-gold" onclick="salvarProd()">Salvar</button>
+        <input type="number" id="e_preco" placeholder="Preço de Venda R$">
+        <input type="text" id="e_foto" placeholder="Link da Imagem (URL)">
+        <button class="btn btn-gold" onclick="salvarProd()">SALVAR NO ESTOQUE</button>
+        <button class="btn" style="background:#222; color:#fff; margin-top:10px;" onclick="fecharModais()">FECHAR</button>
     </div>
 </div>
 
-<div id="modal-pg"><div class="modal-box" id="modal_content"></div></div>
+<div id="m-pagamento" class="modal-full">
+    <div class="modal-content" id="pay_content" style="text-align:center;"></div>
+</div>
 
 <script>
     let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
     let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
     let mesas = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
 
-    function formatarNome(n) { return n.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' '); }
-
-    function tab(e, id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(e) e.currentTarget.classList.add('active');
+    // FUNÇÕES DE INTERFACE
+    function toggleFab() { 
+        const menu = document.getElementById('fab-menu');
+        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
     }
 
+    function abrirModal(id) { fecharModais(); document.getElementById(id).style.display = 'block'; toggleFab(); }
+    function fecharModais() { document.querySelectorAll('.modal-full').forEach(m => m.style.display = 'none'); }
+
+    // BUSCA E CADASTRO
     async function buscarProdutoNet() {
         const ean = document.getElementById('e_ean').value;
         if(ean.length < 8) return;
@@ -88,7 +110,7 @@
             const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${ean}.json`);
             const data = await res.json();
             if(data.status === 1) {
-                document.getElementById('e_nome').value = data.product.product_name.toUpperCase();
+                document.getElementById('e_nome').value = (data.product.product_name || "").toUpperCase();
                 document.getElementById('e_foto').value = data.product.image_url || "";
             }
         } catch(e) { console.log("Erro API"); }
@@ -96,47 +118,49 @@
 
     function salvarCliente() {
         let n = document.getElementById('c_nome').value;
-        let w = document.getElementById('c_whats').value;
         if(n) {
-            clientes.push({ nome: formatarNome(n), whats: w.replace(/\D/g, '') });
+            clientes.push({ nome: n.toUpperCase(), whats: document.getElementById('c_whats').value.replace(/\D/g,'') });
             clientes.sort((a,b) => a.nome.localeCompare(b.nome));
             localStorage.setItem('b934_clientes', JSON.stringify(clientes));
-            document.getElementById('c_nome').value = ''; 
-            document.getElementById('c_whats').value = '';
-            renderMesas(); renderClientes();
+            fecharModais(); renderMesas();
         }
     }
 
-    function renderClientes() {
-        const cont = document.getElementById('lista_clientes_corpo');
-        clientes.sort((a,b) => a.nome.localeCompare(b.nome));
-        cont.innerHTML = clientes.map(c => `<div class="box"><b>${c.nome}</b><br><small>${c.whats}</small></div>`).join('');
+    function salvarProd() {
+        const n = document.getElementById('e_nome').value.toUpperCase();
+        const p = parseFloat(document.getElementById('e_preco').value);
+        if(n && p) {
+            estoque.push({ ean: document.getElementById('e_ean').value, nome: n, preco: p, foto: document.getElementById('e_foto').value });
+            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+            fecharModais(); alert("PRODUTO SALVO!");
+        }
     }
 
+    // LÓGICA DAS MESAS
     function renderMesas() {
         const grid = document.getElementById('grid_mesas');
         grid.innerHTML = mesas.map(m => {
             let soma = 0; let itensH = "";
             for (let n in m.consumo) {
                 const it = m.consumo[n]; soma += (it.qtd * it.preco);
-                itensH += `<div class="item-row"><img src="${it.foto}" class="foto-prod"><div><b>${it.qtd}x ${n}</b></div></div>`;
+                itensH += `<div class="item-row"><img src="${it.foto}" class="foto-prod"><div><b>${it.qtd}x ${n}</b><br><small>R$ ${it.preco.toFixed(2)}</small></div></div>`;
             }
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
-                    <div style="padding:10px; text-align:center;">
-                        <b style="color:var(--gold)">MESA 0${m.id}</b><br>
-                        <select onchange="mesas.find(x=>x.id===${m.id}).cliente=this.value">
-                            <option value="">${m.cliente || '--- CLIENTE ---'}</option>
+                    <div style="padding:15px; text-align:center; background:#080808; border-radius:12px 12px 0 0;">
+                        <b style="color:var(--gold); font-size:18px;">MESA 0${m.id}</b>
+                        <select onchange="mesas.find(x=>x.id===${m.id}).cliente=this.value" style="margin-top:10px;">
+                            <option value="">${m.cliente || 'SELECIONAR CLIENTE'}</option>
                             ${clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
                         </select>
                     </div>
-                    <div style="flex:1; padding:10px; overflow-y:auto;">${itensH || '<small>Livre</small>'}</div>
-                    <div style="padding:10px;">
-                        <input type="text" placeholder="BIPAR OU BUSCAR..." oninput="mostrarSugestao(this, ${m.id})">
+                    <div style="flex:1; padding:15px; overflow-y:auto;">${itensH || '<center style="opacity:0.2; margin-top:60px">ABERTA</center>'}</div>
+                    <div style="padding:10px; position:relative;">
+                        <input type="text" placeholder="BIPAR OU DIGITAR NOME..." oninput="mostrarSugestao(this, ${m.id})">
                         <div id="sug-${m.id}" class="sugestoes"></div>
                     </div>
-                    <div style="padding:15px; background:#111;">
-                        <div style="display:flex; justify-content:space-between;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                    <div style="padding:15px; background:#111; border-top:1px solid #222; border-radius:0 0 12px 12px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span style="font-size:14px">TOTAL</span><b style="color:var(--green); font-size:22px;">R$ ${soma.toFixed(2)}</b></div>
                         <button class="btn btn-gold" onclick="abrirPagamento(${m.id}, ${soma})">FECHAR CONTA</button>
                     </div>
                 </div>`;
@@ -147,83 +171,74 @@
         const lista = document.getElementById(`sug-${mId}`);
         const busca = input.value.toUpperCase();
         if(busca.length < 2) { lista.style.display = 'none'; return; }
-        const matches = estoque.filter(p => p.nome.includes(busca));
-        lista.innerHTML = matches.map(p => `<div class="sugestao-item" onclick="adicionarAoConsumo('${p.nome}', ${mId})">${p.nome} - R$ ${p.preco.toFixed(2)}</div>`).join('');
-        lista.style.display = 'block';
+        const matches = estoque.filter(p => p.nome.includes(busca) || p.ean === busca);
+        if(matches.length > 0) {
+            lista.innerHTML = matches.map(p => `<div class="sugestao-item" onclick="adicionarProd('${p.nome}', ${mId})">${p.nome} <br> <small>R$ ${p.preco.toFixed(2)}</small></div>`).join('');
+            lista.style.display = 'block';
+        }
     }
 
-    function adicionarAoConsumo(nomeProd, mId) {
-        const p = estoque.find(x => x.nome === nomeProd);
+    function adicionarProd(nome, mId) {
+        const p = estoque.find(x => x.nome === nome);
         const m = mesas.find(x => x.id === mId);
         if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
         else m.consumo[p.nome] = { qtd: 1, preco: p.preco, foto: p.foto || 'https://via.placeholder.com/50' };
         m.status = 'Ocupada';
         document.querySelectorAll('.sugestoes').forEach(s => s.style.display = 'none');
-        document.querySelectorAll('input[placeholder="BIPAR OU BUSCAR..."]').forEach(i => i.value = '');
+        document.querySelectorAll('input[placeholder="BIPAR OU DIGITAR NOME..."]').forEach(i => i.value = '');
         renderMesas();
     }
 
     function abrirPagamento(id, total) {
         if(total <= 0) return;
         const m = mesas.find(x => x.id === id);
-        document.getElementById('modal-pg').style.display = 'flex';
-        document.getElementById('modal_content').innerHTML = `
-            <h3>FECHAR MESA 0${id}</h3>
-            <div style="color:#888; margin-bottom:10px;">Cliente: <b>${m.cliente || "NÃO SELECIONADO"}</b></div>
-            <h1 style="color:var(--green); margin:10px 0;">R$ ${total.toFixed(2)}</h1>
-            <select id="forma_p" onchange="verificarTravaFiado('${m.cliente}')">
+        document.getElementById('m-pagamento').style.display = 'block';
+        document.getElementById('pay_content').innerHTML = `
+            <h2 style="color:var(--gold)">MESA 0${id}</h2>
+            <p style="color:#aaa">Cliente: <b>${m.cliente || "AVULSO"}</b></p>
+            <h1 style="color:var(--green); font-size:40px;">R$ ${total.toFixed(2)}</h1>
+            <select id="forma_p" style="height:60px" onchange="travaFiado('${m.cliente}')">
                 <option value="PIX">PIX</option>
                 <option value="DINHEIRO">DINHEIRO</option>
-                <option value="DÉBITO">CARTÃO DÉBITO</option>
-                <option value="CRÉDITO">CARTÃO CRÉDITO</option>
+                <option value="DÉBITO">DÉBITO</option>
+                <option value="CRÉDITO">CRÉDITO</option>
                 <option value="FIADO" style="color:red">FIADO (PENDURA)</option>
             </select>
-            <div id="msg-erro" class="aviso-erro">⚠️ SELECIONE UM CLIENTE PARA FAZER FIADO!</div>
-            <button id="btn-confirmar" class="btn btn-gold" onclick="finalizar(${id}, ${total})">FINALIZAR VENDA</button>
-            <button class="btn" style="background:#222; margin-top:8px;" onclick="document.getElementById('modal-pg').style.display='none'">VOLTAR</button>
+            <div id="erro-fiado" style="color:red; font-weight:bold; margin:10px 0; display:none;">⚠️ SELECIONE O CLIENTE NA MESA!</div>
+            <button id="btn-pago" class="btn btn-gold" onclick="finalizar(${id}, ${total})">CONFIRMAR PAGAMENTO</button>
+            <button class="btn" style="background:#222; margin-top:10px;" onclick="fecharModais()">VOLTAR</button>
         `;
     }
 
-    function verificarTravaFiado(nomeCliente) {
+    function travaFiado(nome) {
         const f = document.getElementById('forma_p').value;
-        const btn = document.getElementById('btn-confirmar');
-        const msg = document.getElementById('msg-erro');
-        if(f === 'FIADO' && (!nomeCliente || nomeCliente === "")) {
-            btn.disabled = true; btn.style.opacity = "0.3"; msg.style.display = "block";
-        } else {
-            btn.disabled = false; btn.style.opacity = "1"; msg.style.display = "none";
-        }
+        const btn = document.getElementById('btn-pago');
+        const erro = document.getElementById('erro-fiado');
+        if(f === 'FIADO' && !nome) { btn.disabled = true; btn.style.opacity = '0.2'; erro.style.display = 'block'; }
+        else { btn.disabled = false; btn.style.opacity = '1'; erro.style.display = 'none'; }
     }
 
     function finalizar(id, total) {
         const m = mesas.find(x => x.id === id);
         const f = document.getElementById('forma_p').value;
-        
         if(f === 'FIADO') {
-            const clienteObj = clientes.find(c => c.nome === m.cliente);
-            if(clienteObj && clienteObj.whats) {
-                const texto = encodeURIComponent(`*BOTECO 934 - AVISO DE CONTA*\n\nOlá ${m.cliente}, uma nova conta no valor de *R$ ${total.toFixed(2)}* foi registrada no seu fiado hoje.\n\n_Sistema Elite Boteco 934_`);
-                window.open(`https://wa.me/55${clienteObj.whats}?text=${texto}`, '_blank');
+            const c = clientes.find(x => x.nome === m.cliente);
+            if(c && c.whats) {
+                const msg = encodeURIComponent(`*BOTECO 934*\nNova conta no FIADO registrada:\nValor: *R$ ${total.toFixed(2)}*`);
+                window.open(`https://wa.me/55${c.whats}?text=${msg}`, '_blank');
             }
-            alert(`PENDURA REGISTRADO PARA ${m.cliente}!`);
-        } else {
-            alert(`PAGAMENTO EM ${f} CONFIRMADO!`);
         }
-
         m.status = 'Livre'; m.cliente = ''; m.consumo = {};
-        document.getElementById('modal-pg').style.display = 'none';
-        renderMesas();
+        fecharModais(); renderMesas();
     }
 
-    function salvarProd() {
-        const n = document.getElementById('e_nome').value.toUpperCase();
-        const p = parseFloat(document.getElementById('e_preco').value);
-        if(n && p) {
-            estoque.push({ ean: document.getElementById('e_ean').value, nome: n, preco: p, foto: document.getElementById('e_foto').value });
-            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
-            alert("SALVO!");
-            document.querySelectorAll('#v-estoque input').forEach(i => i.value = '');
-        }
+    function exportarBackup() {
+        let csv = "TIPO;NOME;VALOR\n";
+        clientes.forEach(c => csv += `CLIENTE;${c.nome};${c.whats}\n`);
+        estoque.forEach(p => csv += `PRODUTO;${p.nome};${p.preco}\n`);
+        const blob = new Blob(["\ufeff" + csv], { type: 'text/csv' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob); link.download = "boteco_backup.csv"; link.click();
     }
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
