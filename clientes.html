@@ -2,65 +2,90 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>BOTECO 934 - GESTÃO COMPLETA</title>
+    <title>BOTECO 934 - SISTEMA ELITE</title>
     <style>
-        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; }
-        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; }
+        :root { --gold: #d4af37; --bg: #000; --card: #0c0c0c; --green: #00ff88; --border: #1a1a1a; --danger: #ff4444; }
+        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding: 10px; margin-bottom: 10px; }
-        .nav { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
-        .tab { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: #555; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 10px; text-align: center; border-radius: 4px; min-width: 110px; }
-        .tab.active { border-color: var(--gold); color: var(--gold); background: #111; }
+        /* BARRA DE NAVEGAÇÃO FIXA (HOME SEMPRE VISÍVEL) */
+        .navbar { 
+            background: #050505; 
+            border-bottom: 2px solid var(--gold); 
+            padding: 10px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-brand { color: var(--gold); font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+        
+        .nav-links { display: flex; gap: 10px; padding: 10px; overflow-x: auto; background: #000; }
+        .tab { 
+            padding: 12px 20px; 
+            background: #111; 
+            border: 1px solid var(--border); 
+            color: #777; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            font-size: 11px; 
+            border-radius: 4px; 
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab.active { border-color: var(--gold); color: var(--gold); background: #1a1a1a; }
+        .tab-home { background: var(--gold) !important; color: #000 !important; }
 
-        .view { display: none; }
+        .view { display: none; padding: 15px; }
         .view.active { display: block; }
 
+        /* CARDS E FORMULÁRIOS */
         .box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
-        
-        /* GRID MESAS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .mesa { background: var(--card); border: 1px solid var(--green); border-radius: 8px; display: flex; flex-direction: column; min-height: 450px; }
-        .mesa.ocupada { border-color: #ff4444; }
+        .mesa.ocupada { border-color: var(--danger); }
         
-        /* FOTO DO PRODUTO NO RECIBO */
-        .foto-prod { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid var(--gold); }
-        .item-linha { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; border-bottom: 1px solid #111; padding-bottom: 5px; }
-
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--gold); border-radius: 4px; margin-bottom: 10px; box-sizing: border-box; font-size: 15px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: #000; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th, td { padding: 10px; border-bottom: 1px solid #111; text-align: left; }
+        .foto-prod { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #222; }
+        .item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1 style="color:var(--gold); font-size:16px; margin:0;">BOTECO 934 - PDV ELITE</h1>
-    <div id="clock" style="font-family:monospace; color:var(--gold)"></div>
+<div class="navbar">
+    <div class="nav-brand">BOTECO 934</div>
+    <div id="clock" style="color:var(--gold); font-family:monospace; font-size:14px;"></div>
 </div>
 
-<div class="nav">
-    <div class="tab active" onclick="tab(event, 'v-mesas')">Caixa/Mesas</div>
-    <div class="tab" onclick="tab(event, 'v-clientes')">Clientes</div>
-    <div class="tab" onclick="tab(event, 'v-estoque')">Estoque</div>
-    <div class="tab" onclick="tab(event, 'v-backup')">Planilhas</div>
+<div class="nav-links">
+    <div class="tab tab-home" onclick="tab(event, 'v-mesas')">🏠 HOME (CAIXA)</div>
+    <div class="tab" onclick="tab(event, 'v-clientes')">👥 CLIENTES</div>
+    <div class="tab" onclick="tab(event, 'v-estoque')">📦 ESTOQUE</div>
+    <div class="tab" onclick="tab(event, 'v-calc')">💰 PRECIFICAÇÃO</div>
+    <div class="tab" onclick="tab(event, 'v-backup')">📂 PLANILHAS</div>
+</div>
+
+<div id="v-mesas" class="view active">
+    <div class="grid" id="grid_mesas"></div>
 </div>
 
 <div id="v-clientes" class="view">
     <div class="box">
-        <h3 style="color:var(--gold)">Novo Cliente</h3>
-        <input type="text" id="c_nome" placeholder="Nome Completo">
-        <input type="text" id="c_whats" placeholder="WhatsApp (ex: 87999999999)">
-        <button class="btn btn-gold" onclick="salvarCliente()">Cadastrar Cliente</button>
+        <h3 style="color:var(--gold)">Cadastrar Novo Cliente</h3>
+        <input type="text" id="c_nome" placeholder="Nome do Cliente">
+        <input type="text" id="c_whats" placeholder="WhatsApp / Contato">
+        <button class="btn btn-gold" onclick="salvarCliente()">Salvar Cliente</button>
     </div>
     <div class="box">
-        <h3>Lista de Contatos</h3>
-        <table id="tabela_clientes">
-            <thead><tr><th>Nome</th><th>WhatsApp</th><th>Ações</th></tr></thead>
-            <tbody></tbody>
-        </table>
+        <h3>Meus Clientes</h3>
+        <div id="lista_clientes_corpo"></div>
     </div>
 </div>
 
@@ -69,39 +94,50 @@
         <h3 style="color:var(--gold)">Novo Produto</h3>
         <input type="text" id="e_ean" placeholder="Código de Barras">
         <input type="text" id="e_nome" placeholder="Nome do Produto">
-        <input type="number" id="e_preco" placeholder="Preço de Venda R$" step="0.01">
-        <input type="number" id="e_qtd" placeholder="Quantidade">
-        <input type="text" id="e_foto" placeholder="Link da Foto (ou deixe vazio)">
-        <button class="btn btn-gold" onclick="salvarProd()">Salvar Produto</button>
+        <input type="number" id="e_preco" placeholder="Preço de Venda R$">
+        <input type="number" id="e_qtd" placeholder="Quantidade inicial">
+        <input type="text" id="e_foto" placeholder="Link da imagem do produto">
+        <button class="btn btn-gold" onclick="salvarProd()">Adicionar ao Estoque</button>
     </div>
 </div>
 
-<div id="v-mesas" class="view active">
-    <div class="grid" id="grid_mesas"></div>
+<div id="v-calc" class="view">
+    <div class="box" style="max-width:500px; margin:auto;">
+        <h3 style="color:var(--gold); text-align:center;">CALCULADORA DE MARGEM</h3>
+        <label>Custo da Caixa/Lote</label>
+        <input type="number" id="calc_custo" oninput="calcularMargem()">
+        <label>Unidades no Lote</label>
+        <input type="number" id="calc_qtd" oninput="calcularMargem()">
+        <label>Preço de Venda Sugerido</label>
+        <input type="number" id="calc_venda" oninput="calcularMargem()">
+        
+        <div id="calc_resultado" style="margin-top:20px; padding:15px; background:#000; border:1px solid var(--green); border-radius:5px;">
+            Insera os valores para calcular...
+        </div>
+    </div>
 </div>
 
 <div id="v-backup" class="view">
     <div class="box">
-        <h3>Exportar Dados</h3>
-        <button class="btn btn-gold" onclick="exportarTudo()">BAIXAR TODA A BASE (CSV)</button>
-        <p style="font-size:11px; color:#555; margin-top:10px;">O arquivo baixado pode ser aberto no Google Planilhas.</p>
+        <h3 style="color:var(--gold)">Backup de Dados</h3>
+        <button class="btn btn-gold" style="margin-bottom:10px" onclick="exportarDados()">GERAR PLANILHA COMPLETA</button>
+        <button class="btn" style="background:#222; color:#777" onclick="limparTudo()">REINICIAR SISTEMA (LIMPAR TUDO)</button>
     </div>
 </div>
 
 <script>
     let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
     let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
-    let mesas = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
+    let mesas = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, cliente: '', consumo: {}, status: 'Livre' }));
 
     function tab(e, id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        e.currentTarget.classList.add('active');
+        if(e) e.currentTarget.classList.add('active');
         if(id === 'v-clientes') renderClientes();
     }
 
-    // --- LOGICA CLIENTES ---
     function salvarCliente() {
         const nome = document.getElementById('c_nome').value.toUpperCase();
         const whats = document.getElementById('c_whats').value;
@@ -111,23 +147,22 @@
             document.getElementById('c_nome').value = '';
             document.getElementById('c_whats').value = '';
             renderClientes();
+            alert("Cliente cadastrado!");
         }
     }
 
     function renderClientes() {
-        const tbody = document.querySelector('#tabela_clientes tbody');
-        tbody.innerHTML = clientes.map((c, i) => `
-            <tr>
-                <td>${c.nome}</td>
-                <td>${c.whats}</td>
-                <td><button onclick="removerCliente(${i})" style="color:red; background:none; border:none; cursor:pointer">Excluir</button></td>
-            </tr>
+        const cont = document.getElementById('lista_clientes_corpo');
+        cont.innerHTML = clientes.map(c => `
+            <div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between">
+                <span><b>${c.nome}</b> - ${c.whats}</span>
+                <span style="color:var(--gold); cursor:pointer" onclick="whatsapp('${c.whats}')">WhatsApp</span>
+            </div>
         `).join('');
     }
 
-    function removerCliente(i) { clientes.splice(i, 1); localStorage.setItem('b934_clientes', JSON.stringify(clientes)); renderClientes(); }
+    function whatsapp(num) { if(num) window.open(`https://wa.me/55${num.replace(/\D/g,'')}`); }
 
-    // --- LOGICA ESTOQUE ---
     function salvarProd() {
         const n = document.getElementById('e_nome').value.toUpperCase();
         const p = parseFloat(document.getElementById('e_preco').value);
@@ -142,7 +177,6 @@
         }
     }
 
-    // --- LOGICA CAIXA ---
     function renderMesas() {
         const grid = document.getElementById('grid_mesas');
         grid.innerHTML = mesas.map(m => {
@@ -152,28 +186,26 @@
                 const it = m.consumo[n];
                 soma += (it.qtd * it.preco);
                 itensHtml += `
-                    <div class="item-linha">
+                    <div class="item-row">
                         <img src="${it.foto}" class="foto-prod">
-                        <div style="flex-grow:1">
-                            <b>${it.qtd}x ${n}</b><br>
-                            <small>R$ ${it.preco.toFixed(2)}</small>
-                        </div>
+                        <div style="flex:1"><b>${it.qtd}x ${n}</b></div>
+                        <div style="color:var(--gold)">R$ ${(it.qtd * it.preco).toFixed(2)}</div>
                     </div>`;
             }
             return `
                 <div class="mesa ${m.status === 'Ocupada' ? 'ocupada' : ''}">
-                    <div style="padding:10px; border-bottom:1px dashed #222; text-align:center;">
-                        <b style="color:var(--gold)">MESA 0${m.id}</b><br>
-                        <select onchange="vincularCliente(${m.id}, this.value)" style="margin-top:5px; font-size:11px;">
-                            <option value="">${m.cliente || 'SELECIONE CLIENTE'}</option>
+                    <div style="padding:15px; border-bottom:1px dashed #222; text-align:center;">
+                        <b style="color:var(--gold); font-size:18px;">MESA 0${m.id}</b><br>
+                        <select onchange="vincularCliente(${m.id}, this.value)" style="margin-top:8px;">
+                            <option value="">${m.cliente || 'SELECIONAR CLIENTE'}</option>
                             ${clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
                         </select>
                     </div>
-                    <div style="flex-grow:1; padding:10px; overflow-y:auto;">${itensHtml}</div>
-                    <div style="padding:10px;"><input type="text" placeholder="BIPAR..." onchange="bipar(this, ${m.id})"></div>
-                    <div style="padding:15px; background:#000; border-top:1px dashed var(--border);">
-                        <div style="display:flex; justify-content:space-between;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
-                        <button class="btn btn-gold" onclick="fecharMesa(${m.id}, ${soma})">FECHAR CONTA</button>
+                    <div style="flex:1; padding:10px; overflow-y:auto;">${itensHtml || '<center style="opacity:0.2; margin-top:50px">Mesa Vazia</center>'}</div>
+                    <div style="padding:10px;"><input type="text" placeholder="BIPAR PRODUTO..." onchange="bipar(this, ${m.id})"></div>
+                    <div style="padding:15px; background:#000; border-top:2px solid #111;">
+                        <div style="display:flex; justify-content:space-between; font-size:20px;"><b>TOTAL</b><b style="color:var(--green)">R$ ${soma.toFixed(2)}</b></div>
+                        <button class="btn btn-gold" style="margin-top:10px" onclick="fecharMesa(${m.id}, ${soma})">FECHAR CONTA</button>
                     </div>
                 </div>`;
         }).join('');
@@ -188,34 +220,48 @@
     function bipar(input, mId) {
         const val = input.value.toUpperCase();
         const p = estoque.find(x => x.ean === val || x.nome === val);
-        if(p && p.qtd > 0) {
+        if(p) {
             const m = mesas.find(x => x.id === mId);
             if(m.consumo[p.nome]) m.consumo[p.nome].qtd++;
             else m.consumo[p.nome] = { qtd: 1, preco: p.preco, foto: p.foto };
             p.qtd--; m.status = 'Ocupada';
-            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
             renderMesas();
         }
         input.value = ''; input.focus();
     }
 
     function fecharMesa(id, total) {
-        if(total > 0 && confirm("Confirmar pagamento?")) {
+        if(total > 0 && confirm("Fechar conta no valor de R$ " + total.toFixed(2) + "?")) {
             const m = mesas.find(x => x.id === id);
             m.status = 'Livre'; m.cliente = ''; m.consumo = {};
             renderMesas();
         }
     }
 
-    function exportarTudo() {
-        let csv = "Tipo;Identificador;Nome;Extra\n";
-        clientes.forEach(c => csv += `CLIENTE;${c.whats};${c.nome};\n`);
-        estoque.forEach(p => csv += `PRODUTO;${p.ean};${p.nome};${p.preco}\n`);
-        
+    function calcularMargem() {
+        const c = parseFloat(document.getElementById('calc_custo').value) || 0;
+        const q = parseFloat(document.getElementById('calc_qtd').value) || 0;
+        const v = parseFloat(document.getElementById('calc_venda').value) || 0;
+        if(c > 0 && q > 0) {
+            const custoUn = c / q;
+            const lucro = v - custoUn;
+            const margem = (lucro / v) * 100;
+            document.getElementById('calc_resultado').innerHTML = `
+                Custo por Unidade: <b>R$ ${custoUn.toFixed(2)}</b><br>
+                Lucro por Unidade: <b style="color:var(--green)">R$ ${lucro.toFixed(2)}</b><br>
+                Margem de Lucro Real: <b style="color:var(--gold)">${margem.toFixed(1)}%</b>
+            `;
+        }
+    }
+
+    function exportarDados() {
+        let csv = "IDENTIFICADOR;NOME;VALOR\n";
+        clientes.forEach(c => csv += `CLIENTE;${c.nome};${c.whats}\n`);
+        estoque.forEach(p => csv += `PRODUTO;${p.nome};${p.preco}\n`);
         let blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
         let link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "base_completa_boteco934.csv";
+        link.download = "boteco934_backup.csv";
         link.click();
     }
 
