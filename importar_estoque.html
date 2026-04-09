@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMPORTAR ESTOQUE | 934</title>
+    <title>IMPORTAR | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; }
@@ -19,21 +19,19 @@
 <body>
 
 <div class="container">
-    <div class="header">📦 IMPORTAÇÃO EM MASSA</div>
+    <div class="header"><i class="fas fa-boxes"></i> IMPORTAÇÃO EM MASSA (A-Z)</div>
 
     <div class="instrucoes">
-        <b>COMO USAR:</b><br>
-        Cole os produtos no formato: <br>
-        <code style="color:var(--green)">CÓDIGO;NOME DO PRODUTO;PREÇO</code><br><br>
+        <b>FORMATO:</b> CÓDIGO;NOME;PREÇO<br>
         <i>Exemplo:</i><br>
-        789123456;SPATEN LATA;5.00<br>
-        789987654;AMSTEL LATA;5.00
+        7891000;AMSTEL LATA;5.00<br>
+        7892000;SPATEN LATA;5.00
     </div>
 
-    <textarea id="listaProdutos" placeholder="Cole sua lista aqui..."></textarea>
+    <textarea id="listaProdutos" placeholder="Cole aqui seus produtos..."></textarea>
 
     <button class="btn-importar" onclick="processarImportacao()">
-        <i class="fas fa-file-import"></i> CADASTRAR TUDO AGORA
+        <i class="fas fa-sort-alpha-down"></i> ORGANIZAR E CADASTRAR
     </button>
 
     <a href="index.html" class="btn-voltar">VOLTAR AO MENU</a>
@@ -44,17 +42,15 @@
         const texto = document.getElementById('listaProdutos').value.trim();
         if (!texto) return alert("Cole algum dado primeiro!");
 
-        // Pega o que já tem no estoque do Boteco (ou cria um novo se estiver vazio)
         let estoqueAtual = JSON.parse(localStorage.getItem('estoqueBoteco934')) || {};
-        
         const linhas = texto.split('\n');
         let contagem = 0;
 
         linhas.forEach(linha => {
-            const partes = linha.split(';'); // Divide por ponto e vírgula
+            const partes = linha.split(';');
             if (partes.length === 3) {
                 const codigo = partes[0].trim();
-                const nome = partes[1].trim();
+                const nome = partes[1].trim().toUpperCase();
                 const preco = parseFloat(partes[2].trim());
 
                 if (codigo && nome && !isNaN(preco)) {
@@ -64,12 +60,21 @@
             }
         });
 
-        localStorage.setItem('estoqueBoteco934', JSON.stringify(estoqueAtual));
+        // LÓGICA DE ORDENAÇÃO ALFABÉTICA (Transforma em array, ordena pelo nome e volta para objeto)
+        const chavesOrdenadas = Object.keys(estoqueAtual).sort((a, b) => {
+            return estoqueAtual[a].nome.localeCompare(estoqueAtual[b].nome);
+        });
+
+        const estoqueOrdenado = {};
+        chavesOrdenadas.forEach(key => {
+            estoqueOrdenado[key] = estoqueAtual[key];
+        });
+
+        localStorage.setItem('estoqueBoteco934', JSON.stringify(estoqueOrdenado));
         
-        alert(`SUCESSO! ${contagem} produtos foram adicionados ao estoque.`);
+        alert(`SUCESSO! ${contagem} produtos cadastrados e organizados de A a Z!`);
         document.getElementById('listaProdutos').value = '';
     }
 </script>
-
 </body>
 </html>
