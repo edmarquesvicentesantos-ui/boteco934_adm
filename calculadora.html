@@ -39,6 +39,120 @@
         btn.classList.add('active');
     }
 
+    <button class="btn-zap" onclick="finalizarVenda()">
+        <i class="fab fa-whatsapp"></i> FECHAR CONTA DO CLIENTE
+    </button>
+
+    <button class="btn-fechamento" onclick="gerarRelatorioDiario()" style="background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DO DIA (RELATÓRIO)
+    </button>
+
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+</div> ```
+
+---
+
+### 🚀 Código Completo Atualizado (Para você não ter erro)
+
+Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de fechamento, o sistema de pendura e a lógica do relatório tudo no lugar certo. É só copiar tudo e substituir no seu arquivo `calculadora.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ELITE | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .cliente-area { background: var(--glass); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 90%; }
+        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        #barcode { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
+        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 100px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        .total-box { background: var(--glass); border-radius: 15px; padding: 20px; text-align: right; border: 2px solid var(--green); margin-bottom: 15px; }
+        .total-valor { color: var(--green); font-size: 45px; font-weight: bold; line-height: 1; }
+        .pagamento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; }
+        .btn-pg.active { background: var(--green); color: black; font-weight: bold; }
+        .btn-pendura { background: #c0392b !important; }
+        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-voltar { display: block; text-align: center; margin-top: 15px; color: #555; text-decoration: none; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">BOTECO 934 | GESTÃO ELITE</div>
+
+    <div class="cliente-area">
+        <div>
+            <small style="color:#888">MESA:</small><br>
+            <select id="mesaSel">
+                <option value="BALCÃO">BALCÃO</option>
+                <option value="MESA 01">MESA 01</option>
+                <option value="MESA 02">MESA 02</option>
+                <option value="MESA 03">MESA 03</option>
+                <option value="MESA 04">MESA 04</option>
+            </select>
+        </div>
+        <div>
+            <small style="color:#888">CLIENTE:</small><br>
+            <input type="text" id="nomeCliente" class="input-nome" placeholder="NOME...">
+        </div>
+    </div>
+
+    <div class="search-area">
+        <input type="text" id="barcode" placeholder="BIPE O PRODUTO..." autofocus>
+    </div>
+
+    <div id="listaItens" class="item-list"></div>
+
+    <div class="total-box">
+        <div id="displayTotal" class="total-valor">R$ 0,00</div>
+    </div>
+
+    <div class="pagamento-grid">
+        <button class="btn-pg active" onclick="setPagamento('DINHEIRO', this)">DINHEIRO</button>
+        <button class="btn-pg" onclick="setPagamento('PIX', this)">PIX</button>
+        <button class="btn-pg" onclick="setPagamento('DÉBITO', this)">DÉBITO</button>
+        <button class="btn-pg" onclick="setPagamento('CRÉDITO', this)">CRÉDITO</button>
+        <button class="btn-pg btn-pendura" onclick="setPagamento('PENDURA', this)">PENDURA</button>
+    </div>
+
+    <button class="btn-zap" onclick="finalizarVenda()">
+        <i class="fab fa-whatsapp"></i> FECHAR CONTA DO CLIENTE
+    </button>
+
+    <button onclick="gerarRelatorioDiario()" style="background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DO DIA (RELATÓRIO)
+    </button>
+
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+</div>
+
+<script>
+    const estoqueBoteco = {
+        "7891991010856": { nome: "SPATEN LATA 350ML", preco: 5.00 },
+        "7896045506934": { nome: "AMSTEL LATA 350ML", preco: 5.00 },
+        "001": { nome: "DOSE CANA ELITE", preco: 4.00 }
+    };
+
+    let totalVenda = 0;
+    let formaPg = "DINHEIRO"; 
+    let itensNomes = [];
+
+    function setPagamento(tipo, btn) {
+        formaPg = tipo;
+        document.querySelectorAll('.btn-pg').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
     document.getElementById('barcode').addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && this.value !== '') {
             const produto = estoqueBoteco[this.value];
@@ -54,26 +168,48 @@
             this.value = '';
         }
     });
-function finalizarVenda() {
-    const cliente = document.getElementById('nomeCliente').value || "Cliente Sem Nome";
-    const mesa = document.getElementById('mesaSel').value;
-    if (totalVenda === 0) return alert("SEM ITENS!");
 
-    // SE FOR PENDURA, SALVA NO CADERNO DIGITAL
-    if (formaPg === 'PENDURA') {
-        let dividas = JSON.parse(localStorage.getItem('penduras934')) || [];
-        dividas.push({
-            cliente: cliente,
-            mesa: mesa,
-            valor: totalVenda,
-            data: new Date().toLocaleDateString('pt-BR')
-        });
-        localStorage.setItem('penduras934', JSON.stringify(dividas));
+    function finalizarVenda() {
+        const cliente = document.getElementById('nomeCliente').value || "Cliente";
+        const mesa = document.getElementById('mesaSel').value;
+        if (totalVenda === 0) return alert("SEM ITENS!");
+
+        // 1. REGISTRA PARA O RELATÓRIO DO DIA
+        let historico = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
+        const chave = formaPg === 'DÉBITO' ? 'DEBITO' : (formaPg === 'CRÉDITO' ? 'CREDITO' : formaPg);
+        historico[chave] += totalVenda;
+        localStorage.setItem('vendasDia934', JSON.stringify(historico));
+
+        // 2. SE FOR PENDURA, SALVA NO CADERNO
+        if (formaPg === 'PENDURA') {
+            let dividas = JSON.parse(localStorage.getItem('penduras934')) || [];
+            dividas.push({ cliente, mesa, valor: totalVenda, data: new Date().toLocaleDateString('pt-BR') });
+            localStorage.setItem('penduras934', JSON.stringify(dividas));
+        }
+
+        const texto = `*BOTECO 934 - RECIBO*\n*CLIENTE:* ${cliente}\n*LOCAL:* ${mesa}\n*ITENS:* ${itensNomes.join(", ")}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n\nObrigado! 🍻`;
+        window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(texto)}`);
+        location.reload(); 
     }
 
-    const texto = `*BOTECO 934 - RECIBO*\n--------------------\n*CLIENTE:* ${cliente}\n*LOCAL:* ${mesa}\n--------------------\n*ITENS:* ${itensNomes.join(", ")}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n--------------------\nObrigado! 🍻`;
-    
-    window.open(`https://wa.me/5581999999999?text=${encodeURIComponent(texto)}`);
-    location.reload(); 
-}
+    function gerarRelatorioDiario() {
+        const dados = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
+        const totalGeral = dados.DINHEIRO + dados.PIX + dados.DEBITO + dados.CREDITO + dados.PENDURA;
+        
+        const resumo = `*FECHAMENTO DIÁRIO - BOTECO 934*\n` +
+                     `💰 DINHEIRO: R$ ${dados.DINHEIRO.toFixed(2)}\n` +
+                     `📱 PIX: R$ ${dados.PIX.toFixed(2)}\n` +
+                     `💳 CARTÕES: R$ ${(dados.DEBITO + dados.CREDITO).toFixed(2)}\n` +
+                     `📝 PENDURAS: R$ ${dados.PENDURA.toFixed(2)}\n` +
+                     `🚀 *TOTAL GERAL: R$ ${totalGeral.toFixed(2)}*`;
+
+        if (confirm("Enviar relatório e ZERAR o dia?")) {
+            window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(resumo)}`);
+            localStorage.removeItem('vendasDia934');
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>}
  </script>
