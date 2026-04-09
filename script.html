@@ -1,37 +1,37 @@
-// Função para registrar cada venda no histórico do dia
-function registrarNoHistorico(valor, tipo) {
-    let historico = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-    
-    if (tipo === 'DÉBITO') historico.DEBITO += valor;
-    else if (tipo === 'CRÉDITO') historico.CREDITO += valor;
-    else historico[tipo] += valor;
+<script>
+    function processarImportacao() {
+        const texto = document.getElementById('listaProdutos').value.trim();
+        if (!texto) return alert("Cole algum dado primeiro!");
 
-    localStorage.setItem('vendasDia934', JSON.stringify(historico));
-}
+        let estoqueAtual = JSON.parse(localStorage.getItem('estoqueBoteco934')) || {};
+        const linhas = texto.split('\n');
+        let contagem = 0;
 
-// Atualize sua função finalizarVenda para chamar o registro:
-// (Adicione a linha abaixo dentro da sua função finalizarVenda antes do location.reload)
-// registrarNoHistorico(totalVenda, formaPg);
+        linhas.forEach(linha => {
+            const partes = linha.split(';');
+            if (partes.length === 3) {
+                const codigo = partes[0].trim();
+                const nome = partes[1].trim().toUpperCase(); // Salva sempre em MAIÚSCULO
+                const preco = parseFloat(partes[2].trim());
 
-function gerarRelatorioDiario() {
-    const dados = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-    const totalGeral = dados.DINHEIRO + dados.PIX + dados.DEBITO + dados.CREDITO + dados.PENDURA;
-    
-    const resumo = `*FECHAMENTO DIÁRIO - BOTECO 934*\n` +
-                 `--------------------------------\n` +
-                 `💰 DINHEIRO: R$ ${dados.DINHEIRO.toFixed(2)}\n` +
-                 `📱 PIX: R$ ${dados.PIX.toFixed(2)}\n` +
-                 `💳 CARTÕES (D+C): R$ ${(dados.DEBITO + dados.CREDITO).toFixed(2)}\n` +
-                 `📝 PENDURAS: R$ ${dados.PENDURA.toFixed(2)}\n` +
-                 `--------------------------------\n` +
-                 `🚀 *TOTAL GERAL: R$ ${totalGeral.toFixed(2)}*\n\n` +
-                 `Deseja zerar o caixa para amanhã?`;
+                if (codigo && nome && !isNaN(preco)) {
+                    estoqueAtual[codigo] = { nome: nome, preco: preco };
+                    contagem++;
+                }
+            }
+        });
 
-    const confirmacao = confirm("Deseja enviar o relatório e ZERAR o caixa do dia?");
-    
-    if (confirmacao) {
-        // Envia para o contato do Boteco (pode repetir para o pessoal se desejar)
-        window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(resumo)}`);
-        localStorage.removeItem('vendasDia934'); // Limpa para o dia seguinte
+        // LÓGICA DE ORDENAÇÃO ALFABÉTICA
+        const estoqueOrdenado = {};
+        Object.keys(estoqueAtual)
+            .sort((a, b) => estoqueAtual[a].nome.localeCompare(estoqueAtual[b].nome))
+            .forEach(key => {
+                estoqueOrdenado[key] = estoqueAtual[key];
+            });
+
+        localStorage.setItem('estoqueBoteco934', JSON.stringify(estoqueOrdenado));
+        
+        alert(`SUCESSO! ${contagem} produtos organizados de A-Z.`);
+        document.getElementById('listaProdutos').value = '';
     }
-}
+</script>
