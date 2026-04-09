@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CÁLCULO DE DOSES | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--glass); border: 1px solid var(--gold); border-radius: 15px; padding: 20px; width: 100%; max-width: 450px; backdrop-filter: blur(10px); }
+        h2 { color: var(--gold); text-align: center; font-size: 18px; margin-top: 0; }
+        .campo { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
+        input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.3); padding: 12px; color: white; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .resultado-box { background: rgba(46, 204, 113, 0.1); border: 1px solid #2ecc71; border-radius: 10px; padding: 15px; margin-top: 20px; text-align: center; }
+        .res-valor { font-size: 28px; font-weight: bold; color: #2ecc71; display: block; }
+        .btn-voltar { margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2><i class="fas fa-divide"></i> CALCULADORA DE FRACIONAMENTO</h2>
+    
+    <div class="campo">
+        <label>NOME DO PRODUTO (EX: WHISKY LITRO)</label>
+        <input type="text" id="prodNome" placeholder="Ex: Red Label">
+    </div>
+
+    <div class="campo">
+        <label>PREÇO DE CUSTO DO TOTAL (R$)</label>
+        <input type="number" id="custoTotal" placeholder="Quanto você pagou?" oninput="calcular()">
+    </div>
+
+    <div class="campo">
+        <label>QUANTIDADE TOTAL (ML ou GRAMAS)</label>
+        <input type="number" id="qtdTotal" placeholder="Ex: 1000 para 1 Litro" oninput="calcular()">
+    </div>
+
+    <div class="campo">
+        <label>TAMANHO DA DOSE/PORÇÃO (ML ou GRAMAS)</label>
+        <input type="number" id="doseTamanho" placeholder="Ex: 50 para uma dose" oninput="calcular()">
+    </div>
+
+    <div class="resultado-box">
+        <span id="resTexto" style="font-size: 12px;">CUSTO POR DOSE:</span>
+        <span id="resultado" class="res-valor">R$ 0,00</span>
+        <small id="lucroSugerido" style="color: var(--gold); font-size: 11px;"></small>
+    </div>
+</div>
+
+<a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+
+<script>
+    function calcular() {
+        const custo = parseFloat(document.getElementById('custoTotal').value);
+        const total = parseFloat(document.getElementById('qtdTotal').value);
+        const dose = parseFloat(document.getElementById('doseTamanho').value);
+        const resDisplay = document.getElementById('resultado');
+        const lucroDisplay = document.getElementById('lucroSugerido');
+
+        if (custo > 0 && total > 0 && dose > 0) {
+            // Cálculo do custo da dose: (Custo Total / Qtd Total) * Tamanho da Dose
+            const custoDose = (custo / total) * dose;
+            resDisplay.innerText = "R$ " + custoDose.toFixed(2).replace('.', ',');
+            
+            // Sugestão de venda com 100% de lucro (Mix Inteligente)
+            const sugestao = custoDose * 2;
+            lucroDisplay.innerText = "SUGESTÃO DE VENDA (100% LUCRO): R$ " + sugestao.toFixed(2).replace('.', ',');
+        } else {
+            resDisplay.innerText = "R$ 0,00";
+            lucroDisplay.innerText = "";
+        }
+    }
+</script>
+
+</body>
+</html>
