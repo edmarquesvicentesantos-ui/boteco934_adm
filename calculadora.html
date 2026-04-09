@@ -54,15 +54,26 @@
             this.value = '';
         }
     });
+function finalizarVenda() {
+    const cliente = document.getElementById('nomeCliente').value || "Cliente Sem Nome";
+    const mesa = document.getElementById('mesaSel').value;
+    if (totalVenda === 0) return alert("SEM ITENS!");
 
-    function finalizarVenda() {
-        const cliente = document.getElementById('nomeCliente').value || "Cliente";
-        const mesa = document.getElementById('mesaSel').value;
-        if (totalVenda === 0) return alert("SEM ITENS!");
-
-        const texto = `*BOTECO 934 - RECIBO*\n--------------------\n*CLIENTE:* ${cliente}\n*LOCAL:* ${mesa}\n--------------------\n*ITENS:* ${itensNomes.join(", ")}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n--------------------\nObrigado! 🍻`;
-        
-        window.open(`https://wa.me/${meuZap}?text=${encodeURIComponent(texto)}`);
-        location.reload(); 
+    // SE FOR PENDURA, SALVA NO CADERNO DIGITAL
+    if (formaPg === 'PENDURA') {
+        let dividas = JSON.parse(localStorage.getItem('penduras934')) || [];
+        dividas.push({
+            cliente: cliente,
+            mesa: mesa,
+            valor: totalVenda,
+            data: new Date().toLocaleDateString('pt-BR')
+        });
+        localStorage.setItem('penduras934', JSON.stringify(dividas));
     }
-</script>
+
+    const texto = `*BOTECO 934 - RECIBO*\n--------------------\n*CLIENTE:* ${cliente}\n*LOCAL:* ${mesa}\n--------------------\n*ITENS:* ${itensNomes.join(", ")}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n--------------------\nObrigado! 🍻`;
+    
+    window.open(`https://wa.me/5581999999999?text=${encodeURIComponent(texto)}`);
+    location.reload(); 
+}
+ </script>
