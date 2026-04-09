@@ -9,45 +9,51 @@
         :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 500px; }
-        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; font-size: 14px; }
         
-        .mesa-area { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: var(--glass); padding: 12px; border-radius: 12px; border: 1px solid var(--gold); }
-        select { background: #000; color: var(--gold); border: 1px solid var(--gold); padding: 5px; border-radius: 5px; font-weight: bold; outline: none; }
+        /* Cabeçalho e Identificação */
+        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .cliente-area { background: var(--glass); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 90%; }
 
-        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; text-align: center; }
-        input { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
+        /* Área de Lançamento */
+        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        #barcode { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
 
-        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 120px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 100px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
         
         .total-box { background: var(--glass); border-radius: 15px; padding: 20px; text-align: right; border: 2px solid var(--green); margin-bottom: 15px; }
         .total-valor { color: var(--green); font-size: 45px; font-weight: bold; line-height: 1; }
 
+        /* Pagamento */
         .pagamento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; font-weight: bold; }
-        .btn-pg.active { background: var(--green); color: black; border-color: white; }
+        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; }
+        .btn-pg.active { background: var(--green); color: black; font-weight: bold; }
         .btn-pendura { background: #c0392b !important; }
 
-        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
-        .btn-voltar { margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 13px; display: block; text-align: center; }
+        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header"><i class="fas fa-crown"></i> BOTECO 934 | ELITE</div>
+    <div class="header">BOTECO 934 | GESTÃO DE COMANDAS</div>
 
-    <div class="mesa-area">
-        <i class="fas fa-chair" style="color:var(--gold)"></i> 
-        <select id="mesaSel">
-            <option value="BALCÃO">ATENDIMENTO BALCÃO</option>
-            <option value="MESA 01">MESA 01</option>
-            <option value="MESA 02">MESA 02</option>
-            <option value="MESA 03">MESA 03</option>
-            <option value="MESA 04">MESA 04</option>
-            <option value="MESA 05">MESA 05</option>
-            <option value="MESA 06">MESA 06</option>
-        </select>
+    <div class="cliente-area">
+        <div>
+            <small style="color:#888">MESA:</small><br>
+            <select id="mesaSel">
+                <option value="BALCÃO">BALCÃO</option>
+                <option value="MESA 01">MESA 01</option>
+                <option value="MESA 02">MESA 02</option>
+                <option value="MESA 03">MESA 03</option>
+                <option value="MESA 04">MESA 04</option>
+            </select>
+        </div>
+        <div>
+            <small style="color:#888">CLIENTE:</small><br>
+            <input type="text" id="nomeCliente" class="input-nome" placeholder="NOME...">
+        </div>
     </div>
 
     <div class="search-area">
@@ -57,7 +63,6 @@
     <div id="listaItens" class="item-list"></div>
 
     <div class="total-box">
-        <div style="font-size:12px; color:#94a3b8; margin-bottom:5px;">VALOR TOTAL</div>
         <div id="displayTotal" class="total-valor">R$ 0,00</div>
     </div>
 
@@ -70,10 +75,8 @@
     </div>
 
     <button class="btn-zap" onclick="finalizarVenda()">
-        <i class="fab fa-whatsapp"></i> FINALIZAR E ENVIAR RECIBO
+        <i class="fab fa-whatsapp"></i> FECHAR CONTA DO CLIENTE
     </button>
-
-    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
 </div>
 
 <script>
@@ -104,17 +107,18 @@
                 totalVenda += produto.preco;
                 itensNomes.push(produto.nome);
                 document.getElementById('displayTotal').innerText = `R$ ${totalVenda.toFixed(2).replace('.', ',')}`;
-            } else {
-                alert("NÃO CADASTRADO: " + this.value);
-            }
+            } else { alert("NÃO CADASTRADO!"); }
             this.value = '';
         }
     });
 
     function finalizarVenda() {
-        if (totalVenda === 0) return alert("ADICIONE ITENS!");
+        const cliente = document.getElementById('nomeCliente').value || "Não informado";
         const mesa = document.getElementById('mesaSel').value;
-        const texto = `*BOTECO 934 - RECIBO*\n*LOCAL:* ${mesa}\n*ITENS:* ${itensNomes.join(", ")}\n*PAGAMENTO:* ${formaPg}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n\nObrigado pela preferência! 🍻`;
+        if (totalVenda === 0) return alert("SEM ITENS!");
+
+        const texto = `*BOTECO 934 - RECIBO*\n--------------------\n*CLIENTE:* ${cliente}\n*LOCAL:* ${mesa}\n--------------------\n*ITENS:* ${itensNomes.join(", ")}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n--------------------\nObrigado! 🍻`;
+        
         window.open(`https://wa.me/5581999999999?text=${encodeURIComponent(texto)}`);
         location.reload(); 
     }
