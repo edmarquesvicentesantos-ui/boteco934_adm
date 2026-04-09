@@ -2,187 +2,145 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDV Elite - Boteco 934</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOTECO 934 PRO</title>
     <style>
-        /* ESTILO (CSS) */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; display: flex; height: 100vh; margin: 0; }
+        :root { --gold: #ffd700; --bg: #0d1117; --card: #161b22; --text: #e6edf3; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; }
         
-        #lado-esquerdo { width: 40%; background: #fff; border-right: 2px solid #ddd; padding: 20px; display: flex; flex-direction: column; }
-        #lado-direito { width: 60%; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        /* CABEÇALHO OURO */
+        .gold-header { text-align: center; padding: 15px; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+        .gold-header h1 { color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
 
-        h2 { margin-top: 0; color: #333; border-bottom: 2px solid #27ae60; padding-bottom: 5px; }
+        /* CUPOM DE CAIXA */
+        .cupom { background: #fff; color: #000; padding: 15px; font-family: 'Courier New', Courier, monospace; border-radius: 4px; border: 1px solid #ccc; }
+        .cupom-header { border-bottom: 1px dashed #000; text-align: center; margin-bottom: 10px; padding-bottom: 5px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0; }
         
-        select, input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; text-transform: uppercase; }
-        
-        .caixa-lista { flex-grow: 1; overflow-y: auto; background: #fafafa; border: 1px solid #eee; padding: 10px; border-radius: 5px; }
-        
-        .grid-pagamento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        .total-box { font-size: 28px; font-weight: bold; color: #27ae60; text-align: center; padding: 15px; background: #e8f5e9; border-radius: 8px; }
-        .restante-box { font-size: 20px; font-weight: bold; color: #e74c3c; text-align: center; }
+        /* BOTÕES DE CONTROLE (+ - X) */
+        .btn-ctrl { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+        .btn-plus { background: #2ea44f; color: white; }
+        .btn-minus { background: #d29922; color: white; }
+        .btn-del { background: #da3633; color: white; }
 
-        .btn-acao { cursor: pointer; padding: 15px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        .btn-fechar { background: #27ae60; color: white; width: 100%; }
-        .btn-fechar:hover { background: #219150; }
-        
-        .contato-destaque { font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; box-sizing: border-box; }
+        .btn-save { background: var(--gold); color: #000; font-weight: bold; width: 100%; padding: 15px; border: none; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="lado-esquerdo">
-        <h2>📦 Mercadorias</h2>
-        <input type="text" id="busca-produto" placeholder="Buscar produto..." oninput="filtrarProdutos()">
-        <select id="lista-produtos" size="12" ondoubleclick="adicionarAoCarrinho()"></select>
-        
-        <h3>🛒 Itens da Venda</h3>
-        <div class="caixa-lista" id="carrinho">
-            </div>
-        <div class="total-box" id="visor-total">Total: R$ 0,00</div>
+<div class="gold-header">
+    <h1>BOTECO 934</h1>
+</div>
+
+<div id="main">
+    <div style="margin-bottom: 20px;">
+        <input type="text" id="barcodeInput" placeholder="Bipe ou digite o código aqui..." onchange="buscarProduto(this.value)">
     </div>
 
-    <div id="lado-direito">
-        <h2>👤 Cliente & Cobrança</h2>
-        
-        <input type="text" id="busca-cliente" placeholder="Buscar cliente..." oninput="filtrarClientes()">
-        <select id="lista-clientes" size="5" onchange="selecionarCliente()"></select>
-        <div id="contato-cliente" class="contato-destaque">Contato: ---</div>
-
-        <div class="grid-pagamento">
-            <div>
-                <label>💵 Dinheiro:</label>
-                <input type="number" id="pg-dinheiro" class="pg-input" step="0.01" placeholder="0.00" oninput="calcularPagamento()">
-            </div>
-            <div>
-                <label>💳 Cartão Crédito:</label>
-                <input type="number" id="pg-credito" class="pg-input" step="0.01" placeholder="0.00" oninput="calcularPagamento()">
-            </div>
-            <div>
-                <label>💳 Cartão Débito:</label>
-                <input type="number" id="pg-debito" class="pg-input" step="0.01" placeholder="0.00" oninput="calcularPagamento()">
-            </div>
-            <div>
-                <label>📱 PIX:</label>
-                <input type="number" id="pg-pix" class="pg-input" step="0.01" placeholder="0.00" oninput="calcularPagamento()">
-            </div>
-            <div style="grid-column: span 2;">
-                <label>📝 FIADO (Pendura):</label>
-                <input type="number" id="pg-fiado" class="pg-input" step="0.01" placeholder="0.00" oninput="calcularPagamento()">
-            </div>
+    <div class="cupom" id="cupomCaixa">
+        <div class="cupom-header">
+            <strong>*** BOTECO 934 ***</strong><br>
+            Petrolina - PE<br>
+            --------------------------------
         </div>
-
-        <div class="restante-box" id="visor-restante">Falta: R$ 0,00</div>
-        
-        <button class="btn-acao btn-fechar" onclick="finalizarVenda()">FINALIZAR CONTA</button>
+        <div id="listaItens">
+            <p style="text-align: center; color: #888;">Nenhum item no carrinho</p>
+        </div>
+        <div style="border-top: 1px dashed #000; margin-top: 10px; padding-top: 10px; text-align: right;">
+            <strong>TOTAL: R$ <span id="totalVenda">0,00</span></strong>
+        </div>
+        <div style="text-align: center; font-size: 10px; margin-top: 10px;">
+            --------------------------------<br>
+            OBRIGADO PELA PREFERENCIA!
+        </div>
     </div>
+    
+    <button class="btn-save" style="margin-top: 15px;" onclick="enviarWhatsapp()">ENVIAR VIA WHATSAPP</button>
+</div>
 
-    <script>
-        // DADOS DO SISTEMA
-        let produtosBD = [
-            { nome: "Cerveja Lata", preco: 6.50 },
-            { nome: "Coca-Cola 2L", preco: 12.00 },
-            { nome: "Petisco Misto", preco: 25.00 },
-            { nome: "Agua Mineral", preco: 3.50 }
-        ];
+<script>
+    let carrinho = [];
 
-        let clientesBD = [
-            { nome: "Adriano Santos", fone: "(87) 98888-1111" },
-            { nome: "Bruno Oliveira", fone: "(87) 98888-2222" },
-            { nome: "Zeca Pagodinho", fone: "(87) 98888-3333" },
-            { nome: "Carlos Lima", fone: "(87) 98888-4444" }
-        ];
-
-        let totalVenda = 0;
-
-        // INICIALIZAÇÃO
-        function init() {
-            carregarProdutos();
-            carregarClientes();
-        }
-
-        function carregarProdutos() {
-            const select = document.getElementById('lista-produtos');
-            select.innerHTML = "";
-            produtosBD.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(p => {
-                let opt = document.createElement('option');
-                opt.text = `${p.nome.toUpperCase()} - R$ ${p.preco.toFixed(2)}`;
-                opt.value = p.preco;
-                select.add(opt);
-            });
-        }
-
-        function carregarClientes() {
-            const select = document.getElementById('lista-clientes');
-            select.innerHTML = "";
-            clientesBD.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(c => {
-                let opt = document.createElement('option');
-                opt.text = c.nome.toUpperCase();
-                opt.setAttribute('data-fone', c.fone);
-                select.add(opt);
-            });
-        }
-
-        function selecionarCliente() {
-            const select = document.getElementById('lista-clientes');
-            const fone = select.options[select.selectedIndex].getAttribute('data-fone');
-            document.getElementById('contato-cliente').innerText = "Contato: " + fone;
-        }
-
-        function adicionarAoCarrinho() {
-            const select = document.getElementById('lista-produtos');
-            if (select.selectedIndex == -1) return;
+    async function buscarProduto(codigo) {
+        if(!codigo) return;
+        
+        // 1. Tenta buscar na internet se não soubermos o que é
+        try {
+            const resp = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
+            const data = await resp.json();
             
-            const preco = parseFloat(select.value);
-            const nome = select.options[select.selectedIndex].text;
-            
-            totalVenda += preco;
-            document.getElementById('visor-total').innerText = "Total: R$ " + totalVenda.toFixed(2);
-            
-            const item = document.createElement('div');
-            item.innerText = nome;
-            document.getElementById('carrinho').appendChild(item);
-            calcularPagamento();
-        }
-
-        function calcularPagamento() {
-            let pago = 0;
-            document.querySelectorAll('.pg-input').forEach(input => {
-                pago += parseFloat(input.value) || 0;
-            });
-
-            let falta = totalVenda - pago;
-            const visorFalta = document.getElementById('visor-restante');
-            
-            if(falta <= 0) {
-                visorFalta.innerText = "CONTA PAGA / TROCO: R$ " + Math.abs(falta).toFixed(2);
-                visorFalta.style.color = "#27ae60";
-            } else {
-                visorFalta.innerText = "Falta: R$ " + falta.toFixed(2);
-                visorFalta.style.color = "#e74c3c";
-            }
-        }
-
-        function finalizarVenda() {
-            const fiado = parseFloat(document.getElementById('pg-fiado').value) || 0;
-            const cliente = document.getElementById('lista-clientes').value;
-            const falta = totalVenda - Array.from(document.querySelectorAll('.pg-input')).reduce((acc, input) => acc + (parseFloat(input.value) || 0), 0);
-
-            if (fiado > 0 && !cliente) {
-                alert("❌ ERRO: Para FIADO, selecione um cliente!");
-                return;
+            let nome = "Novo Item " + codigo;
+            if(data.status === 1) {
+                nome = data.product.product_name || nome;
             }
 
-            if (falta > 0.01) {
-                alert("❌ ERRO: O valor pago é menor que o total!");
-                return;
-            }
-
-            alert("✅ VENDA FINALIZADA NO BOTECO 934!");
-            location.reload(); // Reseta para a próxima venda
+            adicionarAoCarrinho(codigo, nome);
+            document.getElementById('barcodeInput').value = ''; // Limpa para o próximo
+        } catch (e) {
+            alert("Erro ao buscar na internet. Adicionando manualmente.");
+            adicionarAoCarrinho(codigo, "Item Manual");
         }
+    }
 
-        window.onload = init;
-    </script>
+    function adicionarAoCarrinho(id, nome) {
+        let item = carrinho.find(i => i.id === id);
+        if(item) {
+            item.qtd++;
+        } else {
+            let preco = prompt(`Qual o preço de venda para: ${nome}?`, "6.00");
+            carrinho.push({ id, nome, preco: parseFloat(preco), qtd: 1 });
+        }
+        renderizar();
+    }
+
+    function alterarQtd(id, delta) {
+        let item = carrinho.find(i => i.id === id);
+        if(item) {
+            item.qtd += delta;
+            if(item.qtd <= 0) removerItem(id);
+        }
+        renderizar();
+    }
+
+    function removerItem(id) {
+        carrinho = carrinho.filter(i => i.id !== id);
+        renderizar();
+    }
+
+    function renderizar() {
+        const lista = document.getElementById('listaItens');
+        const totalTxt = document.getElementById('totalVenda');
+        lista.innerHTML = '';
+        let total = 0;
+
+        carrinho.forEach(item => {
+            total += (item.preco * item.qtd);
+            lista.innerHTML += `
+                <div class="item-row">
+                    <div>
+                        <strong>${item.qtd}x ${item.nome}</strong><br>
+                        <small>R$ ${item.preco.toFixed(2)} un.</small>
+                    </div>
+                    <div>
+                        <button class="btn-ctrl btn-minus" onclick="alterarQtd('${item.id}', -1)">-</button>
+                        <button class="btn-ctrl btn-plus" onclick="alterarQtd('${item.id}', 1)">+</button>
+                        <button class="btn-ctrl btn-del" onclick="removerItem('${item.id}')">X</button>
+                    </div>
+                </div>
+            `;
+        });
+        totalTxt.innerText = total.toFixed(2);
+    }
+
+    function enviarWhatsapp() {
+        let texto = "*BOTECO 934 - RECIBO*\n----------------------------\n";
+        carrinho.forEach(i => {
+            texto += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`;
+        });
+        texto += `----------------------------\n*TOTAL: R$ ${document.getElementById('totalVenda').innerText}*`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
+    }
+</script>
 </body>
 </html>
