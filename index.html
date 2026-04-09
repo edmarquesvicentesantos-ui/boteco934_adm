@@ -3,96 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - PDV GOLD</title>
+    <title>BOTECO 934 - PDV FINAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #050505; --card-bg: #121212; --text: #e0e0e0; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; padding-bottom: 30px; }
+        :root { --gold: #ffd700; --bg: #f4f7f6; --red: #e74c3c; --green: #27ae60; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 10px; }
 
-        /* TÍTULO OURO */
-        .gold-header { text-align: center; padding: 10px; border-bottom: 2px solid var(--gold); color: var(--gold); text-transform: uppercase; margin-bottom: 15px; }
-        .gold-header h1 { font-size: 20px; letter-spacing: 2px; margin: 0; }
-
-        /* CAMPO DE BIPE */
-        .input-container { margin-bottom: 15px; }
-        input#barcodeInput { width: 100%; padding: 18px; border-radius: 10px; border: 2px solid var(--gold); background: #000; color: #fff; font-size: 18px; text-align: center; }
-
-        /* CUPOM FISCAL BRANCO (VISUAL PROFISSIONAL) */
-        #cupom-container { background: #fff; color: #000; padding: 20px; font-family: 'Courier New', Courier, monospace; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); min-height: 200px; }
-        .cupom-topo { text-align: center; border-bottom: 1px dashed #000; margin-bottom: 15px; padding-bottom: 10px; line-height: 1.2; }
+        .header-gold { background: #000; color: var(--gold); text-align: center; padding: 15px; border-bottom: 3px solid var(--gold); border-radius: 8px 8px 0 0; }
         
-        .item-linha { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .item-info { flex: 1; }
-        .item-nome { font-weight: bold; font-size: 14px; text-transform: uppercase; display: block; }
-        .item-detalhe { font-size: 12px; color: #555; }
+        /* INPUT DE BIPE */
+        .input-caixa { width: 100%; padding: 20px; font-size: 22px; text-align: center; border: 3px solid #ddd; border-radius: 12px; margin-bottom: 15px; background: #fffbe6; font-weight: bold; }
 
-        /* BOTÕES DE CONTROLE (+ - X) */
-        .controles { display: flex; gap: 8px; align-items: center; }
-        .btn-c { width: 35px; height: 35px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
+        /* AREA DO CARRINHO */
+        .grid-caixa { display: grid; grid-template-columns: 1fr 350px; gap: 15px; }
+        @media (max-width: 800px) { .grid-caixa { grid-template-columns: 1fr; } }
+
+        .lista-produtos { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); min-height: 400px; }
+        
+        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; gap: 15px; transition: 0.3s; }
+        .foto-p { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; background: #f9f9f9; }
+        
+        .info-p { flex: 1; }
+        .nome-p { font-weight: bold; font-size: 15px; color: #333; display: block; text-transform: uppercase; }
+        .preco-p { color: #666; font-size: 14px; }
+
+        /* CONTROLES */
+        .btns { display: flex; gap: 8px; }
+        .btn-acao { width: 40px; height: 40px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .btn-mais { background: var(--green); }
         .btn-menos { background: #f39c12; }
-        .btn-mais { background: #27ae60; }
-        .btn-excluir { background: #e74c3c; }
+        .btn-excluir { background: var(--red); }
 
-        /* TOTAL */
-        .cupom-total { border-top: 2px solid #000; margin-top: 15px; padding-top: 10px; font-size: 22px; font-weight: 900; text-align: right; }
-        .cupom-rodape { text-align: center; font-size: 11px; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; }
-
-        /* BOTÃO WHATSAPP */
-        .btn-whats { background: #25d366; color: #fff; width: 100%; padding: 18px; border: none; border-radius: 10px; font-weight: bold; margin-top: 20px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+        /* RESUMO FINANCEIRO */
+        .resumo-fixo { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: fit-content; text-align: center; border: 1px solid #ddd; }
+        .total-valor { font-size: 38px; font-weight: 900; color: var(--green); margin: 20px 0; }
+        
+        .btn-pagamento { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <div class="gold-header">
-        <h1><i class="fa-solid fa-crown"></i> BOTECO 934</h1>
+    <div class="header-gold">
+        <h2>BOTECO 934 - MESA 3</h2>
     </div>
 
-    <div class="input-container">
-        <input type="text" id="barcodeInput" placeholder="BIPE O PRODUTO..." onkeypress="if(event.key === 'Enter') processarBipe(this.value)">
-    </div>
+    <input type="text" id="inputBipe" class="input-caixa" placeholder="BIPE O CÓDIGO AQUI" autofocus onkeypress="if(event.key === 'Enter') tratarBipe(this.value)">
 
-    <div id="cupom-container">
-        <div class="cupom-topo">
-            <strong>*** BOTECO 934 ***</strong><br>
-            BEBIDAS E CONVENIÊNCIA<br>
-            PETROLINA - PE<br>
-            --------------------------------
+    <div class="grid-caixa">
+        <div class="lista-produtos" id="carrinhoVisual">
+            <p style="text-align:center; color:#999; margin-top:50px;">Aguardando bipagem de produtos...</p>
         </div>
 
-        <div id="lista-venda">
-            <p style="text-align: center; color: #888; margin-top: 20px;">Aguardando bipagem...</p>
-        </div>
-
-        <div class="cupom-total">
-            TOTAL R$ <span id="valor-total">0.00</span>
-        </div>
-
-        <div class="cupom-rodape">
-            --------------------------------<br>
-            OBRIGADO PELA PREFERÊNCIA!<br>
-            VIA WHATSAPP - SISTEMA 934 PRO
+        <div class="resumo-fixo">
+            <h3>RESUMO DA VENDA</h3>
+            <div class="total-valor">R$ <span id="displayTotal">0.00</span></div>
+            
+            <button class="btn-pagamento" style="background:#27ae60;"><i class="fa-solid fa-money-bill-1-wave"></i> DINHEIRO</button>
+            <button class="btn-pagamento" style="background:#2980b9;"><i class="fa-solid fa-pix"></i> PIX</button>
+            <button class="btn-pagamento" style="background:#8e44ad;"><i class="fa-solid fa-credit-card"></i> CARTÃO</button>
+            <button class="btn-pagamento" style="background:#e67e22;" onclick="enviarWhatsApp()"><i class="fa-brands fa-whatsapp"></i> ENVIAR RECIBO</button>
         </div>
     </div>
 
-    <button class="btn-whats" onclick="enviarWhatsApp()">
-        <i class="fa-brands fa-whatsapp"></i> ENVIAR RECIBO WHATSAPP
-    </button>
+<script>
+    let itensNoCarrinho = [];
 
-    <script>
-        let carrinho = [];
+    async function tratarBipe(codigo) {
+        if (!codigo) return;
+        const codLimpo = codigo.trim(); // Limpa espaços do leitor
+        document.getElementById('inputBipe').value = '';
 
-        async function processarBipe(codigo) {
-            if (!codigo) return;
-            document.getElementById('barcodeInput').value = '';
+        // 1. CHECA SE JÁ EXISTE PARA NÃO REPETIR LINHA
+        let jaExiste = itensNoCarrinho.find(item => item.id === codLimpo);
 
-            // 1. TRAVA ANTI-DUPLICAÇÃO (Checa se já está no carrinho)
-            let itemExistente = carrinho.find(i => i.id === codigo);
+        if (jaExiste) {
+            jaExiste.qtd++;
+            atualizarTudo();
+        } else {
+            // 2. BUSCA FOTO E NOME NA INTERNET
+            try {
+                const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codLimpo}.json`);
+                const d = await r.json();
+                
+                let nome = (d.status === 1 && d.product.product_name) ? d.product.product_name : "Item " + codLimpo;
+                let foto = (d.status === 1 && d.product.image_url) ? d.product.image_url : "https://cdn-icons-png.flaticon.com/512/3121/3121784.png";
+                
+                let preco = prompt(`Produto: ${nome}\nInforme o preço de venda:`, "6.00");
+                
+                if (preco) {
+                    itensNoCarrinho.push({
+                        id: codLimpo,
+                        nome: nome,
+                        foto: foto,
+                        preco: parseFloat(preco.replace(',', '.')),
+                        qtd: 1
+                    });
+                    atualizarTudo();
+                }
+            } catch (e) {
+                alert("Erro ao buscar dados. Tente novamente.");
+            }
+        }
+    }
 
-            if (itemExistente) {
-                itemExistente.qtd++;
-                atualizarTela();
-            } else {
-                // 2. BUSCA NA INTERNET (Se for item novo)
-                try {
-                    const resp = await fetch(`
+    function alterarQuantidade(id, valor) {
+        let item = itensNoCarrinho.find(i => i.id === id);
+        if (item) {
+            item.qtd += valor;
+            if (item.qtd <= 0) excluir(id);
+            atualizarTudo();
+        }
+    }
+
+    function excluir(id) {
+        itensNoCarrinho = itensNoCarrinho.filter(i => i.id !== id);
+        atualizarTudo();
+    }
+
+    function atualizarTudo() {
+        const container = document.getElementById('carrinhoVisual');
+        const totalDisp = document.getElementById('displayTotal');
+        container.innerHTML = '';
+        let somaTotal = 0;
+
+        if (itensNoCarrinho.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">Aguardando bipagem de produtos...</p>';
+            totalDisp.innerText = "0.00";
+            return;
+        }
+
+        itensNoCarrinho.forEach(item => {
+            let subtotal = item.preco * item.qtd;
+            somaTotal += subtotal;
+            container.innerHTML += `
+                <div class="item-row">
+                    <img src="${item.foto}" class="foto-p" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3121/3121784.png'">
+                    <div class="info-p">
+                        <span class="nome-p">${item.nome}</span>
+                        <span class="preco-p">${item.qtd}x R$ ${item.preco.toFixed(2)} = <strong>R$ ${subtotal.toFixed(2)}</strong></span>
+                    </div>
+                    <div class="btns">
+                        <button class="btn-acao btn-menos" onclick="alterarQuantidade('${item.id}', -1)">-</button>
+                        <button class="btn-acao btn-mais" onclick="alterarQuantidade('${item.id}', 1)">+</button>
+                        <button class="btn-acao btn-excluir" onclick="excluir('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+        totalDisp.innerText = somaTotal.toFixed(2);
+    }
+
+    function enviarWhatsApp() {
+        let txt = "*BOTECO 934 - RECIBO*\n------------------------\n";
+        itensNoCarrinho.forEach(i => txt += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`);
+        txt += "------------------------\n*TOTAL: R$ " + document.getElementById('displayTotal').innerText + "*\nObrigado!";
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+    }
+</script>
+</body>
+</html>
