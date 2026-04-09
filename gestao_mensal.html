@@ -1,39 +1,113 @@
-<select id="destinoMov">
-    <option value="ENTRADA">DINHEIRO QUE ENTROU (VENDA)</option>
-    <option value="COMPRA BAR (CARTÃO PESSOAL)">COMPRA BAR (NO MEU CARTÃO)</option>
-    <option value="CONTA PESSOAL">MINHA CONTA PESSOAL (SALÁRIO)</option>
-    <option value="FORNECEDOR">PAGAR FORNECEDOR (DINHEIRO CAIXA)</option>
-</select>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO MENSAL | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --red: #ff4757; --green: #2ed573; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; margin: 0; }
+        .container { max-width: 600px; margin: auto; }
+        
+        /* Cards de Resumo */
+        .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .card-res { background: var(--glass); border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .card-res span { display: block; font-size: 10px; color: #888; text-transform: uppercase; }
+        .card-res b { font-size: 18px; display: block; margin-top: 5px; }
+
+        /* Configuração de Salário */
+        .config-salario { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .config-salario input { background: transparent; border: none; color: var(--gold); font-size: 24px; font-weight: bold; width: 150px; text-align: center; outline: none; }
+
+        /* Lançamentos */
+        .form-lançamento { background: var(--glass); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); margin-bottom: 20px; }
+        .form-lançamento select, .form-lançamento input { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-lancar { background: var(--green); border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        .item-lista { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 5px; font-size: 13px; }
+        .dest-pessoal { border-left: 4px solid var(--blue); }
+        .dest-bar { border-left: 4px solid var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color: var(--gold);">📊 FLUXO MENSAL 934</h2>
+
+    <div class="config-salario">
+        <span>DEFINIR SALÁRIO MENSAL (PROLABORE)</span><br>
+        R$ <input type="number" id="salarioMeta" value="2000" oninput="atualizarGeral()">
+    </div>
+
+    <div class="resumo-grid">
+        <div class="card-res">
+            <span>ENTRADAS (MÊS)</span>
+            <b id="totalEntradas" style="color: var(--green);">R$ 0,00</b>
+        </div>
+        <div class="card-res">
+            <span>DISPONÍVEL / SALDO</span>
+            <b id="saldoDisponivel" style="color: var(--gold);">R$ 0,00</b>
+        </div>
+    </div>
+
+    <div class="form-lançamento">
+        <label>LANÇAR MOVIMENTAÇÃO</label>
+        <input type="number" id="valorMov" placeholder="Valor R$">
+        <select id="destinoMov">
+            <option value="ENTRADA">VALOR QUE ENTROU (VENDA)</option>
+            <option value="RETIRADA PESSOAL">RETIRADA PESSOAL (SALÁRIO)</option>
+            <option value="FORNECEDOR">PAGAR FORNECEDOR</option>
+            <option value="CARTÃO">PAGAR CARTÃO</option>
+            <option value="EXTRAS">EXTRAS / DIVERSOS</option>
+        </select>
+        <button class="btn-lancar" onclick="lancar()">REGISTRAR</button>
+    </div>
+
+    <div id="historicoMensal">
+        </div>
+
+    <a href="index.html" style="display:block; text-align:center; margin-top:30px; color:#555; text-decoration:none;">VOLTAR</a>
+</div>
 
 <script>
+    function lancar() {
+        const valor = parseFloat(document.getElementById('valorMov').value);
+        const destino = document.getElementById('destinoMov').value;
+        if(!valor) return;
+
+        let dados = JSON.parse(localStorage.getItem('mensal934')) || [];
+        dados.push({ valor, destino, data: new Date().toLocaleDateString('pt-BR') });
+        localStorage.setItem('mensal934', JSON.stringify(dados));
+        
+        document.getElementById('valorMov').value = '';
+        atualizarGeral();
+    }
+
     function atualizarGeral() {
         const dados = JSON.parse(localStorage.getItem('mensal934')) || [];
-        const salarioMeta = parseFloat(document.getElementById('salarioMeta').value) || 0;
-        
-        let totalVendas = 0;
-        let oQueOBarDeveProEdmarques = 0; // Compras do bar no seu cartão
-        let oQueOEdmarquesJaTirou = 0;   // Contas pessoais pagas pelo bar
+        const salario = parseFloat(document.getElementById('salarioMeta').value) || 0;
+        let entradas = 0;
+        let saidas = 0;
+
+        const lista = document.getElementById('historicoMensal');
+        lista.innerHTML = '';
 
         dados.forEach(item => {
-            if(item.destino === 'ENTRADA') {
-                totalVendas += item.valor;
-            } else if(item.destino === 'COMPRA BAR (CARTÃO PESSOAL)') {
-                oQueOBarDeveProEdmarques += item.valor;
-            } else if(item.destino === 'CONTA PESSOAL') {
-                oQueOEdmarquesJaTirou += item.valor;
-            }
+            if(item.destino === 'ENTRADA') entradas += item.valor;
+            else saidas += item.valor;
+
+            const div = document.createElement('div');
+            div.className = 'item-lista';
+            div.innerHTML = `<span>${item.data} - ${item.destino}</span> <b>R$ ${item.valor.toFixed(2)}</b>`;
+            lista.prepend(div);
         });
 
-        // CÁLCULO MESTRE
-        // O Saldo Real é: Vendas - (O que o bar gastou)
-        const saldoBar = totalVendas - oQueOBarDeveProEdmarques;
-        // O que resta do seu salário para você gastar:
-        const restoSalario = salarioMeta - oQueOEdmarquesJaTirou;
-
-        document.getElementById('totalEntradas').innerText = "Vendas: R$ " + totalVendas.toFixed(2);
-        document.getElementById('saldoDisponivel').innerText = "Saldo Bar: R$ " + saldoBar.toFixed(2);
-        
-        // Vamos criar um novo campo visual para o seu salário
-        alert("Edmarques, você ainda pode retirar R$ " + restoSalario.toFixed(2) + " este mês.");
+        document.getElementById('totalEntradas').innerText = "R$ " + entradas.toFixed(2);
+        document.getElementById('saldoDisponivel').innerText = "R$ " + (entradas - saidas).toFixed(2);
     }
+
+    window.onload = atualizarGeral;
 </script>
+</body>
+</html>
