@@ -3,162 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - PDV FINAL</title>
+    <title>BOTECO 934 PRO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #f4f7f6; --red: #e74c3c; --green: #27ae60; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: var(--bg); margin: 0; padding: 10px; }
-
-        .header-gold { background: #000; color: var(--gold); text-align: center; padding: 15px; border-bottom: 3px solid var(--gold); border-radius: 8px 8px 0 0; }
+        :root { --gold: #ffd700; --red: #ff4b2b; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         
-        /* INPUT DE BIPE */
-        .input-caixa { width: 100%; padding: 20px; font-size: 22px; text-align: center; border: 3px solid #ddd; border-radius: 12px; margin-bottom: 15px; background: #fffbe6; font-weight: bold; }
-
-        /* AREA DO CARRINHO */
-        .grid-caixa { display: grid; grid-template-columns: 1fr 350px; gap: 15px; }
-        @media (max-width: 800px) { .grid-caixa { grid-template-columns: 1fr; } }
-
-        .lista-produtos { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); min-height: 400px; }
+        .header { background: #000; color: var(--gold); text-align: center; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--gold); margin-bottom: 10px; }
         
-        .item-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; gap: 15px; transition: 0.3s; }
-        .foto-p { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; background: #f9f9f9; }
-        
-        .info-p { flex: 1; }
-        .nome-p { font-weight: bold; font-size: 15px; color: #333; display: block; text-transform: uppercase; }
-        .preco-p { color: #666; font-size: 14px; }
+        /* CAMPO DE BUSCA TURBINADO */
+        .busca-container { margin-bottom: 15px; }
+        input#inputBipe { width: 100%; padding: 20px; border-radius: 12px; border: 3px solid #ccc; font-size: 20px; text-align: center; background: #fffbe6; outline: none; }
+        input#inputBipe:focus { border-color: var(--gold); }
 
-        /* CONTROLES */
-        .btns { display: flex; gap: 8px; }
-        .btn-acao { width: 40px; height: 40px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .btn-mais { background: var(--green); }
-        .btn-menos { background: #f39c12; }
-        .btn-excluir { background: var(--red); }
-
-        /* RESUMO FINANCEIRO */
-        .resumo-fixo { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: fit-content; text-align: center; border: 1px solid #ddd; }
-        .total-valor { font-size: 38px; font-weight: 900; color: var(--green); margin: 20px 0; }
+        /* LISTA DE PRODUTOS ESTILO CARD */
+        .carrinho { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-height: 300px; }
+        .item-caixa { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; gap: 12px; }
         
-        .btn-pagamento { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; text-transform: uppercase; }
+        /* FOTO DO PRODUTO COM FALLBACK */
+        .foto-item { width: 60px; height: 60px; border-radius: 8px; object-fit: contain; background: #f9f9f9; border: 1px solid #ddd; }
+
+        .info { flex: 1; }
+        .nome { font-weight: bold; font-size: 15px; text-transform: uppercase; color: #333; }
+        .detalhe { display: block; font-size: 13px; color: #666; margin-top: 4px; }
+
+        /* BOTÕES DE CONTROLE */
+        .btns-controle { display: flex; gap: 8px; align-items: center; }
+        .btn { border: none; border-radius: 8px; color: #fff; font-weight: bold; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .btn-m { background: #f39c12; }
+        .btn-p { background: #27ae60; }
+        .btn-x { background: var(--red); box-shadow: 0 2px 5px rgba(255, 75, 43, 0.3); }
+
+        /* RESUMO FINAL */
+        .rodape-caixa { background: #fff; margin-top: 15px; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #ddd; }
+        .total-texto { font-size: 32px; font-weight: 900; color: #1a1a1a; margin-bottom: 15px; }
+        .total-texto span { color: #27ae60; }
+        
+        .btn-whats { background: #25d366; color: #fff; width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header-gold">
-        <h2>BOTECO 934 - MESA 3</h2>
+    <div class="header">
+        <h2 style="margin:0">BOTECO 934 - CAIXA</h2>
     </div>
 
-    <input type="text" id="inputBipe" class="input-caixa" placeholder="BIPE O CÓDIGO AQUI" autofocus onkeypress="if(event.key === 'Enter') tratarBipe(this.value)">
+    <div class="busca-container">
+        <input type="text" id="inputBipe" placeholder="BIPE O CÓDIGO AQUI..." onkeypress="if(event.key === 'Enter') handleBipe(this.value)" autofocus>
+    </div>
 
-    <div class="grid-caixa">
-        <div class="lista-produtos" id="carrinhoVisual">
-            <p style="text-align:center; color:#999; margin-top:50px;">Aguardando bipagem de produtos...</p>
-        </div>
+    <div class="carrinho" id="listaItens">
+        <p style="text-align:center; color:#999; padding-top:50px;">Carrinho vazio. Bipe um produto!</p>
+    </div>
 
-        <div class="resumo-fixo">
-            <h3>RESUMO DA VENDA</h3>
-            <div class="total-valor">R$ <span id="displayTotal">0.00</span></div>
-            
-            <button class="btn-pagamento" style="background:#27ae60;"><i class="fa-solid fa-money-bill-1-wave"></i> DINHEIRO</button>
-            <button class="btn-pagamento" style="background:#2980b9;"><i class="fa-solid fa-pix"></i> PIX</button>
-            <button class="btn-pagamento" style="background:#8e44ad;"><i class="fa-solid fa-credit-card"></i> CARTÃO</button>
-            <button class="btn-pagamento" style="background:#e67e22;" onclick="enviarWhatsApp()"><i class="fa-brands fa-whatsapp"></i> ENVIAR RECIBO</button>
-        </div>
+    <div class="rodape-caixa">
+        <div class="total-texto">TOTAL: <span>R$ <span id="totalVenda">0,00</span></span></div>
+        <button class="btn-whats" onclick="finalizarVenda()">
+            <i class="fa-brands fa-whatsapp"></i> ENVIAR RECIBO
+        </button>
     </div>
 
 <script>
-    let itensNoCarrinho = [];
+    let dbVenda = [];
 
-    async function tratarBipe(codigo) {
+    async function handleBipe(codigo) {
         if (!codigo) return;
-        const codLimpo = codigo.trim(); // Limpa espaços do leitor
+        const codLimpo = codigo.trim(); // ESSA É A TRAVA: remove espaços que fazem duplicar
         document.getElementById('inputBipe').value = '';
 
-        // 1. CHECA SE JÁ EXISTE PARA NÃO REPETIR LINHA
-        let jaExiste = itensNoCarrinho.find(item => item.id === codLimpo);
+        // 1. CHECA SE JÁ ESTÁ NA TELA (TRAVA DE REPETIÇÃO)
+        let index = dbVenda.findIndex(item => item.id === codLimpo);
 
-        if (jaExiste) {
-            jaExiste.qtd++;
-            atualizarTudo();
+        if (index !== -1) {
+            dbVenda[index].qtd++;
+            render();
         } else {
-            // 2. BUSCA FOTO E NOME NA INTERNET
+            // 2. BUSCA NOME E FOTO NA INTERNET
             try {
-                const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codLimpo}.json`);
-                const d = await r.json();
+                const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codLimpo}.json`);
+                const data = await res.json();
                 
-                let nome = (d.status === 1 && d.product.product_name) ? d.product.product_name : "Item " + codLimpo;
-                let foto = (d.status === 1 && d.product.image_url) ? d.product.image_url : "https://cdn-icons-png.flaticon.com/512/3121/3121784.png";
+                let nome = (data.status === 1 && data.product.product_name) ? data.product.product_name : "PRODUTO " + codLimpo;
+                let foto = (data.status === 1 && data.product.image_url) ? data.product.image_url : "https://cdn-icons-png.flaticon.com/512/3121/3121784.png";
                 
-                let preco = prompt(`Produto: ${nome}\nInforme o preço de venda:`, "6.00");
+                let preco = prompt(`Novo Item: ${nome}\nValor de Venda:`, "6.00");
                 
                 if (preco) {
-                    itensNoCarrinho.push({
+                    dbVenda.push({
                         id: codLimpo,
                         nome: nome,
                         foto: foto,
                         preco: parseFloat(preco.replace(',', '.')),
                         qtd: 1
                     });
-                    atualizarTudo();
+                    render();
                 }
             } catch (e) {
-                alert("Erro ao buscar dados. Tente novamente.");
+                alert("Erro na conexão. Verifique a internet.");
             }
         }
     }
 
-    function alterarQuantidade(id, valor) {
-        let item = itensNoCarrinho.find(i => i.id === id);
-        if (item) {
-            item.qtd += valor;
-            if (item.qtd <= 0) excluir(id);
-            atualizarTudo();
+    function alterarQtd(id, delta) {
+        let i = dbVenda.findIndex(it => it.id === id);
+        if(i !== -1) {
+            dbVenda[i].qtd += delta;
+            if(dbVenda[i].qtd <= 0) excluir(id);
+            render();
         }
     }
 
     function excluir(id) {
-        itensNoCarrinho = itensNoCarrinho.filter(i => i.id !== id);
-        atualizarTudo();
+        dbVenda = dbVenda.filter(it => it.id !== id);
+        render();
     }
 
-    function atualizarTudo() {
-        const container = document.getElementById('carrinhoVisual');
-        const totalDisp = document.getElementById('displayTotal');
-        container.innerHTML = '';
-        let somaTotal = 0;
+    function render() {
+        const lista = document.getElementById('listaItens');
+        const totalTxt = document.getElementById('totalVenda');
+        lista.innerHTML = '';
+        let soma = 0;
 
-        if (itensNoCarrinho.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">Aguardando bipagem de produtos...</p>';
-            totalDisp.innerText = "0.00";
+        if (dbVenda.length === 0) {
+            lista.innerHTML = '<p style="text-align:center; color:#999; padding-top:50px;">Carrinho vazio. Bipe um produto!</p>';
+            totalTxt.innerText = "0,00";
             return;
         }
 
-        itensNoCarrinho.forEach(item => {
-            let subtotal = item.preco * item.qtd;
-            somaTotal += subtotal;
-            container.innerHTML += `
-                <div class="item-row">
-                    <img src="${item.foto}" class="foto-p" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3121/3121784.png'">
-                    <div class="info-p">
-                        <span class="nome-p">${item.nome}</span>
-                        <span class="preco-p">${item.qtd}x R$ ${item.preco.toFixed(2)} = <strong>R$ ${subtotal.toFixed(2)}</strong></span>
+        dbVenda.forEach(item => {
+            let sub = item.preco * item.qtd;
+            soma += sub;
+            lista.innerHTML += `
+                <div class="item-caixa">
+                    <img src="${item.foto}" class="foto-item" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3121/3121784.png'">
+                    <div class="info">
+                        <span class="nome">${item.nome}</span>
+                        <span class="detalhe">${item.qtd}x R$ ${item.preco.toFixed(2)} = R$ ${sub.toFixed(2)}</span>
                     </div>
-                    <div class="btns">
-                        <button class="btn-acao btn-menos" onclick="alterarQuantidade('${item.id}', -1)">-</button>
-                        <button class="btn-acao btn-mais" onclick="alterarQuantidade('${item.id}', 1)">+</button>
-                        <button class="btn-acao btn-excluir" onclick="excluir('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                    <div class="btns-controle">
+                        <button class="btn btn-m" onclick="alterarQtd('${item.id}', -1)">-</button>
+                        <button class="btn btn-p" onclick="alterarQtd('${item.id}', 1)">+</button>
+                        <button class="btn btn-x" onclick="excluir('${item.id}')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>
             `;
         });
-        totalDisp.innerText = somaTotal.toFixed(2);
+        totalTxt.innerText = soma.toFixed(2).replace('.', ',');
     }
 
-    function enviarWhatsApp() {
-        let txt = "*BOTECO 934 - RECIBO*\n------------------------\n";
-        itensNoCarrinho.forEach(i => txt += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`);
-        txt += "------------------------\n*TOTAL: R$ " + document.getElementById('displayTotal').innerText + "*\nObrigado!";
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+    function finalizarVenda() {
+        if(dbVenda.length === 0) return;
+        let msg = "*BOTECO 934 - RECIBO*\n----------------------\n";
+        dbVenda.forEach(i => msg += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`);
+        msg += "----------------------\n*TOTAL: R$ " + document.getElementById('totalVenda').innerText + "*";
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
 </script>
 </body>
