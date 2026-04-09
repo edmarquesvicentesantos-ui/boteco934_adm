@@ -3,99 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Elite | Boteco 934</title>
+    <title>ESTOQUE | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: auto; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 25px; text-transform: uppercase; }
         
-        .container { width: 100%; max-width: 600px; }
-        .header { text-align: center; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* Campo de Bipe Estilizado */
-        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-        input { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 22px; font-weight: bold; outline: none; }
-        input::placeholder { color: rgba(255,255,255,0.3); font-size: 16px; }
-
-        /* Lista de Itens */
-        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 200px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); animation: slideIn 0.3s ease; }
+        /* Estilo das Categorias */
+        .categoria-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .categoria-titulo { color: var(--gold); font-weight: bold; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--gold); padding-bottom: 5px; }
         
-        /* Painel de Total */
-        .total-box { background: var(--glass); border-radius: 15px; padding: 25px; text-align: right; border: 1px solid var(--green); margin-bottom: 20px; }
-        .total-label { color: #94a3b8; font-size: 14px; }
-        .total-valor { color: var(--green); font-size: 50px; font-weight: bold; }
-
-        /* Botões */
-        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
-        .btn-voltar { margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; display: inline-block; }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Inputs Flexíveis */
+        .grid-item { display: grid; grid-template-columns: 1fr 80px 80px; gap: 10px; margin-bottom: 10px; }
+        input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 5px; font-size: 14px; }
+        input:focus { border-color: var(--gold); outline: none; }
+        
+        .btn-salvar { background: var(--gold); color: black; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-voltar { display: block; text-align: center; color: #94a3b8; text-decoration: none; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <i class="fas fa-calculator"></i> Boteco 934 | Mix Inteligente
-        </div>
-
-        <div class="search-area">
-            <input type="text" id="barcode" placeholder="BIPE O CÓDIGO AQUI..." autofocus>
-        </div>
-
-        <div class="item-list" id="listaItens">
-            <p style="text-align:center; color:#475569; margin-top:80px;">Aguardando venda...</p>
-        </div>
-
-        <div class="total-box">
-            <div class="total-label">TOTAL DA MESA</div>
-            <div class="total-valor" id="displayTotal">R$ 0,00</div>
-        </div>
-
-        <button class="btn-zap" onclick="finalizarVenda()">
-            <i class="fab fa-whatsapp"></i> ENVIAR RECIBO WHATSAPP
-        </button>
-
-        <center>
-            <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU PRINCIPAL</a>
-        </center>
+<div class="container">
+    <div class="header">
+        <h2><i class="fas fa-boxes"></i> GESTÃO DE PRODUTOS</h2>
     </div>
 
-    <script>
-        let total = 0;
-        const input = document.getElementById('barcode');
-        const lista = document.getElementById('listaItens');
-        const displayTotal = document.getElementById('displayTotal');
+    <div class="categoria-card">
+        <div class="categoria-titulo"><i class="fas fa-beer"></i> CERVEJAS</div>
+        <div class="grid-item">
+            <span><b>Produto</b></span> <span><b>Custo</b></span> <span><b>Venda</b></span>
+        </div>
+        <div class="grid-item">
+            <input type="text" placeholder="Ex: Heineken 600ml">
+            <input type="text" placeholder="R$">
+            <input type="text" placeholder="R$">
+        </div>
+        <div class="grid-item">
+            <input type="text" placeholder="Ex: Skol Lata">
+            <input type="text" placeholder="R$">
+            <input type="text" placeholder="R$">
+        </div>
+        <div id="maisCervejas"></div>
+    </div>
 
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && this.value !== '') {
-                adicionarProduto(this.value);
-                this.value = '';
-            }
-        });
+    <div class="categoria-card">
+        <div class="categoria-titulo"><i class="fas fa-glass-whiskey"></i> DOSES / MIX</div>
+        <div class="grid-item">
+            <input type="text" placeholder="Ex: Dose de Cana">
+            <input type="text" placeholder="R$">
+            <input type="text" placeholder="R$">
+        </div>
+        <div class="grid-item">
+            <input type="text" placeholder="Ex: Dose de Whisky">
+            <input type="text" placeholder="R$">
+            <input type="text" placeholder="R$">
+        </div>
+    </div>
 
-        function adicionarProduto(codigo) {
-            // Limpa o texto de "Aguardando" na primeira venda
-            if (total === 0) lista.innerHTML = '';
+    <div class="categoria-card">
+        <div class="categoria-titulo"><i class="fas fa-utensils"></i> PETISCOS</div>
+        <div class="grid-item">
+            <input type="text" placeholder="Ex: Porção Batata">
+            <input type="text" placeholder="R$">
+            <input type="text" placeholder="R$">
+        </div>
+    </div>
 
-            // Simulação de preço (Aqui você conectará com seu estoque.html depois)
-            let nomeFicticio = "Produto " + codigo.substring(0,4);
-            let precoFicticio = Math.floor(Math.random() * 20) + 5;
+    <button class="btn-salvar" onclick="alert('Dados salvos no sistema local!')">
+        <i class="fas fa-save"></i> SALVAR PREÇOS NO SISTEMA
+    </button>
 
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<span>${nomeFicticio}</span> <b>R$ ${precoFicticio.toFixed(2)}</b>`;
-            lista.appendChild(div);
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+</div>
 
-            total += precoFicticio;
-            displayTotal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
-        }
-
-        function finalizarVenda() {
-            const mensagem = encodeURIComponent(`*BOTECO 934*\nTotal da Venda: R$ ${total.toFixed(2)}`);
-            window.open(`https://wa.me/5581999999999?text=${mensagem}`); // Coloque seu número aqui
-        }
-    </script>
 </body>
 </html>
