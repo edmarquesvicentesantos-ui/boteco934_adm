@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADERNO DE DÍVIDAS | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --red: #e74c3c; --green: #2ecc71; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: auto; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
+        
+        .card-devedor { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-left: 5px solid var(--red); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .info h4 { margin: 0; color: var(--gold); text-transform: uppercase; font-size: 14px; }
+        .info small { color: #888; font-size: 11px; }
+        .valor-divida { color: var(--red); font-weight: bold; font-size: 18px; }
+        
+        .btn-pago { background: var(--green); border: none; color: black; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 10px; }
+        .stats { background: rgba(231, 76, 60, 0.1); border: 1px solid var(--red); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .total-pendente { display: block; font-size: 30px; font-weight: bold; color: var(--red); }
+        
+        .btn-voltar { display: block; text-align: center; margin-top: 25px; color: #555; text-decoration: none; font-size: 12px; }
+        .vazio { text-align: center; color: #555; margin-top: 50px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header"><i class="fas fa-book"></i> CADERNO DE PENDURAS</div>
+
+    <div class="stats">
+        <small>TOTAL A RECEBER NA RUA</small>
+        <span id="totalGeral" class="total-pendente">R$ 0,00</span>
+    </div>
+
+    <div id="listaDevedores">
+        </div>
+
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+</div>
+
+<script>
+    function carregarDividas() {
+        const lista = document.getElementById('listaDevedores');
+        const totalDisplay = document.getElementById('totalGeral');
+        const dividas = JSON.parse(localStorage.getItem('penduras934')) || [];
+        
+        lista.innerHTML = '';
+        let somaTotal = 0;
+
+        if (dividas.length === 0) {
+            lista.innerHTML = '<div class="vazio">Nenhuma dívida pendente. Que beleza!</div>';
+        }
+
+        dividas.forEach((item, index) => {
+            somaTotal += item.valor;
+            const div = document.createElement('div');
+            div.className = 'card-devedor';
+            div.innerHTML = `
+                <div class="info">
+                    <h4>${item.cliente}</h4>
+                    <small>${item.data} | ${item.mesa}</small>
+                </div>
+                <div style="text-align:right">
+                    <div class="valor-divida">R$ ${item.valor.toFixed(2)}</div>
+                    <button class="btn-pago" onclick="darBaixa(${index})">PAGO</button>
+                </div>
+            `;
+            lista.appendChild(div);
+        });
+
+        totalDisplay.innerText = "R$ " + somaTotal.toFixed(2).replace('.', ',');
+    }
+
+    function darBaixa(index) {
+        let dividas = JSON.parse(localStorage.getItem('penduras934'));
+        if(confirm("Confirmar que " + dividas[index].cliente + " pagou?")) {
+            dividas.splice(index, 1);
+            localStorage.setItem('penduras934', JSON.stringify(dividas));
+            carregarDividas();
+        }
+    }
+
+    window.onload = carregarDividas;
+</script>
+</body>
+</html>
