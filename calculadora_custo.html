@@ -3,67 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIX INTELIGENTE | BOTECO 934</title>
+    <title>ESTRATÉGIA 934 | MIX INTELIGENTE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; --blue: #3498db; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; }
-        .header { text-align: center; color: var(--gold); margin-bottom: 20px; font-weight: bold; }
+        .container { max-width: 600px; margin: auto; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
         
-        .card { background: var(--glass); border: 1px solid rgba(255,215,0,0.2); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-        label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; }
-        input { width: 100%; background: #000; border: 1px solid var(--gold); padding: 12px; color: white; border-radius: 8px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-
-        /* Painel de Resultados */
-        .painel-lucro { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .box { padding: 15px; border-radius: 12px; text-align: center; }
-        .box-natural { border: 1px solid #94a3b8; background: rgba(148, 163, 184, 0.1); }
-        .box-gelada { border: 1px solid var(--blue); background: rgba(52, 152, 219, 0.1); }
+        .secao-titulo { background: var(--gold); color: black; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
         
-        .val { display: block; font-size: 20px; font-weight: bold; margin: 5px 0; }
-        .margem { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 5px; display: inline-block; }
-        .m-natural { background: #475569; color: white; }
-        .m-gelada { background: var(--green); color: black; }
+        .card { background: var(--glass); border: 1px solid rgba(255,215,0,0.2); border-radius: 15px; padding: 15px; margin-bottom: 20px; }
+        label { display: block; font-size: 10px; color: #aaa; margin-bottom: 4px; }
+        input { width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.1); padding: 10px; color: var(--gold); border-radius: 8px; margin-bottom: 10px; font-size: 16px; box-sizing: border-box; }
 
-        .btn-voltar { display: block; text-align: center; margin-top: 20px; color: #555; text-decoration: none; font-size: 12px; }
+        .grid-res { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .box-res { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .box-res small { font-size: 9px; color: #888; display: block; text-transform: uppercase; }
+        .box-res b { font-size: 18px; color: var(--green); display: block; margin: 4px 0; }
+        .box-res .lucro-tag { font-size: 9px; color: var(--gold); border: 1px solid var(--gold); padding: 2px 5px; border-radius: 4px; }
+
+        .btn-voltar { display: block; text-align: center; margin-top: 25px; color: #555; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header"><i class="fas fa-chart-line"></i> MIX INTELIGENTE 934</div>
+    <div class="header"><i class="fas fa-crown"></i> BOTECO 934 | ESTRATÉGIA</div>
 
+    <span class="secao-titulo"><i class="fas fa-beer"></i> CERVEJAS E REFRIS</span>
     <div class="card">
-        <label>CUSTO DO FARDO/CAIXA (R$)</label>
-        <input type="number" id="custoFardo" placeholder="Ex: 46.12" oninput="calcular()">
-
-        <label>QUANTIDADE DE UNIDADES NO FARDO</label>
-        <input type="number" id="qtdUnid" placeholder="Ex: 12" oninput="calcular()">
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
-                <label>PREÇO VENDA (NATURAL)</label>
-                <input type="number" id="vendaNat" placeholder="Ex: 4.50" oninput="calcular()">
+                <label>CUSTO DO FARDO (R$)</label>
+                <input type="number" id="custoFardo" oninput="calcCerveja()">
             </div>
             <div>
-                <label>PREÇO VENDA (GELADA)</label>
-                <input type="number" id="vendaGel" placeholder="Ex: 5.50" oninput="calcular()">
+                <label>QUANTIDADE (UNID)</label>
+                <input type="number" id="qtdUnid" oninput="calcCerveja()">
+            </div>
+        </div>
+
+        <div class="grid-res">
+            <div class="box-res" style="border-left: 3px solid #94a3b8;">
+                <small>Sugestão Natural</small>
+                <b id="unidNat">R$ 0,00</b>
+                <span class="lucro-tag">Margem: 40%</span>
+            </div>
+            <div class="box-res" style="border-left: 3px solid var(--blue);">
+                <small>Sugestão Gelada</small>
+                <b id="unidGel">R$ 0,00</b>
+                <span class="lucro-tag">Margem: 60%</span>
             </div>
         </div>
     </div>
 
-    <div class="painel-lucro">
-        <div class="box box-natural">
-            <small>LUCRO UN. (NATURAL)</small>
-            <span id="lucroNat" class="val" style="color:#94a3b8">R$ 0,00</span>
-            <span id="margemNat" class="margem m-natural">0%</span>
+    <span class="secao-titulo" style="background: #e74c3c; color: white;"><i class="fas fa-wine-bottle"></i> DESTILADOS E DOSES</span>
+    <div class="card">
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px;">
+            <div>
+                <label>CUSTO DA GARRAFA (R$)</label>
+                <input type="number" id="custoGarrafa" oninput="calcDose()">
+            </div>
+            <div>
+                <label>TAMANHO (ML)</label>
+                <input type="number" id="mlTotal" placeholder="1000" oninput="calcDose()">
+            </div>
         </div>
+        <label>TAMANHO DA DOSE (ML)</label>
+        <input type="number" id="mlDose" placeholder="50" oninput="calcDose()">
 
-        <div class="box box-gelada">
-            <small>LUCRO UN. (GELADA)</small>
-            <span id="lucroGel" class="val" style="color:var(--green)">R$ 0,00</span>
-            <span id="margemGel" class="margem m-gelada">0%</span>
+        <div class="grid-res">
+            <div class="box-res" style="border-left: 3px solid var(--gold);">
+                <small>Custo da Dose</small>
+                <b id="custoDose" style="color: #94a3b8;">R$ 0,00</b>
+            </div>
+            <div class="box-res" style="border-left: 3px solid var(--green);">
+                <small>Sugestão de Venda</small>
+                <b id="vendaDose">R$ 0,00</b>
+                <span class="lucro-tag">Lucro: 100%</span>
+            </div>
         </div>
     </div>
 
@@ -71,30 +90,26 @@
 </div>
 
 <script>
-    function calcular() {
-        const custoFardo = parseFloat(document.getElementById('custoFardo').value);
-        const qtdUnid = parseFloat(document.getElementById('qtdUnid').value);
-        const vendaNat = parseFloat(document.getElementById('vendaNat').value);
-        const vendaGel = parseFloat(document.getElementById('vendaGel').value);
+    function calcCerveja() {
+        const custo = parseFloat(document.getElementById('custoFardo').value);
+        const qtd = parseFloat(document.getElementById('qtdUnid').value);
+        if (custo > 0 && qtd > 0) {
+            const custoUn = custo / qtd;
+            // Unidade Natural (40% margem) e Gelada (60% margem)
+            document.getElementById('unidNat').innerText = "R$ " + (custoUn / 0.6).toFixed(2).replace('.', ',');
+            document.getElementById('unidGel').innerText = "R$ " + (custoUn / 0.4).toFixed(2).replace('.', ',');
+        }
+    }
 
-        if (custoFardo > 0 && qtdUnid > 0) {
-            const custoUnid = custoFardo / qtdUnid;
-
-            // Cálculo Natural
-            if (vendaNat > 0) {
-                const lNat = vendaNat - custoUnid;
-                const mNat = (lNat / vendaNat) * 100;
-                document.getElementById('lucroNat').innerText = "R$ " + lNat.toFixed(2).replace('.', ',');
-                document.getElementById('margemNat').innerText = mNat.toFixed(1) + "% MARGEM";
-            }
-
-            // Cálculo Gelada
-            if (vendaGel > 0) {
-                const lGel = vendaGel - custoUnid;
-                const mGel = (lGel / vendaGel) * 100;
-                document.getElementById('lucroGel').innerText = "R$ " + lGel.toFixed(2).replace('.', ',');
-                document.getElementById('margemGel').innerText = mGel.toFixed(1) + "% MARGEM";
-            }
+    function calcDose() {
+        const custoG = parseFloat(document.getElementById('custoGarrafa').value);
+        const mlT = parseFloat(document.getElementById('mlTotal').value);
+        const mlD = parseFloat(document.getElementById('mlDose').value);
+        if (custoG > 0 && mlT > 0 && mlD > 0) {
+            const cDose = (custoG / mlT) * mlD;
+            document.getElementById('custoDose').innerText = "R$ " + cDose.toFixed(2).replace('.', ',');
+            // Sugestão com 100% de margem sobre o custo (dobrar o valor)
+            document.getElementById('vendaDose').innerText = "R$ " + (cDose * 2).toFixed(2).replace('.', ',');
         }
     }
 </script>
