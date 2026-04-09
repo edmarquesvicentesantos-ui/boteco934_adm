@@ -1,21 +1,37 @@
-// LÓGICA 2: DESTILADOS (Com Margem de Perda Realista)
-function calcularD() {
-    const custoGarrafa = parseFloat(document.getElementById('d_custo_garrafa').value) || 0;
-    const mlGarrafa = parseFloat(document.getElementById('d_ml_garrafa').value) || 1;
-    const mlDose = parseFloat(document.getElementById('d_ml_dose').value) || 1;
-    const markup = parseFloat(document.getElementById('d_markup').value) || 0;
+// Função para registrar cada venda no histórico do dia
+function registrarNoHistorico(valor, tipo) {
+    let historico = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
     
-    // Fator de perda: Geralmente 10% para destilados (derramamento/fundo de garrafa)
-    // Isso faz com que 1000ml rendam aprox. 18 doses de 50ml em vez de 20.
-    const margemPerda = 0.10; 
-    const mlUtil = mlGarrafa * (1 - margemPerda);
+    if (tipo === 'DÉBITO') historico.DEBITO += valor;
+    else if (tipo === 'CRÉDITO') historico.CREDITO += valor;
+    else historico[tipo] += valor;
 
-    const totalDosesReais = mlUtil / mlDose;
-    const custoPorDoseReal = custoGarrafa / totalDosesReais;
-    const precoVendaDose = custoPorDoseReal * (1 + (markup / 100));
+    localStorage.setItem('vendasDia934', JSON.stringify(historico));
+}
 
-    // Atualiza a tela com os valores reais
-    document.getElementById('d_venda').innerText = `R$ ${precoVendaDose.toFixed(2)}`;
-    document.getElementById('d_detalhe').innerText = 
-        `Rende aprox. ${Math.floor(totalDosesReais)} doses (c/ perda) | Custo Real/Dose: R$ ${custoPorDoseReal.toFixed(2)}`;
+// Atualize sua função finalizarVenda para chamar o registro:
+// (Adicione a linha abaixo dentro da sua função finalizarVenda antes do location.reload)
+// registrarNoHistorico(totalVenda, formaPg);
+
+function gerarRelatorioDiario() {
+    const dados = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
+    const totalGeral = dados.DINHEIRO + dados.PIX + dados.DEBITO + dados.CREDITO + dados.PENDURA;
+    
+    const resumo = `*FECHAMENTO DIÁRIO - BOTECO 934*\n` +
+                 `--------------------------------\n` +
+                 `💰 DINHEIRO: R$ ${dados.DINHEIRO.toFixed(2)}\n` +
+                 `📱 PIX: R$ ${dados.PIX.toFixed(2)}\n` +
+                 `💳 CARTÕES (D+C): R$ ${(dados.DEBITO + dados.CREDITO).toFixed(2)}\n` +
+                 `📝 PENDURAS: R$ ${dados.PENDURA.toFixed(2)}\n` +
+                 `--------------------------------\n` +
+                 `🚀 *TOTAL GERAL: R$ ${totalGeral.toFixed(2)}*\n\n` +
+                 `Deseja zerar o caixa para amanhã?`;
+
+    const confirmacao = confirm("Deseja enviar o relatório e ZERAR o caixa do dia?");
+    
+    if (confirmacao) {
+        // Envia para o contato do Boteco (pode repetir para o pessoal se desejar)
+        window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(resumo)}`);
+        localStorage.removeItem('vendasDia934'); // Limpa para o dia seguinte
+    }
 }
