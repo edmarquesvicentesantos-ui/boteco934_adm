@@ -3,144 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 PRO</title>
+    <title>BOTECO 934 - PDV GOLD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #0d1117; --card: #161b22; --text: #e6edf3; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; }
-        
-        /* CABEÇALHO OURO */
-        .gold-header { text-align: center; padding: 15px; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
-        .gold-header h1 { color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        :root { --gold: #ffd700; --bg: #050505; --card-bg: #121212; --text: #e0e0e0; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; padding-bottom: 30px; }
 
-        /* CUPOM DE CAIXA */
-        .cupom { background: #fff; color: #000; padding: 15px; font-family: 'Courier New', Courier, monospace; border-radius: 4px; border: 1px solid #ccc; }
-        .cupom-header { border-bottom: 1px dashed #000; text-align: center; margin-bottom: 10px; padding-bottom: 5px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0; }
+        /* TÍTULO OURO */
+        .gold-header { text-align: center; padding: 10px; border-bottom: 2px solid var(--gold); color: var(--gold); text-transform: uppercase; margin-bottom: 15px; }
+        .gold-header h1 { font-size: 20px; letter-spacing: 2px; margin: 0; }
+
+        /* CAMPO DE BIPE */
+        .input-container { margin-bottom: 15px; }
+        input#barcodeInput { width: 100%; padding: 18px; border-radius: 10px; border: 2px solid var(--gold); background: #000; color: #fff; font-size: 18px; text-align: center; }
+
+        /* CUPOM FISCAL BRANCO (VISUAL PROFISSIONAL) */
+        #cupom-container { background: #fff; color: #000; padding: 20px; font-family: 'Courier New', Courier, monospace; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); min-height: 200px; }
+        .cupom-topo { text-align: center; border-bottom: 1px dashed #000; margin-bottom: 15px; padding-bottom: 10px; line-height: 1.2; }
         
+        .item-linha { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .item-info { flex: 1; }
+        .item-nome { font-weight: bold; font-size: 14px; text-transform: uppercase; display: block; }
+        .item-detalhe { font-size: 12px; color: #555; }
+
         /* BOTÕES DE CONTROLE (+ - X) */
-        .btn-ctrl { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .btn-plus { background: #2ea44f; color: white; }
-        .btn-minus { background: #d29922; color: white; }
-        .btn-del { background: #da3633; color: white; }
+        .controles { display: flex; gap: 8px; align-items: center; }
+        .btn-c { width: 35px; height: 35px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .btn-menos { background: #f39c12; }
+        .btn-mais { background: #27ae60; }
+        .btn-excluir { background: #e74c3c; }
 
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; box-sizing: border-box; }
-        .btn-save { background: var(--gold); color: #000; font-weight: bold; width: 100%; padding: 15px; border: none; border-radius: 6px; cursor: pointer; }
+        /* TOTAL */
+        .cupom-total { border-top: 2px solid #000; margin-top: 15px; padding-top: 10px; font-size: 22px; font-weight: 900; text-align: right; }
+        .cupom-rodape { text-align: center; font-size: 11px; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; }
+
+        /* BOTÃO WHATSAPP */
+        .btn-whats { background: #25d366; color: #fff; width: 100%; padding: 18px; border: none; border-radius: 10px; font-weight: bold; margin-top: 20px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
     </style>
 </head>
 <body>
 
-<div class="gold-header">
-    <h1>BOTECO 934</h1>
-</div>
-
-<div id="main">
-    <div style="margin-bottom: 20px;">
-        <input type="text" id="barcodeInput" placeholder="Bipe ou digite o código aqui..." onchange="buscarProduto(this.value)">
+    <div class="gold-header">
+        <h1><i class="fa-solid fa-crown"></i> BOTECO 934</h1>
     </div>
 
-    <div class="cupom" id="cupomCaixa">
-        <div class="cupom-header">
+    <div class="input-container">
+        <input type="text" id="barcodeInput" placeholder="BIPE O PRODUTO..." onkeypress="if(event.key === 'Enter') processarBipe(this.value)">
+    </div>
+
+    <div id="cupom-container">
+        <div class="cupom-topo">
             <strong>*** BOTECO 934 ***</strong><br>
-            Petrolina - PE<br>
+            BEBIDAS E CONVENIÊNCIA<br>
+            PETROLINA - PE<br>
             --------------------------------
         </div>
-        <div id="listaItens">
-            <p style="text-align: center; color: #888;">Nenhum item no carrinho</p>
+
+        <div id="lista-venda">
+            <p style="text-align: center; color: #888; margin-top: 20px;">Aguardando bipagem...</p>
         </div>
-        <div style="border-top: 1px dashed #000; margin-top: 10px; padding-top: 10px; text-align: right;">
-            <strong>TOTAL: R$ <span id="totalVenda">0,00</span></strong>
+
+        <div class="cupom-total">
+            TOTAL R$ <span id="valor-total">0.00</span>
         </div>
-        <div style="text-align: center; font-size: 10px; margin-top: 10px;">
+
+        <div class="cupom-rodape">
             --------------------------------<br>
-            OBRIGADO PELA PREFERENCIA!
+            OBRIGADO PELA PREFERÊNCIA!<br>
+            VIA WHATSAPP - SISTEMA 934 PRO
         </div>
     </div>
-    
-    <button class="btn-save" style="margin-top: 15px;" onclick="enviarWhatsapp()">ENVIAR VIA WHATSAPP</button>
-</div>
 
-<script>
-    let carrinho = [];
+    <button class="btn-whats" onclick="enviarWhatsApp()">
+        <i class="fa-brands fa-whatsapp"></i> ENVIAR RECIBO WHATSAPP
+    </button>
 
-    async function buscarProduto(codigo) {
-        if(!codigo) return;
-        
-        // 1. Tenta buscar na internet se não soubermos o que é
-        try {
-            const resp = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
-            const data = await resp.json();
-            
-            let nome = "Novo Item " + codigo;
-            if(data.status === 1) {
-                nome = data.product.product_name || nome;
-            }
+    <script>
+        let carrinho = [];
 
-            adicionarAoCarrinho(codigo, nome);
-            document.getElementById('barcodeInput').value = ''; // Limpa para o próximo
-        } catch (e) {
-            alert("Erro ao buscar na internet. Adicionando manualmente.");
-            adicionarAoCarrinho(codigo, "Item Manual");
-        }
-    }
+        async function processarBipe(codigo) {
+            if (!codigo) return;
+            document.getElementById('barcodeInput').value = '';
 
-    function adicionarAoCarrinho(id, nome) {
-        let item = carrinho.find(i => i.id === id);
-        if(item) {
-            item.qtd++;
-        } else {
-            let preco = prompt(`Qual o preço de venda para: ${nome}?`, "6.00");
-            carrinho.push({ id, nome, preco: parseFloat(preco), qtd: 1 });
-        }
-        renderizar();
-    }
+            // 1. TRAVA ANTI-DUPLICAÇÃO (Checa se já está no carrinho)
+            let itemExistente = carrinho.find(i => i.id === codigo);
 
-    function alterarQtd(id, delta) {
-        let item = carrinho.find(i => i.id === id);
-        if(item) {
-            item.qtd += delta;
-            if(item.qtd <= 0) removerItem(id);
-        }
-        renderizar();
-    }
-
-    function removerItem(id) {
-        carrinho = carrinho.filter(i => i.id !== id);
-        renderizar();
-    }
-
-    function renderizar() {
-        const lista = document.getElementById('listaItens');
-        const totalTxt = document.getElementById('totalVenda');
-        lista.innerHTML = '';
-        let total = 0;
-
-        carrinho.forEach(item => {
-            total += (item.preco * item.qtd);
-            lista.innerHTML += `
-                <div class="item-row">
-                    <div>
-                        <strong>${item.qtd}x ${item.nome}</strong><br>
-                        <small>R$ ${item.preco.toFixed(2)} un.</small>
-                    </div>
-                    <div>
-                        <button class="btn-ctrl btn-minus" onclick="alterarQtd('${item.id}', -1)">-</button>
-                        <button class="btn-ctrl btn-plus" onclick="alterarQtd('${item.id}', 1)">+</button>
-                        <button class="btn-ctrl btn-del" onclick="removerItem('${item.id}')">X</button>
-                    </div>
-                </div>
-            `;
-        });
-        totalTxt.innerText = total.toFixed(2);
-    }
-
-    function enviarWhatsapp() {
-        let texto = "*BOTECO 934 - RECIBO*\n----------------------------\n";
-        carrinho.forEach(i => {
-            texto += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`;
-        });
-        texto += `----------------------------\n*TOTAL: R$ ${document.getElementById('totalVenda').innerText}*`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
-    }
-</script>
-</body>
-</html>
+            if (itemExistente) {
+                itemExistente.qtd++;
+                atualizarTela();
+            } else {
+                // 2. BUSCA NA INTERNET (Se for item novo)
+                try {
+                    const resp = await fetch(`
