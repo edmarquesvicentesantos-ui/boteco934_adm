@@ -1,61 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ELITE | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; }
+        .container { max-width: 600px; margin: auto; }
+        
+        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; }
+        
+        /* SELEÇÃO DE MESA */
+        .mesa-area { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 10px; border: 1px solid var(--gold); }
+        select { background: #000; color: var(--gold); border: none; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
+
+        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        input { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; }
+
+        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 150px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        
+        .total-box { background: var(--glass); border-radius: 15px; padding: 20px; text-align: right; border: 1px solid var(--green); margin-bottom: 15px; }
+        .total-valor { color: var(--green); font-size: 40px; font-weight: bold; }
+
+        /* FORMAS DE PAGAMENTO */
+        .pagamento-titulo { font-size: 12px; color: var(--gold); margin-bottom: 10px; text-align: center; }
+        .pagamento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 5px; border-radius: 8px; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .btn-pg.active { background: var(--green); color: black; border-color: white; font-weight: bold; }
+        .btn-pendura { background: #e74c3c !important; }
+
+        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">BOTECO 934 | MIX INTELIGENTE</div>
+
+    <div class="mesa-area">
+        <i class="fas fa-chair"></i> SELECIONE A MESA: 
+        <select id="mesaSel">
+            <option value="BALCÃO">BALCÃO</option>
+            <option value="MESA 01">MESA 01</option>
+            <option value="MESA 02">MESA 02</option>
+            <option value="MESA 03">MESA 03</option>
+            <option value="MESA 04">MESA 04</option>
+            <option value="MESA 05">MESA 05</option>
+        </select>
+    </div>
+
+    <div class="search-area">
+        <input type="text" id="barcode" placeholder="BIPE O PRODUTO..." autofocus>
+    </div>
+
+    <div class="item-list" id="listaItens"></div>
+
+    <div class="total-box">
+        <div style="font-size:12px; color:#94a3b8">TOTAL A PAGAR</div>
+        <div class="total-valor" id="displayTotal">R$ 0,00</div>
+    </div>
+
+    <div class="pagamento-titulo">FORMA DE PAGAMENTO:</div>
+    <div class="pagamento-grid">
+        <button class="btn-pg" onclick="setPagamento('DINHEIRO', this)">DINHEIRO</button>
+        <button class="btn-pg" onclick="setPagamento('PIX', this)">PIX</button>
+        <button class="btn-pg" onclick="setPagamento('DÉBITO', this)">DÉBITO</button>
+        <button class="btn-pg" onclick="setPagamento('CRÉDITO', this)">CRÉDITO</button>
+        <button class="btn-pg btn-pendura" onclick="setPagamento('PENDURA', this)">PENDURA</button>
+    </div>
+
+    <button class="btn-zap" onclick="finalizarVenda()">
+        <i class="fab fa-whatsapp"></i> FINALIZAR E ENVIAR RECIBO
+    </button>
+</div>
+
 <script>
-    // [!] SEU ESTOQUE (Nome, Preço de Venda, Preço de Custo)
     const estoqueBoteco = {
-        "7891991010856": { nome: "SPATEN LATA 350ML", preco: 5.00, custo: 3.84 },
-        "7896045506934": { nome: "AMSTEL LATA 350ML", preco: 5.00, custo: 3.50 },
-        "001": { nome: "DOSE CANA ELITE", preco: 4.00, custo: 1.50 }
+        "7891991010856": { nome: "SPATEN LATA 350ML", preco: 5.00 },
+        "7896045506934": { nome: "AMSTEL LATA 350ML", preco: 5.00 },
+        "001": { nome: "DOSE CANA ELITE", preco: 4.00 }
     };
 
-    let totalVenda = 0;
-    let lucroAcumulado = 0;
+    let total = 0;
+    let formaPg = "NÃO DEFINIDO";
+    let itensVendidos = [];
 
-    const input = document.getElementById('barcode');
-    const lista = document.getElementById('listaItens');
-    const displayTotal = document.getElementById('displayTotal');
+    function setPagamento(tipo, btn) {
+        formaPg = tipo;
+        document.querySelectorAll('.btn-pg').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
 
-    input.addEventListener('keypress', function(e) {
+    document.getElementById('barcode').addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && this.value !== '') {
-            processarBipe(this.value);
+            const produto = estoqueBoteco[this.value];
+            if (produto) {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `<span>${produto.nome}</span> <b>R$ ${produto.preco.toFixed(2)}</b>`;
+                document.getElementById('listaItens').appendChild(div);
+                total += produto.preco;
+                itensVendidos.push(produto.nome);
+                document.getElementById('displayTotal').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            } else { alert("NÃO CADASTRADO!"); }
             this.value = '';
         }
     });
 
-    function processarBipe(codigo) {
-        const produto = estoqueBoteco[codigo];
-        if (produto) {
-            if (totalVenda === 0) lista.innerHTML = ''; 
-
-            const lucroUnitario = produto.preco - produto.custo;
-            
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `
-                <span>${produto.nome}</span> 
-                <small style="color:#ffd700; font-size:10px; margin-left:10px;">(Lucro: R$ ${lucroUnitario.toFixed(2)})</small>
-                <b>R$ ${produto.preco.toFixed(2)}</b>
-            `;
-            lista.appendChild(div);
-
-            totalVenda += produto.preco;
-            lucroAcumulado += lucroUnitario;
-            
-            displayTotal.innerText = `R$ ${totalVenda.toFixed(2).replace('.', ',')}`;
-            
-            // Console log para você ver o lucro sem o cliente ver
-            console.log("Lucro acumulado nesta venda: R$ " + lucroAcumulado.toFixed(2));
-        } else {
-            alert("PRODUTO NÃO CADASTRADO: " + codigo);
-        }
-    }
-
     function finalizarVenda() {
-        if (totalVenda === 0) return alert("BIPE ALGO PRIMEIRO!");
-        const tel = "5581999999999"; 
-        const msg = encodeURIComponent(`*BOTECO 934 - RECIBO*\n--------------------\nTotal: R$ ${totalVenda.toFixed(2)}\nObrigado! 🍻`);
-        window.open(`https://wa.me/${tel}?text=${msg}`);
-        
-        // Reseta tudo para a próxima venda
-        totalVenda = 0;
-        lucroAcumulado = 0;
+        if (total === 0) return alert("MESA VAZIA!");
+        const mesa = document.getElementById('mesaSel').value;
+        const msg = encodeURIComponent(`*BOTECO 934 - RECIBO*\n*ATENDIMENTO:* ${mesa}\n*ITENS:* ${itensVendidos.join(", ")}\n*TOTAL:* R$ ${total.toFixed(2)}\n*PAGAMENTO:* ${formaPg}\n\nObrigado! 🍻`);
+        window.open(`https://wa.me/5581999999999?text=${msg}`);
+        location.reload(); // Reseta para a próxima mesa
     }
 </script>
+</body>
+</html>
