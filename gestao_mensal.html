@@ -1,0 +1,39 @@
+<select id="destinoMov">
+    <option value="ENTRADA">DINHEIRO QUE ENTROU (VENDA)</option>
+    <option value="COMPRA BAR (CARTÃO PESSOAL)">COMPRA BAR (NO MEU CARTÃO)</option>
+    <option value="CONTA PESSOAL">MINHA CONTA PESSOAL (SALÁRIO)</option>
+    <option value="FORNECEDOR">PAGAR FORNECEDOR (DINHEIRO CAIXA)</option>
+</select>
+
+<script>
+    function atualizarGeral() {
+        const dados = JSON.parse(localStorage.getItem('mensal934')) || [];
+        const salarioMeta = parseFloat(document.getElementById('salarioMeta').value) || 0;
+        
+        let totalVendas = 0;
+        let oQueOBarDeveProEdmarques = 0; // Compras do bar no seu cartão
+        let oQueOEdmarquesJaTirou = 0;   // Contas pessoais pagas pelo bar
+
+        dados.forEach(item => {
+            if(item.destino === 'ENTRADA') {
+                totalVendas += item.valor;
+            } else if(item.destino === 'COMPRA BAR (CARTÃO PESSOAL)') {
+                oQueOBarDeveProEdmarques += item.valor;
+            } else if(item.destino === 'CONTA PESSOAL') {
+                oQueOEdmarquesJaTirou += item.valor;
+            }
+        });
+
+        // CÁLCULO MESTRE
+        // O Saldo Real é: Vendas - (O que o bar gastou)
+        const saldoBar = totalVendas - oQueOBarDeveProEdmarques;
+        // O que resta do seu salário para você gastar:
+        const restoSalario = salarioMeta - oQueOEdmarquesJaTirou;
+
+        document.getElementById('totalEntradas').innerText = "Vendas: R$ " + totalVendas.toFixed(2);
+        document.getElementById('saldoDisponivel').innerText = "Saldo Bar: R$ " + saldoBar.toFixed(2);
+        
+        // Vamos criar um novo campo visual para o seu salário
+        alert("Edmarques, você ainda pode retirar R$ " + restoSalario.toFixed(2) + " este mês.");
+    }
+</script>
