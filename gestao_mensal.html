@@ -3,151 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARTÕES | BOTECO 934</title>
+    <title>GESTÃO MENSAL | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --blue: #3498db; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 10px; margin: 0; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --red: #ff4757; --green: #2ed573; --blue: #3498db; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; margin: 0; }
         .container { max-width: 600px; margin: auto; }
-        .header { text-align: center; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
         
-        /* Formulário */
-        .card-form { background: var(--glass); border: 1px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 20px; }
-        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { display: block; font-size: 10px; color: #888; margin-bottom: 4px; }
-        input, select { width: 100%; background: #000; border: 1px solid rgba(255,215,0,0.3); padding: 10px; color: white; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        .btn-add { background: var(--gold); color: black; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 20px; font-weight: bold; }
 
-        /* Tabela Digital */
-        .tabela-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; background: var(--glass); border-radius: 10px; font-size: 12px; }
-        th { background: rgba(255,215,0,0.1); color: var(--gold); padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .status-pago { color: #2ecc71; font-weight: bold; }
-        .status-aberto { color: #e74c3c; font-weight: bold; }
-        .btn-acao { border: none; padding: 5px; border-radius: 4px; cursor: pointer; }
+        .config-salario { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .config-salario small { font-size: 10px; color: #888; }
+        .config-salario input { background: transparent; border: none; color: var(--gold); font-size: 24px; font-weight: bold; width: 140px; text-align: center; outline: none; }
 
-        .btn-voltar { display: block; text-align: center; margin-top: 25px; color: #555; text-decoration: none; font-size: 12px; }
+        .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .card-res { background: var(--glass); border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .card-res span { display: block; font-size: 10px; color: #888; text-transform: uppercase; }
+        .card-res b { font-size: 16px; display: block; margin-top: 5px; }
+
+        .form-mov { background: var(--glass); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); margin-bottom: 20px; }
+        select, input { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px; }
+        .btn-lancar { background: var(--green); border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; }
+
+        .historico { margin-top: 20px; }
+        .item-lista { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; border-left: 4px solid #555; }
+        .tipo-entrada { border-left-color: var(--green); }
+        .tipo-bar-pessoal { border-left-color: var(--blue); }
+        .tipo-pessoal { border-left-color: var(--red); }
+
+        .btn-voltar { display: block; text-align: center; margin-top: 30px; color: #555; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header"><i class="fas fa-credit-card"></i> CONTAS DE CARTÃO</div>
+    <div class="header">📊 PAINEL FINANCEIRO 934</div>
 
-    <div class="card-form">
-        <div class="grid-form">
-            <div>
-                <label>BANCO</label>
-                <select id="banco">
-                    <option value="NUBANK">NUBANK</option>
-                    <option value="INTER">INTER</option>
-                    <option value="BRADESCO">BRADESCO</option>
-                    <option value="SANTANDER">SANTANDER</option>
-                    <option value="OUTRO">OUTRO</option>
-                </select>
-            </div>
-            <div>
-                <label>VALOR (R$)</label>
-                <input type="number" id="valor" placeholder="0.00">
-            </div>
-            <div>
-                <label>VENCIMENTO</label>
-                <input type="date" id="dataVenc">
-            </div>
-            <div>
-                <label>MELHOR DIA COMPRA</label>
-                <input type="number" id="melhorDia" placeholder="Ex: 05">
-            </div>
+    <div class="config-salario">
+        <small>MEU SALÁRIO ALVO (MÊS)</small><br>
+        R$ <input type="number" id="salarioMeta" value="2000" oninput="atualizarPainel()">
+    </div>
+
+    <div class="resumo-grid">
+        <div class="card-res">
+            <span>SALDO REAL DO BAR</span>
+            <b id="saldoBar" style="color: var(--green);">R$ 0,00</b>
         </div>
-        <button class="btn-add" onclick="salvarConta()">LANÇAR CONTA</button>
+        <div class="card-res">
+            <span>RESTO DO MEU SALÁRIO</span>
+            <b id="saldoPessoal" style="color: var(--gold);">R$ 0,00</b>
+        </div>
     </div>
 
-    <div class="tabela-container">
-        <table id="tabelaCartoes">
-            <thead>
-                <tr>
-                    <th>Banco</th>
-                    <th>Valor</th>
-                    <th>Venc.</th>
-                    <th>Melhor Dia</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-        </table>
+    <div class="form-mov">
+        <label style="font-size: 10px; color: #888;">VALOR DA MOVIMENTAÇÃO</label>
+        <input type="number" id="valorMov" placeholder="R$ 0,00">
+        
+        <label style="font-size: 10px; color: #888;">DESTINO / CATEGORIA</label>
+        <select id="destinoMov">
+            <option value="ENTRADA">💰 DINHEIRO QUE ENTROU (VENDA)</option>
+            <option value="BAR_NO_PESSOAL">🛒 COMPRA BAR (NO MEU CARTÃO)</option>
+            <option value="PESSOAL">🏠 MINHA CONTA PESSOAL (SALÁRIO)</option>
+            <option value="FORNECEDOR">📦 PAGAR FORNECEDOR (DINHEIRO CAIXA)</option>
+        </select>
+        <button class="btn-lancar" onclick="lancarMovimentacao()">REGISTRAR NO FLUXO</button>
     </div>
 
-    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
+    <div class="historico" id="listaMov"></div>
+
+    <a href="index.html" class="btn-voltar">VOLTAR AO MENU PRINCIPAL</a>
 </div>
 
 <script>
-    function salvarConta() {
-        const banco = document.getElementById('banco').value;
-        const valor = parseFloat(document.getElementById('valor').value);
-        const dataVenc = document.getElementById('dataVenc').value;
-        const melhorDia = document.getElementById('melhorDia').value;
-
-        if (!valor || !dataVenc) return alert("Preencha Valor e Vencimento!");
-
-        const novaConta = { banco, valor, dataVenc, melhorDia, pago: false };
-        let contas = JSON.parse(localStorage.getItem('contas934')) || [];
-        contas.push(novaConta);
-        localStorage.setItem('contas934', JSON.stringify(contas));
+    function lancarMovimentacao() {
+        const valor = parseFloat(document.getElementById('valorMov').value);
+        const destino = document.getElementById('destinoMov').value;
         
-        limparCampos();
-        carregarTabela();
+        if (!valor || valor <= 0) {
+            alert("Digite um valor válido!");
+            return;
+        }
+
+        const novaMov = {
+            valor,
+            destino,
+            data: new Date().toLocaleDateString('pt-BR')
+        };
+
+        let historico = JSON.parse(localStorage.getItem('fluxo934')) || [];
+        historico.push(novaMov);
+        localStorage.setItem('fluxo934', JSON.stringify(historico));
+
+        document.getElementById('valorMov').value = '';
+        atualizarPainel();
     }
 
-    function carregarTabela() {
-        const contas = JSON.parse(localStorage.getItem('contas934')) || [];
-        const corpo = document.getElementById('corpoTabela');
-        corpo.innerHTML = '';
+    function atualizarPainel() {
+        const dados = JSON.parse(localStorage.getItem('fluxo934')) || [];
+        const salarioMeta = parseFloat(document.getElementById('salarioMeta').value) || 0;
+        
+        let totalVendas = 0;
+        let gastosBarNoCartaoEd = 0; // O Bar deve ao Edmarques
+        let retiradasPessoais = 0;   // O Edmarques tirou do Bar
+        let pagamentosFornecedor = 0;
 
-        contas.sort((a, b) => new Date(a.dataVenc) - new Date(b.dataVenc));
+        const lista = document.getElementById('listaMov');
+        lista.innerHTML = '';
 
-        contas.forEach((c, i) => {
-            const dataFormatada = new Date(c.dataVenc).toLocaleDateString('pt-BR', {timeZone: 'UTC'});
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${c.banco}</td>
-                <td>R$ ${c.valor.toFixed(2)}</td>
-                <td>${dataFormatada}</td>
-                <td>Dia ${c.melhorDia}</td>
-                <td>
-                    <span class="${c.pago ? 'status-pago' : 'status-aberto'}" onclick="alternarStatus(${i})" style="cursor:pointer">
-                        ${c.pago ? 'PAGO' : 'ABERTO'}
-                    </span>
-                    <button class="btn-acao" onclick="excluir(${i})" style="background:none; color:#555"><i class="fas fa-trash"></i></button>
-                </td>
+        dados.forEach((item, index) => {
+            let classe = '';
+            if (item.destino === 'ENTRADA') {
+                totalVendas += item.valor;
+                classe = 'tipo-entrada';
+            } else if (item.destino === 'BAR_NO_PESSOAL') {
+                gastosBarNoCartaoEd += item.valor;
+                classe = 'tipo-bar-pessoal';
+            } else if (item.destino === 'PESSOAL') {
+                retiradasPessoais += item.valor;
+                classe = 'tipo-pessoal';
+            } else {
+                pagamentosFornecedor += item.valor;
+            }
+
+            // Criar item na lista visual
+            const div = document.createElement('div');
+            div.className = `item-lista ${classe}`;
+            div.innerHTML = `
+                <div>
+                    <small>${item.data}</small><br>
+                    <b>${item.destino.replace('_', ' ')}</b>
+                </div>
+                <div style="text-align:right">
+                    <b>R$ ${item.valor.toFixed(2)}</b><br>
+                    <i class="fas fa-trash" onclick="remover(${index})" style="color:#444; cursor:pointer; font-size:10px;"></i>
+                </div>
             `;
-            corpo.appendChild(tr);
+            lista.prepend(div);
         });
+
+        // CÁLCULOS FINAIS
+        // Saldo do Bar = Vendas - Fornecedores - Reembolso do que o Edmarques comprou no cartão
+        const saldoFinalBar = totalVendas - pagamentosFornecedor - gastosBarNoCartaoEd;
+        
+        // Saldo do Salário = Meta Salário - Retiradas Pessoais
+        const saldoFinalPessoal = salarioMeta - retiradasPessoais;
+
+        document.getElementById('saldoBar').innerText = "R$ " + saldoFinalBar.toFixed(2).replace('.', ',');
+        document.getElementById('saldoPessoal').innerText = "R$ " + saldoFinalPessoal.toFixed(2).replace('.', ',');
     }
 
-    function alternarStatus(i) {
-        let contas = JSON.parse(localStorage.getItem('contas934'));
-        contas[i].pago = !contas[i].pago;
-        localStorage.setItem('contas934', JSON.stringify(contas));
-        carregarTabela();
-    }
-
-    function excluir(i) {
-        if(confirm("Excluir este lançamento?")) {
-            let contas = JSON.parse(localStorage.getItem('contas934'));
-            contas.splice(i, 1);
-            localStorage.setItem('contas934', JSON.stringify(contas));
-            carregarTabela();
+    function remover(index) {
+        if(confirm("Remover este lançamento?")) {
+            let historico = JSON.parse(localStorage.getItem('fluxo934'));
+            historico.splice(index, 1);
+            localStorage.setItem('fluxo934', JSON.stringify(historico));
+            atualizarPainel();
         }
     }
 
-    function limparCampos() {
-        document.getElementById('valor').value = '';
-        document.getElementById('dataVenc').value = '';
-        document.getElementById('melhorDia').value = '';
-    }
-
-    window.onload = carregarTabela;
+    window.onload = atualizarPainel;
 </script>
+
 </body>
 </html>
