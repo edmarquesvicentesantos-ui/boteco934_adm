@@ -1,5 +1,140 @@
 <!DOCTYPE html>
+<html lang="pt-br"><!DOCTYPE html>
 <html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOTECO 934 - OFICIAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --green: #27ae60; --red: #ff4b2b; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        .header { background: #000; color: var(--gold); text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .input-bipe { width: 100%; padding: 20px; border-radius: 12px; border: 2px solid #ccc; font-size: 20px; text-align: center; background: #fffbe6; outline: none; margin-bottom: 15px; box-sizing: border-box; }
+        .container { display: grid; grid-template-columns: 1fr 350px; gap: 15px; }
+        @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
+        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-height: 400px; }
+        .item-venda { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; gap: 12px; }
+        .foto-prod { width: 55px; height: 55px; border-radius: 8px; object-fit: contain; background: #f9f9f9; border: 1px solid #ddd; }
+        .detalhes { flex: 1; }
+        .nome-prod { font-weight: bold; font-size: 14px; text-transform: uppercase; color: #333; }
+        .preco-qtd { font-size: 13px; color: #666; }
+        .btn-excluir { background: var(--red); color: #fff; border: none; width: 35px; height: 35px; border-radius: 6px; cursor: pointer; }
+        .resumo-caixa { background: #fff; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #ddd; height: fit-content; }
+        .valor-total { font-size: 35px; font-weight: 900; color: var(--green); margin: 15px 0; }
+        .btn-whats { background: #25d366; color: #fff; width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header"><h1>BOTECO 934</h1></div>
+
+    <input type="text" class="input-bipe" id="campoBipe" placeholder="BIPE O CÓDIGO AQUI..." onkeypress="if(event.key === 'Enter') tratarBipe(this.value)" autofocus>
+
+    <div class="container">
+        <div class="card" id="listaVenda">
+            <p style="text-align:center; color:#999; padding-top:100px;">Bipe um produto para começar!</p>
+        </div>
+
+        <div class="resumo-caixa">
+            <h3>TOTAL DA MESA</h3>
+            <div class="valor-total">R$ <span id="totalDisplay">0,00</span></div>
+            <button class="btn-whats" onclick="enviarCupom()">
+                <i class="fa-brands fa-whatsapp"></i> RECIBO WHATSAPP
+            </button>
+        </div>
+    </div>
+
+<script>
+    // Carrega o estoque que você salvou no navegador
+    let produtosSalvos = JSON.parse(localStorage.getItem('estoque_boteco')) || [];
+    let carrinhoMesa = [];
+
+    function tratarBipe(codigo) {
+        if (!codigo) return;
+        const codLimpo = codigo.trim();
+        document.getElementById('campoBipe').value = '';
+
+        // 1. TRAVA DE REPETIÇÃO: Se o produto já está na mesa, apenas soma +1
+        let existeNoCarrinho = carrinhoMesa.find(item => item.id === codLimpo);
+        if (existeNoCarrinho) {
+            existeNoCarrinho.qtd++;
+            atualizarTela();
+            return;
+        }
+
+        // 2. BUSCA NO SEU ESTOQUE LOCAL
+        let noEstoque = produtosSalvos.find(p => p.id === codLimpo);
+        if (noEstoque) {
+            carrinhoMesa.push({ ...noEstoque, qtd: 1 });
+            atualizarTela();
+        } else {
+            // 3. SE FOR NOVO, BUSCA NA WEB E SALVA
+            buscarExterno(codLimpo);
+        }
+    }
+
+    async function buscarExterno(cod) {
+        try {
+            const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${cod}.json`);
+            const data = await res.json();
+            let nome = (data.status === 1 && data.product.product_name) ? data.product.product_name : "NOVO ITEM";
+            let preco = prompt(`PRODUTO NÃO CADASTRADO: ${nome}\nDigite o preço:`, "6.00");
+            
+            if (preco) {
+                let p = { id: cod, nome: nome, preco: parseFloat(preco.replace(',','.')), foto: "" };
+                produtosSalvos.push(p);
+                localStorage.setItem('estoque_boteco', JSON.stringify(produtosSalvos));
+                carrinhoMesa.push({ ...p, qtd: 1 });
+                atualizarTela();
+            }
+        } catch (e) { alert("Erro ao buscar."); }
+    }
+
+    function remover(id) {
+        carrinhoMesa = carrinhoMesa.filter(i => i.id !== id);
+        atualizarTela();
+    }
+
+    function atualizarTela() {
+        const lista = document.getElementById('listaVenda');
+        const display = document.getElementById('totalDisplay');
+        lista.innerHTML = '';
+        let soma = 0;
+
+        if (carrinhoMesa.length === 0) {
+            lista.innerHTML = '<p style="text-align:center; color:#999; padding-top:100px;">Bipe um produto!</p>';
+            display.innerText = "0,00";
+            return;
+        }
+
+        carrinhoMesa.forEach(item => {
+            let totalItem = item.preco * item.qtd;
+            soma += totalItem;
+            lista.innerHTML += `
+                <div class="item-venda">
+                    <img src="${item.foto}" class="foto-prod" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3121/3121784.png'">
+                    <div class="detalhes">
+                        <div class="nome-prod">${item.nome}</div>
+                        <div class="preco-qtd">${item.qtd}x R$ ${item.preco.toFixed(2)} = R$ ${totalItem.toFixed(2)}</div>
+                    </div>
+                    <button class="btn-excluir" onclick="remover('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+        });
+        display.innerText = soma.toFixed(2).replace('.', ',');
+    }
+
+    function enviarCupom() {
+        if (carrinhoMesa.length === 0) return;
+        let texto = "*BOTECO 934 - RECIBO*\n--------------------\n";
+        carrinhoMesa.forEach(i => texto += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}\n`);
+        texto += "--------------------\n*TOTAL: R$ " + document.getElementById('totalDisplay').innerText + "*";
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
+    }
+</script>
+</body>
+</html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
