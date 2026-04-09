@@ -1,62 +1,3 @@
-<script>
-    // =========================================================
-    // 🟢 ZONA 1: SEU ESTOQUE (PRODUTOS)
-    // Para adicionar mais, copie uma linha e troque o código e o preço.
-    // =========================================================
-    const estoqueBoteco = {
-        "7891991010856": { nome: "SPATEN LATA 350ML", preco: 5.00 },
-        "7896045506934": { nome: "AMSTEL LATA 350ML", preco: 5.00 },
-        "001": { nome: "DOSE CANA ELITE", preco: 4.00 },
-        "002": { nome: "DOSE PITÚ", preco: 3.50 }, 
-        // [COLE NOVAS LINHAS DE PRODUTOS AQUI]
-    };
-
-    // =========================================================
-    // 🟡 ZONA 2: SUAS MESAS
-    // Vá no HTML lá em cima e procure a tag <select id="mesaSel">.
-    // Para aumentar as mesas, basta copiar a linha <option>.
-    // =========================================================
-    /* Exemplo do que fazer no HTML:
-       <option value="MESA 05">MESA 05</option>
-       <option value="MESA 06">MESA 06</option> 
-    */
-
-    // =========================================================
-    // 🔴 ZONA 3: SEU WHATSAPP
-    // Coloque seu número real aqui (55 + DDD + Número)
-    // =========================================================
-    const meuZap = "5587992438359"; 
-
-
-    // --- ABAIXO É O "MOTOR" DO SISTEMA (NÃO PRECISA MEXER) ---
-    let totalVenda = 0;
-    let formaPg = "DINHEIRO"; 
-    let itensNomes = [];
-
-    function setPagamento(tipo, btn) {
-        formaPg = tipo;
-        document.querySelectorAll('.btn-pg').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    <button class="btn-zap" onclick="finalizarVenda()">
-        <i class="fab fa-whatsapp"></i> FECHAR CONTA DO CLIENTE
-    </button>
-
-    <button class="btn-fechamento" onclick="gerarRelatorioDiario()" style="background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-        <i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DO DIA (RELATÓRIO)
-    </button>
-
-    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
-</div> ```
-
----
-
-### 🚀 Código Completo Atualizado (Para você não ter erro)
-
-Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de fechamento, o sistema de pendura e a lógica do relatório tudo no lugar certo. É só copiar tudo e substituir no seu arquivo `calculadora.html`:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -70,7 +11,7 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
         .container { width: 100%; max-width: 500px; }
         .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
         .cliente-area { background: var(--glass); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 90%; }
+        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 95%; }
         .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
         #barcode { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
         .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 100px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
@@ -81,8 +22,9 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
         .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; }
         .btn-pg.active { background: var(--green); color: black; font-weight: bold; }
         .btn-pendura { background: #c0392b !important; }
-        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-voltar { display: block; text-align: center; margin-top: 15px; color: #555; text-decoration: none; font-size: 12px; }
+        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .btn-fechamento { background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-voltar { display: block; text-align: center; margin-top: 20px; color: #555; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -129,14 +71,15 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
         <i class="fab fa-whatsapp"></i> FECHAR CONTA DO CLIENTE
     </button>
 
-    <button onclick="gerarRelatorioDiario()" style="background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-        <i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DO DIA (RELATÓRIO)
+    <button class="btn-fechamento" onclick="gerarRelatorioDiario()">
+        <i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DO DIA
     </button>
 
     <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AO MENU</a>
 </div>
 
 <script>
+    // ESTOQUE BASE
     const estoqueBoteco = {
         "7891991010856": { nome: "SPATEN LATA 350ML", preco: 5.00 },
         "7896045506934": { nome: "AMSTEL LATA 350ML", preco: 5.00 },
@@ -153,6 +96,7 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
         btn.classList.add('active');
     }
 
+    // LISTENER DO CÓDIGO DE BARRAS
     document.getElementById('barcode').addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && this.value !== '') {
             const produto = estoqueBoteco[this.value];
@@ -164,7 +108,9 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
                 totalVenda += produto.preco;
                 itensNomes.push(produto.nome);
                 document.getElementById('displayTotal').innerText = `R$ ${totalVenda.toFixed(2).replace('.', ',')}`;
-            } else { alert("NÃO CADASTRADO!"); }
+            } else { 
+                alert("NÃO CADASTRADO!"); 
+            }
             this.value = '';
         }
     });
@@ -174,13 +120,13 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
         const mesa = document.getElementById('mesaSel').value;
         if (totalVenda === 0) return alert("SEM ITENS!");
 
-        // 1. REGISTRA PARA O RELATÓRIO DO DIA
+        // REGISTRA NO HISTÓRICO PARA O RELATÓRIO
         let historico = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-        const chave = formaPg === 'DÉBITO' ? 'DEBITO' : (formaPg === 'CRÉDITO' ? 'CREDITO' : formaPg);
-        historico[chave] += totalVenda;
+        const chave = (formaPg === 'DÉBITO') ? 'DEBITO' : (formaPg === 'CRÉDITO' ? 'CREDITO' : formaPg);
+        historico[chave] = (historico[chave] || 0) + totalVenda;
         localStorage.setItem('vendasDia934', JSON.stringify(historico));
 
-        // 2. SE FOR PENDURA, SALVA NO CADERNO
+        // SE FOR PENDURA, SALVA NO CADERNO
         if (formaPg === 'PENDURA') {
             let dividas = JSON.parse(localStorage.getItem('penduras934')) || [];
             dividas.push({ cliente, mesa, valor: totalVenda, data: new Date().toLocaleDateString('pt-BR') });
@@ -194,16 +140,17 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
 
     function gerarRelatorioDiario() {
         const dados = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-        const totalGeral = dados.DINHEIRO + dados.PIX + dados.DEBITO + dados.CREDITO + dados.PENDURA;
+        const totalGeral = (dados.DINHEIRO || 0) + (dados.PIX || 0) + (dados.DEBITO || 0) + (dados.CREDITO || 0) + (dados.PENDURA || 0);
         
         const resumo = `*FECHAMENTO DIÁRIO - BOTECO 934*\n` +
-                     `💰 DINHEIRO: R$ ${dados.DINHEIRO.toFixed(2)}\n` +
-                     `📱 PIX: R$ ${dados.PIX.toFixed(2)}\n` +
-                     `💳 CARTÕES: R$ ${(dados.DEBITO + dados.CREDITO).toFixed(2)}\n` +
-                     `📝 PENDURAS: R$ ${dados.PENDURA.toFixed(2)}\n` +
+                     `💰 DINHEIRO: R$ ${(dados.DINHEIRO || 0).toFixed(2)}\n` +
+                     `📱 PIX: R$ ${(dados.PIX || 0).toFixed(2)}\n` +
+                     `💳 CARTÕES: R$ ${((dados.DEBITO || 0) + (dados.CREDITO || 0)).toFixed(2)}\n` +
+                     `📝 PENDURAS: R$ ${(dados.PENDURA || 0).toFixed(2)}\n` +
                      `🚀 *TOTAL GERAL: R$ ${totalGeral.toFixed(2)}*`;
 
         if (confirm("Enviar relatório e ZERAR o dia?")) {
+            // Envia para o contato do Boteco
             window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(resumo)}`);
             localStorage.removeItem('vendasDia934');
             location.reload();
@@ -211,5 +158,4 @@ Para facilitar, aqui está o código da **Calculadora PDV** já com o botão de 
     }
 </script>
 </body>
-</html>}
- </script>
+</html>
