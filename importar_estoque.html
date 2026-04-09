@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPORTAR ESTOQUE | 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 600px; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 20px; font-weight: bold; }
+        .instrucoes { background: var(--glass); padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 20px; border-left: 4px solid var(--gold); }
+        textarea { width: 100%; height: 200px; background: #000; color: #2ecc71; border: 1px solid #333; border-radius: 10px; padding: 15px; font-family: monospace; font-size: 12px; outline: none; box-sizing: border-box; }
+        .btn-importar { background: var(--gold); color: black; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
+        .btn-voltar { display: block; text-align: center; margin-top: 25px; color: #555; text-decoration: none; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">📦 IMPORTAÇÃO EM MASSA</div>
+
+    <div class="instrucoes">
+        <b>COMO USAR:</b><br>
+        Cole os produtos no formato: <br>
+        <code style="color:var(--green)">CÓDIGO;NOME DO PRODUTO;PREÇO</code><br><br>
+        <i>Exemplo:</i><br>
+        789123456;SPATEN LATA;5.00<br>
+        789987654;AMSTEL LATA;5.00
+    </div>
+
+    <textarea id="listaProdutos" placeholder="Cole sua lista aqui..."></textarea>
+
+    <button class="btn-importar" onclick="processarImportacao()">
+        <i class="fas fa-file-import"></i> CADASTRAR TUDO AGORA
+    </button>
+
+    <a href="index.html" class="btn-voltar">VOLTAR AO MENU</a>
+</div>
+
+<script>
+    function processarImportacao() {
+        const texto = document.getElementById('listaProdutos').value.trim();
+        if (!texto) return alert("Cole algum dado primeiro!");
+
+        // Pega o que já tem no estoque do Boteco (ou cria um novo se estiver vazio)
+        let estoqueAtual = JSON.parse(localStorage.getItem('estoqueBoteco934')) || {};
+        
+        const linhas = texto.split('\n');
+        let contagem = 0;
+
+        linhas.forEach(linha => {
+            const partes = linha.split(';'); // Divide por ponto e vírgula
+            if (partes.length === 3) {
+                const codigo = partes[0].trim();
+                const nome = partes[1].trim();
+                const preco = parseFloat(partes[2].trim());
+
+                if (codigo && nome && !isNaN(preco)) {
+                    estoqueAtual[codigo] = { nome: nome, preco: preco };
+                    contagem++;
+                }
+            }
+        });
+
+        localStorage.setItem('estoqueBoteco934', JSON.stringify(estoqueAtual));
+        
+        alert(`SUCESSO! ${contagem} produtos foram adicionados ao estoque.`);
+        document.getElementById('listaProdutos').value = '';
+    }
+</script>
+
+</body>
+</html>
