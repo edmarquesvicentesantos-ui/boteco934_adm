@@ -63,3 +63,11 @@ function gerarResumoFinanceiro(vendasDoDia) {
     console.log(`💳 Total em Cartão: R$ ${financeiro.cartao.toFixed(2)}`);
     console.log(`📝 Total em Pendura: R$ ${financeiro.pendura.toFixed(2)}`);
 }
+
+function verificarSubidaPreco(custoNovo, custoAntigo) {
+    if (custoNovo > custoAntigo) {
+        let aumento = ((custoNovo - custoAntigo) / custoAntigo) * 100;
+        alert(`🚨 ALERTA DE SUBIDA: Este produto está ${aumento.toFixed(1)}% mais caro que na última compra!`);
+        // Aqui o sistema sugere o novo preço mantendo a margem
+    }
+}
