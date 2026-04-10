@@ -66,4 +66,16 @@
             <input type="text" id="calc-nome" placeholder="Nome do Destilado" class="w-full p-3 border rounded-lg mb-3 text-sm">
             <input type="number" id="calc-custo" placeholder="Custo da Garrafa (R$)" class="w-full p-3 border rounded-lg mb-4 text-sm">
             <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-gray-100 p-2 rounded text-center"><p class="
+                <div class="bg-gray-100 p-2 rounded text-center"><p class="text-[8px] font-bold uppercase">Dose</p><p id="sugestao-dose" class="text-green-600 font-black text-xs">R$ 0,00</p></div>
+                <div class="bg-gray-100 p-2 rounded text-center"><p class="text-[8px] font-bold uppercase">Garrafa</p><p id="sugestao-litro" class="text-green-600 font-black text-xs">R$ 0,00</p></div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="fecharPainelGerente()" class="flex-1 py-3 font-bold text-gray-400 uppercase text-[10px]">Sair</button>
+                <button onclick="salvarPrecos()" class="flex-1 py-3 bg-blue-900 text-white rounded-xl font-bold uppercase text-[10px]">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
