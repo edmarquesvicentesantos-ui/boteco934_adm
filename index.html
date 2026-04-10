@@ -1,84 +1,86 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PDV | BOTECO 934</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <style>
-        body { touch-action: manipulation; } /* Melhora o toque no Android/iOS */
-        .fonte-13 { font-size: 13px !important; }
-        .tarja-botao { background-color: #1e3a8a; }
-        .cupom { font-family: 'Courier New', Courier, monospace; background-color: #fffdec; min-height: 300px; }
-        .tracejado { border-top: 2px dashed #000; margin: 5px 0; }
-        /* Esconder barra de rolagem */
-        ::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="bg-gray-200 min-h-screen flex flex-col overflow-hidden text-black">
+// ... (mantenha sua FirebaseConfig aqui)
 
-    <header class="bg-white p-2 shadow-sm flex justify-between items-center border-b-2 border-blue-900">
-        <h1 class="text-lg font-black italic text-blue-900">BOTECO 934</h1>
-        <button onclick="abrirPainelGerente()" class="bg-yellow-500 text-white text-[10px] font-bold px-3 py-2 rounded-lg uppercase">💰 Precificar</button>
-    </header>
+let produtos = [
+    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00 },
+    { id: 102, cat: "Cervejas", nome: "HEINEKEN LN", preco: 11.00 }
+];
 
-    <div class="flex flex-1 overflow-hidden">
-        <aside class="w-[45%] bg-gray-300 flex flex-col border-r border-gray-400">
-            <div id="menu-categorias" class="flex overflow-x-auto bg-white border-b sticky top-0 z-10">
-                <button onclick="filtrar('Tudo')" class="px-4 py-3 text-[10px] font-bold uppercase whitespace-nowrap">Tudo</button>
-                <button onclick="filtrar('Cervejas')" class="px-4 py-3 text-[10px] font-bold uppercase whitespace-nowrap">Cervejas</button>
-                <button onclick="filtrar('Doses')" class="px-4 py-3 text-[10px] font-bold uppercase whitespace-nowrap">Doses</button>
+let carrinho = [];
+
+function filtrar(categoria) {
+    const lista = document.getElementById('lista-produtos');
+    const filtrados = categoria === "Tudo" ? produtos : produtos.filter(p => p.cat === categoria);
+    
+    lista.innerHTML = filtrados.map(p => `
+        <button onclick="adicionarItem(${p.id})" class="w-full flex flex-col bg-white rounded-xl border border-gray-400 overflow-hidden active:bg-blue-100 shadow-sm">
+            <div class="tarja-botao w-full p-2 text-left">
+                <div class="text-white font-bold fonte-13 truncate uppercase">${p.nome}</div>
+                <div class="text-blue-200 font-bold">R$ ${p.preco.toFixed(2)}</div>
             </div>
-            <div id="lista-produtos" class="p-2 space-y-2 overflow-y-auto pb-20">
-                </div>
-        </aside>
+        </button>
+    `).join('');
+}
 
-        <main class="w-[55%] p-2 bg-gray-400 flex flex-col justify-between overflow-hidden">
-            <div class="cupom p-3 shadow-lg rounded-sm flex flex-col flex-1 overflow-hidden text-[10px]">
-                <div class="text-center font-bold uppercase">
-                    <p>BOTECO 934 - PETROLINA</p>
-                    <div class="tracejado"></div>
-                </div>
-                <div id="itens-venda" class="flex-1 overflow-y-auto space-y-1 py-2">
-                    </div>
-                <div class="mt-auto">
-                    <div class="tracejado"></div>
-                    <div class="flex justify-between font-black text-lg">
-                        <span>TOTAL</span>
-                        <span id="valor-total">0.00</span>
-                    </div>
-                </div>
-            </div>
-            <button onclick="finalizarVenda()" class="mt-2 w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-xl uppercase active:bg-green-700">Finalizar</button>
-        </main>
-    </div>
+function adicionarItem(id) {
+    const prod = produtos.find(p => p.id === id);
+    const index = carrinho.findIndex(item => item.id === id);
+    if (index >= 0) {
+        carrinho[index].qtd += 1;
+    } else {
+        carrinho.push({ ...prod, qtd: 1 });
+    }
+    atualizarCarrinho();
+}
 
-    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-5 w-full max-w-sm">
-            <h2 class="font-bold text-blue-900 border-b pb-2 mb-4 uppercase text-center">Calculadora 18 Doses</h2>
-            <input type="text" id="calc-nome" placeholder="Nome do Destilado" class="w-full p-3 border rounded-lg mb-3">
-            <input type="number" id="calc-custo" placeholder="Custo da Garrafa (R$)" class="w-full p-3 border rounded-lg mb-4">
-            
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-gray-100 p-2 rounded text-center">
-                    <p class="text-[9px] font-bold uppercase">Dose Sugerida</p>
-                    <p id="sugestao-dose" class="text-green-600 font-black">R$ 0,00</p>
-                </div>
-                <div class="bg-gray-100 p-2 rounded text-center">
-                    <p class="text-[9px] font-bold uppercase">Litro Sugerido</p>
-                    <p id="sugestao-litro" class="text-green-600 font-black">R$ 0,00</p>
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <button onclick="fecharPainelGerente()" class="flex-1 py-3 font-bold text-gray-400 uppercase text-xs">Sair</button>
-                <button onclick="salvarPrecos()" class="flex-1 py-3 bg-blue-900 text-white rounded-xl font-bold uppercase text-xs">Cadastrar</button>
-            </div>
+function atualizarCarrinho() {
+    const lista = document.getElementById('itens-venda');
+    lista.innerHTML = carrinho.map(item => `
+        <div class="flex justify-between border-b border-gray-100 py-1 uppercase">
+            <span class="w-1/2">${item.nome}</span>
+            <span class="w-1/4 text-right">${item.qtd}x${item.preco.toFixed(2)}</span>
+            <span class="w-1/4 text-right font-bold">${(item.qtd * item.preco).toFixed(2)}</span>
         </div>
-    </div>
+    `).join('');
+    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
+    document.getElementById('valor-total').innerText = total.toFixed(2);
+}
 
-    <script src="app.js"></script>
-</body>
-</html>
+// LÓGICA DA CALCULADORA
+function abrirPainelGerente() { document.getElementById('modal-gerente').classList.remove('hidden'); }
+function fecharPainelGerente() { document.getElementById('modal-gerente').classList.add('hidden'); }
+
+document.getElementById('calc-custo').addEventListener('input', function() {
+    const custo = parseFloat(this.value) || 0;
+    if (custo > 0) {
+        const doseSug = ((custo / 18) + 0.70) * 2.8; 
+        const litroSug = custo * 1.5;
+        document.getElementById('sugestao-dose').innerText = `R$ ${doseSug.toFixed(2)}`;
+        document.getElementById('sugestao-litro').innerText = `R$ ${litroSug.toFixed(2)}`;
+    }
+});
+
+function salvarPrecos() {
+    const nome = document.getElementById('calc-nome').value;
+    const pDose = parseFloat(document.getElementById('sugestao-dose').innerText.replace('R$ ', ''));
+    const pLitro = parseFloat(document.getElementById('sugestao-litro').innerText.replace('R$ ', ''));
+    if (!nome || pDose <= 0) return;
+
+    produtos.push({ id: Date.now(), cat: "Doses", nome: nome + " (DOSE)", preco: pDose });
+    produtos.push({ id: Date.now()+1, cat: "Doses", nome: nome + " (GARRAF)", preco: pLitro });
+    
+    fecharPainelGerente();
+    filtrar('Doses');
+}
+
+async function finalizarVenda() {
+    if (carrinho.length === 0) return;
+    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
+    try {
+        await db.collection("vendas").add({ data: new Date().toLocaleString(), valor: total, local: "Boteco 934" });
+        alert("VENDA SALVA!");
+        carrinho = [];
+        atualizarCarrinho();
+    } catch(e) { alert("Erro: " + e); }
+}
+
+filtrar('Tudo');
