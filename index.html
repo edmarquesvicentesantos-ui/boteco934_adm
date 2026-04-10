@@ -10,49 +10,59 @@
     <style>
         .fonte-13 { font-size: 13px !important; }
         .tarja-botao { background-color: #1e3a8a; }
-        .area-logo { height: 100px; border-bottom: 2px solid #e5e7eb; }
-        .aba-ativa { border-bottom: 4px solid #1e3a8a; color: #1e3a8a; font-weight: bold; }
+        .area-logo { height: 80px; }
+        /* Estilo Cupom */
+        .cupom { font-family: 'Courier New', Courier, monospace; background-color: #fff9e6; }
+        .border-cupom { border-top: 2px dashed #ccc; border-bottom: 2px dashed #ccc; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <header class="bg-white area-logo flex items-center justify-center p-4">
-        <div class="text-center">
-            <h1 class="text-2xl font-black italic text-blue-900">BOTECO 934</h1>
-            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Petrolina - PE</p>
-        </div>
+    <header class="bg-white area-logo flex items-center justify-center border-b shadow-sm">
+        <h1 class="text-xl font-black italic text-blue-900">BOTECO 934</h1>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
         
-        <aside class="w-1/2 md:w-5/12 bg-gray-200 flex flex-col border-r border-gray-300">
-            <div id="menu-categorias" class="flex overflow-x-auto bg-white border-b border-gray-300">
-                <button onclick="filtrar('Tudo')" class="px-4 py-3 text-xs uppercase aba-ativa">Tudo</button>
-                <button onclick="filtrar('Cervejas')" class="px-4 py-3 text-xs uppercase">Cervejas</button>
-                <button onclick="filtrar('Refrigerantes')" class="px-4 py-3 text-xs uppercase">Refri</button>
-                <button onclick="filtrar('Petiscos')" class="px-4 py-3 text-xs uppercase">Petiscos</button>
-                <button onclick="filtrar('Doses')" class="px-4 py-3 text-xs uppercase">Doses</button>
+        <aside class="w-1/2 md:w-5/12 bg-gray-200 flex flex-col border-r">
+            <div id="menu-categorias" class="flex overflow-x-auto bg-white border-b">
+                <button onclick="filtrar('Tudo')" class="px-4 py-3 text-[10px] font-bold uppercase">Tudo</button>
+                <button onclick="filtrar('Cervejas')" class="px-4 py-3 text-[10px] font-bold uppercase">Cervejas</button>
+                <button onclick="filtrar('Petiscos')" class="px-4 py-3 text-[10px] font-bold uppercase">Petiscos</button>
             </div>
-
-            <div id="lista-produtos" class="p-3 grid grid-cols-1 gap-2 overflow-y-auto">
-                </div>
+            <div id="lista-produtos" class="p-2 grid grid-cols-1 gap-2 overflow-y-auto"></div>
         </aside>
 
-        <main class="flex-1 p-4 bg-white flex flex-col justify-between">
-            <div class="overflow-y-auto">
-                <h3 class="font-bold mb-4 text-blue-900 border-b pb-2 uppercase text-[10px]">Pedido</h3>
-                <div id="itens-venda" class="space-y-2"></div>
+        <main class="flex-1 p-2 bg-gray-300 flex flex-col justify-between">
+            <div class="cupom p-4 shadow-inner rounded-sm h-full flex flex-col">
+                <div class="text-center text-[10px] mb-2 uppercase">
+                    <p class="font-bold">** BOTECO 934 **</p>
+                    <p>Petrolina - PE</p>
+                    <p id="data-recibo">00/00/0000 00:00:00</p>
+                    <p class="border-cupom my-1">CUPOM DE VENDA</p>
+                </div>
+
+                <div class="flex justify-between text-[10px] font-bold mb-1 border-b border-gray-300">
+                    <span class="w-1/2">ITEM/DESCRIÇÃO</span>
+                    <span class="w-1/4 text-right">UN</span>
+                    <span class="w-1/4 text-right">TOTAL</span>
+                </div>
+
+                <div id="itens-venda" class="flex-1 overflow-y-auto text-[11px] space-y-1">
+                    </div>
+
+                <div class="mt-2 pt-2 border-cupom uppercase">
+                    <div class="flex justify-between font-bold text-lg">
+                        <span>TOTAL R$:</span>
+                        <span id="valor-total">0,00</span>
+                    </div>
+                    <p class="text-[9px] text-center mt-2 italic">Obrigado pela preferência!</p>
+                </div>
             </div>
 
-            <div class="pt-4 border-t-2 border-gray-100">
-                <div class="flex justify-between items-end mb-4">
-                    <span class="text-gray-400 font-bold text-xs uppercase">Total</span>
-                    <span id="valor-total" class="text-4xl font-black text-gray-900">R$ 0,00</span>
-                </div>
-                <button onclick="finalizarVenda()" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl shadow-lg text-xl uppercase active:scale-95 transition-all">
-                    Finalizar PIX
-                </button>
-            </div>
+            <button onclick="finalizarVenda()" class="mt-2 w-full bg-blue-900 text-white font-black py-4 rounded-xl shadow-lg uppercase active:scale-95">
+                Fechar Venda
+            </button>
         </main>
     </div>
 
