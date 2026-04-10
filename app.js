@@ -77,6 +77,16 @@ function atualizarCarrinho() {
     const total = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
     totalTxt.innerText = total.toFixed(2);
 }
+function calcularPrecoVenda(custoCompra, tipoVenda) {
+    let margem = (tipoVenda === 'dose') ? 2.5 : 1.4; // 150% para dose, 40% para garrafa
+    let precoSugerido = custoCompra * margem;
+    
+    return precoSugerido.toFixed(2);
+}
 
+// Exemplo de uso:
+// Se o litro da Pitu custa 25.00 e rende 18 doses:
+let custoDose = 25 / 18; 
+console.log("Preço sugerido da Dose: R$ " + calcularPrecoVenda(custoDose, 'dose'));
 // ... Restante da função finalizarVenda e filtrar ...
 filtrar('Tudo');
