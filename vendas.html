@@ -3,164 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDV - Boteco 934</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <title>VENDAS AO VIVO | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
-        .header { text-align: center; border-bottom: 2px solid #ff9f0a; padding-bottom: 10px; margin-bottom: 10px; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; --blue: #3498db; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; }
         
-        /* Grid de Mesas Ocupadas */
-        .painel-mesas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .mesa-card { background: #1c1c1e; border: 1px solid #ff9f0a; padding: 10px; border-radius: 12px; text-align: center; }
-        .mesa-nome { font-size: 12px; color: #ff9f0a; font-weight: bold; }
-        .mesa-total { font-size: 18px; font-weight: bold; color: #30d158; display: block; }
+        /* Cabeçalho */
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        .header h2 { color: var(--gold); text-transform: uppercase; margin: 5px 0; }
 
-        /* Lista de Produtos para Clicar */
-        .secao-titulo { font-size: 12px; color: #8e8e93; margin: 15px 0 5px; text-transform: uppercase; }
-        .grid-produtos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
-        .btn-prod { background: #333; color: #fff; border: 1px solid #444; padding: 12px 5px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .btn-prod:active { background: #ff9f0a; color: #000; }
+        /* Cards de Resumo */
+        .resumo-vendas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .card { background: var(--glass); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #333; }
+        .card i { font-size: 20px; margin-bottom: 8px; }
+        .card .valor { font-size: 20px; font-weight: bold; display: block; }
+        .total-dia { border-color: var(--gold); background: rgba(255, 215, 0, 0.05); }
 
-        /* Rodapé de Ações */
-        .footer-pdv { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; padding: 15px; border-top: 2px solid #ff9f0a; box-sizing: border-box; }
-        .btn-acao { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        /* Lista de Vendas */
+        .lista-vendas { background: var(--glass); border-radius: 20px; padding: 10px; border: 1px solid #222; min-height: 300px; }
+        .venda-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; box-sizing: border-box; }
-        .input-dark { width: 100%; padding: 15px; background: #121212; border: 1px solid #444; color: white; border-radius: 8px; margin-bottom: 10px; font-size: 16px; }
+        .info-venda b { color: var(--green); font-size: 16px; }
+        .info-venda span { font-size: 11px; color: #888; display: block; }
+        .metodo { font-size: 10px; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; font-weight: bold; }
+        .pix { background: #008080; color: white; }
+        .cartao { background: #f39c12; color: white; }
+
+        .btn-voltar { display: block; text-align: center; margin-top: 30px; color: var(--gold); text-decoration: none; font-size: 13px; border: 1px solid var(--gold); padding: 12px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div class="header">
-        <h2 style="margin:0; color: #ff9f0a;">COMANDAS 934</h2>
-        <button onclick="location.href='index.html'" style="background:none; border:none; color:#8e8e93; font-size: 12px;">🏠 INÍCIO</button>
+        <i class="fas fa-chart-line fa-2x"></i>
+        <h2>Monitor de Vendas 934</h2>
+        <small id="data-atual"></small>
     </div>
 
-    <div id="lista-mesas" class="painel-mesas">
+    <div class="resumo-vendas">
+        <div class="card total-dia">
+            <i class="fas fa-wallet" style="color:var(--gold)"></i>
+            <span class="valor" id="total-valor">R$ 0,00</span>
+            <small>Total de Hoje</small>
         </div>
+        <div class="card">
+            <i class="fas fa-shopping-cart" style="color:var(--blue)"></i>
+            <span class="valor" id="total-vendas">0</span>
+            <small>Vendas</small>
+        </div>
+    </div>
 
-    <div class="secao-titulo">ADICIONAR À MESA SELECIONADA:</div>
-    <div id="lista-produtos" class="grid-produtos">
-        </div>
+    <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--gold);"><i class="fas fa-history"></i> ÚLTIMOS RECEBIMENTOS</h3>
+    <div class="lista-vendas" id="fluxo-vendas">
+        <p style="text-align:center; color:#555; margin-top:50px;">Aguardando pagamentos...</p>
+    </div>
 
-    <div style="height: 150px;"></div> <div class="footer-pdv">
-        <div id="mesa-foco" style="text-align: center; margin-bottom: 10px; color: #ff9f0a; font-weight: bold; font-size: 14px;">
-            SELECIONE UMA MESA ACIMA
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
-    <button onclick="location.href='index.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #ff9f0a; color: #000;">🍺 PRODUTOS</button>
-    <button onclick="location.href='vendas.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #333; color: #fff;">💰 VENDAS</button>
-    <button onclick="location.href='clientes.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #333; color: #fff;">👥 PENDURA</button>
-    
-    <button onclick="location.href='boticario.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #00a896; color: #fff;">✨ BOTICÁRIO</button>
-    <button onclick="location.href='despesas.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #ff453a; color: #fff;">📉 GASTOS</button>
-    <button onclick="location.href='dashboard.html'" style="padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 10px; background: #5856d6; color: #fff;">📊 LUCRO</button>
+    <a href="index.html" class="btn-voltar">VOLTAR AO MENU</a>
 </div>
-<hr style="border: 0; border-top: 1px solid #333; margin-bottom: 20px;">
-    </div>
 
-    <div id="modal-geral" class="modal">
-        <div id="conteudo-modal"></div>
-    </div>
+<audio id="som-caixa" src="https://www.myinstants.com/media/sounds/cash-register-purchase.mp3"></audio>
 
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", authDomain: "boteco934-afc3f.firebaseapp.com", projectId: "boteco934-afc3f", storageBucket: "boteco934-afc3f.firebasestorage.app", appId: "1:182023728304:web:040a13bb6f61c9fff35f75" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+<script>
+    // Data de hoje
+    document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR');
 
-        let mesaAtivaId = null;
-        let mesaAtivaNome = "";
+    // Função para simular a chegada de uma venda (Depois conectaremos ao Mercado Pago)
+    function registrarVenda(valor, metodo) {
+        const som = document.getElementById('som-caixa');
+        som.play(); // Toca o Din-Din!
 
-        // 1. CARREGAR PRODUTOS DO CADASTRO
-        db.collection("produtos").onSnapshot(snap => {
-            let html = "";
-            snap.forEach(doc => {
-                let p = doc.data();
-                let precoUn = (parseFloat(p.venda) / (parseInt(p.qtd_fardo) || 1)).toFixed(2);
-                html += `<button class="btn-prod" onclick="addProduto('${precoUn}', '${p.nome}')">${p.nome}<br>R$ ${precoUn}</button>`;
-            });
-            document.getElementById('lista-produtos').innerHTML = html;
-        });
+        const lista = document.getElementById('fluxo-vendas');
+        if (lista.innerHTML.includes("Aguardando")) lista.innerHTML = "";
 
-        // 2. CARREGAR MESAS OCUPADAS
-        db.collection("mesas_abertas").onSnapshot(snap => {
-            let html = "";
-            snap.forEach(doc => {
-                let m = doc.data();
-                let border = mesaAtivaId === doc.id ? "3px solid #30d158" : "1px solid #ff9f0a";
-                html += `
-                <div class="mesa-card" style="border: ${border}" onclick="selecionarMesa('${doc.id}', '${m.nome}')">
-                    <span class="mesa-nome">${m.nome}</span>
-                    <span class="mesa-total">R$ ${m.total.toFixed(2)}</span>
-                </div>`;
-            });
-            document.getElementById('lista-mesas').innerHTML = html;
-        });
+        const hora = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        
+        const item = `
+            <div class="venda-item">
+                <div class="info-venda">
+                    <b>R$ ${valor.toFixed(2)}</b>
+                    <span>${hora} - Recebido com sucesso</span>
+                </div>
+                <span class="metodo ${metodo.toLowerCase()}">${metodo}</span>
+            </div>
+        `;
+        
+        lista.insertAdjacentHTML('afterbegin', item);
+        atualizarResumo(valor);
+    }
 
-        function selecionarMesa(id, nome) {
-            mesaAtivaId = id;
-            mesaAtivaNome = nome;
-            document.getElementById('mesa-foco').innerText = "EDITANDO: " + nome;
-        }
+    let totalDinheiro = 0;
+    let totalVendas = 0;
 
-        async function addProduto(valor, nome) {
-            if(!mesaAtivaId) return alert("Selecione uma mesa primeiro!");
-            const ref = db.collection("mesas_abertas").doc(mesaAtivaId);
-            const doc = await ref.get();
-            const novoTotal = doc.data().total + parseFloat(valor);
-            await ref.update({ total: novoTotal });
-        }
+    function atualizarResumo(valor) {
+        totalDinheiro += valor;
+        totalVendas += 1;
+        document.getElementById('total-valor').innerText = `R$ ${totalDinheiro.toFixed(2)}`;
+        document.getElementById('total-vendas').innerText = totalVendas;
+    }
 
-        function abrirNovaMesa() {
-            document.getElementById('modal-geral').style.display = "block";
-            document.getElementById('conteudo-modal').innerHTML = `
-                <h3 style="color:#ff9f0a">ABRIR MESA / CLIENTE</h3>
-                <input type="text" id="n-mesa" class="input-dark" placeholder="Nome da Mesa ou Cliente">
-                <button class="btn-acao" style="background:#ff9f0a" onclick="salvarMesa()">ABRIR AGORA</button>
-                <button class="btn-acao" style="background:#333; color:#fff" onclick="fecharModal()">CANCELAR</button>
-            `;
-        }
+    // TESTE AUTOMÁTICO (Só para você ver como funciona)
+    // Pode apagar essas linhas abaixo depois
+    setTimeout(() => registrarVenda(15.50, 'PIX'), 2000);
+    setTimeout(() => registrarVenda(22.00, 'CARTAO'), 5000);
+</script>
 
-        async function salvarMesa() {
-            const nome = document.getElementById('n-mesa').value.toUpperCase();
-            if(!nome) return;
-            await db.collection("mesas_abertas").add({ nome, total: 0, data: new Date() });
-            fecharModal();
-        }
-
-        function fecharComanda() {
-            if(!mesaAtivaId) return alert("Selecione a mesa para fechar!");
-            document.getElementById('modal-geral').style.display = "block";
-            document.getElementById('conteudo-modal').innerHTML = `
-                <h3 style="color:#30d158">FECHAR: ${mesaAtivaNome}</h3>
-                <button class="btn-acao" style="background:#00a896" onclick="finalizar('PIX')">PAGOU NO PIX</button>
-                <button class="btn-acao" style="background:#28a745" onclick="finalizar('DINHEIRO')">PAGOU EM DINHEIRO</button>
-                <button class="btn-acao" style="background:#5856d6" onclick="finalizar('CARTÃO')">CARTÃO</button>
-                <button class="btn-acao" style="background:#ff453a" onclick="location.href='clientes.html'">PENDURAR (FIADO)</button>
-                <button class="btn-acao" style="background:#333; color:#fff" onclick="fecharModal()">VOLTAR</button>
-            `;
-        }
-
-        async function finalizar(forma) {
-            const ref = db.collection("mesas_abertas").doc(mesaAtivaId);
-            const doc = await ref.get();
-            const dados = doc.data();
-
-            await db.collection("vendas_realizadas").add({
-                cliente: dados.nome,
-                valor: dados.total,
-                metodo: forma,
-                data: new Date()
-            });
-
-            await ref.delete();
-            mesaAtivaId = null;
-            document.getElementById('mesa-foco').innerText = "Mesa Finalizada!";
-            fecharModal();
-        }
-
-        function fecharModal() { document.getElementById('modal-geral').style.display = "none"; }
-    </script>
 </body>
 </html>
