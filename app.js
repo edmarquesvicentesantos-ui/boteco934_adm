@@ -232,3 +232,75 @@ function filtrar(cat) {
         `;
     }).join('');
 }
+// CONFIGURAÇÃO INICIAL
+let mesas = [
+    { numero: 1, status: 'livre', itens: [], total: 0 },
+    { numero: 2, status: 'livre', itens: [], total: 0 },
+    { numero: 3, status: 'livre', itens: [], total: 0 },
+    { numero: 4, status: 'livre', itens: [], total: 0 },
+    { numero: 5, status: 'livre', itens: [], total: 0 },
+    { numero: 6, status: 'livre', itens: [], total: 0 }
+];
+
+let mesaAtiva = null;
+
+// GERA O VISUAL DAS MESAS
+function renderizarMesas() {
+    const painel = document.getElementById('painel-mesas');
+    painel.innerHTML = mesas.map(m => {
+        const cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
+        const borda = mesaAtiva === m.numero ? 'border-4 border-yellow-400' : 'border border-transparent';
+        return `
+            <button onclick="selecionarMesa(${m.numero})" class="${cor} ${borda} p-2 rounded-lg text-white font-bold text-[10px] uppercase">
+                Mesa ${m.numero}
+                <div class="text-[8px]">${m.status === 'ocupada' ? 'R$ '+m.total.toFixed(2) : 'Livre'}</div>
+            </button>
+        `;
+    }).join('');
+}
+
+function selecionarMesa(numero) {
+    mesaAtiva = numero;
+    const mesa = mesas.find(m => m.numero === numero);
+    carrinho = mesa.itens; // Carrega os itens daquela mesa
+    saldoRestante = mesa.total;
+    
+    renderizarMesas();
+    atualizarCarrinho();
+}
+
+// AJUSTE NA FUNÇÃO DE ADICIONAR ITEM
+function adicionarItem(id) {
+    if (mesaAtiva === null) {
+        alert("⚠️ Selecione uma MESA primeiro!");
+        return;
+    }
+
+    const p = produtos.find(i => i.id === id);
+    const mesa = mesas.find(m => m.numero === mesaAtiva);
+    
+    const index = mesa.itens.findIndex(i => i.id === id);
+    if (index >= 0) { mesa.itens[index].qtd += 1; } 
+    else { mesa.itens.push({ ...p, qtd: 1 }); }
+    
+    mesa.status = 'ocupada';
+    mesa.total = mesa.itens.reduce((s, i) => s + (i.preco * i.qtd), 0);
+    
+    saldoRestante = mesa.total;
+    renderizarMesas();
+    atualizarCarrinho();
+}
+
+// AJUSTE NO FINALIZAR VENDA (Para liberar a mesa após pagar tudo)
+// Dentro da sua função finalizarVenda(), quando o saldoRestante <= 0:
+/*
+    if (saldoRestante <= 0.05) {
+        const mesa = mesas.find(m => m.numero === mesaAtiva);
+        mesa.status = 'livre';
+        mesa.itens = [];
+        mesa.total = 0;
+        mesaAtiva = null;
+        renderizarMesas();
+        // ... restante do código de fechar conta
+    }
+*/
