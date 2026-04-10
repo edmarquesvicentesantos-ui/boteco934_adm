@@ -8,7 +8,98 @@
     <style>
         :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; displa<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Boteco 934">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
+
+    <title>ADM | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; }
+        
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 400px; padding-top: 20px; }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--gold); font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; }
+        .header p { color: #888; font-size: 12px; margin: 0; }
+
+        /* Grade de Botões Estilo App */
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .app-card {
+            background: var(--card);
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: 0.2s;
+            aspect-ratio: 1 / 1; /* Faz o botão ser quadradinho */
+        }
+        .app-card:active { transform: scale(0.95); background: #1c222d; }
+        .app-card i { font-size: 32px; margin-bottom: 12px; }
+        .app-card span { font-size: 13px; font-weight: 600; line-height: 1.2; }
+
+        /* Cores dos Ícones */
+        .icon-vendas { color: var(--green); }
+        .icon-custo { color: var(--gold); }
+        .icon-estoque { color: var(--blue); }
+        .icon-clientes { color: #a55eea; }
+
+        .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #444; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>BOTECO 934</h1>
+        <p>PAINEL DE CONTROLE ADM</p>
+    </div>
+
+    <div class="app-grid">
+        <a href="vendas.html" class="app-card">
+            <i class="fas fa-chart-line icon-vendas"></i>
+            <span>Monitor de<br>Vendas</span>
+        </a>
+
+        <a href="calculadora_custo.html" class="app-card">
+            <i class="fas fa-calculator icon-custo"></i>
+            <span>Cálculo de<br>Preços</span>
+        </a>
+
+        <a href="importar_estoque.html" class="app-card">
+            <i class="fas fa-boxes icon-estoque"></i>
+            <span>Importar<br>Estoque</span>
+        </a>
+
+        <a href="lista_clientes.html" class="app-card">
+            <i class="fas fa-users icon-clientes"></i>
+            <span>Lista de<br>Clientes</span>
+        </a>
+    </div>
+
+    <div class="footer">
+        Petrolina - Pernambuco
+    </div>
+</div>
+
+</body>
+</html>y: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 450px; }
 
         .header { text-align: center; margin: 30px 0; }
