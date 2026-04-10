@@ -3,122 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Boteco 934">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
-
-    <title>ADM MASTER | BOTECO 934</title>
+    <title>MONITOR | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; --red: #ff4757; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; }
         
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
-        .container { width: 100%; max-width: 450px; margin: 0 auto; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
+        
+        /* Cabeçalho do Monitor */
+        .monitor-header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
+        .monitor-header h2 { margin: 5px 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
 
-        .header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
-        .header h1 { color: var(--gold); font-size: 22px; letter-spacing: 2px; margin: 0; }
-        .header p { color: #888; font-size: 11px; text-transform: uppercase; }
+        /* Painel de Resumo (Igual à foto que você mandou) */
+        .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .resumo-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; text-align: center; }
+        .resumo-card span { font-size: 11px; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .resumo-card strong { font-size: 24px; color: var(--green); }
 
-        .section-title { font-size: 12px; color: var(--gold); text-transform: uppercase; margin: 20px 0 10px 5px; font-weight: bold; opacity: 0.7; }
+        /* Lista de Vendas em Tempo Real */
+        .vendas-container { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
+        .venda-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #222; animation: lightUp 1s ease; }
+        @keyframes lightUp { from { background: rgba(46, 204, 113, 0.2); } to { background: transparent; } }
 
-        /* Grade de Botões */
-        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .venda-info b { display: block; font-size: 16px; }
+        .venda-info small { color: #666; font-size: 12px; }
+        
+        .venda-valor { text-align: right; }
+        .venda-valor .tag { font-size: 10px; background: #333; padding: 2px 6px; border-radius: 4px; color: var(--gold); }
 
-        .app-card {
-            background: var(--card);
-            border: 1px solid #333;
-            border-radius: 18px;
-            padding: 15px;
-            text-decoration: none;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: 0.2s;
-        }
-        .app-card:active { transform: scale(0.95); background: #1c222d; }
-        .app-card i { font-size: 28px; margin-bottom: 10px; }
-        .app-card span { font-size: 13px; font-weight: 500; }
-
-        /* Cores Específicas */
-        .c-vendas { color: var(--green); }
-        .c-financeiro { color: #54a0ff; }
-        .c-custo { color: var(--gold); }
-        .c-estoque { color: var(--blue); }
-        .c-clientes { color: #a55eea; }
-        .c-devedores { color: var(--red); }
-
-        .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #444; padding-bottom: 20px; }
+        .btn-voltar { display: block; text-align: center; margin-top: 30px; color: #555; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>BOTECO 934</h1>
-        <p>Sistema de Gestão Integrado</p>
+    <div class="monitor-header">
+        <i class="fas fa-desktop fa-2x" style="color: var(--gold);"></i>
+        <h2>Monitor de Vendas</h2>
+        <small id="data-atual"></small>
     </div>
 
-    <div class="section-title">Operacional e Vendas</div>
-    <div class="app-grid">
-        <a href="vendas.html" class="app-card">
-            <i class="fas fa-chart-line c-vendas"></i>
-            <span>Monitor de Vendas</span>
-        </a>
-        <a href="produtos.html" class="app-card">
-            <i class="fas fa-wine-bottle c-vendas"></i>
-            <span>Produtos</span>
-        </a>
+    <div class="resumo-grid">
+        <div class="resumo-card">
+            <span>Total Hoje</span>
+            <strong id="total-valor">R$ 0,00</strong>
+        </div>
+        <div class="resumo-card">
+            <span>Vendas</span>
+            <strong id="total-qtd" style="color: white;">0</strong>
+        </div>
     </div>
 
-    <div class="section-title">Financeiro e Custos</div>
-    <div class="app-grid">
-        <a href="gestao_mensal.html" class="app-card">
-            <i class="fas fa-calendar-alt c-financeiro"></i>
-            <span>Gestão Mensal</span>
-        </a>
-        <a href="contas_cartao.html" class="app-card">
-            <i class="fas fa-credit-card c-financeiro"></i>
-            <span>Contas Cartão</span>
-        </a>
-        <a href="calculadora_custo.html" class="app-card">
-            <i class="fas fa-calculator c-custo"></i>
-            <span>Custo de Fardo</span>
-        </a>
-        <a href="calculadora.html" class="app-card">
-            <i class="fas fa-hand-holding-usd c-custo"></i>
-            <span>Calculadora</span>
-        </a>
+    <div class="section-title" style="font-size: 12px; color: var(--gold); margin-bottom: 10px; font-weight: bold;">RECIBOS RECENTES</div>
+    
+    <div class="vendas-container" id="lista-vendas">
+        <div style="padding: 40px; text-align: center; color: #444;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>
+            Aguardando pagamentos...
+        </div>
     </div>
 
-    <div class="section-title">Administração</div>
-    <div class="app-grid">
-        <a href="estoque.html" class="app-card">
-            <i class="fas fa-boxes c-estoque"></i>
-            <span>Estoque Geral</span>
-        </a>
-        <a href="lista_clientes.html" class="app-card">
-            <i class="fas fa-users c-clientes"></i>
-            <span>Clientes A-Z</span>
-        </a>
-        <a href="devedores.html" class="app-card">
-            <i class="fas fa-user-times c-devedores"></i>
-            <span>Devedores</span>
-        </a>
-        <a href="script.html" class="app-card">
-            <i class="fas fa-code" style="color:#888"></i>
-            <span>Scripts/Backup</span>
-        </a>
-    </div>
+    <a href="index.html" class="btn-voltar">
+        <i class="fas fa-chevron-left"></i> VOLTAR AO MENU PRINCIPAL
+    </a>
 
-    <div class="footer">
-        Boteco 934 | Desenvolvido para iPhone & Web
-    </div>
-</div>
+    <audio id="som-venda" src="https://www.myinstants.com/media/sounds/cash-register-purchase.mp3"></audio>
+
+<script>
+    // Atualiza a data no topo
+    document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR');
+
+    // Função para adicionar uma nova venda na tela (Simulação do Webhook)
+    function registrarVenda(valor, metodo) {
+        const som = document.getElementById('som-venda');
+        const lista = document.getElementById('lista-vendas');
+        
+        // Se for a primeira venda, limpa o "Aguardando..."
+        if(lista.innerText.includes("Aguardando")) lista.innerHTML = '';
+
+        const hora = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        
+        const htmlVenda = `
+            <div class="venda-item">
+                <div class="venda-info">
+                    <b>Venda Aprovada</b>
+                    <small>${hora} • Boteco 934</small>
+                </div>
+                <div class="venda-valor">
+                    <span style="color: var(--green); font-weight: bold;">R$ ${valor.toFixed(2)}</span><br>
+                    <span class="tag">${metodo.toUpperCase()}</span>
+                </div>
+            </div>
+        `;
+
+        lista.insertAdjacentHTML('afterbegin', htmlVenda);
+        som.play();
+        
+        // Atualiza os totais (Lógica simples para exemplo)
+        atualizarTotais(valor);
+    }
+
+    let acumulado = 0;
+    let qtd = 0;
+    function atualizarTotais(valor) {
+        acumulado += valor;
+        qtd++;
+        document.getElementById('total-valor').innerText = `R$ ${acumulado.toFixed(2)}`;
+        document.getElementById('total-qtd').innerText = qtd;
+    }
+
+    // TESTE AUTOMÁTICO: Em 3 segundos vai simular uma venda para você ver o efeito
+    setTimeout(() => {
+        registrarVenda(37.50, 'Pix');
+    }, 3000);
+</script>
 
 </body>
 </html>
