@@ -3,84 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA | BOTECO 934</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Boteco 934">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>SISTEMA BOTECO 934</title>
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .logo-area { text-align: center; margin-bottom: 30px; margin-top: 20px; }
-        .logo-area i { font-size: 50px; color: var(--gold); margin-bottom: 10px; }
-        .logo-area h1 { margin: 0; font-size: 22px; letter-spacing: 2px; }
-
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; }
-        
-        .btn-menu { 
-            background: var(--glass); 
-            border: 1px solid rgba(255, 215, 0, 0.2); 
-            border-radius: 15px; 
-            padding: 20px 10px; 
-            text-align: center; 
-            text-decoration: none; 
+        body { 
+            background-color: #0b0f19; 
             color: white; 
+            font-family: sans-serif; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: 10px;
-            transition: 0.3s;
+            padding: 20px;
         }
-        .btn-menu i { font-size: 24px; color: var(--gold); }
-        .btn-menu span { font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .btn-menu:active { transform: scale(0.95); background: rgba(255, 215, 0, 0.1); }
+        h1 { color: #ffd700; margin-bottom: 30px; }
+        
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
 
-        .btn-full { grid-column: span 2; background: linear-gradient(45deg, #f39c12, #f1c40f); color: black; border: none; }
-        .btn-full i { color: black; }
+        .botao {
+            display: block;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 12px;
+            font-size: 18px;
+            color: black;
+            transition: 0.2s;
+        }
+
+        /* Cores dos Botões */
+        .btn-venda { background-color: #ffd700; } /* Dourado */
+        .btn-financas { background-color: #2ed573; } /* Verde */
+        .btn-cartao { background-color: #3498db; } /* Azul */
+        .btn-estoque { background-color: #ffffff; } /* Branco */
+
+        .botao:active { transform: scale(0.95); opacity: 0.8; }
+        
+        small { margin-top: 50px; color: #444; }
     </style>
 </head>
 <body>
 
-<div class="logo-area">
-    <i class="fas fa-beer"></i>
     <h1>BOTECO 934</h1>
-    <small style="color: #888;">GESTÃO ELITE V3.0</small>
-</div>
 
-<div class="menu-grid">
-    <a href="calculadora.html" class="btn-menu">
-        <i class="fas fa-cash-register"></i>
-        <span>Vender (PDV)</span>
-    </a>
+    <div class="menu-container">
+        <a href="calculadora.html" class="botao btn-venda">💰 VENDER (PDV)</a>
 
-    <a href="gestao_mensal.html" class="btn-menu">
-        <i class="fas fa-chart-line"></i>
-        <span>Finanças</span>
-    </a>
+        <a href="gestao_mensal.html" class="botao btn-financas">📊 FINANÇAS</a>
 
-    <a href="contas_cartao.html" class="btn-menu">
-        <i class="fas fa-credit-card"></i>
-        <span>Cartões</span>
-    </a>
+        <a href="contas_cartao.html" class="botao btn-cartao">💳 CARTÕES</a>
 
-    <a href="importar_estoque.html" class="btn-menu">
-        <i class="fas fa-boxes"></i>
-        <span>Estoque</span>
-    </a>
+        <a href="importar_estoque.html" class="botao btn-estoque">📦 ESTOQUE</a>
+    </div>
 
-    <a href="calculadora.html" class="btn-menu btn-full">
-        <i class="fas fa-file-invoice-dollar"></i>
-        <span>Ir para Fechamento do Dia</span>
-    </a>
-</div>
-
-<p style="margin-top: 40px; font-size: 10px; color: #444;">ID: EDMARQUES SANTOS | GITHUB HOSTED</p>
+    <small>Edmarques Santos | v3.0</small>
 
 </body>
 </html>
