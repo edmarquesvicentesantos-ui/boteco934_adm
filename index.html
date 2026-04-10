@@ -2,16 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADM | BOTECO 934</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; }
-        
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; displa<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,48 +9,50 @@
     <meta name="apple-mobile-web-app-title" content="Boteco 934">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
 
-    <title>ADM | BOTECO 934</title>
+    <title>ADM MASTER | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; --red: #ff4757; }
         
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 400px; padding-top: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 450px; margin: 0 auto; }
 
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: var(--gold); font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; }
-        .header p { color: #888; font-size: 12px; margin: 0; }
+        .header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
+        .header h1 { color: var(--gold); font-size: 22px; letter-spacing: 2px; margin: 0; }
+        .header p { color: #888; font-size: 11px; text-transform: uppercase; }
 
-        /* Grade de Botões Estilo App */
-        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .section-title { font-size: 12px; color: var(--gold); text-transform: uppercase; margin: 20px 0 10px 5px; font-weight: bold; opacity: 0.7; }
+
+        /* Grade de Botões */
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .app-card {
             background: var(--card);
             border: 1px solid #333;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 18px;
+            padding: 15px;
             text-decoration: none;
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             text-align: center;
             transition: 0.2s;
-            aspect-ratio: 1 / 1; /* Faz o botão ser quadradinho */
         }
         .app-card:active { transform: scale(0.95); background: #1c222d; }
-        .app-card i { font-size: 32px; margin-bottom: 12px; }
-        .app-card span { font-size: 13px; font-weight: 600; line-height: 1.2; }
+        .app-card i { font-size: 28px; margin-bottom: 10px; }
+        .app-card span { font-size: 13px; font-weight: 500; }
 
-        /* Cores dos Ícones */
-        .icon-vendas { color: var(--green); }
-        .icon-custo { color: var(--gold); }
-        .icon-estoque { color: var(--blue); }
-        .icon-clientes { color: #a55eea; }
+        /* Cores Específicas */
+        .c-vendas { color: var(--green); }
+        .c-financeiro { color: #54a0ff; }
+        .c-custo { color: var(--gold); }
+        .c-estoque { color: var(--blue); }
+        .c-clientes { color: #a55eea; }
+        .c-devedores { color: var(--red); }
 
-        .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #444; }
+        .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #444; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -68,117 +60,63 @@
 <div class="container">
     <div class="header">
         <h1>BOTECO 934</h1>
-        <p>PAINEL DE CONTROLE ADM</p>
+        <p>Sistema de Gestão Integrado</p>
     </div>
 
+    <div class="section-title">Operacional e Vendas</div>
     <div class="app-grid">
         <a href="vendas.html" class="app-card">
-            <i class="fas fa-chart-line icon-vendas"></i>
-            <span>Monitor de<br>Vendas</span>
+            <i class="fas fa-chart-line c-vendas"></i>
+            <span>Monitor de Vendas</span>
         </a>
+        <a href="produtos.html" class="app-card">
+            <i class="fas fa-wine-bottle c-vendas"></i>
+            <span>Produtos</span>
+        </a>
+    </div>
 
+    <div class="section-title">Financeiro e Custos</div>
+    <div class="app-grid">
+        <a href="gestao_mensal.html" class="app-card">
+            <i class="fas fa-calendar-alt c-financeiro"></i>
+            <span>Gestão Mensal</span>
+        </a>
+        <a href="contas_cartao.html" class="app-card">
+            <i class="fas fa-credit-card c-financeiro"></i>
+            <span>Contas Cartão</span>
+        </a>
         <a href="calculadora_custo.html" class="app-card">
-            <i class="fas fa-calculator icon-custo"></i>
-            <span>Cálculo de<br>Preços</span>
+            <i class="fas fa-calculator c-custo"></i>
+            <span>Custo de Fardo</span>
         </a>
-
-        <a href="importar_estoque.html" class="app-card">
-            <i class="fas fa-boxes icon-estoque"></i>
-            <span>Importar<br>Estoque</span>
+        <a href="calculadora.html" class="app-card">
+            <i class="fas fa-hand-holding-usd c-custo"></i>
+            <span>Calculadora</span>
         </a>
+    </div>
 
+    <div class="section-title">Administração</div>
+    <div class="app-grid">
+        <a href="estoque.html" class="app-card">
+            <i class="fas fa-boxes c-estoque"></i>
+            <span>Estoque Geral</span>
+        </a>
         <a href="lista_clientes.html" class="app-card">
-            <i class="fas fa-users icon-clientes"></i>
-            <span>Lista de<br>Clientes</span>
+            <i class="fas fa-users c-clientes"></i>
+            <span>Clientes A-Z</span>
+        </a>
+        <a href="devedores.html" class="app-card">
+            <i class="fas fa-user-times c-devedores"></i>
+            <span>Devedores</span>
+        </a>
+        <a href="script.html" class="app-card">
+            <i class="fas fa-code" style="color:#888"></i>
+            <span>Scripts/Backup</span>
         </a>
     </div>
 
     <div class="footer">
-        Petrolina - Pernambuco
-    </div>
-</div>
-
-</body>
-</html>y: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; }
-
-        .header { text-align: center; margin: 30px 0; }
-        .logo { font-size: 50px; color: var(--gold); margin-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
-        .header p { color: #888; font-size: 13px; }
-
-        .menu-section { margin-bottom: 25px; }
-        .section-title { font-size: 11px; color: var(--gold); text-transform: uppercase; margin-left: 10px; margin-bottom: 10px; letter-spacing: 1px; font-weight: bold; }
-
-        .btn-link { 
-            background: var(--card); 
-            border: 1px solid #333; 
-            padding: 20px; 
-            border-radius: 15px; 
-            text-decoration: none; 
-            color: white; 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 12px;
-            transition: 0.3s;
-        }
-        .btn-link:active { transform: scale(0.96); background: #1c222d; }
-        .btn-link i { font-size: 24px; width: 45px; text-align: center; margin-right: 15px; }
-        .btn-link .info { display: flex; flex-direction: column; }
-        .btn-link .info strong { font-size: 16px; }
-        .btn-link .info span { font-size: 11px; color: #777; }
-
-        /* Cores de destaque */
-        .vendas-border { border-left: 5px solid var(--green); }
-        .custo-border { border-left: 5px solid var(--gold); }
-        .estoque-border { border-left: 5px solid var(--blue); }
-
-        .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #444; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <div class="logo"><i class="fas fa-beer"></i></div>
-        <h1>BOTECO 934</h1>
-        <p>Painel Administrativo v2.0</p>
-    </div>
-
-    <div class="menu-section">
-        <div class="section-title">Financeiro</div>
-        
-        <a href="vendas.html" class="btn-link vendas-border">
-            <i class="fas fa-chart-line" style="color: var(--green);"></i>
-            <div class="info">
-                <strong>Monitor de Vendas</strong>
-                <span>Acompanhe o caixa em tempo real</span>
-            </div>
-        </a>
-
-        <a href="calculadora_custo.html" class="btn-link custo-border">
-            <i class="fas fa-calculator" style="color: var(--gold);"></i>
-            <div class="info">
-                <strong>Calculadora de Custo</strong>
-                <span>Precificação e Margem de Lucro</span>
-            </div>
-        </a>
-    </div>
-
-    <div class="menu-section">
-        <div class="section-title">Logística e Estoque</div>
-
-        <a href="importar_estoque.html" class="btn-link estoque-border">
-            <i class="fas fa-file-import" style="color: var(--blue);"></i>
-            <div class="info">
-                <strong>Importar Mercadorias</strong>
-                <span>Entrada via XML ou Lista</span>
-            </div>
-        </a>
-    </div>
-
-    <div class="footer">
-        Petrolina - PE | Gerenciamento de Bebidas
+        Boteco 934 | Desenvolvido para iPhone & Web
     </div>
 </div>
 
