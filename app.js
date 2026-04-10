@@ -158,3 +158,53 @@ async function carregarContatos() {
 }
 
 filtrar('Tudo');
+async function enviarFechamentoDia() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    
+    try {
+        // Busca as vendas de hoje no Firebase
+        const snapshot = await db.collection("vendas")
+            .where("data", ">=", hoje) 
+            .get();
+
+        let resumo = {
+            dinheiro: 0,
+            pix: 0,
+            cartao: 0,
+            pendura: 0,
+            totalReal: 0
+        };
+
+        snapshot.forEach(doc => {
+            const v = doc.data();
+            const valor = parseFloat(v.valor) || 0;
+
+            if (v.metodo === "DINHEIRO") resumo.dinheiro += valor;
+            else if (v.metodo === "PIX") resumo.pix += valor;
+            else if (v.metodo === "CREDITO" || v.metodo === "DEBITO") resumo.cartao += valor;
+            else if (v.metodo === "PENDURA") resumo.pendura += valor;
+        });
+
+        resumo.totalReal = resumo.dinheiro + resumo.pix + resumo.cartao;
+
+        // Montagem da Mensagem para o Edmarques
+        let texto = `*📊 FECHAMENTO BOTECO 934 - ${hoje}*%0A`;
+        texto += `------------------------------%0A`;
+        texto += `💵 *DINHEIRO:* R$ ${resumo.dinheiro.toFixed(2)}%0A`;
+        texto += `💎 *PIX:* R$ ${resumo.pix.toFixed(2)}%0A`;
+        texto += `💳 *CARTÕES:* R$ ${resumo.cartao.toFixed(2)}%0A`;
+        texto += `------------------------------%0A`;
+        texto += `✅ *SALDO REAL EM CAIXA:* R$ ${resumo.totalReal.toFixed(2)}%0A`;
+        texto += `------------------------------%0A`;
+        texto += `📝 *PENDURAS DO DIA:* R$ ${resumo.pendura.toFixed(2)}%0A`;
+        texto += `------------------------------%0A`;
+        texto += `_Relatório gerado automaticamente._`;
+
+        // Envia para o seu WhatsApp pessoal
+        const meuFone = "5587996806181";
+        window.open(`https://api.whatsapp.org/send?phone=${meuFone}&text=${texto}`);
+
+    } catch (e) {
+        alert("Erro ao gerar fechamento: " + e);
+    }
+}
