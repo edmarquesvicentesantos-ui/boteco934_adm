@@ -1,34 +1,59 @@
-// ... (mantenha sua FirebaseConfig aqui)
+// ... Mantenha sua firebaseConfig aqui ...
 
-const produtos = [
-    { id: 1, cat: "Cervejas", nome: "CERVEJA LATA", preco: 6.00 },
-    { id: 2, cat: "Cervejas", nome: "HEINEKEN LN", preco: 10.00 },
-    { id: 3, cat: "Petiscos", nome: "ESPETINHO", preco: 8.00 },
-    { id: 4, cat: "Petiscos", nome: "CALABRESA", preco: 15.00 }
+const produtosLocal = [
+    { id: "7891991000858", cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, foto: "" }, // Exemplo de código real
+    { id: "1", cat: "Doses", nome: "PITU", preco: 3.50, foto: "" }
 ];
 
 let carrinho = [];
 
-function filtrar(categoria) {
-    const lista = document.getElementById('lista-produtos');
-    const filtrados = categoria === "Tudo" ? produtos : produtos.filter(p => p.cat === categoria);
-    lista.innerHTML = filtrados.map(p => `
-        <button onclick="adicionarItem(${p.id})" class="bg-white border rounded-lg overflow-hidden flex active:scale-95">
-            <div class="tarja-botao w-full p-2 text-left">
-                <div class="text-white font-bold fonte-13">${p.nome}</div>
-                <div class="text-blue-200 fonte-13">R$ ${p.preco.toFixed(2)}</div>
-            </div>
-        </button>
-    `).join('');
+// ESCUTA O INPUT (BIP OU DIGITAÇÃO)
+document.getElementById('input-busca').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        buscarProduto(this.value);
+        this.value = ''; // Limpa após buscar
+    }
+});
+
+async function buscarProduto(termo) {
+    // 1. Tenta buscar no seu estoque local primeiro
+    let p = produtosLocal.find(item => item.id === termo || item.nome.toLowerCase().includes(termo.toLowerCase()));
+
+    if (p) {
+        adicionarItem(p);
+    } else {
+        // 2. Se não achou no estoque, tenta buscar na Internet (API)
+        try {
+            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${termo}.json`);
+            const data = await res.json();
+
+            if (data.status === 1) {
+                const novoProd = {
+                    id: termo,
+                    nome: data.product.product_name.toUpperCase(),
+                    preco: 0.00, // Você define o preço na hora ou depois
+                    foto: data.product.image_front_url || ""
+                };
+                adicionarItem(novoProd);
+            } else {
+                alert("Produto não encontrado na internet. Tente cadastrar manualmente.");
+            }
+        } catch (error) {
+            console.error("Erro na busca remota", error);
+        }
+    }
 }
 
-function adicionarItem(id) {
-    const prod = produtos.find(p => p.id === id);
-    // Verifica se já tem o item no carrinho para somar quantidade
-    const existente = carrinho.find(item => item.id === id);
-    if (existente) {
-        existente.qtd += 1;
+function adicionarItem(prod) {
+    const index = carrinho.findIndex(item => item.id === prod.id);
+    if (index >= 0) {
+        carrinho[index].qtd += 1;
     } else {
+        // Se o preço for 0 (busca na internet), pede para o usuário digitar
+        if (prod.preco === 0) {
+            const valorPrompt = prompt(`Qual o preço de ${prod.nome}?`, "0.00");
+            prod.preco = parseFloat(valorPrompt) || 0;
+        }
         carrinho.push({ ...prod, qtd: 1 });
     }
     atualizarCarrinho();
@@ -37,15 +62,15 @@ function adicionarItem(id) {
 function atualizarCarrinho() {
     const lista = document.getElementById('itens-venda');
     const totalTxt = document.getElementById('valor-total');
-    const dataTxt = document.getElementById('data-recibo');
     
-    dataTxt.innerText = new Date().toLocaleString("pt-BR");
-
-    lista.innerHTML = carrinho.map((item, index) => `
-        <div class="flex justify-between border-b border-gray-100 pb-1">
-            <span class="w-1/2 uppercase">${index + 1}. ${item.nome}</span>
-            <span class="w-1/4 text-right">${item.qtd}x${item.preco.toFixed(2)}</span>
-            <span class="w-1/4 text-right font-bold">${(item.qtd * item.preco).toFixed(2)}</span>
+    lista.innerHTML = carrinho.map((item) => `
+        <div class="flex items-center gap-2 border-b border-gray-100 py-1">
+            ${item.foto ? `<img src="${item.foto}" class="w-8 h-8 object-contain rounded">` : `<div class="w-8 h-8 bg-gray-200 rounded"></div>`}
+            <div class="flex-1 flex justify-between">
+                <span class="w-1/2 uppercase text-[10px] leading-tight">${item.nome}</span>
+                <span class="w-1/4 text-right">${item.qtd}x${item.preco.toFixed(2)}</span>
+                <span class="w-1/4 text-right font-bold">${(item.qtd * item.preco).toFixed(2)}</span>
+            </div>
         </div>
     `).join('');
 
@@ -53,6 +78,5 @@ function atualizarCarrinho() {
     totalTxt.innerText = total.toFixed(2);
 }
 
-// ... (mantenha a função finalizarVenda anterior)
-
+// ... Restante da função finalizarVenda e filtrar ...
 filtrar('Tudo');
