@@ -1,393 +1,126 @@
-<!DOCTYPE html><!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Boteco 934">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Boteco 934 - Gestão</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
-    <style>
-        body { 
-            background-color: #f0f2f5; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        .section { display: none; }
-        .section.active { display: block; animation: slideUp 0.3s ease-out; }
-        
-        @keyframes slideUp { 
-            from { transform: translateY(20px); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
-        }
-        
-        /* Botões Estilo iPhone */
-        .app-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 1/1;
-            border-radius: 24px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transition: transform 0.1s;
-            cursor: pointer;
-        }
-        .app-button:active { transform: scale(0.92); }
-        
-        .cupom-fiscal {
-            background: #fff;
-            border: 1px dashed #000;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Esconder barra de rolagem mas manter funcionalidade */
-        ::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="p-4 pb-10">
-
-    <header class="flex justify-between items-center mb-8 pt-4">
-        <div>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tighter">BOTECO 934</h1>
-            <p id="subtitulo" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Painel de Controle</p>
-        </div>
-        <button onclick="mudar('inicio')" id="btn-home" class="hidden bg-white shadow-md p-3 rounded-2xl text-xl">🏠</button>
-    </header>
-
-    <div id="inicio" class="section active">
-        <div class="grid grid-cols-2 gap-6">
-            <div onclick="mudar('mesas')" class="app-button bg-orange-500 text-white">
-                <span class="text-5xl">🪑</span>
-                <span class="font-bold mt-3 text-sm">MESAS</span>
-            </div>
-            <div onclick="mudar('fiado')" class="app-button bg-red-600 text-white">
-                <span class="text-5xl">📝</span>
-                <span class="font-bold mt-3 text-sm">FIADO</span>
-            </div>
-            <div onclick="mudar('calc')" class="app-button bg-green-600 text-white">
-                <span class="text-5xl">🧮</span>
-                <span class="font-bold mt-3 text-sm">CALC</span>
-            </div>
-            <div onclick="mudar('relatorio')" class="app-button bg-gray-900 text-white">
-                <span class="text-5xl">📊</span>
-                <span class="font-bold mt-3 text-sm">CAIXA</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="mesas" class="section">
-        <h2 class="text-xl font-bold mb-4 text-gray-700">Gestão de Mesas</h2>
-        <div id="grid-mesas" class="grid grid-cols-3 gap-3">
-            </div>
-    </div>
-
-    <div id="detalhe-mesa" class="section">
-        <div class="cupom-fiscal p-4 mb-4 shadow-sm rounded-sm">
-            <div class="text-center border-b border-black pb-2 mb-2">
-                <h3 class="font-bold text-lg">BOTECO 934</h3>
-                <p class="text-[10px]" id="cupom-cliente"></p>
-                <p class="text-[10px]">MESA: <span id="span-num-mesa">0</span></p>
-            </div>
-            <div id="lista-cupom" class="text-xs space-y-1 min-h-[100px]">
-                </div>
-            <div class="border-t border-black mt-4 pt-2 font-bold">
-                <div class="flex justify-between text-xs"><span>SUBTOTAL:</span><span id="cupom-sub">R$ 0,00</span></div>
-                <div class="flex justify-between text-xs text-blue-600"><span>TX (10%):</span><span id="cupom-taxa">R$ 0,00</span></div>
-                <div class="flex justify-between text-lg border-t border-dashed mt-1 pt-1">
-                    <span>TOTAL:</span><span id="cupom-total">R$ 0,00</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 mb-4" id="lista-botoes-produtos"></div>
-        <button onclick="fecharContaFinal()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black text-lg shadow-lg active:bg-green-700">FINALIZAR CONTA</button>
-    </div>
-
-    <div id="fiado" class="section">
-        <div class="bg-white p-5 rounded-3xl shadow-md mb-6">
-            <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase">Novo Lançamento</h3>
-            <input id="fiado-nome" type="text" placeholder="Nome do Cliente" class="w-full p-4 mb-3 border-none bg-gray-100 rounded-2xl outline-none">
-            <input id="fiado-tel" type="tel" placeholder="WhatsApp (DDD+Número)" class="w-full p-4 mb-3 border-none bg-gray-100 rounded-2xl outline-none">
-            <input id="fiado-v" type="number" placeholder="Valor R$" class="w-full p-4 mb-4 border-none bg-gray-100 rounded-2xl outline-none">
-            <button onclick="lancarFiado()" class="w-full bg-red-600 text-white p-4 rounded-2xl font-bold shadow-lg">LANÇAR NO PENDURA</button>
-        </div>
-        <div id="lista-fiado" class="space-y-3"></div>
-    </div>
-
-    <div id="calc" class="section">
-        <div class="space-y-6">
-            <div class="bg-white p-5 rounded-3xl shadow-md">
-                <h3 class="font-bold mb-4 text-green-600 uppercase text-xs">Mix Inteligente (Comparador)</h3>
-                <input id="mix-preco" type="number" placeholder="Preço R$" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
-                <input id="mix-ml" type="number" placeholder="Volume (ml)" class="w-full p-4 mb-3 bg-gray-100 rounded-2xl outline-none">
-                <button onclick="calcularMix()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold">CALCULAR PREÇO/LITRO</button>
-                <p id="res-mix" class="mt-4 text-center font-black text-xl text-green-700"></p>
-            </div>
-            <div class="bg-white p-5 rounded-3xl shadow-md">
-                <h3 class="font-bold mb-4 text-blue-600 uppercase text-xs">Custo da Dose</h3>
-                <input id="dose-p" type="number" placeholder="Preço da Garrafa" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
-                <input id="dose-mlg" type="number" placeholder="ML da Garrafa" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
-                <input id="dose-mld" type="number" placeholder="Tamanho da Dose (ml)" class="w-full p-4 mb-3 bg-gray-100 rounded-2xl outline-none">
-                <button onclick="calcularDose()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold">CALCULAR CUSTO/DOSE</button>
-                <p id="res-dose" class="mt-4 text-center font-black text-xl text-blue-800"></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="relatorio" class="section">
-        <div class="bg-white p-8 rounded-3xl shadow-md text-center mb-6 border-b-8 border-green-500">
-            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Saldo do Dia</p>
-            <h2 id="total-geral" class="text-4xl font-black text-gray-900 mt-1">R$ 0,00</h2>
-        </div>
-        <h3 class="text-xs font-bold text-gray-400 mb-2 uppercase">Histórico Recente</h3>
-        <div id="historico-vendas" class="space-y-2"></div>
-    </div>
-
-    <script>
-        // CONFIGURAÇÃO DO SEU FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.firebasestorage.app",
-            messagingSenderId: "182023728304",
-            appId: "1:182023728304:web:040a13bb6f1c9fff35f75",
-            databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let mesaAtiva = 0; let nomeAtivo = "";
-
-        // LISTA DE PRODUTOS
-        const mercadorias = [
-            { n: 'Cerveja Lata', p: 6.00 },
-            { n: 'Cerveja Garrafa', p: 12.00 },
-            { n: 'Dose Cana', p: 3.00 },
-            { n: 'Espetinho', p: 8.00 },
-            { n: 'Refrigerante', p: 5.00 },
-            { n: 'Água s/ Gás', p: 4.00 }
-        ].sort((a,b) => a.n.localeCompare(b.n));
-
-        // NAVEGAÇÃO
-        function mudar(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('btn-home').style.display = (id === 'inicio') ? 'none' : 'block';
-            window.scrollTo(0,0);
-        }
-
-        function formatarNome(s) { return s.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, l => l.toUpperCase()); }
-
-        // RENDER BOTÕES DE PRODUTOS
-        document.getElementById('lista-botoes-produtos').innerHTML = mercadorias.map(m => `
-            <button onclick="addAoCupom('${m.n}', ${m.p})" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 font-bold text-[10px] uppercase active:bg-orange-100">
-                ${m.n}<br><span class="text-blue-600 text-xs">R$ ${m.p.toFixed(2)}</span>
-            </button>
-        `).join('');
-
-        // CALCULADORAS
-        function calcularMix() {
-            const p = parseFloat(document.getElementById('mix-preco').value);
-            const ml = parseFloat(document.getElementById('mix-ml').value);
-            if(p && ml) document.getElementById('res-mix').innerText = "R$ " + ((p/ml)*1000).toFixed(2) + " / Litro";
-        }
-        function calcularDose() {
-            const p = parseFloat(document.getElementById('dose-p').value);
-            const mlG = parseFloat(document.getElementById('dose-mlg').value);
-            const mlD = parseFloat(document.getElementById('dose-mld').value);
-            if(p && mlG && mlD) document.getElementById('res-dose').innerText = "Custo: R$ " + ((p/mlG)*mlD).toFixed(2);
-        }
-
-        // LÓGICA DE MESAS
-        function abrirPainelMesa(num, cliente) {
-            mesaAtiva = num;
-            nomeAtivo = cliente || formatarNome(prompt("Nome do Cliente:") || "CLIENTE");
-            if (!cliente) db.ref('mesas_ativas/' + num + '/cliente').set(nomeAtivo);
-            document.getElementById('span-num-mesa').innerText = num;
-            document.getElementById('cupom-cliente').innerText = "CLIENTE: " + nomeAtivo;
-            mudar('detalhe-mesa');
-            carregarCupom(num);
-        }
-
-        function addAoCupom(item, valor) {
-            db.ref('mesas_ativas/' + mesaAtiva + '/consumo').push({ item, valor, data: new Date().toLocaleTimeString() });
-        }
-
-        function carregarCupom(num) {
-            db.ref('mesas_ativas/' + num + '/consumo').on('value', snap => {
-                const lista = document.getElementById('lista-cupom');
-                lista.innerHTML = ''; let sub = 0; const agrupado = {};
-                snap.forEach(c => {
-                    const v = c.val(); agrupado[v.item] = (agrupado[v.item] || {q:0, t:0});
-                    agrupado[v.item].q++; agrupado[v.item].t += v.valor; sub += v.valor;
-                });
-                for(let i in agrupado) lista.innerHTML += `<div class="flex justify-between"><span>${agrupado[i].q}x ${i}</span><span>R$ ${agrupado[i].t.toFixed(2)}</span></div>`;
-                const taxa = sub * 0.10;
-                document.getElementById('cupom-sub').innerText = "R$ " + sub.toFixed(2);
-                document.getElementById('cupom-taxa').innerText = "R$ " + taxa.toFixed(2);
-                document.getElementById('cupom-total').innerText = "R$ " + (sub + taxa).toFixed(2);
-                window.totalConta = sub + taxa;
-            });
-        }
-
-        function fecharContaFinal() {
-            if(confirm("Finalizar e liberar mesa?")) {
-                db.ref('vendas_gerais').push({ 
-                    item: `Mesa ${mesaAtiva} (${nomeAtivo})`, 
-                    valor: window.totalConta, 
-                    data: new Date().toLocaleString() 
-                });
-                db.ref('mesas_ativas/' + mesaAtiva).remove(); 
-                mudar('inicio');
-            }
-        }
-
-        // SINCRONIZAÇÃO DAS MESAS
-        db.ref('mesas_ativas').on('value', snap => {
-            const grid = document.getElementById('grid-mesas'); grid.innerHTML = '';
-            for (let i = 1; i <= 12; i++) {
-                const m = (snap.val() || {})[i];
-                grid.innerHTML += `
-                <div onclick="abrirPainelMesa(${i}, '${m ? m.cliente : ''}')" 
-                     class="app-button ${m ? 'bg-white border-2 border-red-500' : 'bg-gray-200'}">
-                    <span class="text-[10px] font-bold text-gray-400">M${i}</span>
-                    <span class="font-bold text-[9px] truncate w-full text-center px-1 text-gray-800">${m ? m.cliente : 'LIVRE'}</span>
-                </div>`;
-            }
-        });
-
-        // FIADO
-        function lancarFiado() {
-            const n = formatarNome(document.getElementById('fiado-nome').value.trim());
-            const t = document.getElementById('fiado-tel').value.trim();
-            const v = parseFloat(document.getElementById('fiado-v').value);
-            if(n && v) {
-                db.ref('fiado/'+n).transaction(a => {
-                    const at = a || { saldo: 0, telefone: t };
-                    return { saldo: (at.saldo || 0) + v, telefone: t || at.telefone || '' };
-                });
-                document.getElementById('fiado-nome').value = ''; 
-                document.getElementById('fiado-v').value = '';
-                alert("Lançado no Fiado!");
-            }
-        }
-
-        db.ref('fiado').on('value', snap => {
-            const l = document.getElementById('lista-fiado'); l.innerHTML = '';
-            snap.forEach(p => { 
-                if(p.val().saldo > 0) l.innerHTML += `
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-sm border-l-8 border-red-600">
-                    <span><b class="text-gray-900">${p.key}</b><br><span class="text-red-600 font-bold">R$ ${p.val().saldo.toFixed(2)}</span></span>
-                    <button onclick="window.open('https://api.whatsapp.com/send?phone=55${p.val().telefone}&text=Olá, o seu saldo no Boteco 934 é de R$ ${p.val().saldo.toFixed(2)}')" 
-                            class="bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-[10px]">COBRAR</button>
-                </div>`;
-            });
-        });
-
-        // CAIXA
-        db.ref('vendas_gerais').on('value', s => {
-            let t = 0; const h = document.getElementById('historico-vendas'); h.innerHTML = '';
-            s.forEach(v => {
-                t += v.val().valor;
-                h.insertAdjacentHTML('afterbegin', `
-                <div class="bg-white p-3 rounded-xl shadow-sm text-[10px] flex justify-between items-center border-l-4 border-green-500">
-                    <span class="font-bold text-gray-600">${v.val().item}</span>
-                    <b class="text-gray-900 text-sm">R$ ${v.val().valor.toFixed(2)}</b>
-                </div>`);
-            });
-            document.getElementById('total-geral').innerText = 'R$ ' + t.toFixed(2);
-        });
-    </script>
-</body>
-</html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA ELITE - BOTECO 934</title>
+    <title>PDV ELITE | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ESTILOS DO PAINEL PRINCIPAL */
-        :root { --dark: #1a252f; --sidebar: #2c3e50; --accent: #f39c12; --bg: #dfe6e9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        
-        body { display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
-
-        /* MENU LATERAL */
-        nav { width: 220px; background: var(--dark); color: white; display: flex; flex-direction: column; border-right: 3px solid var(--accent); }
-        .cabecalho-nav { padding: 25px 15px; background: #141d26; text-align: center; border-bottom: 1px solid #2c3e50; }
-        .cabecalho-nav h1 { color: var(--accent); font-size: 18px; letter-spacing: 1px; }
-
-        .nav-item { 
-            padding: 15px 20px; 
-            cursor: pointer; 
-            border-bottom: 1px solid #2c3e50; 
-            text-decoration: none; 
-            color: #bdc3c7; 
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            transition: 0.3s;
-        }
-        .nav-item:hover { background: var(--sidebar); color: var(--accent); padding-left: 30px; }
-        .nav-item.active { background: var(--sidebar); color: var(--accent); border-left: 5px solid var(--accent); }
-
-        /* ÁREA DE CONTEÚDO DINÂMICO */
-        main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
-        /* O IFRAME É ONDE AS OUTRAS PÁGINAS VÃO APARECER */
-        #frame-conteudo { width: 100%; height: 100%; border: none; }
-
-        .rodape-status { background: #fff; padding: 5px 15px; font-size: 11px; border-top: 1px solid #ccc; color: #666; display: flex; justify-content: space-between; }
+        :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; }
+        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .cliente-area { background: var(--glass); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 95%; }
+        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        #barcode { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
+        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 100px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        .total-box { background: var(--glass); border-radius: 15px; padding: 20px; text-align: right; border: 2px solid var(--green); margin-bottom: 15px; }
+        .total-valor { color: var(--green); font-size: 45px; font-weight: bold; line-height: 1; }
+        .pagamento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; }
+        .btn-pg.active { background: var(--green); color: black; font-weight: bold; }
+        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .btn-fechamento { background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-voltar { display: block; text-align: center; margin-top: 20px; color: #555; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="cabecalho-nav">
-            <h1>BOTECO 934</h1>
-            <small style="color: #7f8c8d;">Painel de Controle</small>
-        </div>
+<div class="container">
+    <div class="header">BOTECO 934 | PDV A-Z</div>
 
-        <a href="vendas.html" target="janela_principal" class="nav-item">🛒 Frente de Caixa</a>
-        <a href="estoque.html" target="conteudo" class="nav-item">🧠 Mix Inteligente</a>
-        <a href="financeiro.html" target="conteudo" class="nav-item">💸 Contas a Pagar</a>
-        <a href="boticario.html" target="conteudo" class="nav-item">🌸 O Boticário</a>
-        <a href="clientes.html" target="conteudo" class="nav-item">👥 Cadastro Pendura</a>
-        
-        <div style="margin-top: auto; padding: 20px;">
-            <button onclick="window.location.reload()" style="width:100%; padding:8px; cursor:pointer; background:none; border:1px solid #444; color:#999; border-radius:4px;">Atualizar Sistema</button>
-        </div>
-    </nav>
+    <div class="cliente-area">
+        <div><small>MESA:</small><select id="mesaSel"><option>BALCÃO</option><option>MESA 01</option><option>MESA 02</option><option>MESA 03</option><option>MESA 04</option></select></div>
+        <div><small>CLIENTE:</small><input type="text" id="nomeCliente" class="input-nome" placeholder="NOME..."></div>
+    </div>
 
-    <main>
-        <iframe name="conteudo" id="frame-conteudo" src="vendas.html"></iframe>
-        
-        <div class="rodape-status">
-            <span>Operador: Edmarques Santos</span>
-            <span>Status: Sistema Online</span>
-        </div>
-    </main>
+    <div class="search-area"><input type="text" id="barcode" placeholder="BIPE O PRODUTO..." autofocus></div>
 
-    <script>
-        // Lógica simples para marcar qual item do menu está ativo
-        const links = document.querySelectorAll('.nav-item');
-        links.forEach(link => {
-            link.addEventListener('click', function() {
-                links.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
+    <div id="listaItens" class="item-list"></div>
+
+    <div class="total-box"><div id="displayTotal" class="total-valor">R$ 0,00</div></div>
+
+    <div class="pagamento-grid">
+        <button class="btn-pg active" onclick="setPagamento('DINHEIRO', this)">DINHEIRO</button>
+        <button class="btn-pg" onclick="setPagamento('PIX', this)">PIX</button>
+        <button class="btn-pg" onclick="setPagamento('DÉBITO', this)">DÉBITO</button>
+        <button class="btn-pg" onclick="setPagamento('CRÉDITO', this)">CRÉDITO</button>
+        <button class="btn-pg" style="background:#c0392b!important" onclick="setPagamento('PENDURA', this)">PENDURA</button>
+    </div>
+
+    <button class="btn-zap" onclick="finalizarVenda()"><i class="fab fa-whatsapp"></i> FECHAR CONTA</button>
+    <button class="btn-fechamento" onclick="gerarRelatorioDiario()"><i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DIÁRIO</button>
+
+    <a href="index.html" class="btn-voltar">VOLTAR AO MENU</a>
+</div>
+
+<script>
+    let totalVenda = 0;
+    let formaPg = "DINHEIRO"; 
+    let itensVendaAtual = [];
+
+    function setPagamento(tipo, btn) {
+        formaPg = tipo;
+        document.querySelectorAll('.btn-pg').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function atualizarListaTela() {
+        const listaUI = document.getElementById('listaItens');
+        listaUI.innerHTML = '';
+        // Ordena a lista da venda atual de A a Z
+        itensVendaAtual.sort((a, b) => a.nome.localeCompare(b.nome));
+        itensVendaAtual.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `<span>${p.nome}</span> <b>R$ ${p.preco.toFixed(2)}</b>`;
+            listaUI.appendChild(div);
         });
-    </script>
+    }
 
+    document.getElementById('barcode').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && this.value !== '') {
+            const estoque = JSON.parse(localStorage.getItem('estoqueBoteco934')) || {};
+            const produto = estoque[this.value];
+            if (produto) {
+                itensVendaAtual.push({ nome: produto.nome, preco: produto.preco });
+                totalVenda += produto.preco;
+                document.getElementById('displayTotal').innerText = `R$ ${totalVenda.toFixed(2).replace('.', ',')}`;
+                atualizarListaTela();
+            } else { alert("NÃO CADASTRADO!"); }
+            this.value = '';
+        }
+    });
+
+    function finalizarVenda() {
+        if (totalVenda === 0) return alert("SEM ITENS!");
+        const cliente = document.getElementById('nomeCliente').value || "Cliente";
+        
+        // Registrar para o Relatório Diário
+        let hist = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
+        const chave = (formaPg === 'DÉBITO') ? 'DEBITO' : (formaPg === 'CRÉDITO' ? 'CREDITO' : formaPg);
+        hist[chave] += totalVenda;
+        localStorage.setItem('vendasDia934', JSON.stringify(hist));
+
+        // Enviar WhatsApp
+        const resumoItens = itensVendaAtual.map(i => i.nome).join(", ");
+        const texto = `*BOTECO 934*\n*CLIENTE:* ${cliente}\n*ITENS:* ${resumoItens}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PG:* ${formaPg}`;
+        window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(texto)}`);
+        location.reload(); 
+    }
+
+    function gerarRelatorioDiario() {
+        const d = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
+        const total = d.DINHEIRO + d.PIX + d.DEBITO + d.CREDITO + d.PENDURA;
+        const res = `*FECHAMENTO 934*\n💰 DINHEIRO: R$ ${d.DINHEIRO.toFixed(2)}\n📱 PIX: R$ ${d.PIX.toFixed(2)}\n💳 CARTÕES: R$ ${(d.DEBITO+d.CREDITO).toFixed(2)}\n📝 PENDURA: R$ ${d.PENDURA.toFixed(2)}\n*TOTAL: R$ ${total.toFixed(2)}*`;
+        if (confirm("Enviar e ZERAR?")) {
+            window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(res)}`);
+            localStorage.removeItem('vendasDia934');
+            location.reload();
+        }
+    }
+</script>
 </body>
 </html>
