@@ -41,3 +41,25 @@ async function finalizarVenda() {
         alert("Erro ao registrar pendura: " + e); 
     }
 }
+// Função para calcular o resumo financeiro do dia
+function gerarResumoFinanceiro(vendasDoDia) {
+    let financeiro = {
+        dinheiro: 0,
+        pix: 0,
+        cartao: 0,
+        pendura: 0
+    };
+
+    vendasDoDia.forEach(venda => {
+        if (venda.metodo === "DINHEIRO") financeiro.dinheiro += venda.valor_pago;
+        else if (venda.metodo === "PIX") financeiro.pix += venda.valor_pago;
+        else if (venda.metodo === "CREDITO" || venda.metodo === "DEBITO") financeiro.cartao += venda.valor_pago;
+        else if (venda.metodo === "PENDURA") financeiro.pendura += venda.valor_pago;
+    });
+
+    console.log("--- RESUMO DO DIA BOTECO 934 ---");
+    console.log(`💵 Dinheiro em Caixa: R$ ${financeiro.dinheiro.toFixed(2)}`);
+    console.log(`💎 Total em PIX: R$ ${financeiro.pix.toFixed(2)}`);
+    console.log(`💳 Total em Cartão: R$ ${financeiro.cartao.toFixed(2)}`);
+    console.log(`📝 Total em Pendura: R$ ${financeiro.pendura.toFixed(2)}`);
+}
