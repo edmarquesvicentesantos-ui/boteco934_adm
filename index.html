@@ -6,94 +6,96 @@
     <title>SISTEMA | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --blue: #3498db; --green: #2ecc71; }
         
-        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
-        .header i { font-size: 40px; color: var(--gold); }
-        .header h1 { margin: 5px 0; font-size: 20px; letter-spacing: 2px; color: var(--gold); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; }
 
-        .menu-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            width: 100%; 
-            max-width: 450px; 
+        .header { text-align: center; margin: 20px 0 30px 0; }
+        .logo-area { font-size: 40px; color: var(--gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .header h1 { margin: 10px 0 5px 0; font-size: 24px; letter-spacing: 2px; }
+        .header p { color: #888; font-size: 14px; margin: 0; }
+
+        .section-title { font-size: 12px; color: var(--gold); text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px; font-weight: bold; opacity: 0.8; }
+
+        /* Estilo dos Botões */
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        
+        .menu-button { 
+            background: var(--glass); 
+            border: 1px solid #333; 
+            padding: 18px; 
+            border-radius: 15px; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            transition: 0.3s;
         }
+        .menu-button:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+        
+        .menu-button i { font-size: 24px; width: 40px; text-align: center; margin-right: 15px; }
+        .menu-button span { font-weight: 600; font-size: 16px; }
 
-        .btn-item {
-            background: var(--glass);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 15px;
-            padding: 18px 10px;
-            text-align: center;
-            text-decoration: none;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-        }
+        /* Destaques de cores */
+        .btn-vendas { border-color: var(--gold); }
+        .btn-vendas i { color: var(--gold); }
+        
+        .btn-clientes { border-color: var(--blue); }
+        .btn-clientes i { color: var(--blue); }
 
-        .btn-item i { font-size: 22px; }
-        .btn-item span { font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .btn-item:active { transform: scale(0.95); background: rgba(255, 215, 0, 0.15); }
-
-        /* Cores dos Ícones para facilitar */
-        .c-venda { color: #2ecc71; }    /* Verde */
-        .c-custo { color: #f1c40f; }    /* Amarelo */
-        .c-finan { color: #3498db; }    /* Azul */
-        .c-deved { color: #e74c3c; }    /* Vermelho */
-        .c-clien { color: #9b59b6; }    /* Roxo */
-        .c-estoq { color: #ecf0f1; }    /* Branco */
-
-        .footer { margin-top: 30px; font-size: 10px; color: #444; text-align: center; }
+        .footer { margin-top: 40px; text-align: center; color: #444; font-size: 11px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <i class="fas fa-beer"></i>
-    <h1>BOTECO 934</h1>
-    <small style="color: #666;">GESTÃO COMPLETA</small>
-</div>
+<div class="container">
+    <div class="header">
+        <div class="logo-area"><i class="fas fa-glass-cheers"></i></div>
+        <h1>BOTECO 934</h1>
+        <p>Gestão Inteligente & Distribuição</p>
+    </div>
 
-<div class="menu-grid">
-    <a href="calculadora.html" class="btn-item">
-        <i class="fas fa-cash-register c-venda"></i>
-        <span>Calculadora (PDV)</span>
-    </a>
+    <div class="section-title">Financeiro e Vendas</div>
+    <div class="menu-grid">
+        <a href="vendas.html" class="menu-button btn-vendas">
+            <i class="fas fa-chart-line"></i>
+            <span>MONITOR DE VENDAS</span>
+        </a>
+        <a href="pdv.html" class="menu-button">
+            <i class="fas fa-cash-register"></i>
+            <span>ABRIR CAIXA (PDV)</span>
+        </a>
+    </div>
 
-    <a href="calculadora_custo.html" class="btn-item">
-        <i class="fas fa-calculator c-custo"></i>
-        <span>Custos & Lucro</span>
-    </a>
+    <div class="section-title">Mercadorias</div>
+    <div class="menu-grid">
+        <a href="importar_estoque.html" class="menu-button">
+            <i class="fas fa-file-import"></i>
+            <span>ENTRADA DE NOTAS / XML</span>
+        </a>
+        <a href="estoque.html" class="menu-button">
+            <i class="fas fa-boxes"></i>
+            <span>VER ESTOQUE ATUAL</span>
+        </a>
+    </div>
 
-    <a href="gestao_mensal.html" class="btn-item">
-        <i class="fas fa-chart-pie c-finan"></i>
-        <span>Gestão Mensal</span>
-    </a>
+    <div class="section-title">Administração</div>
+    <div class="menu-grid">
+        <a href="lista_clientes.html" class="menu-button btn-clientes">
+            <i class="fas fa-users"></i>
+            <span>LISTA DE CLIENTES (A-Z)</span>
+        </a>
+        <a href="pendura.html" class="menu-button">
+            <i class="fas fa-book-open"></i>
+            <span>CONTROLE DE PENDURA</span>
+        </a>
+    </div>
 
-    <a href="devedores.html" class="btn-item">
-        <i class="fas fa-book-open c-deved"></i>
-        <span>Devedores</span>
-    </a>
-
-    <a href="clientes.html" class="btn-item">
-        <i class="fas fa-users c-clien"></i>
-        <span>Clientes</span>
-    </a>
-
-    <a href="importar_estoque.html" class="btn-item">
-        <i class="fas fa-file-import c-estoq"></i>
-        <span>Importar Estoque</span>
-    </a>
-</div>
-
-<div class="footer">
-    PROPRIEDADE DE EDMARQUES SANTOS<br>
-    SISTEMA HOSPEDADO NO GITHUB
+    <div class="footer">
+        &copy; 2026 Boteco 934 - Petrolina/PE <br>
+        Desenvolvido por Edmarques Vicente
+    </div>
 </div>
 
 </body>
