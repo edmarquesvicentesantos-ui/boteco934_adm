@@ -3,183 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA | BOTECO 934</title>
+    <title>BOTECO 934 | SUPER APP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --blue: #3498db; --green: #2ecc71; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --pink: #ff69b4; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 80px; }
+        .app-header { background: var(--card); padding: 15px; text-align: center; border-bottom: 1px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
+        .app-header h1 { margin: 0; font-size: 18px; color: var(--gold); letter-spacing: 2px; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: fl<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA ÚNICO | BOTECO 934</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; --blue: #3498db; }
-        
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        
-        /* Transição de Telas */
-        .tela { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        .tela { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .tela.ativa { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Menu Inferior Fixo */
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #161b22; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 100; }
-        .nav-item { color: #888; text-decoration: none; text-align: center; font-size: 10px; flex: 1; cursor: pointer; }
-        .nav-item.ativo { color: var(--gold); }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-
-        /* Estilos Comuns */
-        .header-app { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--gold); padding-bottom: 10px; }
-        .card { background: var(--glass); border-radius: 15px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .item-lista { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #222; align-items: center; }
         
-        /* Específico: Monitor */
-        .venda-item { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 10px 0; }
-        .btn-acao { background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
+        /* Menu Inferior */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; border-top: 1px solid #333; padding: 8px 0; z-index: 1000; }
+        .nav-btn { flex: 1; text-align: center; color: #666; font-size: 10px; cursor: pointer; }
+        .nav-btn.ativo { color: var(--gold); }
+        .nav-btn i { font-size: 20px; display: block; margin-bottom: 3px; }
+        
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-add { background: var(--gold); color: black; border: none; padding: 10px; border-radius: 5px; font-weight: bold; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="tela-vendas" class="tela ativa">
-    <div class="header-app">
-        <i class="fas fa-chart-line fa-2x" style="color: var(--gold);"></i>
-        <h2 style="margin:5px 0;">Monitor de Vendas</h2>
+<div class="app-header">
+    <h1>BOTECO 934</h1>
+</div>
+
+<div id="vendas" class="tela ativa">
+    <div class="card" style="border-left: 5px solid var(--green);">
+        <small>RESUMO DE HOJE</small>
+        <h2 id="resumo-total">R$ 0,00</h2>
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="card" style="text-align: center;">
-            <span id="total-vendas-valor" style="font-size: 20px; font-weight: bold; color: var(--green);">R$ 0,00</span>
-            <div style="font-size: 10px; color: #888;">TOTAL HOJE</div>
-        </div>
-        <div class="card" style="text-align: center;">
-            <span id="total-vendas-qtd" style="font-size: 20px; font-weight: bold;">0</span>
-            <div style="font-size: 10px; color: #888;">PEDIDOS</div>
-        </div>
-    </div>
+    <div id="lista-vendas-corpo"></div>
+</div>
+
+<div id="estoque" class="tela">
     <div class="card">
-        <h3 style="font-size: 14px; color: var(--gold); margin-top: 0;">Últimos Recebimentos</h3>
-        <div id="lista-vendas-live"></div>
+        <h3><i class="fas fa-boxes"></i> Estoque</h3>
+        <div id="lista-estoque-corpo"></div>
     </div>
 </div>
 
-<div id="tela-estoque" class="tela">
-    <div class="header-app">
-        <i class="fas fa-boxes fa-2x" style="color: var(--blue);"></i>
-        <h2 style="margin:5px 0;">Gestão de Estoque</h2>
-    </div>
+<div id="clientes" class="tela">
     <div class="card">
-        <strong>Entrada via Texto (CSV)</strong>
-        <textarea id="csv-input" placeholder="789123;PRODUTO;5.50;12"></textarea>
-        <button class="btn-acao" onclick="processarEstoque()">CARREGAR LISTA</button>
+        <h3><i class="fas fa-users"></i> Meus Clientes</h3>
+        <input type="text" id="busca-cli" placeholder="🔍 Buscar cliente..." onkeyup="filtrarCli()">
+        <div id="lista-cli-corpo">
+            </div>
     </div>
-    <div id="lista-produtos-estoque"></div>
 </div>
 
-<div id="tela-clientes" class="tela">
-    <div class="header-app">
-        <i class="fas fa-users fa-2x" style="color: var(--green);"></i>
-        <h2 style="margin:5px 0;">Meus Clientes</h2>
+<div id="boticario" class="tela">
+    <div class="card" style="border-left: 5px solid var(--pink);">
+        <h3 style="color: var(--pink);"><i class="fas fa-magic"></i> Revenda Boticário</h3>
+        <p style="font-size: 12px; color: #888;">Controle de pedidos e catálogo.</p>
+        <button class="btn-add" style="background: var(--pink); color: white;">NOVO PEDIDO</button>
     </div>
-    <input type="text" id="busca-cliente" placeholder="Procurar por nome..." onkeyup="filtrarClientes()">
-    <div id="lista-clientes-grid" class="card"></div>
 </div>
 
-<nav class="nav-bottom">
-    <div class="navex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; }
+<nav class="nav-bar">
+    <div class="nav-btn ativo" onclick="abrir('vendas', this)"><i class="fas fa-home"></i>Início</div>
+    <div class="nav-btn" onclick="abrir('estoque', this)"><i class="fas fa-list"></i>Estoque</div>
+    <div class="nav-btn" onclick="abrir('clientes', this)"><i class="fas fa-user"></i>Clientes</div>
+    <div class="nav-btn" onclick="abrir('boticario', this)"><i class="fas fa-heart"></i>Boticário</div>
+</nav>
 
-        .header { text-align: center; margin: 20px 0 30px 0; }
-        .logo-area { font-size: 40px; color: var(--gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
-        .header h1 { margin: 10px 0 5px 0; font-size: 24px; letter-spacing: 2px; }
-        .header p { color: #888; font-size: 14px; margin: 0; }
+<script>
+    // MUDANÇA DE TELA
+    function abrir(telaId, btn) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('ativo'));
+        document.getElementById(telaId).classList.add('ativa');
+        btn.classList.add('ativo');
 
-        .section-title { font-size: 12px; color: var(--gold); text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px; font-weight: bold; opacity: 0.8; }
+        if(telaId === 'clientes') carregarClientes();
+    }
 
-        /* Estilo dos Botões */
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    // CARREGAR CLIENTES DO NAVEGADOR
+    function carregarClientes() {
+        // Tenta buscar por vários nomes de chave comuns para não perder seus dados antigos
+        const dadosSalvos = localStorage.getItem('clientesBoteco934') || localStorage.getItem('clientes') || '[]';
+        let cli = JSON.parse(dadosSalvos);
+        const corpo = document.getElementById('lista-cli-corpo');
         
-        .menu-button { 
-            background: var(--glass); 
-            border: 1px solid #333; 
-            padding: 18px; 
-            border-radius: 15px; 
-            text-decoration: none; 
-            color: white; 
-            display: flex; 
-            align-items: center; 
-            transition: 0.3s;
+        if (cli.length === 0) {
+            corpo.innerHTML = '<p style="text-align:center;color:#444">Nenhum cliente encontrado.</p>';
+            return;
         }
-        .menu-button:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+
+        // Organizar de A a Z
+        cli.sort((a, b) => a.nome.localeCompare(b.nome));
         
-        .menu-button i { font-size: 24px; width: 40px; text-align: center; margin-right: 15px; }
-        .menu-button span { font-weight: 600; font-size: 16px; }
+        corpo.innerHTML = '';
+        cli.forEach(c => {
+            // Deixa a primeira letra maiúscula
+            const nomeF = c.nome.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, l => l.toUpperCase());
+            corpo.innerHTML += `
+                <div class="item-lista">
+                    <div>
+                        <strong>${nomeF}</strong><br>
+                        <small style="color:#666">${c.contato || '(87) -----'}</small>
+                    </div>
+                    <i class="fas fa-comment-dots" style="color:var(--gold)"></i>
+                </div>
+            `;
+        });
+    }
 
-        /* Destaques de cores */
-        .btn-vendas { border-color: var(--gold); }
-        .btn-vendas i { color: var(--gold); }
-        
-        .btn-clientes { border-color: var(--blue); }
-        .btn-clientes i { color: var(--blue); }
+    function filtrarCli() {
+        let busca = document.getElementById('busca-cli').value.toUpperCase();
+        let itens = document.querySelectorAll('#lista-cli-corpo .item-lista');
+        itens.forEach(i => {
+            i.style.display = i.innerText.toUpperCase().includes(busca) ? "flex" : "none";
+        });
+    }
 
-        .footer { margin-top: 40px; text-align: center; color: #444; font-size: 11px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <div class="logo-area"><i class="fas fa-glass-cheers"></i></div>
-        <h1>BOTECO 934</h1>
-        <p>Gestão Inteligente & Distribuição</p>
-    </div>
-
-    <div class="section-title">Financeiro e Vendas</div>
-    <div class="menu-grid">
-        <a href="vendas.html" class="menu-button btn-vendas">
-            <i class="fas fa-chart-line"></i>
-            <span>MONITOR DE VENDAS</span>
-        </a>
-        <a href="pdv.html" class="menu-button">
-            <i class="fas fa-cash-register"></i>
-            <span>ABRIR CAIXA (PDV)</span>
-        </a>
-    </div>
-
-    <div class="section-title">Mercadorias</div>
-    <div class="menu-grid">
-        <a href="importar_estoque.html" class="menu-button">
-            <i class="fas fa-file-import"></i>
-            <span>ENTRADA DE NOTAS / XML</span>
-        </a>
-        <a href="estoque.html" class="menu-button">
-            <i class="fas fa-boxes"></i>
-            <span>VER ESTOQUE ATUAL</span>
-        </a>
-    </div>
-
-    <div class="section-title">Administração</div>
-    <div class="menu-grid">
-        <a href="lista_clientes.html" class="menu-button btn-clientes">
-            <i class="fas fa-users"></i>
-            <span>LISTA DE CLIENTES (A-Z)</span>
-        </a>
-        <a href="pendura.html" class="menu-button">
-            <i class="fas fa-book-open"></i>
-            <span>CONTROLE DE PENDURA</span>
-        </a>
-        <a href="pendura.html" class="menu-button">
-            <i class="fas fa-book-open"></i>
-            <span>LISTA DE CLIENTES</span>
-        </a>
-    </div>
-
-    <div class="footer">
-        &copy; 2026 Boteco 934 - Petrolina/PE <br>
-        Desenvolvido por Edmarques Vicente
-    </div>
-</div>
+    // Carrega a primeira tela
+    window.onload = () => {
+        // Se você já tiver clientes, ele já prepara o terreno
+        carregarClientes();
+    };
+</script>
 
 </body>
 </html>
