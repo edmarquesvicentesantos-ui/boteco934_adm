@@ -3,65 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA BOTECO 934</title>
+    <title>SISTEMA | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { 
-            background-color: #0b0f19; 
-            color: white; 
-            font-family: sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 20px;
-        }
-        h1 { color: #ffd700; margin-bottom: 30px; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        .menu-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 300px;
+        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .header i { font-size: 40px; color: var(--gold); }
+        .header h1 { margin: 5px 0; font-size: 20px; letter-spacing: 2px; color: var(--gold); }
+
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            width: 100%; 
+            max-width: 450px; 
         }
 
-        .botao {
-            display: block;
-            padding: 20px;
+        .btn-item {
+            background: var(--glass);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 18px 10px;
             text-align: center;
             text-decoration: none;
-            font-weight: bold;
-            border-radius: 12px;
-            font-size: 18px;
-            color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             transition: 0.2s;
         }
 
-        /* Cores dos Botões */
-        .btn-venda { background-color: #ffd700; } /* Dourado */
-        .btn-financas { background-color: #2ed573; } /* Verde */
-        .btn-cartao { background-color: #3498db; } /* Azul */
-        .btn-estoque { background-color: #ffffff; } /* Branco */
+        .btn-item i { font-size: 22px; }
+        .btn-item span { font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .btn-item:active { transform: scale(0.95); background: rgba(255, 215, 0, 0.15); }
 
-        .botao:active { transform: scale(0.95); opacity: 0.8; }
-        
-        small { margin-top: 50px; color: #444; }
+        /* Cores dos Ícones para facilitar */
+        .c-venda { color: #2ecc71; }    /* Verde */
+        .c-custo { color: #f1c40f; }    /* Amarelo */
+        .c-finan { color: #3498db; }    /* Azul */
+        .c-deved { color: #e74c3c; }    /* Vermelho */
+        .c-clien { color: #9b59b6; }    /* Roxo */
+        .c-estoq { color: #ecf0f1; }    /* Branco */
+
+        .footer { margin-top: 30px; font-size: 10px; color: #444; text-align: center; }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <i class="fas fa-beer"></i>
     <h1>BOTECO 934</h1>
+    <small style="color: #666;">GESTÃO COMPLETA</small>
+</div>
 
-    <div class="menu-container">
-        <a href="calculadora.html" class="botao btn-venda">💰 VENDER (PDV)</a>
+<div class="menu-grid">
+    <a href="calculadora.html" class="btn-item">
+        <i class="fas fa-cash-register c-venda"></i>
+        <span>Calculadora (PDV)</span>
+    </a>
 
-        <a href="gestao_mensal.html" class="botao btn-financas">📊 FINANÇAS</a>
+    <a href="calculadora_custos.html" class="btn-item">
+        <i class="fas fa-calculator c-custo"></i>
+        <span>Custos & Lucro</span>
+    </a>
 
-        <a href="contas_cartao.html" class="botao btn-cartao">💳 CARTÕES</a>
+    <a href="gestao_mensal.html" class="btn-item">
+        <i class="fas fa-chart-pie c-finan"></i>
+        <span>Gestão Mensal</span>
+    </a>
 
-        <a href="importar_estoque.html" class="botao btn-estoque">📦 ESTOQUE</a>
-    </div>
+    <a href="devedores.html" class="btn-item">
+        <i class="fas fa-book-open c-deved"></i>
+        <span>Devedores</span>
+    </a>
 
-    <small>Edmarques Santos | v3.0</small>
+    <a href="clientes.html" class="btn-item">
+        <i class="fas fa-users c-clien"></i>
+        <span>Clientes</span>
+    </a>
+
+    <a href="importar_estoque.html" class="btn-item">
+        <i class="fas fa-file-import c-estoq"></i>
+        <span>Importar Estoque</span>
+    </a>
+</div>
+
+<div class="footer">
+    PROPRIEDADE DE EDMARQUES SANTOS<br>
+    SISTEMA HOSPEDADO NO GITHUB
+</div>
 
 </body>
 </html>
