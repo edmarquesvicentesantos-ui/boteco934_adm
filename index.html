@@ -2,120 +2,44 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MONITOR | BOTECO 934</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDV | BOTECO 934</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; }
-        
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; }
-        
-        /* Cabeçalho do Monitor */
-        .monitor-header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-        .monitor-header h2 { margin: 5px 0; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Painel de Resumo (Igual à foto que você mandou) */
-        .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .resumo-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 20px; text-align: center; }
-        .resumo-card span { font-size: 11px; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .resumo-card strong { font-size: 24px; color: var(--green); }
-
-        /* Lista de Vendas em Tempo Real */
-        .vendas-container { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        .venda-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #222; animation: lightUp 1s ease; }
-        @keyframes lightUp { from { background: rgba(46, 204, 113, 0.2); } to { background: transparent; } }
-
-        .venda-info b { display: block; font-size: 16px; }
-        .venda-info small { color: #666; font-size: 12px; }
-        
-        .venda-valor { text-align: right; }
-        .venda-valor .tag { font-size: 10px; background: #333; padding: 2px 6px; border-radius: 4px; color: var(--gold); }
-
-        .btn-voltar { display: block; text-align: center; margin-top: 30px; color: #555; text-decoration: none; font-size: 14px; }
+        .fonte-13 { font-size: 13px !important; }
+        .tarja-botao { background-color: #1e3a8a; } /* Azul Marinho */
     </style>
 </head>
-<body>
+<body class="bg-gray-200 min-h-screen">
+    <nav class="bg-blue-900 text-white p-3 shadow-md flex justify-between items-center">
+        <h1 class="font-bold italic">BOTECO 934</h1>
+        <div id="status-conexao" class="text-[10px] bg-green-500 px-2 py-1 rounded-full uppercase">Online</div>
+    </nav>
 
-    <div class="monitor-header">
-        <i class="fas fa-desktop fa-2x" style="color: var(--gold);"></i>
-        <h2>Monitor de Vendas</h2>
-        <small id="data-atual"></small>
-    </div>
-
-    <div class="resumo-grid">
-        <div class="resumo-card">
-            <span>Total Hoje</span>
-            <strong id="total-valor">R$ 0,00</strong>
-        </div>
-        <div class="resumo-card">
-            <span>Vendas</span>
-            <strong id="total-qtd" style="color: white;">0</strong>
-        </div>
-    </div>
-
-    <div class="section-title" style="font-size: 12px; color: var(--gold); margin-bottom: 10px; font-weight: bold;">RECIBOS RECENTES</div>
-    
-    <div class="vendas-container" id="lista-vendas">
-        <div style="padding: 40px; text-align: center; color: #444;">
-            <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>
-            Aguardando pagamentos...
-        </div>
-    </div>
-
-    <a href="index.html" class="btn-voltar">
-        <i class="fas fa-chevron-left"></i> VOLTAR AO MENU PRINCIPAL
-    </a>
-
-    <audio id="som-venda" src="https://www.myinstants.com/media/sounds/cash-register-purchase.mp3"></audio>
-
-<script>
-    // Atualiza a data no topo
-    document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-BR');
-
-    // Função para adicionar uma nova venda na tela (Simulação do Webhook)
-    function registrarVenda(valor, metodo) {
-        const som = document.getElementById('som-venda');
-        const lista = document.getElementById('lista-vendas');
-        
-        // Se for a primeira venda, limpa o "Aguardando..."
-        if(lista.innerText.includes("Aguardando")) lista.innerHTML = '';
-
-        const hora = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-        
-        const htmlVenda = `
-            <div class="venda-item">
-                <div class="venda-info">
-                    <b>Venda Aprovada</b>
-                    <small>${hora} • Boteco 934</small>
+    <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2">
+            <h2 class="text-gray-600 font-bold mb-3 uppercase text-xs tracking-widest">Cardápio</h2>
+            <div id="lista-produtos" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 </div>
-                <div class="venda-valor">
-                    <span style="color: var(--green); font-weight: bold;">R$ ${valor.toFixed(2)}</span><br>
-                    <span class="tag">${metodo.toUpperCase()}</span>
-                </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-4 h-fit border-t-4 border-blue-900">
+            <h3 class="font-bold mb-4 border-b pb-2">Venda Atual</h3>
+            <div id="itens-venda" class="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                <p class="text-gray-400 text-sm italic text-center">Nenhum item selecionado</p>
             </div>
-        `;
+            <div class="border-t pt-4">
+                <div class="flex justify-between text-xl font-black mb-4">
+                    <span>TOTAL</span>
+                    <span id="valor-total">R$ 0,00</span>
+                </div>
+                <button onclick="finalizarVenda()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all uppercase">Finalizar Venda</button>
+            </div>
+        </div>
+    </div>
 
-        lista.insertAdjacentHTML('afterbegin', htmlVenda);
-        som.play();
-        
-        // Atualiza os totais (Lógica simples para exemplo)
-        atualizarTotais(valor);
-    }
-
-    let acumulado = 0;
-    let qtd = 0;
-    function atualizarTotais(valor) {
-        acumulado += valor;
-        qtd++;
-        document.getElementById('total-valor').innerText = `R$ ${acumulado.toFixed(2)}`;
-        document.getElementById('total-qtd').innerText = qtd;
-    }
-
-    // TESTE AUTOMÁTICO: Em 3 segundos vai simular uma venda para você ver o efeito
-    setTimeout(() => {
-        registrarVenda(37.50, 'Pix');
-    }, 3000);
-</script>
-
+    <script src="app.js"></script>
 </body>
 </html>
