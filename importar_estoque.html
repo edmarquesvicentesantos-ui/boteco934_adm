@@ -163,4 +163,34 @@
     }
 
     function abrirTabela() {
-        document.getElementById('containerTabela').style.
+        document.getElementById('containerTabela').style.display = 'block';
+        document.getElementById('btnConfirmarTudo').style.display = 'block';
+    }
+
+    function salvarEstoqueFinal() {
+        const estoque = JSON.parse(localStorage.getItem(estoqueKey)) || {};
+        const linhas = document.querySelectorAll("#corpoTabela tr");
+        
+        linhas.forEach(tr => {
+            const inputs = tr.querySelectorAll("input");
+            const cod = inputs[0].value;
+            const nom = inputs[1].value.toUpperCase();
+            const pre = parseFloat(inputs[2].value);
+            const qtdN = parseInt(inputs[3].value);
+            const qtdA = estoque[cod] ? estoque[cod].qtd : 0;
+            estoque[cod] = { nome: nom, preco: pre, qtd: qtdA + qtdN };
+        });
+
+        if (chaveNota) {
+            const notas = JSON.parse(localStorage.getItem(notasKey)) || [];
+            notas.push(chaveNota);
+            localStorage.setItem(notasKey, JSON.stringify(notas));
+        }
+
+        localStorage.setItem(estoqueKey, JSON.stringify(estoque));
+        alert("ESTOQUE ATUALIZADO!");
+        location.reload();
+    }
+</script>
+</body>
+</html>
