@@ -2,45 +2,55 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>SISTEMA ELITE - BOTECO 934</title>
     <style>
-        :root { --dark: #1a252f; --sidebar: #2c3e50; --accent: #f39c12; --bg: #dfe6e9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
-
-        /* MENU LATERAL FIXO */
-        nav { width: 200px; background: var(--dark); color: white; display: flex; flex-direction: column; border-right: 2px solid var(--accent); }
-        .logo { padding: 20px; color: var(--accent); font-weight: bold; text-align: center; border-bottom: 1px solid #34495e; }
-        
-        .nav-item { 
-            padding: 15px; 
-            cursor: pointer; 
-            border-bottom: 1px solid #34495e; 
-            text-decoration: none; 
-            color: white; 
-            font-weight: 600;
-            display: block;
-        }
-        .nav-item:hover { background: var(--sidebar); color: var(--accent); border-left: 5px solid var(--accent); }
-
-        /* ÁREA ONDE AS PÁGINAS VÃO APARECER */
-        main { flex: 1; display: flex; flex-direction: column; }
-        iframe { width: 100%; height: 100%; border: none; }
+        body { font-family: sans-serif; padding: 20px; background: #fff; }
+        .painel { border: 2px solid #f39c12; padding: 20px; border-radius: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        input { padding: 10px; width: 100%; border: 1px solid #ccc; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #eee; }
     </style>
 </head>
 <body>
+    <div class="painel">
+        <h2>🧠 CALCULADORA DE MIX INTELIGENTE</h2>
+        <div class="grid">
+            <div>
+                <label>Custo da Caixa (R$)</label>
+                <input type="number" id="custo-cx" value="60.00" oninput="calcular()">
+            </div>
+            <div>
+                <label>Unidades</label>
+                <input type="number" id="qtd-cx" value="24" oninput="calcular()">
+            </div>
+            <div style="background:#1a252f; color:#f39c12; padding:10px; border-radius:4px; text-align:center;">
+                Custo Unitário:<br><b id="res-unit">R$ 2,50</b>
+            </div>
+        </div>
 
-<nav>
-    <div class="logo">BOTECO 934</div>
-    <a href="vendas.html" target="conteudo" class="nav-item">🛒 VENDAS / MESAS</a>
-    <a href="estoque.html" target="conteudo" class="nav-item">🧠 CALCULADORA / MIX</a>
-    <a href="financeiro.html" target="conteudo" class="nav-item">💸 CONTAS A PAGAR</a>
-    <a href="boticario.html" target="conteudo" class="nav-item">🌸 BOTICÁRIO</a>
-</nav>
+        <table>
+            <thead>
+                <tr><th>Tipo</th><th>Venda</th><th>Lucro</th></tr>
+            </thead>
+            <tbody id="resultado"></tbody>
+        </table>
+    </div>
 
-<main>
-    <iframe name="conteudo" src="vendas.html"></iframe>
-</main>
-
+    <script>
+        function calcular() {
+            let cx = parseFloat(document.getElementById('custo-cx').value) || 0;
+            let q = parseInt(document.getElementById('qtd-cx').value) || 1;
+            let u = cx / q;
+            document.getElementById('res-unit').innerText = "R$ " + u.toFixed(2);
+            
+            let html = `
+                <tr><td>Natural</td><td>R$ ${(u*1.4).toFixed(2)}</td><td>R$ ${(u*0.4).toFixed(2)}</td></tr>
+                <tr><td>Gelada</td><td>R$ ${(u*1.4+1.5).toFixed(2)}</td><td>R$ ${(u*0.4+1.5).toFixed(2)}</td></tr>
+            `;
+            document.getElementById('resultado').innerHTML = html;
+        }
+        window.onload = calcular;
+    </script>
 </body>
 </html>
