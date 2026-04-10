@@ -1,4 +1,315 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Boteco 934">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boteco 934 - Gestão</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        body { 
+            background-color: #f0f2f5; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .section { display: none; }
+        .section.active { display: block; animation: slideUp 0.3s ease-out; }
+        
+        @keyframes slideUp { 
+            from { transform: translateY(20px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+        
+        /* Botões Estilo iPhone */
+        .app-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1/1;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            cursor: pointer;
+        }
+        .app-button:active { transform: scale(0.92); }
+        
+        .cupom-fiscal {
+            background: #fff;
+            border: 1px dashed #000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Esconder barra de rolagem mas manter funcionalidade */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="p-4 pb-10">
+
+    <header class="flex justify-between items-center mb-8 pt-4">
+        <div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tighter">BOTECO 934</h1>
+            <p id="subtitulo" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Painel de Controle</p>
+        </div>
+        <button onclick="mudar('inicio')" id="btn-home" class="hidden bg-white shadow-md p-3 rounded-2xl text-xl">🏠</button>
+    </header>
+
+    <div id="inicio" class="section active">
+        <div class="grid grid-cols-2 gap-6">
+            <div onclick="mudar('mesas')" class="app-button bg-orange-500 text-white">
+                <span class="text-5xl">🪑</span>
+                <span class="font-bold mt-3 text-sm">MESAS</span>
+            </div>
+            <div onclick="mudar('fiado')" class="app-button bg-red-600 text-white">
+                <span class="text-5xl">📝</span>
+                <span class="font-bold mt-3 text-sm">FIADO</span>
+            </div>
+            <div onclick="mudar('calc')" class="app-button bg-green-600 text-white">
+                <span class="text-5xl">🧮</span>
+                <span class="font-bold mt-3 text-sm">CALC</span>
+            </div>
+            <div onclick="mudar('relatorio')" class="app-button bg-gray-900 text-white">
+                <span class="text-5xl">📊</span>
+                <span class="font-bold mt-3 text-sm">CAIXA</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mesas" class="section">
+        <h2 class="text-xl font-bold mb-4 text-gray-700">Gestão de Mesas</h2>
+        <div id="grid-mesas" class="grid grid-cols-3 gap-3">
+            </div>
+    </div>
+
+    <div id="detalhe-mesa" class="section">
+        <div class="cupom-fiscal p-4 mb-4 shadow-sm rounded-sm">
+            <div class="text-center border-b border-black pb-2 mb-2">
+                <h3 class="font-bold text-lg">BOTECO 934</h3>
+                <p class="text-[10px]" id="cupom-cliente"></p>
+                <p class="text-[10px]">MESA: <span id="span-num-mesa">0</span></p>
+            </div>
+            <div id="lista-cupom" class="text-xs space-y-1 min-h-[100px]">
+                </div>
+            <div class="border-t border-black mt-4 pt-2 font-bold">
+                <div class="flex justify-between text-xs"><span>SUBTOTAL:</span><span id="cupom-sub">R$ 0,00</span></div>
+                <div class="flex justify-between text-xs text-blue-600"><span>TX (10%):</span><span id="cupom-taxa">R$ 0,00</span></div>
+                <div class="flex justify-between text-lg border-t border-dashed mt-1 pt-1">
+                    <span>TOTAL:</span><span id="cupom-total">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4" id="lista-botoes-produtos"></div>
+        <button onclick="fecharContaFinal()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black text-lg shadow-lg active:bg-green-700">FINALIZAR CONTA</button>
+    </div>
+
+    <div id="fiado" class="section">
+        <div class="bg-white p-5 rounded-3xl shadow-md mb-6">
+            <h3 class="font-bold mb-4 text-gray-400 text-xs uppercase">Novo Lançamento</h3>
+            <input id="fiado-nome" type="text" placeholder="Nome do Cliente" class="w-full p-4 mb-3 border-none bg-gray-100 rounded-2xl outline-none">
+            <input id="fiado-tel" type="tel" placeholder="WhatsApp (DDD+Número)" class="w-full p-4 mb-3 border-none bg-gray-100 rounded-2xl outline-none">
+            <input id="fiado-v" type="number" placeholder="Valor R$" class="w-full p-4 mb-4 border-none bg-gray-100 rounded-2xl outline-none">
+            <button onclick="lancarFiado()" class="w-full bg-red-600 text-white p-4 rounded-2xl font-bold shadow-lg">LANÇAR NO PENDURA</button>
+        </div>
+        <div id="lista-fiado" class="space-y-3"></div>
+    </div>
+
+    <div id="calc" class="section">
+        <div class="space-y-6">
+            <div class="bg-white p-5 rounded-3xl shadow-md">
+                <h3 class="font-bold mb-4 text-green-600 uppercase text-xs">Mix Inteligente (Comparador)</h3>
+                <input id="mix-preco" type="number" placeholder="Preço R$" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
+                <input id="mix-ml" type="number" placeholder="Volume (ml)" class="w-full p-4 mb-3 bg-gray-100 rounded-2xl outline-none">
+                <button onclick="calcularMix()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold">CALCULAR PREÇO/LITRO</button>
+                <p id="res-mix" class="mt-4 text-center font-black text-xl text-green-700"></p>
+            </div>
+            <div class="bg-white p-5 rounded-3xl shadow-md">
+                <h3 class="font-bold mb-4 text-blue-600 uppercase text-xs">Custo da Dose</h3>
+                <input id="dose-p" type="number" placeholder="Preço da Garrafa" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
+                <input id="dose-mlg" type="number" placeholder="ML da Garrafa" class="w-full p-4 mb-2 bg-gray-100 rounded-2xl outline-none">
+                <input id="dose-mld" type="number" placeholder="Tamanho da Dose (ml)" class="w-full p-4 mb-3 bg-gray-100 rounded-2xl outline-none">
+                <button onclick="calcularDose()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold">CALCULAR CUSTO/DOSE</button>
+                <p id="res-dose" class="mt-4 text-center font-black text-xl text-blue-800"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="relatorio" class="section">
+        <div class="bg-white p-8 rounded-3xl shadow-md text-center mb-6 border-b-8 border-green-500">
+            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Saldo do Dia</p>
+            <h2 id="total-geral" class="text-4xl font-black text-gray-900 mt-1">R$ 0,00</h2>
+        </div>
+        <h3 class="text-xs font-bold text-gray-400 mb-2 uppercase">Histórico Recente</h3>
+        <div id="historico-vendas" class="space-y-2"></div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DO SEU FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.firebasestorage.app",
+            messagingSenderId: "182023728304",
+            appId: "1:182023728304:web:040a13bb6f1c9fff35f75",
+            databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let mesaAtiva = 0; let nomeAtivo = "";
+
+        // LISTA DE PRODUTOS
+        const mercadorias = [
+            { n: 'Cerveja Lata', p: 6.00 },
+            { n: 'Cerveja Garrafa', p: 12.00 },
+            { n: 'Dose Cana', p: 3.00 },
+            { n: 'Espetinho', p: 8.00 },
+            { n: 'Refrigerante', p: 5.00 },
+            { n: 'Água s/ Gás', p: 4.00 }
+        ].sort((a,b) => a.n.localeCompare(b.n));
+
+        // NAVEGAÇÃO
+        function mudar(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('btn-home').style.display = (id === 'inicio') ? 'none' : 'block';
+            window.scrollTo(0,0);
+        }
+
+        function formatarNome(s) { return s.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, l => l.toUpperCase()); }
+
+        // RENDER BOTÕES DE PRODUTOS
+        document.getElementById('lista-botoes-produtos').innerHTML = mercadorias.map(m => `
+            <button onclick="addAoCupom('${m.n}', ${m.p})" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 font-bold text-[10px] uppercase active:bg-orange-100">
+                ${m.n}<br><span class="text-blue-600 text-xs">R$ ${m.p.toFixed(2)}</span>
+            </button>
+        `).join('');
+
+        // CALCULADORAS
+        function calcularMix() {
+            const p = parseFloat(document.getElementById('mix-preco').value);
+            const ml = parseFloat(document.getElementById('mix-ml').value);
+            if(p && ml) document.getElementById('res-mix').innerText = "R$ " + ((p/ml)*1000).toFixed(2) + " / Litro";
+        }
+        function calcularDose() {
+            const p = parseFloat(document.getElementById('dose-p').value);
+            const mlG = parseFloat(document.getElementById('dose-mlg').value);
+            const mlD = parseFloat(document.getElementById('dose-mld').value);
+            if(p && mlG && mlD) document.getElementById('res-dose').innerText = "Custo: R$ " + ((p/mlG)*mlD).toFixed(2);
+        }
+
+        // LÓGICA DE MESAS
+        function abrirPainelMesa(num, cliente) {
+            mesaAtiva = num;
+            nomeAtivo = cliente || formatarNome(prompt("Nome do Cliente:") || "CLIENTE");
+            if (!cliente) db.ref('mesas_ativas/' + num + '/cliente').set(nomeAtivo);
+            document.getElementById('span-num-mesa').innerText = num;
+            document.getElementById('cupom-cliente').innerText = "CLIENTE: " + nomeAtivo;
+            mudar('detalhe-mesa');
+            carregarCupom(num);
+        }
+
+        function addAoCupom(item, valor) {
+            db.ref('mesas_ativas/' + mesaAtiva + '/consumo').push({ item, valor, data: new Date().toLocaleTimeString() });
+        }
+
+        function carregarCupom(num) {
+            db.ref('mesas_ativas/' + num + '/consumo').on('value', snap => {
+                const lista = document.getElementById('lista-cupom');
+                lista.innerHTML = ''; let sub = 0; const agrupado = {};
+                snap.forEach(c => {
+                    const v = c.val(); agrupado[v.item] = (agrupado[v.item] || {q:0, t:0});
+                    agrupado[v.item].q++; agrupado[v.item].t += v.valor; sub += v.valor;
+                });
+                for(let i in agrupado) lista.innerHTML += `<div class="flex justify-between"><span>${agrupado[i].q}x ${i}</span><span>R$ ${agrupado[i].t.toFixed(2)}</span></div>`;
+                const taxa = sub * 0.10;
+                document.getElementById('cupom-sub').innerText = "R$ " + sub.toFixed(2);
+                document.getElementById('cupom-taxa').innerText = "R$ " + taxa.toFixed(2);
+                document.getElementById('cupom-total').innerText = "R$ " + (sub + taxa).toFixed(2);
+                window.totalConta = sub + taxa;
+            });
+        }
+
+        function fecharContaFinal() {
+            if(confirm("Finalizar e liberar mesa?")) {
+                db.ref('vendas_gerais').push({ 
+                    item: `Mesa ${mesaAtiva} (${nomeAtivo})`, 
+                    valor: window.totalConta, 
+                    data: new Date().toLocaleString() 
+                });
+                db.ref('mesas_ativas/' + mesaAtiva).remove(); 
+                mudar('inicio');
+            }
+        }
+
+        // SINCRONIZAÇÃO DAS MESAS
+        db.ref('mesas_ativas').on('value', snap => {
+            const grid = document.getElementById('grid-mesas'); grid.innerHTML = '';
+            for (let i = 1; i <= 12; i++) {
+                const m = (snap.val() || {})[i];
+                grid.innerHTML += `
+                <div onclick="abrirPainelMesa(${i}, '${m ? m.cliente : ''}')" 
+                     class="app-button ${m ? 'bg-white border-2 border-red-500' : 'bg-gray-200'}">
+                    <span class="text-[10px] font-bold text-gray-400">M${i}</span>
+                    <span class="font-bold text-[9px] truncate w-full text-center px-1 text-gray-800">${m ? m.cliente : 'LIVRE'}</span>
+                </div>`;
+            }
+        });
+
+        // FIADO
+        function lancarFiado() {
+            const n = formatarNome(document.getElementById('fiado-nome').value.trim());
+            const t = document.getElementById('fiado-tel').value.trim();
+            const v = parseFloat(document.getElementById('fiado-v').value);
+            if(n && v) {
+                db.ref('fiado/'+n).transaction(a => {
+                    const at = a || { saldo: 0, telefone: t };
+                    return { saldo: (at.saldo || 0) + v, telefone: t || at.telefone || '' };
+                });
+                document.getElementById('fiado-nome').value = ''; 
+                document.getElementById('fiado-v').value = '';
+                alert("Lançado no Fiado!");
+            }
+        }
+
+        db.ref('fiado').on('value', snap => {
+            const l = document.getElementById('lista-fiado'); l.innerHTML = '';
+            snap.forEach(p => { 
+                if(p.val().saldo > 0) l.innerHTML += `
+                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-sm border-l-8 border-red-600">
+                    <span><b class="text-gray-900">${p.key}</b><br><span class="text-red-600 font-bold">R$ ${p.val().saldo.toFixed(2)}</span></span>
+                    <button onclick="window.open('https://api.whatsapp.com/send?phone=55${p.val().telefone}&text=Olá, o seu saldo no Boteco 934 é de R$ ${p.val().saldo.toFixed(2)}')" 
+                            class="bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-[10px]">COBRAR</button>
+                </div>`;
+            });
+        });
+
+        // CAIXA
+        db.ref('vendas_gerais').on('value', s => {
+            let t = 0; const h = document.getElementById('historico-vendas'); h.innerHTML = '';
+            s.forEach(v => {
+                t += v.val().valor;
+                h.insertAdjacentHTML('afterbegin', `
+                <div class="bg-white p-3 rounded-xl shadow-sm text-[10px] flex justify-between items-center border-l-4 border-green-500">
+                    <span class="font-bold text-gray-600">${v.val().item}</span>
+                    <b class="text-gray-900 text-sm">R$ ${v.val().valor.toFixed(2)}</b>
+                </div>`);
+            });
+            document.getElementById('total-geral').innerText = 'R$ ' + t.toFixed(2);
+        });
+    </script>
+</body>
+</html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
