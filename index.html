@@ -3,80 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | SISTEMA GOLD</title>
+    <title>BOTECO 934 | GOLD MESAS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
     <style>
         body { background-color: #0f172a; color: white; touch-action: manipulation; }
         .cupom { background-color: #fffdec; color: black; font-family: monospace; border-radius: 4px; }
-        .btn-ativo { ring: 4px solid #eab308; transform: scale(1.05); }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col overflow-hidden">
 
-    <header class="bg-slate-900 p-4 border-b border-yellow-600 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-black text-yellow-500">BOTECO 934</h1>
-            <div class="flex gap-2 mt-2">
-                <button onclick="btContatos()" class="bg-blue-600 px-3 py-1 rounded text-[10px] font-bold uppercase">👥 Contatos</button>
-                <button onclick="btGerente()" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold uppercase border border-slate-500">⚙️ Gerente</button>
-                <button onclick="btFecharDia()" class="bg-red-700 px-3 py-1 rounded text-[10px] font-bold uppercase">📊 Fechar Dia</button>
-            </div>
-        </div>
-        <div class="text-right">
-            <p id="relogio" class="text-yellow-500 font-bold">00:00:00</p>
+    <header class="bg-slate-900 p-2 border-b border-yellow-600 flex justify-between items-center">
+        <h1 class="text-lg font-black text-yellow-500">BOTECO 934</h1>
+        <div class="flex gap-1">
+            <button onclick="btContatos()" class="bg-blue-600 px-2 py-1 rounded text-[9px] font-bold uppercase">👥 Zap</button>
+            <button onclick="btGerente()" class="bg-slate-700 px-2 py-1 rounded text-[9px] font-bold uppercase border border-slate-500">⚙️ Prod</button>
+            <button onclick="btFecharDia()" class="bg-red-700 px-2 py-1 rounded text-[9px] font-bold uppercase">📊 Fim</button>
         </div>
     </header>
 
-    <div id="grid-mesas" class="p-2 bg-slate-950 grid grid-cols-5 gap-2 border-b border-slate-800"></div>
+    <div id="grid-mesas" class="p-1 bg-slate-950 grid grid-cols-8 gap-1 border-b border-slate-800"></div>
 
     <div class="flex flex-1 overflow-hidden">
-        <aside class="w-[45%] bg-slate-800 flex flex-col">
-            <div class="p-2 bg-slate-900">
-                <input type="text" id="input-busca" oninput="funcaoBusca(this.value)" placeholder="Buscar produto..." class="w-full p-2 bg-slate-950 rounded text-xs border border-slate-700">
-            </div>
-            <div id="lista-prods" class="p-2 space-y-2 overflow-y-auto"></div>
+        <aside class="w-[40%] bg-slate-800 flex flex-col border-r border-slate-700">
+            <input type="text" oninput="funcaoBusca(this.value)" placeholder="Buscar..." class="m-2 p-2 bg-slate-900 rounded text-xs border border-slate-700">
+            <div id="lista-prods" class="p-1 space-y-1 overflow-y-auto"></div>
         </aside>
 
-        <main class="w-[55%] p-2 flex flex-col bg-black">
-            <div class="cupom p-3 flex-1 flex flex-col text-[10px]">
-                <p class="text-center font-bold">*** BOTECO 934 ***</p>
-                <p id="status-mesa" class="text-center text-blue-700 font-bold mb-2 uppercase">Selecione uma mesa</p>
-                <div id="itens-cupom" class="flex-1 overflow-y-auto"></div>
-                <div class="border-t border-black mt-2 pt-2 flex justify-between text-lg font-black text-red-600">
-                    <span>TOTAL</span>
-                    <span id="txt-total">0.00</span>
+        <main class="w-[60%] p-2 flex flex-col bg-black">
+            <div class="cupom p-2 flex-1 flex flex-col text-[10px]">
+                <div class="flex justify-between items-center mb-1">
+                    <p id="status-mesa" class="font-bold text-blue-800 uppercase">Selecione Mesa</p>
+                    <button onclick="renomearMesa()" class="bg-gray-300 px-1 rounded text-[8px] font-bold">NOME</button>
+                </div>
+                <div id="itens-cupom" class="flex-1 overflow-y-auto border-t border-gray-300 pt-1"></div>
+                <div class="border-t-2 border-black mt-1 pt-1">
+                    <div class="flex justify-between text-xs font-black text-red-600">
+                        <span>TOTAL</span>
+                        <span id="txt-total">0.00</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-2 space-y-2">
-                <select id="select-pagto" class="w-full p-3 bg-slate-800 text-yellow-500 rounded font-bold text-xs uppercase">
+            <div class="mt-2 grid grid-cols-1 gap-1">
+                <select id="select-pagto" class="p-2 bg-slate-800 text-yellow-500 rounded font-bold text-[10px] uppercase border border-slate-600">
                     <option value="DINHEIRO">💵 DINHEIRO</option>
                     <option value="PIX">💎 PIX</option>
                     <option value="CARTAO">💳 CARTÃO</option>
                     <option value="PENDURA">📝 PENDURA</option>
                 </select>
-                <button onclick="btReceber()" class="w-full bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-xs">Receber Agora</button>
+                <button onclick="btReceber()" class="bg-yellow-500 text-black py-3 rounded-lg font-black uppercase text-[11px] shadow-lg active:scale-95 transition-transform">Receber / Dividir</button>
             </div>
         </main>
     </div>
 
-    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center">
-        <div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm border border-yellow-500">
-            <h2 class="text-yellow-500 font-bold mb-4 uppercase">Novo Produto / Preço</h2>
-            <input type="text" id="cad-nome" placeholder="Nome" class="w-full p-3 bg-slate-900 mb-2 rounded border border-slate-700">
-            <input type="number" id="cad-preco" placeholder="Preço" class="w-full p-3 bg-slate-900 mb-4 rounded border border-slate-700">
+    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center text-black">
+        <div class="bg-slate-200 p-5 rounded-xl w-full max-w-sm">
+            <h2 class="font-black mb-4 uppercase text-center text-sm">Novo Produto</h2>
+            <input type="text" id="cad-nome" placeholder="Nome do Item" class="w-full p-3 mb-2 rounded border border-gray-400">
+            <input type="number" id="cad-preco" placeholder="Preço" class="w-full p-3 mb-4 rounded border border-gray-400">
             <div class="flex gap-2">
-                <button onclick="btGerente()" class="flex-1 py-3 text-gray-400 font-bold uppercase text-[10px]">Cancelar</button>
-                <button onclick="funcaoSalvarProd()" class="flex-1 py-3 bg-yellow-500 text-black font-black rounded uppercase text-[10px]">Salvar</button>
+                <button onclick="btGerente()" class="flex-1 py-2 font-bold uppercase text-xs text-gray-600">Voltar</button>
+                <button onclick="funcaoSalvarProd()" class="flex-1 py-2 bg-green-600 text-white font-black rounded uppercase text-xs">Salvar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIG ---
+        // Configurações do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -88,80 +84,67 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let mesas = Array.from({length: 10}, (_, i) => ({ num: i + 1, status: 'livre', itens: [], total: 0 }));
+        let mesas = Array.from({length: 16}, (_, i) => ({ num: i + 1, nome: "", status: 'livre', itens: [], total: 0 }));
         let mesaAtiva = null;
         let produtos = [
             { id: 1, nome: "SKOL LATA", preco: 6.00 },
-            { id: 2, nome: "PITU DOSE", preco: 4.00 },
-            { id: 3, nome: "HEINEKEN LN", preco: 11.00 }
+            { id: 2, nome: "PITU DOSE", preco: 4.50 },
+            { id: 3, nome: "HEINEKEN LN", preco: 11.00 },
+            { id: 4, nome: "SKOL 600ML", preco: 10.00 }
         ];
 
-        // --- FUNÇÕES BOTÕES ---
-        function btGerente() {
-            document.getElementById('modal-gerente').classList.toggle('hidden');
-        }
-
-        function btContatos() {
-            let tel = prompt("WhatsApp do Cliente (DDD + Número):", "879");
-            if(tel) window.open(`https://wa.me/55${tel}`);
-        }
-
-        function btFecharDia() {
-            let total = document.getElementById('txt-total').innerText;
-            window.open(`https://wa.me/5587996806181?text=*FECHAMENTO BOTECO 934*%0A*Data:* ${new Date().toLocaleDateString()}%0A*Total:* R$ ${total}`);
-        }
-
-        function funcaoSalvarProd() {
-            let n = document.getElementById('cad-nome').value.toUpperCase();
-            let p = parseFloat(document.getElementById('cad-preco').value);
-            if(n && p) {
-                produtos.push({ id: Date.now(), nome: n, preco: p });
-                renderizarProds();
-                btGerente();
-                alert("Salvo!");
-            }
-        }
-
-        // --- LÓGICA PDV ---
         function renderizarMesas() {
             const grid = document.getElementById('grid-mesas');
             grid.innerHTML = mesas.map(m => {
                 let cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
-                let borda = mesaAtiva === m.num ? 'ring-4 ring-yellow-400' : '';
-                return `<button onclick="selecionarMesa(${m.num})" class="${cor} ${borda} p-2 rounded text-[9px] font-bold text-white shadow">M${m.num}<br>R$${m.total.toFixed(2)}</button>`;
+                let borda = mesaAtiva === m.num ? 'ring-2 ring-white scale-110 z-10' : '';
+                return `
+                    <button onclick="selecionarMesa(${m.num})" class="${cor} ${borda} h-10 rounded flex flex-col items-center justify-center text-[8px] font-black text-white shadow relative">
+                        <span>M${m.num}</span>
+                        <span class="text-[6px] truncate w-full px-1">${m.nome || (m.total > 0 ? 'R$'+m.total.toFixed(0) : '')}</span>
+                    </button>`;
             }).join('');
         }
 
         function selecionarMesa(n) {
             mesaAtiva = n;
             const mesa = mesas.find(m => m.num === n);
-            document.getElementById('status-mesa').innerText = `CONTA: MESA ${n}`;
+            document.getElementById('status-mesa').innerText = `MESA ${n} ${mesa.nome ? '- ' + mesa.nome : ''}`;
             atualizarCupom(mesa);
             renderizarMesas();
+        }
+
+        function renomearMesa() {
+            if(!mesaAtiva) return;
+            const mesa = mesas.find(m => m.num === mesaAtiva);
+            const novoNome = prompt("Identificar Mesa (Nome do Cliente):", mesa.nome);
+            if(novoNome !== null) {
+                mesa.nome = novoNome.toUpperCase();
+                selecionarMesa(mesaAtiva);
+            }
         }
 
         function renderizarProds() {
             const lista = document.getElementById('lista-prods');
             lista.innerHTML = produtos.map(p => `
-                <button onclick="addItem(${p.id})" class="w-full bg-slate-700 p-3 rounded-lg border border-slate-600 text-left active:bg-slate-500">
-                    <p class="text-[10px] font-bold uppercase">${p.nome}</p>
-                    <p class="text-yellow-500 font-black">R$ ${p.preco.toFixed(2)}</p>
+                <button onclick="addItem(${p.id})" class="w-full bg-slate-700 p-2 rounded border border-slate-600 text-left active:bg-slate-500">
+                    <p class="text-[9px] font-bold uppercase text-white">${p.nome}</p>
+                    <p class="text-yellow-500 font-black text-[10px]">R$ ${p.preco.toFixed(2)}</p>
                 </button>
             `).join('');
         }
 
         function addItem(id) {
-            if(!mesaAtiva) return alert("Clique numa mesa primeiro!");
+            if(!mesaAtiva) return alert("Selecione uma mesa!");
             const mesa = mesas.find(m => m.num === mesaAtiva);
             const p = produtos.find(prod => prod.id === id);
-            
             const itemIdx = mesa.itens.findIndex(i => i.id === id);
+            
             if(itemIdx >= 0) mesa.itens[itemIdx].qtd++;
             else mesa.itens.push({ ...p, qtd: 1 });
 
             mesa.status = 'ocupada';
             mesa.total = mesa.itens.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
-            
             atualizarCupom(mesa);
             renderizarMesas();
         }
@@ -169,7 +152,7 @@
         function atualizarCupom(mesa) {
             const container = document.getElementById('itens-cupom');
             container.innerHTML = mesa.itens.map(i => `
-                <div class="flex justify-between border-b border-gray-200 py-1 uppercase font-bold text-[9px]">
+                <div class="flex justify-between border-b border-gray-200 py-1 uppercase font-bold text-[8px]">
                     <span>${i.qtd}x ${i.nome}</span>
                     <span>R$ ${(i.qtd * i.preco).toFixed(2)}</span>
                 </div>
@@ -180,33 +163,56 @@
         async function btReceber() {
             if(!mesaAtiva) return;
             const mesa = mesas.find(m => m.num === mesaAtiva);
-            const pagto = document.getElementById('select-pagto').value;
-            
-            if(confirm(`Fechar MESA ${mesaAtiva} no ${pagto}?`)) {
-                await db.collection("vendas").add({
-                    data: new Date().toLocaleString(),
-                    mesa: mesaAtiva,
-                    total: mesa.total,
-                    metodo: pagto
-                });
+            if(mesa.total <= 0) return;
 
+            const pagto = document.getElementById('select-pagto').value;
+            const valorPago = parseFloat(prompt(`CONTA: R$ ${mesa.total.toFixed(2)}\nQuanto o cliente vai pagar agora?`, mesa.total.toFixed(2)));
+
+            if(isNaN(valorPago) || valorPago <= 0) return;
+
+            // Salva no Banco
+            await db.collection("vendas").add({
+                data: new Date().toLocaleString(),
+                mesa: mesaAtiva,
+                cliente: mesa.nome,
+                valor: valorPago,
+                metodo: pagto
+            });
+
+            // Lógica de Divisão
+            mesa.total -= valorPago;
+
+            if(mesa.total <= 0.05) {
                 mesa.status = 'livre';
                 mesa.itens = [];
                 mesa.total = 0;
+                mesa.nome = "";
                 mesaAtiva = null;
-                document.getElementById('status-mesa').innerText = "Selecione uma mesa";
+                document.getElementById('status-mesa').innerText = "Selecione Mesa";
                 atualizarCupom({itens: [], total: 0});
-                renderizarMesas();
-                alert("Venda registrada!");
+                alert("CONTA TOTAL PAGA!");
+            } else {
+                alert(`PAGAMENTO PARCIAL! Faltam R$ ${mesa.total.toFixed(2)} nesta mesa.`);
+            }
+            renderizarMesas();
+        }
+
+        function btGerente() { document.getElementById('modal-gerente').classList.toggle('hidden'); }
+        function btContatos() { let tel = prompt("WhatsApp (DDD+Número):", "879"); if(tel) window.open(`https://wa.me/55${tel}`); }
+        function btFecharDia() { window.open(`https://wa.me/5587996806181?text=*BOTECO 934*%0AFechamento solicitado.`); }
+
+        function funcaoSalvarProd() {
+            let n = document.getElementById('cad-nome').value.toUpperCase();
+            let p = parseFloat(document.getElementById('cad-preco').value);
+            if(n && p) {
+                produtos.push({ id: Date.now(), nome: n, preco: p });
+                renderizarProds();
+                btGerente();
             }
         }
 
-        setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-
-        // Início
         renderizarMesas();
         renderizarProds();
-
     </script>
 </body>
 </html>
