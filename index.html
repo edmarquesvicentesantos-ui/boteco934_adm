@@ -10,45 +10,50 @@
     <style>
         .fonte-13 { font-size: 13px !important; }
         .tarja-botao { background-color: #1e3a8a; }
-        /* Ajuste para a logo não ficar esmagada */
-        .area-logo { height: 120px; border-bottom: 2px solid #e5e7eb; }
+        .area-logo { height: 100px; border-bottom: 2px solid #e5e7eb; }
+        .aba-ativa { border-bottom: 4px solid #1e3a8a; color: #1e3a8a; font-weight: bold; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <header class="bg-white area-logo flex items-center justify-center p-4 shadow-sm">
+    <header class="bg-white area-logo flex items-center justify-center p-4">
         <div class="text-center">
-            <h1 class="text-3xl font-black italic text-blue-900 tracking-tighter">BOTECO 934</h1>
-            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Distribuidora & Bar</p>
+            <h1 class="text-2xl font-black italic text-blue-900">BOTECO 934</h1>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Petrolina - PE</p>
         </div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
         
-        <aside class="w-1/2 md:w-1/3 bg-gray-200 p-4 overflow-y-auto border-r border-gray-300">
-            <h2 class="text-gray-600 font-bold mb-4 uppercase text-[10px] tracking-widest">Produtos</h2>
-            <div id="lista-produtos" class="grid grid-cols-1 gap-3">
+        <aside class="w-1/2 md:w-5/12 bg-gray-200 flex flex-col border-r border-gray-300">
+            <div id="menu-categorias" class="flex overflow-x-auto bg-white border-b border-gray-300">
+                <button onclick="filtrar('Tudo')" class="px-4 py-3 text-xs uppercase aba-ativa">Tudo</button>
+                <button onclick="filtrar('Cervejas')" class="px-4 py-3 text-xs uppercase">Cervejas</button>
+                <button onclick="filtrar('Refrigerantes')" class="px-4 py-3 text-xs uppercase">Refri</button>
+                <button onclick="filtrar('Petiscos')" class="px-4 py-3 text-xs uppercase">Petiscos</button>
+                <button onclick="filtrar('Doses')" class="px-4 py-3 text-xs uppercase">Doses</button>
+            </div>
+
+            <div id="lista-produtos" class="p-3 grid grid-cols-1 gap-2 overflow-y-auto">
                 </div>
         </aside>
 
         <main class="flex-1 p-4 bg-white flex flex-col justify-between">
-            <div>
-                <h3 class="font-bold mb-4 text-blue-900 border-b pb-2 uppercase text-xs">Venda Atual</h3>
-                <div id="itens-venda" class="space-y-3">
-                    </div>
+            <div class="overflow-y-auto">
+                <h3 class="font-bold mb-4 text-blue-900 border-b pb-2 uppercase text-[10px]">Pedido</h3>
+                <div id="itens-venda" class="space-y-2"></div>
             </div>
 
-            <div class="mt-auto pt-6 border-t-2 border-dashed border-gray-200">
+            <div class="pt-4 border-t-2 border-gray-100">
                 <div class="flex justify-between items-end mb-4">
-                    <span class="text-gray-400 font-bold text-xs uppercase">Total a Pagar</span>
-                    <span id="valor-total" class="text-4xl font-black text-gray-900 leading-none">R$ 0,00</span>
+                    <span class="text-gray-400 font-bold text-xs uppercase">Total</span>
+                    <span id="valor-total" class="text-4xl font-black text-gray-900">R$ 0,00</span>
                 </div>
-                <button onclick="finalizarVenda()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-green-200 active:scale-95 transition-all text-xl uppercase">
-                    Fechar Conta (PIX)
+                <button onclick="finalizarVenda()" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl shadow-lg text-xl uppercase active:scale-95 transition-all">
+                    Finalizar PIX
                 </button>
             </div>
         </main>
-
     </div>
 
     <script src="app.js"></script>
