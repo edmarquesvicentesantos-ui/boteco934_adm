@@ -3,124 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDV ELITE | BOTECO 934</title>
+    <title>SISTEMA | BOTECO 934</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Boteco 934">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/931/931949.png">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --gold: #ffd700; --green: #2ecc71; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 500px; }
-        .header { text-align: center; color: var(--gold); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
-        .cliente-area { background: var(--glass); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        select, .input-nome { background: #000; color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 8px; border-radius: 8px; outline: none; width: 95%; }
-        .search-area { background: var(--glass); border: 2px solid var(--gold); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-        #barcode { background: transparent; border: none; color: white; width: 100%; text-align: center; font-size: 20px; outline: none; font-weight: bold; }
-        .item-list { background: var(--glass); border-radius: 15px; padding: 15px; min-height: 100px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
-        .total-box { background: var(--glass); border-radius: 15px; padding: 20px; text-align: right; border: 2px solid var(--green); margin-bottom: 15px; }
-        .total-valor { color: var(--green); font-size: 45px; font-weight: bold; line-height: 1; }
-        .pagamento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .btn-pg { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 5px; border-radius: 10px; font-size: 11px; cursor: pointer; }
-        .btn-pg.active { background: var(--green); color: black; font-weight: bold; }
-        .btn-zap { background: #25d366; color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .btn-fechamento { background: #f39c12; color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-voltar { display: block; text-align: center; margin-top: 20px; color: #555; text-decoration: none; font-size: 12px; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .logo-area { text-align: center; margin-bottom: 30px; margin-top: 20px; }
+        .logo-area i { font-size: 50px; color: var(--gold); margin-bottom: 10px; }
+        .logo-area h1 { margin: 0; font-size: 22px; letter-spacing: 2px; }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; }
+        
+        .btn-menu { 
+            background: var(--glass); 
+            border: 1px solid rgba(255, 215, 0, 0.2); 
+            border-radius: 15px; 
+            padding: 20px 10px; 
+            text-align: center; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-menu i { font-size: 24px; color: var(--gold); }
+        .btn-menu span { font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .btn-menu:active { transform: scale(0.95); background: rgba(255, 215, 0, 0.1); }
+
+        .btn-full { grid-column: span 2; background: linear-gradient(45deg, #f39c12, #f1c40f); color: black; border: none; }
+        .btn-full i { color: black; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">BOTECO 934 | PDV A-Z</div>
-
-    <div class="cliente-area">
-        <div><small>MESA:</small><select id="mesaSel"><option>BALCÃO</option><option>MESA 01</option><option>MESA 02</option><option>MESA 03</option><option>MESA 04</option></select></div>
-        <div><small>CLIENTE:</small><input type="text" id="nomeCliente" class="input-nome" placeholder="NOME..."></div>
-    </div>
-
-    <div class="search-area"><input type="text" id="barcode" placeholder="BIPE O PRODUTO..." autofocus></div>
-
-    <div id="listaItens" class="item-list"></div>
-
-    <div class="total-box"><div id="displayTotal" class="total-valor">R$ 0,00</div></div>
-
-    <div class="pagamento-grid">
-        <button class="btn-pg active" onclick="setPagamento('DINHEIRO', this)">DINHEIRO</button>
-        <button class="btn-pg" onclick="setPagamento('PIX', this)">PIX</button>
-        <button class="btn-pg" onclick="setPagamento('DÉBITO', this)">DÉBITO</button>
-        <button class="btn-pg" onclick="setPagamento('CRÉDITO', this)">CRÉDITO</button>
-        <button class="btn-pg" style="background:#c0392b!important" onclick="setPagamento('PENDURA', this)">PENDURA</button>
-    </div>
-
-    <button class="btn-zap" onclick="finalizarVenda()"><i class="fab fa-whatsapp"></i> FECHAR CONTA</button>
-    <button class="btn-fechamento" onclick="gerarRelatorioDiario()"><i class="fas fa-file-invoice-dollar"></i> FECHAMENTO DIÁRIO</button>
-
-    <a href="index.html" class="btn-voltar">VOLTAR AO MENU</a>
+<div class="logo-area">
+    <i class="fas fa-beer"></i>
+    <h1>BOTECO 934</h1>
+    <small style="color: #888;">GESTÃO ELITE V3.0</small>
 </div>
 
-<script>
-    let totalVenda = 0;
-    let formaPg = "DINHEIRO"; 
-    let itensVendaAtual = [];
+<div class="menu-grid">
+    <a href="calculadora.html" class="btn-menu">
+        <i class="fas fa-cash-register"></i>
+        <span>Vender (PDV)</span>
+    </a>
 
-    function setPagamento(tipo, btn) {
-        formaPg = tipo;
-        document.querySelectorAll('.btn-pg').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
+    <a href="gestao_mensal.html" class="btn-menu">
+        <i class="fas fa-chart-line"></i>
+        <span>Finanças</span>
+    </a>
 
-    function atualizarListaTela() {
-        const listaUI = document.getElementById('listaItens');
-        listaUI.innerHTML = '';
-        // Ordena a lista da venda atual de A a Z
-        itensVendaAtual.sort((a, b) => a.nome.localeCompare(b.nome));
-        itensVendaAtual.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<span>${p.nome}</span> <b>R$ ${p.preco.toFixed(2)}</b>`;
-            listaUI.appendChild(div);
-        });
-    }
+    <a href="contas_cartao.html" class="btn-menu">
+        <i class="fas fa-credit-card"></i>
+        <span>Cartões</span>
+    </a>
 
-    document.getElementById('barcode').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && this.value !== '') {
-            const estoque = JSON.parse(localStorage.getItem('estoqueBoteco934')) || {};
-            const produto = estoque[this.value];
-            if (produto) {
-                itensVendaAtual.push({ nome: produto.nome, preco: produto.preco });
-                totalVenda += produto.preco;
-                document.getElementById('displayTotal').innerText = `R$ ${totalVenda.toFixed(2).replace('.', ',')}`;
-                atualizarListaTela();
-            } else { alert("NÃO CADASTRADO!"); }
-            this.value = '';
-        }
-    });
+    <a href="importar_estoque.html" class="btn-menu">
+        <i class="fas fa-boxes"></i>
+        <span>Estoque</span>
+    </a>
 
-    function finalizarVenda() {
-        if (totalVenda === 0) return alert("SEM ITENS!");
-        const cliente = document.getElementById('nomeCliente').value || "Cliente";
-        
-        // Registrar para o Relatório Diário
-        let hist = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-        const chave = (formaPg === 'DÉBITO') ? 'DEBITO' : (formaPg === 'CRÉDITO' ? 'CREDITO' : formaPg);
-        hist[chave] += totalVenda;
-        localStorage.setItem('vendasDia934', JSON.stringify(hist));
+    <a href="calculadora.html" class="btn-menu btn-full">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>Ir para Fechamento do Dia</span>
+    </a>
+</div>
 
-        // Enviar WhatsApp
-        const resumoItens = itensVendaAtual.map(i => i.nome).join(", ");
-        const texto = `*BOTECO 934*\n*CLIENTE:* ${cliente}\n*ITENS:* ${resumoItens}\n*TOTAL:* R$ ${totalVenda.toFixed(2)}\n*PG:* ${formaPg}`;
-        window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(texto)}`);
-        location.reload(); 
-    }
+<p style="margin-top: 40px; font-size: 10px; color: #444;">ID: EDMARQUES SANTOS | GITHUB HOSTED</p>
 
-    function gerarRelatorioDiario() {
-        const d = JSON.parse(localStorage.getItem('vendasDia934')) || { DINHEIRO: 0, PIX: 0, DEBITO: 0, CREDITO: 0, PENDURA: 0 };
-        const total = d.DINHEIRO + d.PIX + d.DEBITO + d.CREDITO + d.PENDURA;
-        const res = `*FECHAMENTO 934*\n💰 DINHEIRO: R$ ${d.DINHEIRO.toFixed(2)}\n📱 PIX: R$ ${d.PIX.toFixed(2)}\n💳 CARTÕES: R$ ${(d.DEBITO+d.CREDITO).toFixed(2)}\n📝 PENDURA: R$ ${d.PENDURA.toFixed(2)}\n*TOTAL: R$ ${total.toFixed(2)}*`;
-        if (confirm("Enviar e ZERAR?")) {
-            window.open(`https://wa.me/5587992438359?text=${encodeURIComponent(res)}`);
-            localStorage.removeItem('vendasDia934');
-            location.reload();
-        }
-    }
-</script>
 </body>
 </html>
