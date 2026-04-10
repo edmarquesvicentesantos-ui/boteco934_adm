@@ -208,3 +208,27 @@ async function enviarFechamentoDia() {
         alert("Erro ao gerar fechamento: " + e);
     }
 }
+// Adicione 'estoque' e 'minimo' nos seus produtos
+let produtos = [
+    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, estoque: 24, minimo: 6 },
+    { id: 103, cat: "Doses", nome: "PITU", preco: 4.00, estoque: 50, minimo: 10 }
+];
+
+// No filtrar, vamos mudar a cor se o estoque estiver baixo
+function filtrar(cat) {
+    const lista = document.getElementById('lista-produtos');
+    const filtrados = cat === "Tudo" ? produtos : produtos.filter(p => p.cat === cat);
+    
+    lista.innerHTML = filtrados.map(p => {
+        const corEstoque = p.estoque <= p.minimo ? 'border-red-500 bg-red-900' : 'border-slate-600 bg-slate-700';
+        return `
+            <button onclick="adicionarItem(${p.id})" class="w-full ${corEstoque} rounded-xl overflow-hidden active:bg-slate-600 border shadow-sm">
+                <div class="p-3 text-left">
+                    <div class="text-white font-bold text-[11px] uppercase">${p.nome}</div>
+                    <div class="text-yellow-500 font-black">R$ ${p.preco.toFixed(2)}</div>
+                    <div class="text-[8px] text-gray-400">Restam: ${p.estoque}</div>
+                </div>
+            </button>
+        `;
+    }).join('');
+}
