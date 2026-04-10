@@ -1,92 +1,53 @@
-// ... Mantenha sua firebaseConfig aqui ...
+// Funções para abrir/fechar o painel
+function abrirPainelGerente() {
+    document.getElementById('modal-gerente').classList.remove('hidden');
+}
 
-const produtosLocal = [
-    { id: "7891991000858", cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, foto: "" }, // Exemplo de código real
-    { id: "1", cat: "Doses", nome: "PITU", preco: 3.50, foto: "" }
-];
+function fecharPainelGerente() {
+    document.getElementById('modal-gerente').classList.add('hidden');
+}
 
-let carrinho = [];
+// OUVINTE PARA CALCULAR ENQUANTO VOCÊ DIGITA
+document.getElementById('calc-custo').addEventListener('input', function() {
+    const custo = parseFloat(this.value) || 0;
+    if (custo > 0) {
+        // MATEMÁTICA DO BOTECO 934
+        const doseCustoBase = custo / 18;
+        const doseComGelo = doseCustoBase + 0.70; // Custo operacional
+        
+        const precoDose = doseComGelo * 2.8; // Margem de 180% na dose
+        const precoLitro = custo * 1.5;      // Margem de 50% na garrafa
 
-// ESCUTA O INPUT (BIP OU DIGITAÇÃO)
-document.getElementById('input-busca').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        buscarProduto(this.value);
-        this.value = ''; // Limpa após buscar
+        document.getElementById('sugestao-dose').innerText = `R$ ${precoDose.toFixed(2)}`;
+        document.getElementById('sugestao-litro').innerText = `R$ ${precoLitro.toFixed(2)}`;
     }
 });
 
-async function buscarProduto(termo) {
-    // 1. Tenta buscar no seu estoque local primeiro
-    let p = produtosLocal.find(item => item.id === termo || item.nome.toLowerCase().includes(termo.toLowerCase()));
+// FUNÇÃO PARA SALVAR E JÁ CRIAR OS BOTÕES NO PDV
+function salvarPrecos() {
+    const nome = document.getElementById('calc-nome').value.toUpperCase();
+    const precoDose = parseFloat(document.getElementById('sugestao-dose').innerText.replace('R$ ', ''));
+    const precoLitro = parseFloat(document.getElementById('sugestao-litro').innerText.replace('R$ ', ''));
 
-    if (p) {
-        adicionarItem(p);
-    } else {
-        // 2. Se não achou no estoque, tenta buscar na Internet (API)
-        try {
-            const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${termo}.json`);
-            const data = await res.json();
+    if (!nome || precoDose <= 0) return alert("Preencha os dados!");
 
-            if (data.status === 1) {
-                const novoProd = {
-                    id: termo,
-                    nome: data.product.product_name.toUpperCase(),
-                    preco: 0.00, // Você define o preço na hora ou depois
-                    foto: data.product.image_front_url || ""
-                };
-                adicionarItem(novoProd);
-            } else {
-                alert("Produto não encontrado na internet. Tente cadastrar manualmente.");
-            }
-        } catch (error) {
-            console.error("Erro na busca remota", error);
-        }
-    }
+    // Adiciona a Dose
+    produtos.push({
+        id: Date.now(), // gera um id unico
+        cat: "Doses",
+        nome: `${nome} (DOSE)`,
+        preco: precoDose
+    });
+
+    // Adiciona a Garrafa
+    produtos.push({
+        id: Date.now() + 1,
+        cat: "Doses",
+        nome: `${nome} (GARRAF)`,
+        preco: precoLitro
+    });
+
+    alert("Produtos precificados e adicionados!");
+    fecharPainelGerente();
+    filtrar('Doses'); // Já mostra os novos botões
 }
-
-function adicionarItem(prod) {
-    const index = carrinho.findIndex(item => item.id === prod.id);
-    if (index >= 0) {
-        carrinho[index].qtd += 1;
-    } else {
-        // Se o preço for 0 (busca na internet), pede para o usuário digitar
-        if (prod.preco === 0) {
-            const valorPrompt = prompt(`Qual o preço de ${prod.nome}?`, "0.00");
-            prod.preco = parseFloat(valorPrompt) || 0;
-        }
-        carrinho.push({ ...prod, qtd: 1 });
-    }
-    atualizarCarrinho();
-}
-
-function atualizarCarrinho() {
-    const lista = document.getElementById('itens-venda');
-    const totalTxt = document.getElementById('valor-total');
-    
-    lista.innerHTML = carrinho.map((item) => `
-        <div class="flex items-center gap-2 border-b border-gray-100 py-1">
-            ${item.foto ? `<img src="${item.foto}" class="w-8 h-8 object-contain rounded">` : `<div class="w-8 h-8 bg-gray-200 rounded"></div>`}
-            <div class="flex-1 flex justify-between">
-                <span class="w-1/2 uppercase text-[10px] leading-tight">${item.nome}</span>
-                <span class="w-1/4 text-right">${item.qtd}x${item.preco.toFixed(2)}</span>
-                <span class="w-1/4 text-right font-bold">${(item.qtd * item.preco).toFixed(2)}</span>
-            </div>
-        </div>
-    `).join('');
-
-    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
-    totalTxt.innerText = total.toFixed(2);
-}
-function calcularPrecoVenda(custoCompra, tipoVenda) {
-    let margem = (tipoVenda === 'dose') ? 2.5 : 1.4; // 150% para dose, 40% para garrafa
-    let precoSugerido = custoCompra * margem;
-    
-    return precoSugerido.toFixed(2);
-}
-
-// Exemplo de uso:
-// Se o litro da Pitu custa 25.00 e rende 18 doses:
-let custoDose = 25 / 18; 
-console.log("Preço sugerido da Dose: R$ " + calcularPrecoVenda(custoDose, 'dose'));
-// ... Restante da função finalizarVenda e filtrar ...
-filtrar('Tudo');
