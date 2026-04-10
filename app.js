@@ -1,42 +1,7 @@
-// CONFIGURAÇÃO DO FIREBASE (Mantenha a sua aqui em cima)
-const firebaseConfig = {
-    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-    authDomain: "boteco934-afc3f.firebaseapp.com",
-    projectId: "boteco934-afc3f",
-    storageBucket: "boteco934-afc3f.firebasestorage.app",
-    messagingSenderId: "182023728304",
-    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ... (mantenha sua FirebaseConfig e lista de produtos aqui)
 
-let produtos = [
-    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00 },
-    { id: 102, cat: "Cervejas", nome: "HEINEKEN LN", preco: 11.00 }
-];
-let carrinho = [];
-
-// FUNÇÕES BÁSICAS
-function filtrar(cat) {
-    const lista = document.getElementById('lista-produtos');
-    const filtrados = cat === "Tudo" ? produtos : produtos.filter(p => p.cat === cat);
-    lista.innerHTML = filtrados.map(p => `
-        <button onclick="adicionarItem(${p.id})" class="w-full bg-white rounded-lg border border-gray-400 overflow-hidden active:bg-blue-100">
-            <div class="tarja-botao p-2 text-left text-white">
-                <div class="font-bold text-[11px] uppercase truncate">${p.nome}</div>
-                <div class="font-black">R$ ${p.preco.toFixed(2)}</div>
-            </div>
-        </button>
-    `).join('');
-}
-
-function adicionarItem(id) {
-    const p = produtos.find(i => i.id === id);
-    const index = carrinho.findIndex(i => i.id === id);
-    if (index >= 0) { carrinho[index].qtd += 1; } 
-    else { carrinho.push({ ...p, qtd: 1 }); }
-    atualizarCarrinho();
-}
+let saldoRestante = 0;
+let totalVendaOriginal = 0;
 
 function atualizarCarrinho() {
     const lista = document.getElementById('itens-venda');
@@ -47,63 +12,62 @@ function atualizarCarrinho() {
             <span class="w-1/4 text-right font-bold">${(i.qtd*i.preco).toFixed(2)}</span>
         </div>
     `).join('');
-    const total = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
-    document.getElementById('valor-total').innerText = total.toFixed(2);
+    
+    totalVendaOriginal = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
+    
+    // Se for um novo começo de venda, o saldo restante é o total
+    if (saldoRestante <= 0) saldoRestante = totalVendaOriginal;
+
+    document.getElementById('valor-total').innerText = saldoRestante.toFixed(2);
+    
+    // Mostra um aviso se a conta estiver sendo dividida
+    if (saldoRestante < totalVendaOriginal && saldoRestante > 0) {
+        document.getElementById('itens-venda').innerHTML += `
+            <div class="mt-2 p-1 bg-yellow-100 text-center font-bold text-red-600">
+                FALTA RECEBER: R$ ${saldoRestante.toFixed(2)}
+            </div>
+        `;
+    }
 }
 
-// FINALIZAR E WHATSAPP
 async function finalizarVenda() {
     if (carrinho.length === 0) return;
+    
     const pagto = document.getElementById('forma-pagamento').value;
-    const total = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
-    let cliente = "";
+    const valorPago = parseFloat(prompt(`Quanto o cliente está pagando no ${pagto}?`, saldoRestante.toFixed(2)));
+    
+    if (isNaN(valorPago) || valorPago <= 0) return;
 
+    let cliente = "";
     if (pagto === "PENDURA") {
-        cliente = prompt("Nome do cliente que está pendurando:");
+        cliente = prompt("Nome para o Pendura:");
         if (!cliente) return;
     }
 
     try {
-        const dados = { data: new Date().toLocaleString(), valor: total, metodo: pagto, cliente: cliente, local: "Boteco 934" };
-        await db.collection("vendas").add(dados);
-        
-        if (confirm("Venda salva! Imprimir cupom?")) { window.print(); }
-        
-        carrinho = [];
-        atualizarCarrinho();
-        alert("CONCLUÍDO!");
-    } catch(e) { alert("Erro: " + e); }
+        // Registra o pagamento parcial no Firebase
+        await db.collection("vendas").add({
+            data: new Date().toLocaleString(),
+            valor_pago: valorPago,
+            metodo: pagto,
+            cliente: cliente,
+            status: valorPago >= saldoRestante ? "FECHADO" : "PARCIAL",
+            local: "Boteco 934"
+        });
+
+        saldoRestante -= valorPago;
+
+        if (saldoRestante <= 0.01) {
+            alert("CONTA TOTALMENTE PAGA! MESA LIBERADA.");
+            carrinho = [];
+            saldoRestante = 0;
+            totalVendaOriginal = 0;
+            atualizarCarrinho();
+        } else {
+            alert(`Pagamento registrado! Ainda faltam R$ ${saldoRestante.toFixed(2)}`);
+            atualizarCarrinho();
+        }
+    } catch(e) { 
+        alert("Erro ao salvar: " + e); 
+    }
 }
-
-function enviarWhatsApp() {
-    if (carrinho.length === 0) return;
-    const total = document.getElementById('valor-total').innerText;
-    let msg = `*BOTECO 934 - RECIBO*%0A`;
-    carrinho.forEach(i => msg += `${i.qtd}x ${i.nome} - R$${(i.qtd*i.preco).toFixed(2)}%0A`);
-    msg += `*TOTAL: R$ ${total}*`;
-    const fone = prompt("WhatsApp (DDD+Número):", "55879");
-    if (fone) window.open(`https://api.whatsapp.org/send?phone=${fone}&text=${msg}`);
-}
-
-// LÓGICA DO GERENTE
-function abrirPainelGerente() { document.getElementById('modal-gerente').classList.remove('hidden'); }
-function fecharPainelGerente() { document.getElementById('modal-gerente').classList.add('hidden'); }
-
-document.getElementById('calc-custo').addEventListener('input', function() {
-    const custo = parseFloat(this.value) || 0;
-    document.getElementById('sugestao-dose').innerText = "R$ " + (((custo/18)+0.7)*2.8).toFixed(2);
-    document.getElementById('sugestao-litro').innerText = "R$ " + (custo*1.5).toFixed(2);
-});
-
-function salvarPrecos() {
-    const nome = document.getElementById('calc-nome').value.toUpperCase();
-    const pDose = parseFloat(document.getElementById('sugestao-dose').innerText.replace('R$ ', ''));
-    const pLitro = parseFloat(document.getElementById('sugestao-litro').innerText.replace('R$ ', ''));
-    if (!nome || pDose <= 0) return;
-    produtos.push({ id: Date.now(), cat: "Doses", nome: nome + " (DOSE)", preco: pDose });
-    produtos.push({ id: Date.now()+1, cat: "Doses", nome: nome + " (GARRAF)", preco: pLitro });
-    fecharPainelGerente();
-    filtrar('Doses');
-}
-
-filtrar('Tudo');
