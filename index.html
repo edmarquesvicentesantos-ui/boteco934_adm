@@ -8,7 +8,86 @@
     <style>
         :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --blue: #3498db; --green: #2ecc71; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: fl<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ÚNICO | BOTECO 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #ffd700; --bg: #0b0f19; --glass: rgba(255, 255, 255, 0.05); --green: #2ecc71; --blue: #3498db; }
+        
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Transição de Telas */
+        .tela { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        .tela.ativa { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Menu Inferior Fixo */
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #161b22; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 100; }
+        .nav-item { color: #888; text-decoration: none; text-align: center; font-size: 10px; flex: 1; cursor: pointer; }
+        .nav-item.ativo { color: var(--gold); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        /* Estilos Comuns */
+        .header-app { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--gold); padding-bottom: 10px; }
+        .card { background: var(--glass); border-radius: 15px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        
+        /* Específico: Monitor */
+        .venda-item { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 10px 0; }
+        .btn-acao { background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="tela-vendas" class="tela ativa">
+    <div class="header-app">
+        <i class="fas fa-chart-line fa-2x" style="color: var(--gold);"></i>
+        <h2 style="margin:5px 0;">Monitor de Vendas</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="card" style="text-align: center;">
+            <span id="total-vendas-valor" style="font-size: 20px; font-weight: bold; color: var(--green);">R$ 0,00</span>
+            <div style="font-size: 10px; color: #888;">TOTAL HOJE</div>
+        </div>
+        <div class="card" style="text-align: center;">
+            <span id="total-vendas-qtd" style="font-size: 20px; font-weight: bold;">0</span>
+            <div style="font-size: 10px; color: #888;">PEDIDOS</div>
+        </div>
+    </div>
+    <div class="card">
+        <h3 style="font-size: 14px; color: var(--gold); margin-top: 0;">Últimos Recebimentos</h3>
+        <div id="lista-vendas-live"></div>
+    </div>
+</div>
+
+<div id="tela-estoque" class="tela">
+    <div class="header-app">
+        <i class="fas fa-boxes fa-2x" style="color: var(--blue);"></i>
+        <h2 style="margin:5px 0;">Gestão de Estoque</h2>
+    </div>
+    <div class="card">
+        <strong>Entrada via Texto (CSV)</strong>
+        <textarea id="csv-input" placeholder="789123;PRODUTO;5.50;12"></textarea>
+        <button class="btn-acao" onclick="processarEstoque()">CARREGAR LISTA</button>
+    </div>
+    <div id="lista-produtos-estoque"></div>
+</div>
+
+<div id="tela-clientes" class="tela">
+    <div class="header-app">
+        <i class="fas fa-users fa-2x" style="color: var(--green);"></i>
+        <h2 style="margin:5px 0;">Meus Clientes</h2>
+    </div>
+    <input type="text" id="busca-cliente" placeholder="Procurar por nome..." onkeyup="filtrarClientes()">
+    <div id="lista-clientes-grid" class="card"></div>
+</div>
+
+<nav class="nav-bottom">
+    <div class="navex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 450px; }
 
         .header { text-align: center; margin: 20px 0 30px 0; }
