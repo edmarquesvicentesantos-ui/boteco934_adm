@@ -1,306 +1,96 @@
-// CONFIGURAÇÃO FIREBASE
-const firebaseConfig = {
-    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-    authDomain: "boteco934-afc3f.firebaseapp.com",
-    projectId: "boteco934-afc3f",
-    storageBucket: "boteco934-afc3f.firebasestorage.app",
-    messagingSenderId: "182023728304",
-    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-};
+// --- CONFIGURAÇÕES E ESTADO ---
+const firebaseConfig = { /* Sua configuração aqui */ };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ESTADO DO SISTEMA
-let produtos = [
-    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, custo_ant: 4.50 },
-    { id: 102, cat: "Cervejas", nome: "HEINEKEN LN", preco: 11.00, custo_ant: 8.00 }
-];
-let carrinho = [];
+let mesas = Array.from({length: 10}, (_, i) => ({ numero: i + 1, status: 'livre', itens: [], total: 0 }));
+let mesaAtiva = null;
+let produtos = []; // Carregado do Firebase ou XML
 let saldoRestante = 0;
+let vendedorAtivo = "Edmarques"; // Poderia ser um prompt inicial
 
-// RELÓGIO
-setInterval(() => {
-    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-}, 1000);
-
-// NAVEGAÇÃO E FILTROS
-function filtrar(cat) {
-    const lista = document.getElementById('lista-produtos');
-    const filtrados = cat === "Tudo" ? produtos : produtos.filter(p => p.cat === cat);
-    lista.innerHTML = filtrados.map(p => `
-        <button onclick="adicionarItem(${p.id})" class="w-full bg-slate-700 rounded-xl overflow-hidden active:bg-slate-600 border border-slate-600 shadow-sm">
-            <div class="p-3 text-left">
-                <div class="text-white font-bold text-[11px] uppercase truncate">${p.nome}</div>
-                <div class="text-yellow-500 font-black">R$ ${p.preco.toFixed(2)}</div>
-            </div>
-        </button>
-    `).join('');
+// --- GESTÃO DE MESAS ---
+function renderizarMesas() {
+    const painel = document.getElementById('painel-mesas');
+    if(!painel) return;
+    painel.innerHTML = mesas.map(m => {
+        const cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
+        const destaque = mesaAtiva === m.numero ? 'ring-4 ring-yellow-400 scale-105' : '';
+        return `
+            <button onclick="selecionarMesa(${m.numero})" class="${cor} ${destaque} p-3 rounded-xl text-white font-black transition-all shadow-md">
+                MESA ${m.numero}
+                <div class="text-[9px] font-normal">${m.status === 'ocupada' ? 'R$ '+m.total.toFixed(2) : 'LIVRE'}</div>
+            </button>
+        `;
+    }).join('');
 }
 
-// CARRINHO E SOMA IGUAL SUPERMERCADO
-function adicionarItem(id) {
-    const p = produtos.find(i => i.id === id);
-    const index = carrinho.findIndex(i => i.id === id);
-    if (index >= 0) { carrinho[index].qtd += 1; } 
-    else { carrinho.push({ ...p, qtd: 1 }); }
-    
-    // Reset do saldo para novo item
-    const total = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
-    saldoRestante = total;
-    
+function selecionarMesa(num) {
+    mesaAtiva = num;
+    const mesa = mesas.find(m => m.numero === num);
+    carrinho = mesa.itens;
+    saldoRestante = mesa.total;
+    renderizarMesas();
     atualizarCarrinho();
 }
 
-function atualizarCarrinho() {
-    const lista = document.getElementById('itens-venda');
-    lista.innerHTML = carrinho.map(i => `
-        <div class="flex justify-between border-b border-gray-100 py-1 uppercase">
-            <span class="w-1/2">${i.nome}</span>
-            <span class="w-1/4 text-right">${i.qtd}x${i.preco.toFixed(2)}</span>
-            <span class="w-1/4 text-right font-bold">${(i.qtd*i.preco).toFixed(2)}</span>
-        </div>
-    `).join('');
+// --- LANÇAMENTO DE ITENS ---
+function adicionarItem(id) {
+    if (mesaAtiva === null) return alert("❌ SELECIONE UMA MESA!");
     
-    document.getElementById('valor-total').innerText = saldoRestante.toFixed(2);
+    const p = produtos.find(item => item.id === id);
+    const mesa = mesas.find(m => m.numero === mesaAtiva);
+    
+    const index = mesa.itens.findIndex(i => i.id === id);
+    if (index >= 0) mesa.itens[index].qtd += 1;
+    else mesa.itens.push({ ...p, qtd: 1 });
+
+    mesa.status = 'ocupada';
+    mesa.total = mesa.itens.reduce((s, i) => s + (i.preco * i.qtd), 0);
+    saldoRestante = mesa.total;
+    
+    renderizarMesas();
+    atualizarCarrinho();
 }
 
-// PAGAMENTO PARCIAL, PENDURA E DIVISÃO DE CONTA
+// --- FECHAMENTO E DIVISÃO (GOLD) ---
 async function finalizarVenda() {
-    if (carrinho.length === 0) return;
-    const pagto = document.getElementById('forma-pagamento').value;
-    const valorPago = parseFloat(prompt(`Valor pago no ${pagto}:`, saldoRestante.toFixed(2)));
+    if (!mesaAtiva || saldoRestante <= 0) return;
     
-    if (isNaN(valorPago) || valorPago <= 0) return;
+    const pagto = document.getElementById('forma-pagamento').value;
+    const valor = parseFloat(prompt(`Valor no ${pagto} (Falta R$ ${saldoRestante.toFixed(2)}):`, saldoRestante.toFixed(2)));
+    
+    if (!valor || valor <= 0) return;
 
-    let cliente = "";
-    if (pagto === "PENDURA") {
-        cliente = prompt("Nome do Cliente (PENDURA):");
-        if (!cliente) return alert("Erro: Nome obrigatório!");
-    }
+    let cliente = (pagto === "PENDURA") ? prompt("Nome do Cliente:") : "";
+    if (pagto === "PENDURA" && !cliente) return alert("Identificação obrigatória!");
 
     try {
         await db.collection("vendas").add({
             data: new Date().toLocaleString(),
-            valor: valorPago,
+            mesa: mesaAtiva,
+            valor: valor,
             metodo: pagto,
             cliente: cliente,
-            local: "Boteco 934"
+            vendedor: vendedorAtivo
         });
 
-        saldoRestante -= valorPago;
+        saldoRestante -= valor;
+        const mesa = mesas.find(m => m.numero === mesaAtiva);
+        mesa.total = saldoRestante;
 
         if (saldoRestante <= 0.05) {
-            alert("CONTA ZERADA! MESA LIBERADA.");
-            carrinho = [];
-            saldoRestante = 0;
-            atualizarCarrinho();
-        } else {
-            alert(`FALTAM R$ ${saldoRestante.toFixed(2)}`);
-            atualizarCarrinho();
+            mesa.status = 'livre';
+            mesa.itens = [];
+            mesa.total = 0;
+            mesaAtiva = null;
+            alert("✅ CONTA FECHADA! MESA LIBERADA.");
         }
+        
+        renderizarMesas();
+        atualizarCarrinho();
     } catch(e) { alert("Erro: " + e); }
 }
 
-// WHATSAPP
-function enviarWhatsApp() {
-    if (carrinho.length === 0) return;
-    let msg = `*BOTECO 934 - RECIBO*%0A`;
-    carrinho.forEach(i => msg += `${i.qtd}x ${i.nome} - R$${(i.qtd*i.preco).toFixed(2)}%0A`);
-    msg += `*TOTAL: R$ ${saldoRestante.toFixed(2)}*`;
-    const fone = prompt("WhatsApp do cliente:", "55879");
-    if (fone) window.open(`https://api.whatsapp.org/send?phone=${fone}&text=${msg}`);
-}
-
-// GERENTE E ALERTA DE INFLAÇÃO
-function abrirPainelGerente() { document.getElementById('modal-gerente').classList.remove('hidden'); }
-function fecharPainelGerente() { document.getElementById('modal-gerente').classList.add('hidden'); }
-
-document.getElementById('calc-custo').addEventListener('input', function() {
-    const custo = parseFloat(this.value) || 0;
-    document.getElementById('sugestao-dose').innerText = "R$ " + (((custo/18)+0.7)*2.8).toFixed(2);
-    document.getElementById('sugestao-litro').innerText = "R$ " + (custo*1.5).toFixed(2);
-});
-
-function salvarPrecos() {
-    const nome = document.getElementById('calc-nome').value.toUpperCase();
-    const pDose = parseFloat(document.getElementById('sugestao-dose').innerText.replace('R$ ', ''));
-    const pLitro = parseFloat(document.getElementById('sugestao-litro').innerText.replace('R$ ', ''));
-    if (!nome || pDose <= 0) return;
-
-    produtos.push({ id: Date.now(), cat: "Doses", nome: nome + " (DOSE)", preco: pDose });
-    produtos.push({ id: Date.now()+1, cat: "Doses", nome: nome + " (GARRAF)", preco: pLitro });
-    fecharPainelGerente();
-    filtrar('Doses');
-}
-
-// AGENDA DE CONTATOS
-function abrirContatos() { document.getElementById('modal-contatos').classList.remove('hidden'); carregarContatos(); }
-function fecharContatos() { document.getElementById('modal-contatos').classList.add('hidden'); }
-
-async function salvarContato() {
-    const nome = document.getElementById('cont-nome').value.toUpperCase();
-    const fone = document.getElementById('cont-fone').value;
-    if (nome && fone) {
-        await db.collection("contatos").add({ nome, fone });
-        carregarContatos();
-    }
-}
-
-async function carregarContatos() {
-    const lista = document.getElementById('lista-contatos');
-    const snap = await db.collection("contatos").get();
-    lista.innerHTML = snap.docs.map(doc => `
-        <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700">
-            <span class="text-xs font-bold">${doc.data().nome}</span>
-            <button onclick="window.open('https://wa.me/55${doc.data().fone}')" class="bg-green-600 p-1 rounded text-[10px]">ZAP</button>
-        </div>
-    `).join('');
-}
-
-filtrar('Tudo');
-async function enviarFechamentoDia() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    
-    try {
-        // Busca as vendas de hoje no Firebase
-        const snapshot = await db.collection("vendas")
-            .where("data", ">=", hoje) 
-            .get();
-
-        let resumo = {
-            dinheiro: 0,
-            pix: 0,
-            cartao: 0,
-            pendura: 0,
-            totalReal: 0
-        };
-
-        snapshot.forEach(doc => {
-            const v = doc.data();
-            const valor = parseFloat(v.valor) || 0;
-
-            if (v.metodo === "DINHEIRO") resumo.dinheiro += valor;
-            else if (v.metodo === "PIX") resumo.pix += valor;
-            else if (v.metodo === "CREDITO" || v.metodo === "DEBITO") resumo.cartao += valor;
-            else if (v.metodo === "PENDURA") resumo.pendura += valor;
-        });
-
-        resumo.totalReal = resumo.dinheiro + resumo.pix + resumo.cartao;
-
-        // Montagem da Mensagem para o Edmarques
-        let texto = `*📊 FECHAMENTO BOTECO 934 - ${hoje}*%0A`;
-        texto += `------------------------------%0A`;
-        texto += `💵 *DINHEIRO:* R$ ${resumo.dinheiro.toFixed(2)}%0A`;
-        texto += `💎 *PIX:* R$ ${resumo.pix.toFixed(2)}%0A`;
-        texto += `💳 *CARTÕES:* R$ ${resumo.cartao.toFixed(2)}%0A`;
-        texto += `------------------------------%0A`;
-        texto += `✅ *SALDO REAL EM CAIXA:* R$ ${resumo.totalReal.toFixed(2)}%0A`;
-        texto += `------------------------------%0A`;
-        texto += `📝 *PENDURAS DO DIA:* R$ ${resumo.pendura.toFixed(2)}%0A`;
-        texto += `------------------------------%0A`;
-        texto += `_Relatório gerado automaticamente._`;
-
-        // Envia para o seu WhatsApp pessoal
-        const meuFone = "5587996806181";
-        window.open(`https://api.whatsapp.org/send?phone=${meuFone}&text=${texto}`);
-
-    } catch (e) {
-        alert("Erro ao gerar fechamento: " + e);
-    }
-}
-// Adicione 'estoque' e 'minimo' nos seus produtos
-let produtos = [
-    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, estoque: 24, minimo: 6 },
-    { id: 103, cat: "Doses", nome: "PITU", preco: 4.00, estoque: 50, minimo: 10 }
-];
-
-// No filtrar, vamos mudar a cor se o estoque estiver baixo
-function filtrar(cat) {
-    const lista = document.getElementById('lista-produtos');
-    const filtrados = cat === "Tudo" ? produtos : produtos.filter(p => p.cat === cat);
-    
-    lista.innerHTML = filtrados.map(p => {
-        const corEstoque = p.estoque <= p.minimo ? 'border-red-500 bg-red-900' : 'border-slate-600 bg-slate-700';
-        return `
-            <button onclick="adicionarItem(${p.id})" class="w-full ${corEstoque} rounded-xl overflow-hidden active:bg-slate-600 border shadow-sm">
-                <div class="p-3 text-left">
-                    <div class="text-white font-bold text-[11px] uppercase">${p.nome}</div>
-                    <div class="text-yellow-500 font-black">R$ ${p.preco.toFixed(2)}</div>
-                    <div class="text-[8px] text-gray-400">Restam: ${p.estoque}</div>
-                </div>
-            </button>
-        `;
-    }).join('');
-}
-// CONFIGURAÇÃO INICIAL
-let mesas = [
-    { numero: 1, status: 'livre', itens: [], total: 0 },
-    { numero: 2, status: 'livre', itens: [], total: 0 },
-    { numero: 3, status: 'livre', itens: [], total: 0 },
-    { numero: 4, status: 'livre', itens: [], total: 0 },
-    { numero: 5, status: 'livre', itens: [], total: 0 },
-    { numero: 6, status: 'livre', itens: [], total: 0 }
-];
-
-let mesaAtiva = null;
-
-// GERA O VISUAL DAS MESAS
-function renderizarMesas() {
-    const painel = document.getElementById('painel-mesas');
-    painel.innerHTML = mesas.map(m => {
-        const cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
-        const borda = mesaAtiva === m.numero ? 'border-4 border-yellow-400' : 'border border-transparent';
-        return `
-            <button onclick="selecionarMesa(${m.numero})" class="${cor} ${borda} p-2 rounded-lg text-white font-bold text-[10px] uppercase">
-                Mesa ${m.numero}
-                <div class="text-[8px]">${m.status === 'ocupada' ? 'R$ '+m.total.toFixed(2) : 'Livre'}</div>
-            </button>
-        `;
-    }).join('');
-}
-
-function selecionarMesa(numero) {
-    mesaAtiva = numero;
-    const mesa = mesas.find(m => m.numero === numero);
-    carrinho = mesa.itens; // Carrega os itens daquela mesa
-    saldoRestante = mesa.total;
-    
-    renderizarMesas();
-    atualizarCarrinho();
-}
-
-// AJUSTE NA FUNÇÃO DE ADICIONAR ITEM
-function adicionarItem(id) {
-    if (mesaAtiva === null) {
-        alert("⚠️ Selecione uma MESA primeiro!");
-        return;
-    }
-
-    const p = produtos.find(i => i.id === id);
-    const mesa = mesas.find(m => m.numero === mesaAtiva);
-    
-    const index = mesa.itens.findIndex(i => i.id === id);
-    if (index >= 0) { mesa.itens[index].qtd += 1; } 
-    else { mesa.itens.push({ ...p, qtd: 1 }); }
-    
-    mesa.status = 'ocupada';
-    mesa.total = mesa.itens.reduce((s, i) => s + (i.preco * i.qtd), 0);
-    
-    saldoRestante = mesa.total;
-    renderizarMesas();
-    atualizarCarrinho();
-}
-
-// AJUSTE NO FINALIZAR VENDA (Para liberar a mesa após pagar tudo)
-// Dentro da sua função finalizarVenda(), quando o saldoRestante <= 0:
-/*
-    if (saldoRestante <= 0.05) {
-        const mesa = mesas.find(m => m.numero === mesaAtiva);
-        mesa.status = 'livre';
-        mesa.itens = [];
-        mesa.total = 0;
-        mesaAtiva = null;
-        renderizarMesas();
-        // ... restante do código de fechar conta
-    }
-*/
+// --- INICIALIZAÇÃO ---
+renderizarMesas();
