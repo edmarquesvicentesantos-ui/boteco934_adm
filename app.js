@@ -1,73 +1,160 @@
+// CONFIGURAÇÃO FIREBASE
+const firebaseConfig = {
+    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+    authDomain: "boteco934-afc3f.firebaseapp.com",
+    projectId: "boteco934-afc3f",
+    storageBucket: "boteco934-afc3f.firebasestorage.app",
+    messagingSenderId: "182023728304",
+    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ESTADO DO SISTEMA
+let produtos = [
+    { id: 101, cat: "Cervejas", nome: "SKOL LATA", preco: 6.00, custo_ant: 4.50 },
+    { id: 102, cat: "Cervejas", nome: "HEINEKEN LN", preco: 11.00, custo_ant: 8.00 }
+];
+let carrinho = [];
+let saldoRestante = 0;
+
+// RELÓGIO
+setInterval(() => {
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+}, 1000);
+
+// NAVEGAÇÃO E FILTROS
+function filtrar(cat) {
+    const lista = document.getElementById('lista-produtos');
+    const filtrados = cat === "Tudo" ? produtos : produtos.filter(p => p.cat === cat);
+    lista.innerHTML = filtrados.map(p => `
+        <button onclick="adicionarItem(${p.id})" class="w-full bg-slate-700 rounded-xl overflow-hidden active:bg-slate-600 border border-slate-600 shadow-sm">
+            <div class="p-3 text-left">
+                <div class="text-white font-bold text-[11px] uppercase truncate">${p.nome}</div>
+                <div class="text-yellow-500 font-black">R$ ${p.preco.toFixed(2)}</div>
+            </div>
+        </button>
+    `).join('');
+}
+
+// CARRINHO E SOMA IGUAL SUPERMERCADO
+function adicionarItem(id) {
+    const p = produtos.find(i => i.id === id);
+    const index = carrinho.findIndex(i => i.id === id);
+    if (index >= 0) { carrinho[index].qtd += 1; } 
+    else { carrinho.push({ ...p, qtd: 1 }); }
+    
+    // Reset do saldo para novo item
+    const total = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
+    saldoRestante = total;
+    
+    atualizarCarrinho();
+}
+
+function atualizarCarrinho() {
+    const lista = document.getElementById('itens-venda');
+    lista.innerHTML = carrinho.map(i => `
+        <div class="flex justify-between border-b border-gray-100 py-1 uppercase">
+            <span class="w-1/2">${i.nome}</span>
+            <span class="w-1/4 text-right">${i.qtd}x${i.preco.toFixed(2)}</span>
+            <span class="w-1/4 text-right font-bold">${(i.qtd*i.preco).toFixed(2)}</span>
+        </div>
+    `).join('');
+    
+    document.getElementById('valor-total').innerText = saldoRestante.toFixed(2);
+}
+
+// PAGAMENTO PARCIAL, PENDURA E DIVISÃO DE CONTA
 async function finalizarVenda() {
     if (carrinho.length === 0) return;
-    
     const pagto = document.getElementById('forma-pagamento').value;
-    const valorParaCobrar = parseFloat(prompt(`Quanto será registrado no ${pagto}?`, saldoRestante.toFixed(2)));
+    const valorPago = parseFloat(prompt(`Valor pago no ${pagto}:`, saldoRestante.toFixed(2)));
     
-    if (isNaN(valorParaCobrar) || valorParaCobrar <= 0) return;
+    if (isNaN(valorPago) || valorPago <= 0) return;
 
-    let clientePendura = "";
-    // REGRA DO JOGO: Se for Pendura, o nome é obrigatório para salvar no Firebase
+    let cliente = "";
     if (pagto === "PENDURA") {
-        clientePendura = prompt("Para quem vamos pendurar esta conta?");
-        if (!clientePendura) {
-            alert("ERRO: Não é possível pendurar sem identificar o cliente!");
-            return;
-        }
+        cliente = prompt("Nome do Cliente (PENDURA):");
+        if (!cliente) return alert("Erro: Nome obrigatório!");
     }
 
     try {
         await db.collection("vendas").add({
-            data: new Date().toLocaleString("pt-BR"),
-            valor_pago: valorParaCobrar,
+            data: new Date().toLocaleString(),
+            valor: valorPago,
             metodo: pagto,
-            cliente: clientePendura, // Salva o nome do devedor
-            status: valorParaCobrar >= saldoRestante ? "FECHADO" : "PARCIAL",
+            cliente: cliente,
             local: "Boteco 934"
         });
 
-        saldoRestante -= valorParaCobrar;
+        saldoRestante -= valorPago;
 
-        if (saldoRestante <= 0.01) {
-            alert("CONTA ZERADA! Mesa liberada.");
+        if (saldoRestante <= 0.05) {
+            alert("CONTA ZERADA! MESA LIBERADA.");
             carrinho = [];
             saldoRestante = 0;
             atualizarCarrinho();
         } else {
-            alert(`Registrado R$ ${valorParaCobrar.toFixed(2)} no ${pagto}. Ainda faltam R$ ${saldoRestante.toFixed(2)}`);
+            alert(`FALTAM R$ ${saldoRestante.toFixed(2)}`);
             atualizarCarrinho();
         }
-    } catch(e) { 
-        alert("Erro ao registrar pendura: " + e); 
+    } catch(e) { alert("Erro: " + e); }
+}
+
+// WHATSAPP
+function enviarWhatsApp() {
+    if (carrinho.length === 0) return;
+    let msg = `*BOTECO 934 - RECIBO*%0A`;
+    carrinho.forEach(i => msg += `${i.qtd}x ${i.nome} - R$${(i.qtd*i.preco).toFixed(2)}%0A`);
+    msg += `*TOTAL: R$ ${saldoRestante.toFixed(2)}*`;
+    const fone = prompt("WhatsApp do cliente:", "55879");
+    if (fone) window.open(`https://api.whatsapp.org/send?phone=${fone}&text=${msg}`);
+}
+
+// GERENTE E ALERTA DE INFLAÇÃO
+function abrirPainelGerente() { document.getElementById('modal-gerente').classList.remove('hidden'); }
+function fecharPainelGerente() { document.getElementById('modal-gerente').classList.add('hidden'); }
+
+document.getElementById('calc-custo').addEventListener('input', function() {
+    const custo = parseFloat(this.value) || 0;
+    document.getElementById('sugestao-dose').innerText = "R$ " + (((custo/18)+0.7)*2.8).toFixed(2);
+    document.getElementById('sugestao-litro').innerText = "R$ " + (custo*1.5).toFixed(2);
+});
+
+function salvarPrecos() {
+    const nome = document.getElementById('calc-nome').value.toUpperCase();
+    const pDose = parseFloat(document.getElementById('sugestao-dose').innerText.replace('R$ ', ''));
+    const pLitro = parseFloat(document.getElementById('sugestao-litro').innerText.replace('R$ ', ''));
+    if (!nome || pDose <= 0) return;
+
+    produtos.push({ id: Date.now(), cat: "Doses", nome: nome + " (DOSE)", preco: pDose });
+    produtos.push({ id: Date.now()+1, cat: "Doses", nome: nome + " (GARRAF)", preco: pLitro });
+    fecharPainelGerente();
+    filtrar('Doses');
+}
+
+// AGENDA DE CONTATOS
+function abrirContatos() { document.getElementById('modal-contatos').classList.remove('hidden'); carregarContatos(); }
+function fecharContatos() { document.getElementById('modal-contatos').classList.add('hidden'); }
+
+async function salvarContato() {
+    const nome = document.getElementById('cont-nome').value.toUpperCase();
+    const fone = document.getElementById('cont-fone').value;
+    if (nome && fone) {
+        await db.collection("contatos").add({ nome, fone });
+        carregarContatos();
     }
 }
-// Função para calcular o resumo financeiro do dia
-function gerarResumoFinanceiro(vendasDoDia) {
-    let financeiro = {
-        dinheiro: 0,
-        pix: 0,
-        cartao: 0,
-        pendura: 0
-    };
 
-    vendasDoDia.forEach(venda => {
-        if (venda.metodo === "DINHEIRO") financeiro.dinheiro += venda.valor_pago;
-        else if (venda.metodo === "PIX") financeiro.pix += venda.valor_pago;
-        else if (venda.metodo === "CREDITO" || venda.metodo === "DEBITO") financeiro.cartao += venda.valor_pago;
-        else if (venda.metodo === "PENDURA") financeiro.pendura += venda.valor_pago;
-    });
-
-    console.log("--- RESUMO DO DIA BOTECO 934 ---");
-    console.log(`💵 Dinheiro em Caixa: R$ ${financeiro.dinheiro.toFixed(2)}`);
-    console.log(`💎 Total em PIX: R$ ${financeiro.pix.toFixed(2)}`);
-    console.log(`💳 Total em Cartão: R$ ${financeiro.cartao.toFixed(2)}`);
-    console.log(`📝 Total em Pendura: R$ ${financeiro.pendura.toFixed(2)}`);
+async function carregarContatos() {
+    const lista = document.getElementById('lista-contatos');
+    const snap = await db.collection("contatos").get();
+    lista.innerHTML = snap.docs.map(doc => `
+        <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700">
+            <span class="text-xs font-bold">${doc.data().nome}</span>
+            <button onclick="window.open('https://wa.me/55${doc.data().fone}')" class="bg-green-600 p-1 rounded text-[10px]">ZAP</button>
+        </div>
+    `).join('');
 }
 
-function verificarSubidaPreco(custoNovo, custoAntigo) {
-    if (custoNovo > custoAntigo) {
-        let aumento = ((custoNovo - custoAntigo) / custoAntigo) * 100;
-        alert(`🚨 ALERTA DE SUBIDA: Este produto está ${aumento.toFixed(1)}% mais caro que na última compra!`);
-        // Aqui o sistema sugere o novo preço mantendo a margem
-    }
-}
+filtrar('Tudo');
