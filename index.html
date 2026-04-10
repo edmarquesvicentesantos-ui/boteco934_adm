@@ -3,132 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOTECO 934 | SUPER APP</title>
+    <title>ADM | BOTECO 934</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --pink: #ff69b4; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 80px; }
-        .app-header { background: var(--card); padding: 15px; text-align: center; border-bottom: 1px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-        .app-header h1 { margin: 0; font-size: 18px; color: var(--gold); letter-spacing: 2px; }
+        :root { --gold: #ffd700; --bg: #0b0f19; --card: #161b22; --green: #2ecc71; --blue: #3498db; }
         
-        .tela { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
-        .tela.ativa { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .item-lista { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #222; align-items: center; }
-        
-        /* Menu Inferior */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; border-top: 1px solid #333; padding: 8px 0; z-index: 1000; }
-        .nav-btn { flex: 1; text-align: center; color: #666; font-size: 10px; cursor: pointer; }
-        .nav-btn.ativo { color: var(--gold); }
-        .nav-btn i { font-size: 20px; display: block; margin-bottom: 3px; }
-        
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; margin-bottom: 10px; box-sizing: border-box; }
-        .btn-add { background: var(--gold); color: black; border: none; padding: 10px; border-radius: 5px; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        .header { text-align: center; margin: 30px 0; }
+        .logo { font-size: 50px; color: var(--gold); margin-bottom: 10px; }
+        .header h1 { margin: 0; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
+        .header p { color: #888; font-size: 13px; }
+
+        .menu-section { margin-bottom: 25px; }
+        .section-title { font-size: 11px; color: var(--gold); text-transform: uppercase; margin-left: 10px; margin-bottom: 10px; letter-spacing: 1px; font-weight: bold; }
+
+        .btn-link { 
+            background: var(--card); 
+            border: 1px solid #333; 
+            padding: 20px; 
+            border-radius: 15px; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 12px;
+            transition: 0.3s;
+        }
+        .btn-link:active { transform: scale(0.96); background: #1c222d; }
+        .btn-link i { font-size: 24px; width: 45px; text-align: center; margin-right: 15px; }
+        .btn-link .info { display: flex; flex-direction: column; }
+        .btn-link .info strong { font-size: 16px; }
+        .btn-link .info span { font-size: 11px; color: #777; }
+
+        /* Cores de destaque */
+        .vendas-border { border-left: 5px solid var(--green); }
+        .custo-border { border-left: 5px solid var(--gold); }
+        .estoque-border { border-left: 5px solid var(--blue); }
+
+        .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #444; }
     </style>
 </head>
 <body>
 
-<div class="app-header">
-    <h1>BOTECO 934</h1>
-</div>
-
-<div id="vendas" class="tela ativa">
-    <div class="card" style="border-left: 5px solid var(--green);">
-        <small>RESUMO DE HOJE</small>
-        <h2 id="resumo-total">R$ 0,00</h2>
+<div class="container">
+    <div class="header">
+        <div class="logo"><i class="fas fa-beer"></i></div>
+        <h1>BOTECO 934</h1>
+        <p>Painel Administrativo v2.0</p>
     </div>
-    <div id="lista-vendas-corpo"></div>
-</div>
 
-<div id="estoque" class="tela">
-    <div class="card">
-        <h3><i class="fas fa-boxes"></i> Estoque</h3>
-        <div id="lista-estoque-corpo"></div>
-    </div>
-</div>
-
-<div id="clientes" class="tela">
-    <div class="card">
-        <h3><i class="fas fa-users"></i> Meus Clientes</h3>
-        <input type="text" id="busca-cli" placeholder="🔍 Buscar cliente..." onkeyup="filtrarCli()">
-        <div id="lista-cli-corpo">
+    <div class="menu-section">
+        <div class="section-title">Financeiro</div>
+        
+        <a href="vendas.html" class="btn-link vendas-border">
+            <i class="fas fa-chart-line" style="color: var(--green);"></i>
+            <div class="info">
+                <strong>Monitor de Vendas</strong>
+                <span>Acompanhe o caixa em tempo real</span>
             </div>
+        </a>
+
+        <a href="calculadora_custo.html" class="btn-link custo-border">
+            <i class="fas fa-calculator" style="color: var(--gold);"></i>
+            <div class="info">
+                <strong>Calculadora de Custo</strong>
+                <span>Precificação e Margem de Lucro</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="menu-section">
+        <div class="section-title">Logística e Estoque</div>
+
+        <a href="importar_estoque.html" class="btn-link estoque-border">
+            <i class="fas fa-file-import" style="color: var(--blue);"></i>
+            <div class="info">
+                <strong>Importar Mercadorias</strong>
+                <span>Entrada via XML ou Lista</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        Petrolina - PE | Gerenciamento de Bebidas
     </div>
 </div>
-
-<div id="boticario" class="tela">
-    <div class="card" style="border-left: 5px solid var(--pink);">
-        <h3 style="color: var(--pink);"><i class="fas fa-magic"></i> Revenda Boticário</h3>
-        <p style="font-size: 12px; color: #888;">Controle de pedidos e catálogo.</p>
-        <button class="btn-add" style="background: var(--pink); color: white;">NOVO PEDIDO</button>
-    </div>
-</div>
-
-<nav class="nav-bar">
-    <div class="nav-btn ativo" onclick="abrir('vendas', this)"><i class="fas fa-home"></i>Início</div>
-    <div class="nav-btn" onclick="abrir('estoque', this)"><i class="fas fa-list"></i>Estoque</div>
-    <div class="nav-btn" onclick="abrir('clientes', this)"><i class="fas fa-user"></i>Clientes</div>
-    <div class="nav-btn" onclick="abrir('boticario', this)"><i class="fas fa-heart"></i>Boticário</div>
-</nav>
-
-<script>
-    // MUDANÇA DE TELA
-    function abrir(telaId, btn) {
-        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('ativo'));
-        document.getElementById(telaId).classList.add('ativa');
-        btn.classList.add('ativo');
-
-        if(telaId === 'clientes') carregarClientes();
-    }
-
-    // CARREGAR CLIENTES DO NAVEGADOR
-    function carregarClientes() {
-        // Tenta buscar por vários nomes de chave comuns para não perder seus dados antigos
-        const dadosSalvos = localStorage.getItem('clientesBoteco934') || localStorage.getItem('clientes') || '[]';
-        let cli = JSON.parse(dadosSalvos);
-        const corpo = document.getElementById('lista-cli-corpo');
-        
-        if (cli.length === 0) {
-            corpo.innerHTML = '<p style="text-align:center;color:#444">Nenhum cliente encontrado.</p>';
-            return;
-        }
-
-        // Organizar de A a Z
-        cli.sort((a, b) => a.nome.localeCompare(b.nome));
-        
-        corpo.innerHTML = '';
-        cli.forEach(c => {
-            // Deixa a primeira letra maiúscula
-            const nomeF = c.nome.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, l => l.toUpperCase());
-            corpo.innerHTML += `
-                <div class="item-lista">
-                    <div>
-                        <strong>${nomeF}</strong><br>
-                        <small style="color:#666">${c.contato || '(87) -----'}</small>
-                    </div>
-                    <i class="fas fa-comment-dots" style="color:var(--gold)"></i>
-                </div>
-            `;
-        });
-    }
-
-    function filtrarCli() {
-        let busca = document.getElementById('busca-cli').value.toUpperCase();
-        let itens = document.querySelectorAll('#lista-cli-corpo .item-lista');
-        itens.forEach(i => {
-            i.style.display = i.innerText.toUpperCase().includes(busca) ? "flex" : "none";
-        });
-    }
-
-    // Carrega a primeira tela
-    window.onload = () => {
-        // Se você já tiver clientes, ele já prepara o terreno
-        carregarClientes();
-    };
-</script>
 
 </body>
 </html>
