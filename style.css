@@ -13,3 +13,6 @@ body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--t
 .btn-zap { width: 100%; padding: 10px; background: #25d366; color: #fff; border: none; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10; }
 .modal-content { background: #fff; color: #333; padding: 20px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; gap: 10px; }
+.btn-verde { background: #25d366; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; }
+.btn-zap { background: #25d366; color: white; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 5px; }
+.mesa-seletor { background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
