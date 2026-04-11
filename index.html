@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - PDV OFICIAL</title>
+    <title>Boteco 934 - PDV Final</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -30,22 +30,30 @@
 
     <div id="modal-financeiro" class="modal">
         <div class="modal-content">
-            <h3>Resumo Financeiro</h3>
+            <h3>Fluxo de Caixa</h3>
             <p>Dinheiro: R$ <span id="f-dinheiro">0,00</span></p>
             <p>PIX: R$ <span id="f-pix">0,00</span></p>
             <p style="color:red">Pendura: R$ <span id="f-pendura">0,00</span></p>
-            <button onclick="fecharModal('modal-financeiro')">Sair</button>
+            <button onclick="fecharModal('modal-financeiro')">Fechar</button>
         </div>
     </div>
 
     <div id="modal-produto" class="modal">
         <div class="modal-content">
-            <h3>Novo Produto/Dose</h3>
-            <input type="text" id="p-nome" placeholder="Nome">
-            <input type="number" id="p-preco" placeholder="Preço Venda">
-            <select id="p-tipo"><option value="unidade">Garrafa/Lata</option><option value="dose">Dose</option></select>
-            <button onclick="salvarProduto()">Gravar</button>
-            <button onclick="fecharModal('modal-produto')">Cancelar</button>
+            <h3>Cadastrar Novo Item</h3>
+            <input type="text" id="p-nome" placeholder="Nome do Produto">
+            <input type="number" id="p-preco" placeholder="Preço de Venda">
+            <button onclick="salvarProduto()">Salvar no Banco</button>
+            <button onclick="fecharModal('modal-produto')">Sair</button>
+        </div>
+    </div>
+
+    <div id="modal-nota" class="modal">
+        <div class="modal-content">
+            <h3>Lançar Nota (Entrada)</h3>
+            <input type="text" placeholder="Produto">
+            <input type="number" placeholder="Custo">
+            <button onclick="fecharModal('modal-nota')">Gravar Nota</button>
         </div>
     </div>
 
@@ -53,17 +61,8 @@
         <div class="modal-content">
             <h3>Finalizar Venda</h3>
             <select id="metodo"><option>Dinheiro</option><option>PIX</option><option>Pendura</option></select>
-            <button onclick="finalizarVenda()">Confirmar Pagamento</button>
+            <button onclick="finalizarVenda()">Confirmar</button>
             <button onclick="fecharModal('modal-pagamento')">Voltar</button>
-        </div>
-    </div>
-
-    <div id="modal-nota" class="modal">
-        <div class="modal-content">
-            <h3>Entrada de Mercadoria</h3>
-            <input type="text" id="n-prod" placeholder="Produto">
-            <input type="number" id="n-custo" placeholder="Custo">
-            <button onclick="fecharModal('modal-nota')">Salvar Nota</button>
         </div>
     </div>
 
