@@ -24,14 +24,13 @@
                     <option value="5">Mesa 05</option>
                     <option value="balcao">Balcão</option>
                 </select>
-                <input type="text" id="cliente-nome" placeholder="Nome do Cliente" readonly>
+                <input type="text" id="cliente-nome" placeholder="Cliente da Mesa" readonly>
                 <button class="btn-abrir" onclick="abrirMesa()">Abrir Mesa</button>
             </div>
 
             <nav>
-                <button onclick="filtrar('bebidas')">Bebidas</button>
-                <button onclick="filtrar('boticario')">Boticário</button>
-                <button class="btn-add-prod" onclick="abrirModalProd()">+ Novo Produto</button>
+                <button onclick="abrirModalCliente()" style="background: #25d366; color: #fff;">+ Cadastrar Cliente</button>
+                <button onclick="abrirModalProd()">+ Novo Produto</button>
             </nav>
             <div id="status-estoque" class="status-box"></div>
         </aside>
@@ -44,10 +43,11 @@
         </main>
 
         <section class="checkout-panel">
-            <h3>Consumo Atual</h3>
+            <h3>Consumo</h3>
             <div id="carrinho-itens" class="carrinho-lista"></div>
             <div class="checkout-footer">
                 <div id="total-valor">R$ 0,00</div>
+                <button class="btn-zap" onclick="enviarWhatsApp()">Enviar Recibo (Zap)</button>
                 <button class="btn-fechar" onclick="abrirModalPagamento()">Fechar Recibo</button>
             </div>
         </section>
@@ -55,10 +55,10 @@
 
     <div id="modal-pagamento" class="modal" style="display:none;">
         <div class="modal-content">
-            <h3>Fechar Conta - Boteco 934</h3>
+            <h3>Fechar Recibo</h3>
             <div id="info-recibo"></div>
             <hr>
-            <label>Dividir por quantas pessoas?</label>
+            <label>Dividir por:</label>
             <input type="number" id="dividir-pessoas" value="1" oninput="calcularDivisao()">
             <p id="valor-dividido"></p>
             
@@ -70,21 +70,27 @@
                 <option value="Cartão Crédito">Cartão Crédito</option>
                 <option value="Pendura">Pendura (Fiado)</option>
             </select>
-            <button class="btn-confirmar" onclick="finalizarVenda()">Confirmar Pagamento</button>
+            <button class="btn-confirmar" onclick="finalizarVenda()">Finalizar Venda</button>
             <button class="btn-cancelar" onclick="fecharModalPagamento()">Voltar</button>
+        </div>
+    </div>
+
+    <div id="modal-cliente" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Novo Cliente</h3>
+            <input type="text" id="c-nome" placeholder="Nome">
+            <input type="text" id="c-fone" placeholder="Ex: 5587999999999">
+            <button onclick="salvarCliente()">Salvar Cliente</button>
+            <button onclick="fecharModalCliente()">Sair</button>
         </div>
     </div>
 
     <div id="modal-produto" class="modal" style="display:none;">
         <div class="modal-content">
-            <h3>Cadastrar Produto</h3>
+            <h3>Novo Produto</h3>
             <input type="text" id="p-nome" placeholder="Nome">
             <input type="number" id="p-estoque" placeholder="Estoque">
             <input type="number" id="p-preco" placeholder="Preço">
-            <select id="p-cat">
-                <option value="bebidas">Bebidas</option>
-                <option value="boticario">Boticário</option>
-            </select>
             <button onclick="salvarProduto()">Salvar</button>
             <button onclick="fecharModalProd()">Sair</button>
         </div>
