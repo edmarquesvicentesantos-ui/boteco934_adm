@@ -58,7 +58,26 @@
             </div>
         </main>
     </div>
+<div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center text-black">
+    <div class="bg-slate-200 p-5 rounded-xl w-full max-w-sm">
+        <h2 class="font-black mb-4 uppercase text-center text-sm">Gerenciar Estoque</h2>
+        
+        <div class="mb-4 p-3 bg-white rounded-lg shadow-inner">
+            <p class="text-[9px] font-bold uppercase mb-2 text-gray-500">Cadastro Manual</p>
+            <input type="text" id="cad-nome" placeholder="Nome do Item" class="w-full p-2 mb-2 rounded border border-gray-400 text-xs">
+            <input type="number" id="cad-preco" placeholder="Preço de Venda" class="w-full p-2 mb-2 rounded border border-gray-400 text-xs">
+            <button onclick="funcaoSalvarProd()" class="w-full py-2 bg-green-600 text-white font-black rounded uppercase text-[10px]">Salvar Manual</button>
+        </div>
 
+        <div class="p-3 bg-blue-100 rounded-lg border-2 border-dashed border-blue-400 text-center">
+            <p class="text-[10px] font-black uppercase mb-1 text-blue-800">Entrada Automática (XML)</p>
+            <p class="text-[8px] text-blue-600 mb-2">Selecione a nota fiscal para importar itens</p>
+            <input type="file" id="xml-input" accept=".xml" onchange="importarXML(event)" class="text-[9px] w-full file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+        </div>
+
+        <button onclick="btGerente()" class="w-full mt-4 py-2 font-bold uppercase text-xs text-gray-600">Voltar ao Balcão</button>
+    </div>
+</div>
     <div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center text-black">
         <div class="bg-slate-200 p-5 rounded-xl w-full max-w-sm">
             <h2 class="font-black mb-4 uppercase text-center text-sm">Novo Produto</h2>
