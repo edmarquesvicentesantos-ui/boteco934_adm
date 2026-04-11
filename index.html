@@ -2,16 +2,16 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - PDV</title>
+    <title>Boteco 934 - PDV Oficial</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="topo">
-        <h1>Boteco 934</h1>
-        <div class="controles-topo">
-            <select id="select-mesa"><option value="1">Mesa 01</option><option value="balcao">Balcão</option></select>
+    <div class="cabecalho-principal">
+        <h1 class="marca">Boteco 934</h1>
+        <div class="menu-superior">
+            <select id="select-mesa"><option>Balcão</option><option>Mesa 01</option></select>
             <input type="text" id="cliente-nome" placeholder="Nome do Cliente">
             <button onclick="abrirModal('modal-financeiro')" class="btn-azul">📊 Finanças</button>
             <button onclick="abrirModal('modal-nota')" class="btn-ciano">📑 Notas</button>
@@ -21,39 +21,30 @@
 
     <div id="grade-produtos" class="grade"></div>
 
-    <div class="consumo-container">
+    <div class="painel-consumo">
         <h3>Consumo</h3>
-        <div id="lista-carrinho"></div>
-        <p class="total-texto">Total: R$ <span id="total-venda">0,00</span></p>
-        <button onclick="abrirModal('modal-pagamento')" class="btn-fechar">Fechar Recibo</button>
+        <div id="lista-venda"></div>
+        <p>Total: R$ <span id="valor-total">0,00</span></p>
+        <button onclick="abrirModal('modal-pagamento')" class="btn-verde">Fechar Recibo</button>
     </div>
 
-    <div id="modal-financeiro" class="modal">
-        <div class="modal-content">
+    <div id="modal-financeiro" class="janela-flutuante">
+        <div class="conteudo-janela">
             <h3>Fluxo de Caixa / Finanças</h3>
             <p>Dinheiro: R$ <span id="f-dinheiro">0,00</span></p>
             <p>PIX: R$ <span id="f-pix">0,00</span></p>
-            <p style="color:red">Pendura (Fiado): R$ <span id="f-pendura">0,00</span></p>
+            <p style="color:red">Pendura: R$ <span id="f-pendura">0,00</span></p>
             <button onclick="fecharModal('modal-financeiro')">Fechar</button>
         </div>
     </div>
 
-    <div id="modal-produto" class="modal">
-        <div class="modal-content">
+    <div id="modal-produto" class="janela-flutuante">
+        <div class="conteudo-janela">
             <h3>Cadastrar Novo Produto</h3>
-            <input type="text" id="p-nome" placeholder="Nome do Produto">
+            <input type="text" id="p-nome" placeholder="Nome">
             <input type="number" id="p-preco" placeholder="Preço">
             <button onclick="salvarProduto()">Gravar</button>
             <button onclick="fecharModal('modal-produto')">Sair</button>
-        </div>
-    </div>
-
-    <div id="modal-pagamento" class="modal">
-        <div class="modal-content">
-            <h3>Finalizar Venda</h3>
-            <select id="metodo-final"><option>Dinheiro</option><option>PIX</option><option>Pendura</option></select>
-            <button onclick="finalizarVenda()">Confirmar Pagamento</button>
-            <button onclick="fecharModal('modal-pagamento')">Voltar</button>
         </div>
     </div>
 
