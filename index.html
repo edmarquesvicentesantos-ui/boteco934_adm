@@ -3,77 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Sistema Completo</title>
+    <title>Boteco 934 - PDV</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="brand"><h2>Boteco 934</h2></div>
-            <div class="mesa-seletor">
-                <select id="select-mesa" onchange="trocarMesa()">
-                    <option value="1">Mesa 01</option>
-                    <option value="2">Mesa 02</option>
-                    <option value="balcao">Balcão</option>
-                </select>
-                <input type="text" id="cliente-nome" placeholder="Cliente" readonly>
-                <button onclick="abrirMesa()" style="background:#ffc107; color:#000;">Abrir Mesa</button>
-            </div>
-            <nav>
-                <button onclick="abrirModalFinanceiro()" style="background:#007bff; color:#fff;">📊 Finanças / Caixa</button>
-                <button onclick="abrirModal('modal-nota')" style="background:#17a2b8; color:#fff;">📑 Lançar Nota (Entrada)</button>
-                <button onclick="abrirModal('modal-cliente')" style="background:#25d366; color:#fff;">👤 Novo Cliente</button>
-                <button onclick="abrirModal('modal-produto')" style="background:#f8f9fa; color:#333;">➕ Novo Produto/Dose</button>
-            </nav>
-        </aside>
+    <div class="container-principal">
+        <h1 class="logo">Boteco 934</h1>
+        
+        <div class="secao-mesa">
+            <select id="select-mesa" onchange="trocarMesa()">
+                <option value="1">Mesa 01</option>
+                <option value="2">Mesa 02</option>
+                <option value="balcao">Balcão</option>
+            </select>
+            <input type="text" id="cliente-nome" placeholder="Cliente">
+        </div>
 
-        <main class="main-content">
-            <input type="text" id="busca" placeholder="Buscar produto..." oninput="buscar()">
-            <div id="grade-produtos" class="grid-produtos"></div>
-        </main>
+        <button onclick="abrirMesa()" class="btn-amarelo">Abrir Mesa</button>
+        
+        <button onclick="abrirModal('modal-financeiro')" class="btn-azul">📊 Finanças / Caixa</button>
+        <button onclick="abrirModal('modal-nota')" class="btn-ciano">📑 Lançar Nota (Entrada)</button>
+        <button onclick="abrirModal('modal-cliente')" class="btn-verde">👤 Novo Cliente</button>
+        <button onclick="abrirModal('modal-produto')" class="btn-branco">➕ Novo Produto/Dose</button>
 
-        <section class="checkout-panel">
+        <input type="text" id="busca" placeholder="Buscar produto..." oninput="buscar()">
+        
+        <div id="grade-produtos"></div>
+
+        <div class="painel-consumo">
             <h3>Consumo</h3>
-            <div id="carrinho-itens" class="carrinho-lista"></div>
-            <div class="checkout-footer">
-                <div id="total-valor">R$ 0,00</div>
-                <button class="btn-zap" onclick="enviarWhatsApp()">Enviar Recibo (Zap)</button>
-                <button onclick="abrirModal('modal-pagamento')" style="background:#28a745; color:#fff; width:100%; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Fechar Recibo</button>
-            </div>
-        </section>
+            <div id="carrinho-itens"></div>
+            <div class="total">R$ <span id="total-valor">0,00</span></div>
+            <button onclick="enviarWhatsApp()" class="btn-zap">Enviar Recibo (Zap)</button>
+            <button onclick="abrirModal('modal-pagamento')" class="btn-fechar">Fechar Recibo</button>
+        </div>
     </div>
 
     <div id="modal-financeiro" class="modal">
         <div class="modal-content">
-            <h3>Fluxo de Caixa</h3>
-            <p>Dinheiro: <span id="f-dinheiro">R$ 0,00</span></p>
-            <p>PIX: <span id="f-pix">R$ 0,00</span></p>
-            <p style="color:red;">Pendura: <span id="f-pendura">R$ 0,00</span></p>
+            <h3>Resumo do Caixa</h3>
+            <p>Dinheiro: <span id="f-dinheiro">0,00</span></p>
+            <p>PIX: <span id="f-pix">0,00</span></p>
+            <p>Pendura: <span id="f-pendura">0,00</span></p>
             <button onclick="fecharModal('modal-financeiro')">Fechar</button>
         </div>
     </div>
 
     <div id="modal-produto" class="modal">
         <div class="modal-content">
-            <h3>Cadastrar Produto/Dose</h3>
-            <input type="text" id="p-nome" placeholder="Nome do Item">
-            <input type="number" id="p-preco" placeholder="Preço de Venda">
-            <input type="number" id="p-estoque" placeholder="Estoque Inicial">
-            <label>Tipo:</label>
-            <select id="p-tipo">
-                <option value="unidade">Unidade (Lata/Garrafa)</option>
-                <option value="dose">Dose (Copo)</option>
-            </select>
-            <button onclick="salvarProduto()" style="background:#28a745; color:#fff;">Salvar</button>
+            <h3>Cadastrar Produto</h3>
+            <input type="text" id="p-nome" placeholder="Nome">
+            <input type="number" id="p-preco" placeholder="Preço">
+            <button onclick="salvarProduto()">Salvar</button>
             <button onclick="fecharModal('modal-produto')">Sair</button>
         </div>
     </div>
-
-    <div id="modal-nota" class="modal"> <div class="modal-content"> <h3>Nota de Entrada</h3> <input type="text" id="n-prod" placeholder="Produto"> <input type="number" id="n-custo" placeholder="Custo"> <button onclick="fecharModal('modal-nota')">Salvar</button> </div> </div>
-    <div id="modal-cliente" class="modal"> <div class="modal-content"> <h3>Novo Cliente</h3> <input type="text" id="c-nome" placeholder="Nome"> <input type="text" id="c-fone" placeholder="Zap"> <button onclick="salvarCliente()">Salvar</button> <button onclick="fecharModal('modal-cliente')">Sair</button> </div> </div>
-    <div id="modal-pagamento" class="modal"> <div class="modal-content"> <h3>Pagamento</h3> <select id="metodo-pagamento"><option value="Dinheiro">Dinheiro</option><option value="PIX">PIX</option><option value="Pendura">Pendura</option></select> <button onclick="finalizarVenda()">Finalizar</button> <button onclick="fecharModal('modal-pagamento')">Voltar</button> </div> </div>
 
     <script src="app.js"></script>
 </body>
