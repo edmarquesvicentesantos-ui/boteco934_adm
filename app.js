@@ -1,11 +1,37 @@
-body { font-family: sans-serif; padding: 20px; background: #fff; }
-.controles-topo { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.btn-azul { background: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; }
-.btn-ciano { background: #17a2b8; color: white; border: none; padding: 10px; border-radius: 4px; }
-.btn-fechar { background: #28a745; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; width: 200px; cursor: pointer; }
-.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin: 20px 0; }
-.card-prod { border: 1px solid #ccc; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; }
+const firebaseConfig = {
+    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX70Jks",
+    authDomain: "boteco934-afc3f.firebaseapp.com",
+    databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+    projectId: "boteco934-afc3f",
+    storageBucket: "boteco934-afc3f.firebasestorage.app",
+    messagingSenderId: "182023728304",
+    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+};
 
-/* MODAIS */
-.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
-.modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 320px; border: 1px solid #000; display: flex; flex-direction: column; gap: 10px; }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Controla o abre e fecha das janelas
+function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
+function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function salvarProduto() {
+    const nome = document.getElementById('p-nome').value;
+    const preco = parseFloat(document.getElementById('p-preco').value);
+    if(nome && preco) {
+        db.ref('produtos').push({ nome, preco });
+        alert("Produto Gravado!");
+        fecharModal('modal-produto');
+    }
+}
+
+// Carrega os produtos na tela
+db.ref('produtos').on('value', snap => {
+    const grid = document.getElementById('grade-produtos');
+    grid.innerHTML = '';
+    snap.forEach(item => {
+        let p = item.val();
+        grid.innerHTML += `<div class="card-p" style="background:white;padding:15px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid #ccc">
+            <b>${p.nome}</b><br>R$ ${p.preco.toFixed(2)}</div>`;
+    });
+});
