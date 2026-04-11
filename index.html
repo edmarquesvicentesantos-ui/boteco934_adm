@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | SISTEMA GOLD</title>
+    <title>BOTECO 934 | SISTEMA FINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -11,9 +11,10 @@
 <body class="bg-slate-900 text-white min-h-screen flex flex-col overflow-hidden font-sans">
 
     <header class="p-2 bg-black border-b border-yellow-500 flex justify-between items-center shadow-2xl">
-        <h1 class="font-black text-yellow-500 italic text-xl tracking-tighter">BOTECO 934</h1>
+        <h1 class="font-black text-yellow-500 italic text-xl">BOTECO 934</h1>
         <div class="flex gap-2">
-            <button onclick="abrirEstoque()" class="bg-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg active:scale-95">📦 ENTRADA XML</button>
+            <button onclick="abrirCalc()" class="bg-yellow-600 text-black px-3 py-2 rounded-xl font-black text-[10px] uppercase">📊 CALC</button>
+            <button onclick="abrirEstoque()" class="bg-blue-600 px-3 py-2 rounded-xl font-black text-[10px] uppercase">📦 XML</button>
             <button onclick="location.reload()" class="bg-slate-800 px-3 py-2 rounded-xl text-xs">🔄</button>
         </div>
     </header>
@@ -30,27 +31,43 @@
             </div>
             <div class="mt-2 text-right p-2 bg-slate-900 rounded-xl">
                 <p class="text-yellow-500 font-black text-2xl">R$ <span id="total-val">0.00</span></p>
-                <button onclick="finalizarVenda()" class="w-full bg-green-600 py-4 mt-2 rounded-2xl font-black text-white uppercase shadow-lg active:bg-green-700 text-sm">Finalizar Venda</button>
+                <button onclick="finalizarVenda()" class="w-full bg-green-600 py-4 mt-2 rounded-2xl font-black text-white uppercase shadow-lg text-sm">Finalizar Venda</button>
             </div>
         </main>
     </div>
 
-    <div id="modal-xml" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-[32px] w-full max-w-sm text-black shadow-2xl">
-            <h2 class="font-black text-center mb-6 uppercase text-lg italic">Entrada de Estoque</h2>
-            
-            <div class="bg-blue-50 p-6 rounded-3xl border-2 border-dashed border-blue-400 mb-6">
-                <label class="block text-[10px] font-black text-blue-900 mb-4 uppercase text-center">Selecione o arquivo da nota fiscal:</label>
-                <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6 file:bg-blue-600 file:text-white file:border-0 file:px-4 file:py-2 file:rounded-full file:font-black">
+    <div id="modal-calc" class="hidden fixed inset-0 bg-black/95 z-[70] flex items-center justify-center p-4">
+        <div class="bg-slate-100 p-6 rounded-[32px] w-full max-w-sm text-slate-900 shadow-2xl">
+            <h2 class="font-black text-center mb-4 uppercase text-blue-700 italic">Lucro Real Boteco 934</h2>
+            <div class="space-y-4">
+                <input type="number" id="calc-custo" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Custo da Nota (R$)">
+                <input type="number" id="calc-qtd" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Quantidade (Itens/Doses)">
+                <input type="number" id="calc-extra" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Adicionais (Gelo/Luz)">
+                <input type="number" id="calc-venda" oninput="calcularLucro()" class="w-full p-4 rounded-xl border-2 border-green-500 font-bold" placeholder="Preço de Venda">
                 
-                <button onclick="processarXML()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl active:scale-95 transition-all text-sm">🚀 IMPORTAR XML AGORA</button>
+                <div class="bg-green-600 p-4 rounded-2xl text-white text-center">
+                    <p class="text-[10px] uppercase font-bold">Seu Lucro Limpo:</p>
+                    <p class="text-3xl font-black">R$ <span id="res-lucro">0.00</span></p>
+                </div>
             </div>
+            <button onclick="abrirCalc()" class="w-full mt-4 py-2 text-slate-400 font-black text-[10px] uppercase">Voltar</button>
+        </div>
+    </div>
 
-            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase tracking-widest">Fechar Janela</button>
+    <div id="modal-xml" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-[32px] w-full max-w-sm text-black shadow-2xl text-center">
+            <h2 class="font-black mb-6 uppercase italic text-lg border-b pb-2">Entrada de Nota</h2>
+            <div class="bg-blue-50 p-6 rounded-3xl border-2 border-dashed border-blue-400 mb-4">
+                <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6">
+                <button onclick="processarXML()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl text-sm">🚀 IMPORTAR XML AGORA</button>
+            </div>
+            <p id="status-msg" class="text-[10px] text-gray-500 mb-4 uppercase font-bold"></p>
+            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase">Cancelar / Sair</button>
         </div>
     </div>
 
     <script>
+        // Configuração do Banco de Dados
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -73,52 +90,26 @@
             desenharMesas();
         }
 
-        function desenharMesas() {
-            document.getElementById('grid-mesas').innerHTML = mesas.map(m => `
-                <button onclick="setMesa(${m.id})" class="h-12 ${m.id === mesaSelecionada ? 'ring-4 ring-yellow-500' : ''} ${m.total > 0 ? 'bg-red-600 animate-pulse' : 'bg-green-600'} rounded-lg text-[10px] font-black shadow-md transition-all">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : ''}</button>
-            `).join('');
-        }
+        function abrirCalc() { document.getElementById('modal-calc').classList.toggle('hidden'); }
+        function abrirEstoque() { document.getElementById('modal-xml').classList.toggle('hidden'); }
 
-        function setMesa(id) {
-            mesaSelecionada = id;
-            document.getElementById('mesa-titulo').innerText = "ATENDENDO MESA " + id;
-            atualizarCupom();
-            desenharMesas();
-        }
-
-        function desenharProds() {
-            document.getElementById('lista-prods').innerHTML = produtos.map(p => `
-                <button onclick="add('${p.id}')" class="w-full bg-slate-700 p-3 rounded-xl mb-2 text-left border border-slate-600 active:bg-slate-500 shadow-sm">
-                    <p class="text-[10px] font-black uppercase text-white leading-tight mb-1">${p.nome}</p>
-                    <p class="text-yellow-400 font-black text-xs italic">R$ ${p.preco.toFixed(2)}</p>
-                </button>
-            `).join('');
-        }
-
-        function add(id) {
-            if(!mesaSelecionada) return alert("Clique em uma MESA primeiro!");
-            const p = produtos.find(x => x.id === id);
-            const m = mesas.find(x => x.id === mesaSelecionada);
-            m.itens.push(p);
-            m.total = m.itens.reduce((a, b) => a + b.preco, 0);
-            atualizarCupom(); desenharMesas();
-        }
-
-        function atualizarCupom() {
-            const m = mesas.find(x => x.id === mesaSelecionada);
-            if(!m) return;
-            document.getElementById('itens-lista').innerHTML = m.itens.map(i => `<div class="flex justify-between border-b border-gray-200 py-2 uppercase italic"><span>1x ${i.nome}</span><span class="font-bold">${i.preco.toFixed(2)}</span></div>`).join('');
-            document.getElementById('total-val').innerText = m.total.toFixed(2);
+        function calcularLucro() {
+            const custo = parseFloat(document.getElementById('calc-custo').value) || 0;
+            const qtd = parseFloat(document.getElementById('calc-qtd').value) || 1;
+            const extra = parseFloat(document.getElementById('calc-extra').value) || 0;
+            const venda = parseFloat(document.getElementById('calc-venda').value) || 0;
+            const lucro = venda - ((custo + extra) / qtd);
+            document.getElementById('res-lucro').innerText = lucro.toFixed(2);
         }
 
         async function processarXML() {
-            const fileInput = document.getElementById('input-xml');
-            const file = fileInput.files[0];
+            const file = document.getElementById('input-xml').files[0];
             const btn = document.getElementById('btn-importar');
+            const status = document.getElementById('status-msg');
 
-            if(!file) return alert("Selecione o arquivo da nota fiscal!");
+            if(!file) return alert("Selecione o arquivo!");
 
-            btn.innerText = "⏳ LENDO NOTA...";
+            btn.innerText = "⏳ SALVANDO NO FIREBASE...";
             btn.disabled = true;
 
             const reader = new FileReader();
@@ -128,40 +119,71 @@
                     const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
                     const itens = xmlDoc.getElementsByTagName("det");
                     
-                    if(itens.length === 0) throw new Error("XML Inválido");
+                    if(itens.length === 0) throw new Error("XML não é nota fiscal!");
 
                     for (let i = 0; i < itens.length; i++) {
-                        const nomeProd = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                        const valorUn = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-                        const pVenda = valorUn * 1.4; // Margem de 40%
-
-                        await db.collection("produtos").add({ nome: nomeProd, preco: pVenda });
+                        const nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                        const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                        // Salva direto no seu banco de dados
+                        await db.collection("produtos").add({ nome: nome, preco: custo * 1.4 });
+                        status.innerText = "IMPORTANDO: " + (i + 1) + "/" + itens.length;
                     }
 
-                    alert("✅ " + itens.length + " PRODUTOS CARREGADOS!");
+                    alert("SUCESSO! " + itens.length + " ITENS ADICIONADOS.");
                     location.reload();
-
                 } catch (err) {
-                    alert("Erro ao ler XML. Verifique se é uma NF-e válida.");
-                    btn.innerText = "🚀 IMPORTAR AGORA";
+                    alert("Erro na leitura: " + err.message);
+                    btn.innerText = "🚀 IMPORTAR XML AGORA";
                     btn.disabled = false;
                 }
             };
             reader.readAsText(file);
         }
 
-        function abrirEstoque() { document.getElementById('modal-xml').classList.toggle('hidden'); }
-        
+        // Funções de Venda
+        function desenharMesas() {
+            document.getElementById('grid-mesas').innerHTML = mesas.map(m => `
+                <button onclick="setMesa(${m.id})" class="h-12 ${m.id === mesaSelecionada ? 'ring-4 ring-yellow-500' : ''} ${m.total > 0 ? 'bg-red-600 animate-pulse' : 'bg-green-600'} rounded-lg text-[10px] font-black">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : ''}</button>
+            `).join('');
+        }
+
+        function setMesa(id) {
+            mesaSelecionada = id;
+            document.getElementById('mesa-titulo').innerText = "MESA " + id;
+            atualizarCupom(); desenharMesas();
+        }
+
+        function desenharProds() {
+            document.getElementById('lista-prods').innerHTML = produtos.map(p => `
+                <button onclick="add('${p.id}')" class="w-full bg-slate-700 p-3 rounded-xl mb-2 text-left border border-slate-600 active:bg-slate-500">
+                    <p class="text-[10px] font-black uppercase text-white truncate">${p.nome}</p>
+                    <p class="text-yellow-400 font-black text-xs italic">R$ ${p.preco.toFixed(2)}</p>
+                </button>
+            `).join('');
+        }
+
+        function add(id) {
+            if(!mesaSelecionada) return alert("Selecione a MESA!");
+            const p = produtos.find(x => x.id === id);
+            const m = mesas.find(x => x.id === mesaSelecionada);
+            m.itens.push(p);
+            m.total = m.itens.reduce((a, b) => a + b.preco, 0);
+            atualizarCupom(); desenharMesas();
+        }
+
+        function atualizarCupom() {
+            const m = mesas.find(x => x.id === mesaSelecionada);
+            document.getElementById('itens-lista').innerHTML = m.itens.map(i => `<div class="flex justify-between border-b border-gray-200 py-2 uppercase italic text-[10px]"><span>1x ${i.nome}</span><span class="font-bold">${i.preco.toFixed(2)}</span></div>`).join('');
+            document.getElementById('total-val').innerText = m.total.toFixed(2);
+        }
+
         async function finalizarVenda() {
             const m = mesas.find(x => x.id === mesaSelecionada);
             if(!m || m.total === 0) return alert("Mesa vazia!");
-            
-            if(confirm("Deseja finalizar a Mesa " + mesaSelecionada + "?")){
-                await db.collection("vendas").add({ mesa: mesaSelecionada, total: m.total, data: new Date() });
-                m.itens = []; m.total = 0;
-                atualizarCupom(); desenharMesas();
-                alert("Venda registrada!");
-            }
+            await db.collection("vendas").add({ mesa: mesaSelecionada, total: m.total, data: new Date() });
+            m.itens = []; m.total = 0;
+            atualizarCupom(); desenharMesas();
+            alert("Venda registrada!");
         }
 
         carregar();
