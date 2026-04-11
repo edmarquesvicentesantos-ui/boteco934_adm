@@ -2,58 +2,36 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV</title>
+    <title>Boteco 934 - PDV OFICIAL</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="container-principal">
-        <h1 class="logo">Boteco 934</h1>
-        
-        <div class="secao-mesa">
-            <select id="select-mesa" onchange="trocarMesa()">
-                <option value="1">Mesa 01</option>
-                <option value="2">Mesa 02</option>
-                <option value="balcao">Balcão</option>
-            </select>
-            <input type="text" id="cliente-nome" placeholder="Cliente">
-        </div>
-
-        <button onclick="abrirMesa()" class="btn-amarelo">Abrir Mesa</button>
-        
-        <button onclick="abrirModal('modal-financeiro')" class="btn-azul">📊 Finanças / Caixa</button>
-        <button onclick="abrirModal('modal-nota')" class="btn-ciano">📑 Lançar Nota (Entrada)</button>
-        <button onclick="abrirModal('modal-cliente')" class="btn-verde">👤 Novo Cliente</button>
-        <button onclick="abrirModal('modal-produto')" class="btn-branco">➕ Novo Produto/Dose</button>
-
-        <input type="text" id="busca" placeholder="Buscar produto..." oninput="buscar()">
-        
-        <div id="grade-produtos"></div>
-
-        <div class="painel-consumo">
-            <h3>Consumo</h3>
-            <div id="carrinho-itens"></div>
-            <div class="total">R$ <span id="total-valor">0,00</span></div>
-            <button onclick="enviarWhatsApp()" class="btn-zap">Enviar Recibo (Zap)</button>
-            <button onclick="abrirModal('modal-pagamento')" class="btn-fechar">Fechar Recibo</button>
+    <div class="topo">
+        <h1>Boteco 934</h1>
+        <div class="controles">
+            <select id="select-mesa"><option value="1">Mesa 01</option><option value="balcao">Balcão</option></select>
+            <input type="text" id="cliente-nome" placeholder="Nome do Cliente">
+            <button onclick="abrirModal('modal-financeiro')" style="background:#007bff;color:#fff">📊 Finanças</button>
+            <button onclick="abrirModal('modal-nota')" style="background:#17a2b8;color:#fff">📑 Notas</button>
+            <button onclick="abrirModal('modal-produto')" style="background:#f8f9fa;color:#000">➕ Novo Produto</button>
         </div>
     </div>
 
+    <div id="grade-produtos"></div>
+
     <div id="modal-financeiro" class="modal">
         <div class="modal-content">
-            <h3>Resumo do Caixa</h3>
-            <p>Dinheiro: <span id="f-dinheiro">0,00</span></p>
-            <p>PIX: <span id="f-pix">0,00</span></p>
-            <p>Pendura: <span id="f-pendura">0,00</span></p>
+            <h3>Caixa</h3>
+            <p id="f-resumo">Carregando...</p>
             <button onclick="fecharModal('modal-financeiro')">Fechar</button>
         </div>
     </div>
 
     <div id="modal-produto" class="modal">
         <div class="modal-content">
-            <h3>Cadastrar Produto</h3>
+            <h3>Cadastrar Item</h3>
             <input type="text" id="p-nome" placeholder="Nome">
             <input type="number" id="p-preco" placeholder="Preço">
             <button onclick="salvarProduto()">Salvar</button>
