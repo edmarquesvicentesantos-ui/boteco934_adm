@@ -1,43 +1,95 @@
-<script>
-    // Sua configuração do Firebase permanece a mesma
-    
-    async function importarParaFirebase() {
-        const file = document.getElementById('input-xml').files[0];
-        const status = document.getElementById('status-msg');
-        if(!file) return alert("Selecione o arquivo!");
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOTECO 934 | PDV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen">
 
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(e.target.result, "text/xml");
-            const itens = Array.from(xml.getElementsByTagName("det"));
+    <header class="p-4 bg-black border-b border-yellow-500 flex justify-between items-center">
+        <h1 class="font-black text-yellow-500 italic text-2xl">BOTECO 934</h1>
+        <button onclick="document.getElementById('modal-xml').classList.remove('hidden')" class="bg-blue-600 px-4 py-2 rounded-lg font-bold">📦 IMPORTAR XML</button>
+    </header>
 
-            // Dizemos ao sistema para salvar na coleção (pasta) "produtos"
-            const pastaProdutos = db.collection("produtos");
+    <div id="status-geral" class="p-4 text-center text-sm text-gray-400">Aguardando comando...</div>
 
-            for (let i = 0; i < itens.length; i += 5) {
-                const batch = db.batch();
-                const bloco = itens.slice(i, i + 5);
+    <div id="modal-xml" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-[30px] w-full max-w-sm text-black shadow-2xl text-center">
+            <h2 class="font-black mb-4 uppercase italic">Entrada de Estoque</h2>
+            <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6">
+            <button onclick="processarNota()" id="btn-importar" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase">🚀 Importar Agora</button>
+            <p id="progresso" class="mt-4 text-[10px] font-bold text-blue-600 uppercase"></p>
+            <button onclick="document.getElementById('modal-xml').classList.add('hidden')" class="mt-4 text-gray-400 text-xs font-bold">SAIR</button>
+        </div>
+    </div>
 
-                bloco.forEach(item => {
-                    const nome = item.getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                    const custo = parseFloat(item.getElementsByTagName("vUnCom")[0].textContent);
-                    
-                    // Criamos o documento dentro da "pasta"
-                    const novoDoc = pastaProdutos.doc(); 
-                    batch.set(novoDoc, { 
-                        nome: nome, 
-                        preco: custo * 1.4, // Sua margem de lucro
-                        data_entrada: new Date()
-                    });
-                });
-
-                await batch.commit();
-                status.innerText = `Salvando na pasta: ${i + bloco.length} de ${itens.length}`;
-            }
-            alert("✅ Tudo salvo na coleção 'produtos'!");
-            location.reload();
+    <script>
+        // Configuração do seu Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.firebasestorage.app",
+            messagingSenderId: "182023728304",
+            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
         };
-        reader.readAsText(file);
-    }
-</script>
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function processarNota() {
+            const arquivo = document.getElementById('input-xml').files[0];
+            const btn = document.getElementById('btn-importar');
+            const textoProgresso = document.getElementById('progresso');
+
+            if(!arquivo) return alert("Selecione o arquivo XML!");
+
+            btn.disabled = true;
+            textoProgresso.innerText = "LENDO ARQUIVO...";
+
+            const leitor = new FileReader();
+            leitor.onload = async (e) => {
+                try {
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(e.target.result, "text/xml");
+                    const itens = Array.from(xml.getElementsByTagName("det"));
+                    
+                    // Aqui o sistema cria ou acessa a "pasta" chamada produtos
+                    const colecaoProdutos = db.collection("produtos");
+
+                    for (let i = 0; i < itens.length; i += 5) {
+                        const batch = db.batch();
+                        const bloco = itens.slice(i, i + 5);
+
+                        bloco.forEach(item => {
+                            const nome = item.getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                            const custo = parseFloat(item.getElementsByTagName("vUnCom")[0].textContent);
+                            
+                            // Cria o documento dentro da "pasta"
+                            const refDoc = colecaoProdutos.doc();
+                            batch.set(refDoc, {
+                                nome: nome,
+                                preco: custo * 1.4, // Aplica sua margem de lucro
+                                data_cadastro: new Date()
+                            });
+                        });
+
+                        await batch.commit();
+                        textoProgresso.innerText = `SALVANDO: ${Math.min(i + 5, itens.length)} de ${itens.length}`;
+                    }
+
+                    alert("✅ NOTA SALVA NA PASTA 'PRODUTOS'!");
+                    location.reload();
+                } catch (erro) {
+                    alert("Erro ao processar: " + erro.message);
+                    btn.disabled = false;
+                }
+            };
+            leitor.readAsText(arquivo);
+        }
+    </script>
+</body>
+</html>
