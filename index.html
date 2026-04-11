@@ -5,38 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV GOLD</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <div class="container">
+    <div class="app-container">
         <aside class="sidebar">
-            <div class="logo">
-                <h2>Boteco 934</h2>
+            <div class="brand">
+                <img src="logo.png" alt="Boteco 934" onerror="this.src='https://via.placeholder.com/50?text=B934'">
+                <span>PDV Gold</span>
             </div>
             <nav>
-                <button onclick="carregarProdutos('bebidas')">Bebidas</button>
-                <button onclick="carregarProdutos('boticario')">Boticário</button>
-                <button class="btn-categoria">+ Categorias</button>
+                <button onclick="filtrarCategoria('bebidas')">Bebidas</button>
+                <button onclick="filtrarCategoria('boticario')">Boticário</button>
+                <button class="btn-add-cat">+ Categorias</button>
             </nav>
-            <div id="alerta-estoque" class="alerta-minimo"></div>
+            <div id="status-estoque" class="status-box"></div>
         </aside>
 
-        <main class="pdv-area">
-            <header class="busca">
-                <input type="text" placeholder="Buscar produto ou bipar código..." id="input-busca">
+        <main class="main-content">
+            <header class="top-bar">
+                <input type="text" id="busca" placeholder="Bipar código ou digitar nome..." oninput="buscarProduto()">
             </header>
-            <div class="grid-produtos" id="grid-produtos">
+            
+            <div id="grade-produtos" class="grid-produtos">
                 </div>
         </main>
 
-        <section class="cupom-lateral">
-            <h3>Consumo / Mesa</h3>
-            <div id="lista-venda"></div>
-            <div class="totalizador">
-                <span>Total: R$ <strong id="total-venda">0,00</strong></span>
-                <button class="btn-finalizar" onclick="abrirPagamento()">Finalizar (F1)</button>
+        <section class="checkout-panel">
+            <h3>Consumo Atual</h3>
+            <div id="carrinho-itens" class="carrinho-lista"></div>
+            
+            <div class="checkout-footer">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span id="total-valor">R$ 0,00</span>
+                </div>
+                <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar Venda (F1)</button>
+                <button class="btn-whatsapp" onclick="enviarExtratoWhatsApp()">Enviar p/ WhatsApp</button>
             </div>
         </section>
     </div>
