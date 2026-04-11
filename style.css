@@ -1,88 +1,44 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX70Jks", 
-    authDomain: "boteco934-afc3f.firebaseapp.com",
-    databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
-    projectId: "boteco934-afc3f",
-    storageBucket: "boteco934-afc3f.firebasestorage.app",
-    messagingSenderId: "182023728304",
-    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-};
+/* Limpeza Geral */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #333; }
+h1 { color: #212529; margin-bottom: 20px; }
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-let carrinho = [];
+/* Barra de Botões Superior */
+.topo { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 30px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+input, select { padding: 10px; border: 1px solid #ced4da; border-radius: 4px; }
 
-// Funções de Janela
-function abrirModal(id) { 
-    if(id === 'modal-financeiro') carregarFinanceiro();
-    document.getElementById(id).style.display = 'flex'; 
-}
-function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+/* Cores dos Botões */
+button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.btn-azul { background-color: #007bff; color: white; }
+.btn-ciano { background-color: #17a2b8; color: white; }
+.btn-branco { background-color: #ffffff; border: 1px solid #333; }
+.btn-verde { background-color: #28a745; color: white; padding: 15px; font-size: 16px; }
 
-// Cadastro de Produto
-function salvarProduto() {
-    const nome = document.getElementById('p-nome').value;
-    const preco = parseFloat(document.getElementById('p-preco').value);
-    const tipo = document.getElementById('p-tipo').value;
-    if(nome && preco) {
-        db.ref('produtos').push({ nome, preco, tipo });
-        alert("Produto salvo!");
-        fecharModal('modal-produto');
-    }
+/* A MÁGICA QUE FALTOU: Esconder as Janelas */
+.modal { 
+    display: none; /* Isso impede que elas fiquem jogadas na tela */
+    position: fixed; 
+    z-index: 9999; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.6); 
+    align-items: center; 
+    justify-content: center; 
 }
 
-// Carregar Grade de Produtos
-db.ref('produtos').on('value', snap => {
-    const grade = document.getElementById('grade-produtos');
-    grade.innerHTML = '';
-    snap.forEach(item => {
-        let p = item.val();
-        grade.innerHTML += `
-            <div class="card-produto" onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
-                <strong>${p.nome}</strong><br>R$ ${p.preco.toFixed(2)}
-            </div>`;
-    });
-});
-
-function adicionarAoCarrinho(nome, preco) {
-    if(!document.getElementById('cliente-nome').value) return alert("Dê nome ao cliente!");
-    carrinho.push({ nome, preco });
-    renderCarrinho();
+/* Conteúdo da Janela (Branca e Centralizada) */
+.modal-content { 
+    background-color: white; 
+    padding: 30px; 
+    border-radius: 12px; 
+    width: 90%; 
+    max-width: 400px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
 }
 
-function renderCarrinho() {
-    const lista = document.getElementById('itens-carrinho');
-    lista.innerHTML = ''; let total = 0;
-    carrinho.forEach(i => {
-        total += i.preco;
-        lista.innerHTML += `<div>${i.nome} - R$ ${i.preco.toFixed(2)}</div>`;
-    });
-    document.getElementById('total-valor').innerText = total.toFixed(2);
-}
-
-function confirmarVenda() {
-    const met = document.getElementById('metodo-pagto').value;
-    const total = parseFloat(document.getElementById('total-valor').innerText);
-    db.ref('vendas').push({ 
-        total, 
-        metodo: met, 
-        cliente: document.getElementById('cliente-nome').value,
-        data: new Date().toLocaleString() 
-    });
-    alert("Venda realizada!");
-    location.reload();
-}
-
-function carregarFinanceiro() {
-    let totais = { Dinheiro: 0, PIX: 0, Cartao: 0, Pendura: 0 };
-    db.ref('vendas').once('value', snap => {
-        snap.forEach(v => {
-            const d = v.val();
-            if(totais[d.metodo] !== undefined) totais[d.metodo] += d.total;
-        });
-        document.getElementById('f-dinheiro').innerText = totais.Dinheiro.toFixed(2);
-        document.getElementById('f-pix').innerText = totais.PIX.toFixed(2);
-        document.getElementById('f-cartao').innerText = totais.Cartao.toFixed(2);
-        document.getElementById('f-pendura').innerText = totais.Pendura.toFixed(2);
-    });
-}
+/* Grade de Produtos */
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
+.card-produto { background: white; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; }
+.card-produto:hover { border-color: #007bff; background: #e7f1ff; }
