@@ -1,197 +1,43 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | SISTEMA FINAL</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-</head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col overflow-hidden font-sans">
+<script>
+    // Sua configuração do Firebase permanece a mesma
+    
+    async function importarParaFirebase() {
+        const file = document.getElementById('input-xml').files[0];
+        const status = document.getElementById('status-msg');
+        if(!file) return alert("Selecione o arquivo!");
 
-    <header class="p-2 bg-black border-b border-yellow-500 flex justify-between items-center shadow-xl">
-        <h1 class="font-black text-yellow-500 italic text-xl tracking-tighter">BOTECO 934</h1>
-        <div class="flex gap-1">
-            <button onclick="abrirCalc()" class="bg-yellow-600 text-black px-3 py-2 rounded-lg font-black text-[10px] uppercase">📊 CALC</button>
-            <button onclick="abrirEstoque()" class="bg-blue-600 px-3 py-2 rounded-lg font-black text-[10px] uppercase">📦 XML</button>
-            <button onclick="zerarEstoque()" class="bg-red-700 px-3 py-2 rounded-lg font-black text-[10px] uppercase">🗑️ LIMPAR</button>
-            <button onclick="location.reload()" class="bg-slate-800 px-2 py-2 rounded-lg text-xs">🔄</button>
-        </div>
-    </header>
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(e.target.result, "text/xml");
+            const itens = Array.from(xml.getElementsByTagName("det"));
 
-    <div id="grid-mesas" class="p-1 grid grid-cols-8 gap-1 bg-slate-950 border-b border-slate-800 overflow-y-auto max-h-24"></div>
+            // Dizemos ao sistema para salvar na coleção (pasta) "produtos"
+            const pastaProdutos = db.collection("produtos");
 
-    <div class="flex flex-1 overflow-hidden">
-        <aside class="w-1/3 bg-slate-800 border-r border-slate-700 overflow-y-auto p-1" id="lista-prods"></aside>
-        
-        <main class="w-2/3 bg-black p-2 flex flex-col">
-            <div class="bg-yellow-50 text-black flex-1 p-2 rounded shadow-inner overflow-y-auto border-2 border-yellow-200">
-                <p class="font-black border-b border-black mb-2 text-center uppercase text-[10px]" id="mesa-titulo">Selecione a Mesa</p>
-                <div id="itens-lista" class="text-[11px] space-y-1 font-mono uppercase italic font-bold"></div>
-            </div>
-            <div class="mt-2 text-right p-3 bg-slate-900 rounded-xl">
-                <p class="text-yellow-500 font-black text-3xl">R$ <span id="total-val">0.00</span></p>
-                <button onclick="finalizarVenda()" class="w-full bg-green-600 py-4 mt-2 rounded-2xl font-black text-white uppercase shadow-lg text-sm active:scale-95 transition-transform">Finalizar Venda</button>
-            </div>
-        </main>
-    </div>
-
-    <div id="modal-calc" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-[30px] w-full max-w-sm text-slate-900 shadow-2xl">
-            <h2 class="font-black text-center mb-4 uppercase text-blue-700 italic border-b pb-2">Lucro Real Boteco 934</h2>
-            <div class="space-y-3">
-                <input type="number" id="calc-custo" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Custo da Nota (R$)" oninput="calcMargem()">
-                <input type="number" id="calc-qtd" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Quantidade Itens" oninput="calcMargem()">
-                <input type="number" id="calc-venda" class="w-full p-4 rounded-xl border-2 border-green-500 font-bold" placeholder="Preço de Venda" oninput="calcMargem()">
-                <div class="bg-green-600 p-4 rounded-2xl text-white text-center">
-                    <p class="text-[10px] uppercase font-bold opacity-80">Lucro por Unidade:</p>
-                    <p class="text-3xl font-black">R$ <span id="res-lucro">0.00</span></p>
-                </div>
-            </div>
-            <button onclick="abrirCalc()" class="w-full mt-4 py-2 text-slate-400 font-black text-[10px] uppercase text-center">Sair</button>
-        </div>
-    </div>
-
-    <div id="modal-xml" class="hidden fixed inset-0 bg-black/90 z-[90] flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-[30px] w-full max-w-sm text-black shadow-2xl text-center border-4 border-blue-500">
-            <h2 class="font-black mb-4 uppercase italic text-lg">Importar Nota Fiscal</h2>
-            <div class="bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-400 mb-4">
-                <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6">
-                <button onclick="importarXMLBatch()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-xl font-black uppercase shadow-xl">🚀 IMPORTAR AGORA</button>
-            </div>
-            <p id="status-msg" class="text-[10px] text-blue-600 font-black uppercase"></p>
-            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase">Voltar</button>
-        </div>
-    </div>
-
-    <script>
-        // CONFIGURAÇÃO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-            authDomain: "boteco934-afc3f.firebaseapp.com",
-            projectId: "boteco934-afc3f",
-            storageBucket: "boteco934-afc3f.firebasestorage.app",
-            messagingSenderId: "182023728304",
-            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let produtos = [];
-        let mesaAtiva = null;
-        let mesas = Array.from({length: 16}, (_, i) => ({ id: i+1, itens: [], total: 0 }));
-
-        async function carregar() {
-            const snap = await db.collection("produtos").orderBy("nome").get();
-            produtos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderProds(); renderMesas();
-        }
-
-        function abrirCalc() { document.getElementById('modal-calc').classList.toggle('hidden'); }
-        function abrirEstoque() { document.getElementById('modal-xml').classList.toggle('hidden'); }
-
-        function calcMargem() {
-            const c = parseFloat(document.getElementById('calc-custo').value) || 0;
-            const q = parseFloat(document.getElementById('calc-qtd').value) || 1;
-            const v = parseFloat(document.getElementById('calc-venda').value) || 0;
-            document.getElementById('res-lucro').innerText = (v - (c / q)).toFixed(2);
-        }
-
-        async function importarXMLBatch() {
-            const file = document.getElementById('input-xml').files[0];
-            const btn = document.getElementById('btn-importar');
-            const status = document.getElementById('status-msg');
-            if(!file) return alert("Selecione a nota XML!");
-
-            btn.disabled = true; btn.innerText = "⚡ LENDO...";
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const parser = new DOMParser();
-                    const xml = parser.parseFromString(e.target.result, "text/xml");
-                    const itens = xml.getElementsByTagName("det");
-                    const batch = db.batch();
-
-                    for (let i = 0; i < itens.length; i++) {
-                        const nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                        const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-                        const ref = db.collection("produtos").doc();
-                        batch.set(ref, { nome: nome, preco: custo * 1.4 });
-                        status.innerText = `PROCESSADO: ${i+1}/${itens.length}`;
-                    }
-
-                    status.innerText = "🚀 ENVIANDO AO FIREBASE...";
-                    await batch.commit();
-                    alert("✅ ESTOQUE ATUALIZADO COM SUCESSO!");
-                    location.reload();
-                } catch (err) {
-                    alert("Erro: " + err.message);
-                    btn.disabled = false; btn.innerText = "🚀 IMPORTAR AGORA";
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        async function zerarEstoque() {
-            if(confirm("Deseja apagar TUDO para recomeçar?")) {
-                const snap = await db.collection("produtos").get();
+            for (let i = 0; i < itens.length; i += 5) {
                 const batch = db.batch();
-                snap.docs.forEach(doc => batch.delete(doc.ref));
+                const bloco = itens.slice(i, i + 5);
+
+                bloco.forEach(item => {
+                    const nome = item.getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                    const custo = parseFloat(item.getElementsByTagName("vUnCom")[0].textContent);
+                    
+                    // Criamos o documento dentro da "pasta"
+                    const novoDoc = pastaProdutos.doc(); 
+                    batch.set(novoDoc, { 
+                        nome: nome, 
+                        preco: custo * 1.4, // Sua margem de lucro
+                        data_entrada: new Date()
+                    });
+                });
+
                 await batch.commit();
-                location.reload();
+                status.innerText = `Salvando na pasta: ${i + bloco.length} de ${itens.length}`;
             }
-        }
-
-        function renderMesas() {
-            document.getElementById('grid-mesas').innerHTML = mesas.map(m => `
-                <button onclick="setMesa(${m.id})" class="h-12 ${m.id === mesaAtiva ? 'ring-4 ring-yellow-400' : ''} ${m.total > 0 ? 'bg-red-600 animate-pulse' : 'bg-green-600'} rounded-xl text-[10px] font-black uppercase">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : 'Livre'}</button>
-            `).join('');
-        }
-
-        function setMesa(id) {
-            mesaAtiva = id;
-            document.getElementById('mesa-titulo').innerText = "MESA " + id;
-            atualizaCupom(); renderMesas();
-        }
-
-        function renderProds() {
-            document.getElementById('lista-prods').innerHTML = produtos.map(p => `
-                <button onclick="addItem('${p.id}')" class="w-full bg-slate-700 p-3 rounded-xl mb-2 text-left border border-slate-600 active:scale-95 shadow-md">
-                    <p class="text-[10px] font-black uppercase text-white truncate leading-tight">${p.nome}</p>
-                    <p class="text-yellow-400 font-black text-xs italic mt-1">R$ ${p.preco.toFixed(2)}</p>
-                </button>
-            `).join('');
-        }
-
-        function addItem(id) {
-            if(!mesaAtiva) return alert("Selecione uma mesa!");
-            const prod = produtos.find(x => x.id === id);
-            const mesa = mesas.find(x => x.id === mesaAtiva);
-            mesa.itens.push(prod);
-            mesa.total = mesa.itens.reduce((a, b) => a + b.preco, 0);
-            atualizaCupom(); renderMesas();
-        }
-
-        function atualizaCupom() {
-            const m = mesas.find(x => x.id === mesaAtiva);
-            document.getElementById('itens-lista').innerHTML = m.itens.map(i => `<div class="flex justify-between border-b border-black/10 py-2"><span>1x ${i.nome}</span><span class="font-black">R$ ${i.preco.toFixed(2)}</span></div>`).join('');
-            document.getElementById('total-val').innerText = m.total.toFixed(2);
-        }
-
-        async function finalizarVenda() {
-            const m = mesas.find(x => x.id === mesaAtiva);
-            if(!m || m.total === 0) return;
-            if(confirm("Fechar conta da Mesa " + mesaAtiva + "?")) {
-                await db.collection("vendas").add({ mesa: mesaAtiva, total: m.total, data: new Date() });
-                m.itens = []; m.total = 0;
-                atualizaCupom(); renderMesas();
-                alert("CONTA FECHADA!");
-            }
-        }
-
-        carregar();
-    </script>
-</body>
-</html>
+            alert("✅ Tudo salvo na coleção 'produtos'!");
+            location.reload();
+        };
+        reader.readAsText(file);
+    }
+</script>
