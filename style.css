@@ -1,11 +1,88 @@
-body { font-family: sans-serif; padding: 20px; }
-.controles-topo { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
-.btn-azul { background: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; }
-.btn-ciano { background: #17a2b8; color: white; border: none; padding: 10px; border-radius: 4px; }
-.btn-verde { background: #28a745; color: white; border: none; padding: 15px; border-radius: 5px; font-weight: bold; }
-.btn-branco { background: #fff; border: 1px solid #000; padding: 10px; border-radius: 4px; }
+const firebaseConfig = {
+    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX70Jks", 
+    authDomain: "boteco934-afc3f.firebaseapp.com",
+    databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+    projectId: "boteco934-afc3f",
+    storageBucket: "boteco934-afc3f.firebasestorage.app",
+    messagingSenderId: "182023728304",
+    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+};
 
-.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
-.modal-content { background: #fff; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 1px solid #000; }
-.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-bottom: 30px; }
-.item-card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+let carrinho = [];
+
+// Funções de Janela
+function abrirModal(id) { 
+    if(id === 'modal-financeiro') carregarFinanceiro();
+    document.getElementById(id).style.display = 'flex'; 
+}
+function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
+// Cadastro de Produto
+function salvarProduto() {
+    const nome = document.getElementById('p-nome').value;
+    const preco = parseFloat(document.getElementById('p-preco').value);
+    const tipo = document.getElementById('p-tipo').value;
+    if(nome && preco) {
+        db.ref('produtos').push({ nome, preco, tipo });
+        alert("Produto salvo!");
+        fecharModal('modal-produto');
+    }
+}
+
+// Carregar Grade de Produtos
+db.ref('produtos').on('value', snap => {
+    const grade = document.getElementById('grade-produtos');
+    grade.innerHTML = '';
+    snap.forEach(item => {
+        let p = item.val();
+        grade.innerHTML += `
+            <div class="card-produto" onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
+                <strong>${p.nome}</strong><br>R$ ${p.preco.toFixed(2)}
+            </div>`;
+    });
+});
+
+function adicionarAoCarrinho(nome, preco) {
+    if(!document.getElementById('cliente-nome').value) return alert("Dê nome ao cliente!");
+    carrinho.push({ nome, preco });
+    renderCarrinho();
+}
+
+function renderCarrinho() {
+    const lista = document.getElementById('itens-carrinho');
+    lista.innerHTML = ''; let total = 0;
+    carrinho.forEach(i => {
+        total += i.preco;
+        lista.innerHTML += `<div>${i.nome} - R$ ${i.preco.toFixed(2)}</div>`;
+    });
+    document.getElementById('total-valor').innerText = total.toFixed(2);
+}
+
+function confirmarVenda() {
+    const met = document.getElementById('metodo-pagto').value;
+    const total = parseFloat(document.getElementById('total-valor').innerText);
+    db.ref('vendas').push({ 
+        total, 
+        metodo: met, 
+        cliente: document.getElementById('cliente-nome').value,
+        data: new Date().toLocaleString() 
+    });
+    alert("Venda realizada!");
+    location.reload();
+}
+
+function carregarFinanceiro() {
+    let totais = { Dinheiro: 0, PIX: 0, Cartao: 0, Pendura: 0 };
+    db.ref('vendas').once('value', snap => {
+        snap.forEach(v => {
+            const d = v.val();
+            if(totais[d.metodo] !== undefined) totais[d.metodo] += d.total;
+        });
+        document.getElementById('f-dinheiro').innerText = totais.Dinheiro.toFixed(2);
+        document.getElementById('f-pix').innerText = totais.PIX.toFixed(2);
+        document.getElementById('f-cartao').innerText = totais.Cartao.toFixed(2);
+        document.getElementById('f-pendura').innerText = totais.Pendura.toFixed(2);
+    });
+}
