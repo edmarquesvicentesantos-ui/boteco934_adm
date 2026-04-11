@@ -1,18 +1,29 @@
-:root { --bg: #121212; --accent: #ffc107; --text: #fff; }
+:root { --bg: #121212; --accent: #ffc107; --text: #fff; --verde: #25d366; }
 body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); }
 .app-container { display: flex; height: 100vh; }
-.sidebar { width: 220px; background: #000; padding: 15px; border-right: 1px solid #333; }
-.mesa-seletor { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
-.btn-abrir { background: var(--accent); border: none; padding: 8px; font-weight: bold; cursor: pointer; }
+
+/* Sidebar e botões */
+.sidebar { width: 230px; background: #000; padding: 15px; border-right: 1px solid #333; overflow-y: auto; }
+.mesa-seletor { background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+.sidebar button { width: 100%; padding: 12px; margin-bottom: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+/* Grid de Produtos */
 .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-.grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
 .card { background: #1e1e1e; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #333; }
-.checkout-panel { width: 300px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; }
-.carrinho-lista { flex: 1; border-top: 1px solid #eee; margin-top: 10px; }
-.btn-fechar { width: 100%; padding: 15px; background: #28a745; color: #fff; border: none; font-weight: bold; cursor: pointer; }
-.btn-zap { width: 100%; padding: 10px; background: #25d366; color: #fff; border: none; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10; }
-.modal-content { background: #fff; color: #333; padding: 20px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; gap: 10px; }
-.btn-verde { background: #25d366; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; }
-.btn-zap { background: #25d366; color: white; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 5px; }
-.mesa-seletor { background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+
+/* Carrinho Lateral */
+.checkout-panel { width: 320px; background: #fff; color: #000; padding: 20px; display: flex; flex-direction: column; }
+.carrinho-lista { flex: 1; overflow-y: auto; margin: 15px 0; border-top: 1px solid #eee; }
+.btn-fechar { background: #28a745; color: #fff; font-size: 1.2rem; }
+.btn-zap { background: var(--verde); color: #fff; }
+
+/* MODAL - O segredo para não travar */
+.modal { 
+    display: none; /* Começa escondido obrigatoriamente */
+    position: fixed; z-index: 1000; left: 0; top: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.85); 
+    align-items: center; justify-content: center; 
+}
+.modal-content { background: #fff; color: #333; padding: 25px; border-radius: 12px; width: 350px; display: flex; flex-direction: column; gap: 10px; }
+.modal-content input, .modal-content select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
