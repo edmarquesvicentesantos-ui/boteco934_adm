@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV GOLD</title>
+    <title>Boteco 934 - Gestão Financeira</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -12,25 +12,30 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="brand"><h2>Boteco 934</h2></div>
+            
             <div class="mesa-seletor">
-                <label>Mesa/Local:</label>
                 <select id="select-mesa" onchange="trocarMesa()">
                     <option value="1">Mesa 01</option>
                     <option value="2">Mesa 02</option>
                     <option value="balcao">Balcão</option>
                 </select>
-                <input type="text" id="cliente-nome" placeholder="Cliente da Mesa" readonly>
+                <input type="text" id="cliente-nome" placeholder="Cliente" readonly>
                 <button class="btn-abrir" onclick="abrirMesa()">Abrir Mesa</button>
             </div>
+
             <nav>
-                <button onclick="abrirModalCliente()" class="btn-verde">+ Cadastrar Cliente</button>
-                <button onclick="abrirModalProd()">+ Novo Produto</button>
+                <button onclick="abrirModalFinanceiro()" style="background: #007bff; color: white;">📊 Finanças / Caixa</button>
+                <button onclick="abrirModalNota()" style="background: #17a2b8; color: white;">📑 Lançar Nota (Entrada)</button>
+                <button onclick="abrirModalCliente()" style="background: #25d366; color: white;">👤 Novo Cliente</button>
+                <button onclick="abrirModalProd()">➕ Novo Produto/Dose</button>
             </nav>
         </aside>
+
         <main class="main-content">
             <input type="text" id="busca" placeholder="Buscar produto..." oninput="buscar()">
             <div id="grade-produtos" class="grid-produtos"></div>
         </main>
+
         <section class="checkout-panel">
             <h3>Consumo</h3>
             <div id="carrinho-itens" class="carrinho-lista"></div>
@@ -42,15 +47,23 @@
         </section>
     </div>
 
-    <div id="modal-cliente" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h3>Novo Cliente</h3>
-            <input type="text" id="c-nome" placeholder="Nome">
-            <input type="text" id="c-fone" placeholder="WhatsApp (ex: 55879...)">
-            <button onclick="salvarCliente()">Salvar</button>
-            <button onclick="fecharModalCliente()">Sair</button>
+    <div id="modal-financeiro" class="modal" style="display:none;">
+        <div class="modal-content finance-content">
+            <h3>Fluxo de Caixa / Finanças</h3>
+            <div id="resumo-caixa">
+                <p>Dinheiro: <span id="f-dinheiro">R$ 0,00</span></p>
+                <p>PIX: <span id="f-pix">R$ 0,00</span></p>
+                <p>Cartão Débito: <span id="f-debito">R$ 0,00</span></p>
+                <p>Cartão Crédito: <span id="f-credito">R$ 0,00</span></p>
+                <p style="color: red;">Pendura (Fiado): <span id="f-pendura">R$ 0,00</span></p>
+            </div>
+            <hr>
+            <h4>Histórico de Compras (Notas)</h4>
+            <div id="historico-notas" class="lista-rolavel"></div>
+            <button onclick="fecharModalFinanceiro()">Fechar</button>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
