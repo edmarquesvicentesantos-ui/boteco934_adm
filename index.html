@@ -6,13 +6,10 @@
     <title>Boteco 934 - PDV</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: #f0f2f5;
-            margin: 0;
             padding: 20px;
         }
-
-        h2 { color: #1c1e21; margin-bottom: 20px; }
 
         .grid-container {
             display: grid;
@@ -25,56 +22,48 @@
             border-radius: 12px;
             padding: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
         }
 
-        .card:active { transform: scale(0.95); }
+        /* BOX DA IMAGEM: Garante que o espaço sempre exista */
+        .img-container {
+            width: 100%;
+            height: 100px;
+            background-color: #e9ecef; /* Cor cinza caso não tenha foto */
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
         .card img {
             width: 100%;
-            height: 100px;
-            object-fit: contain; /* Ajusta a foto sem cortar */
-            border-radius: 8px;
-            margin-bottom: 10px;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .info {
-            margin-bottom: 12px;
+        /* Se a imagem quebrar, o texto ALT não bagunça o layout */
+        .card img[alt] {
+            font-size: 10px;
+            color: #888;
         }
 
-        .nome { 
-            display: block;
-            font-size: 14px; 
-            font-weight: 600; 
-            color: #444; 
-            min-height: 35px; /* Mantém os botões alinhados */
-        }
-
-        .preco { 
-            display: block;
-            color: #28a745; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin-top: 5px;
-        }
+        .nome { display: block; font-weight: bold; font-size: 14px; min-height: 35px; }
+        .preco { display: block; color: #28a745; font-weight: bold; margin-bottom: 10px; }
 
         .btn-add {
-            display: block;
             background-color: #007bff;
             color: white;
-            text-decoration: none;
-            padding: 10px 5px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
             border: none;
-            cursor: pointer;
+            padding: 10px;
             width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
         }
-
-        .btn-add:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -83,31 +72,29 @@
 
     <div class="grid-container">
         <div class="card">
-            <img src="https://cdn-icons-png.flaticon.com/512/931/931949.png" alt="Cerveja">
-            <div class="info">
-                <span class="nome">Cerveja Latão</span>
-                <span class="preco">R$ 7,50</span>
+            <div class="img-container">
+                <img src="nao-existe.jpg" alt="[ Foto ]">
             </div>
+            <span class="nome">Cerveja Latão</span>
+            <span class="preco">R$ 7,50</span>
             <button class="btn-add" onclick="vender('Cerveja Latão', 7.50)">Adicionar</button>
         </div>
 
         <div class="card">
-            <img src="https://cdn-icons-png.flaticon.com/512/3100/3100566.png" alt="Agua">
-            <div class="info">
-                <span class="nome">Água s/ Gás</span>
-                <span class="preco">R$ 3,00</span>
+            <div class="img-container">
+                <img src="nao-existe.jpg" alt="[ Foto ]">
             </div>
+            <span class="nome">Água s/ Gás</span>
+            <span class="preco">R$ 3,00</span>
             <button class="btn-add" onclick="vender('Água s/ Gás', 3.00)">Adicionar</button>
         </div>
     </div>
 
     <script>
         function vender(nome, valor) {
-            // Usando o console para registrar a venda sem recarregar
-            console.log(`Venda registrada: ${nome} - R$ ${valor.toFixed(2)}`);
-            
-            // Alerta simples para confirmar
-            alert(`${nome} adicionado!`);
+            // O botão mantém você na página
+            console.log("Vendido: " + nome);
+            alert(nome + " adicionado!");
         }
     </script>
 
