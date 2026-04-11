@@ -13,39 +13,50 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="brand">
-                <img src="logo.png" alt="Boteco 934" onerror="this.src='https://via.placeholder.com/50?text=B934'">
-                <span>PDV Gold</span>
+                <h2>Boteco 934</h2>
             </div>
             <nav>
-                <button onclick="filtrarCategoria('bebidas')">Bebidas</button>
-                <button onclick="filtrarCategoria('boticario')">Boticário</button>
-                <button class="btn-add-cat">+ Categorias</button>
+                <button onclick="filtrar('bebidas')">Bebidas</button>
+                <button onclick="filtrar('boticario')">Boticário</button>
+                <button class="btn-add" onclick="abrirModal()">+ Produto</button>
             </nav>
             <div id="status-estoque" class="status-box"></div>
         </aside>
 
         <main class="main-content">
             <header class="top-bar">
-                <input type="text" id="busca" placeholder="Bipar código ou digitar nome..." oninput="buscarProduto()">
+                <input type="text" id="busca" placeholder="Buscar produto..." oninput="buscar()">
             </header>
-            
-            <div id="grade-produtos" class="grid-produtos">
-                </div>
+            <div id="grade-produtos" class="grid-produtos"></div>
         </main>
 
         <section class="checkout-panel">
-            <h3>Consumo Atual</h3>
+            <h3>Consumo / Pendura</h3>
             <div id="carrinho-itens" class="carrinho-lista"></div>
-            
             <div class="checkout-footer">
                 <div class="total-row">
                     <span>Total:</span>
                     <span id="total-valor">R$ 0,00</span>
                 </div>
-                <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar Venda (F1)</button>
-                <button class="btn-whatsapp" onclick="enviarExtratoWhatsApp()">Enviar p/ WhatsApp</button>
+                <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar (F1)</button>
+                <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
             </div>
         </section>
+    </div>
+
+    <div id="modal-produto" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Novo Produto</h3>
+            <input type="text" id="nome-prod" placeholder="Nome do item">
+            <input type="number" id="estoque-prod" placeholder="Estoque Inicial">
+            <input type="number" id="preco-prod" placeholder="Preço de Venda">
+            <select id="cat-prod">
+                <option value="bebidas">Bebidas</option>
+                <option value="boticario">Boticário</option>
+            </select>
+            <button onclick="salvarProduto()">Salvar no Sistema</button>
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        </div>
     </div>
 
     <script src="app.js"></script>
