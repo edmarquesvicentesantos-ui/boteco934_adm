@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | GOLD MESAS</title>
+    <title>BOTECO 934 | SISTEMA GOLD V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        body { background-color: #0f172a; color: white; touch-action: manipulation; }
-        .cupom { background-color: #fffdec; color: black; font-family: monospace; border-radius: 4px; }
+        body { background-color: #0f172a; color: white; touch-action: manipulation; font-family: sans-serif; }
+        .cupom { background-color: #fffdec; color: black; font-family: monospace; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
         ::-webkit-scrollbar { display: none; }
+        .mesa-btn { transition: all 0.2s; }
+        .mesa-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col overflow-hidden">
 
-    <header class="bg-slate-900 p-2 border-b border-yellow-600 flex justify-between items-center">
-        <h1 class="text-lg font-black text-yellow-500">BOTECO 934</h1>
+    <header class="bg-slate-900 p-2 border-b border-yellow-600 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-lg font-black text-yellow-500 italic">BOTECO 934 <span class="text-[8px] bg-yellow-600 text-black px-1 rounded">GOLD</span></h1>
+        </div>
         <div class="flex gap-1">
             <button onclick="btContatos()" class="bg-blue-600 px-2 py-1 rounded text-[9px] font-bold uppercase">👥 Zap</button>
-            <button onclick="btGerente()" class="bg-slate-700 px-2 py-1 rounded text-[9px] font-bold uppercase border border-slate-500">⚙️ Prod</button>
-            <button onclick="btFecharDia()" class="bg-red-700 px-2 py-1 rounded text-[9px] font-bold uppercase">📊 Fim</button>
+            <button onclick="btGerente()" class="bg-slate-700 px-2 py-1 rounded text-[9px] font-bold uppercase border border-slate-500">⚙️ Gerente</button>
+            <button onclick="btFecharDia()" class="bg-red-700 px-2 py-1 rounded text-[9px] font-bold uppercase font-black">📊 Fim</button>
         </div>
     </header>
 
@@ -28,70 +32,59 @@
 
     <div class="flex flex-1 overflow-hidden">
         <aside class="w-[40%] bg-slate-800 flex flex-col border-r border-slate-700">
-            <input type="text" oninput="funcaoBusca(this.value)" placeholder="Buscar..." class="m-2 p-2 bg-slate-900 rounded text-xs border border-slate-700">
-            <div id="lista-prods" class="p-1 space-y-1 overflow-y-auto"></div>
+            <input type="text" id="input-busca" oninput="funcaoBusca(this.value)" placeholder="🔍 Buscar..." class="m-2 p-2 bg-slate-900 rounded text-xs border border-slate-700 outline-none focus:border-yellow-500">
+            <div id="lista-prods" class="p-1 space-y-1 overflow-y-auto pb-10"></div>
         </aside>
 
         <main class="w-[60%] p-2 flex flex-col bg-black">
             <div class="cupom p-2 flex-1 flex flex-col text-[10px]">
-                <div class="flex justify-between items-center mb-1">
-                    <p id="status-mesa" class="font-bold text-blue-800 uppercase">Selecione Mesa</p>
-                    <button onclick="renomearMesa()" class="bg-gray-300 px-1 rounded text-[8px] font-bold">NOME</button>
+                <div class="flex justify-between items-center mb-1 border-b border-gray-300 pb-1">
+                    <p id="status-mesa" class="font-black text-blue-800 uppercase text-[9px]">Selecione uma mesa</p>
+                    <button onclick="renomearMesa()" class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-[8px] font-black">NOME/REF</button>
                 </div>
-                <div id="itens-cupom" class="flex-1 overflow-y-auto border-t border-gray-300 pt-1"></div>
+                <div id="itens-cupom" class="flex-1 overflow-y-auto pt-1"></div>
                 <div class="border-t-2 border-black mt-1 pt-1">
                     <div class="flex justify-between text-xs font-black text-red-600">
-                        <span>TOTAL</span>
-                        <span id="txt-total">0.00</span>
+                        <span>TOTAL A PAGAR</span>
+                        <span>R$ <span id="txt-total">0.00</span></span>
                     </div>
                 </div>
             </div>
 
             <div class="mt-2 grid grid-cols-1 gap-1">
-                <select id="select-pagto" class="p-2 bg-slate-800 text-yellow-500 rounded font-bold text-[10px] uppercase border border-slate-600">
+                <select id="select-pagto" class="p-2 bg-slate-800 text-yellow-500 rounded font-bold text-[10px] uppercase border border-slate-600 outline-none">
                     <option value="DINHEIRO">💵 DINHEIRO</option>
                     <option value="PIX">💎 PIX</option>
-                    <option value="CARTAO">💳 CARTÃO</option>
-                    <option value="PENDURA">📝 PENDURA</option>
+                    <option value="CARTAO">💳 CARTÃO (D/C)</option>
+                    <option value="PENDURA">📝 PENDURA (FIADO)</option>
                 </select>
-                <button onclick="btReceber()" class="bg-yellow-500 text-black py-3 rounded-lg font-black uppercase text-[11px] shadow-lg active:scale-95 transition-transform">Receber / Dividir</button>
+                <button onclick="btReceber()" class="bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-[11px] shadow-lg active:bg-yellow-600">Finalizar / Dividir Conta</button>
             </div>
         </main>
     </div>
-<div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center text-black">
-    <div class="bg-slate-200 p-5 rounded-xl w-full max-w-sm">
-        <h2 class="font-black mb-4 uppercase text-center text-sm">Gerenciar Estoque</h2>
-        
-        <div class="mb-4 p-3 bg-white rounded-lg shadow-inner">
-            <p class="text-[9px] font-bold uppercase mb-2 text-gray-500">Cadastro Manual</p>
-            <input type="text" id="cad-nome" placeholder="Nome do Item" class="w-full p-2 mb-2 rounded border border-gray-400 text-xs">
-            <input type="number" id="cad-preco" placeholder="Preço de Venda" class="w-full p-2 mb-2 rounded border border-gray-400 text-xs">
-            <button onclick="funcaoSalvarProd()" class="w-full py-2 bg-green-600 text-white font-black rounded uppercase text-[10px]">Salvar Manual</button>
-        </div>
 
-        <div class="p-3 bg-blue-100 rounded-lg border-2 border-dashed border-blue-400 text-center">
-            <p class="text-[10px] font-black uppercase mb-1 text-blue-800">Entrada Automática (XML)</p>
-            <p class="text-[8px] text-blue-600 mb-2">Selecione a nota fiscal para importar itens</p>
-            <input type="file" id="xml-input" accept=".xml" onchange="importarXML(event)" class="text-[9px] w-full file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
-        </div>
-
-        <button onclick="btGerente()" class="w-full mt-4 py-2 font-bold uppercase text-xs text-gray-600">Voltar ao Balcão</button>
-    </div>
-</div>
-    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center text-black">
-        <div class="bg-slate-200 p-5 rounded-xl w-full max-w-sm">
-            <h2 class="font-black mb-4 uppercase text-center text-sm">Novo Produto</h2>
-            <input type="text" id="cad-nome" placeholder="Nome do Item" class="w-full p-3 mb-2 rounded border border-gray-400">
-            <input type="number" id="cad-preco" placeholder="Preço" class="w-full p-3 mb-4 rounded border border-gray-400">
-            <div class="flex gap-2">
-                <button onclick="btGerente()" class="flex-1 py-2 font-bold uppercase text-xs text-gray-600">Voltar</button>
-                <button onclick="funcaoSalvarProd()" class="flex-1 py-2 bg-green-600 text-white font-black rounded uppercase text-xs">Salvar</button>
+    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/95 z-50 p-6 flex items-center justify-center">
+        <div class="bg-slate-200 p-5 rounded-2xl w-full max-w-sm text-black shadow-2xl">
+            <h2 class="font-black mb-4 uppercase text-center text-sm border-b border-gray-400 pb-2">Gestão de Estoque</h2>
+            
+            <div class="p-3 bg-blue-600 rounded-xl mb-4 text-white shadow-md">
+                <p class="text-[10px] font-black uppercase mb-2">📥 Importar Nota Fiscal (XML)</p>
+                <input type="file" id="xml-input" accept=".xml" onchange="importarXML(event)" class="text-[9px] w-full file:bg-white file:rounded file:border-0 file:px-2 file:py-1 file:font-bold file:text-blue-600">
             </div>
+
+            <div class="space-y-2 mb-4">
+                <p class="text-[9px] font-black uppercase text-gray-500">Cadastro Manual</p>
+                <input type="text" id="cad-nome" placeholder="Nome do Produto" class="w-full p-2 rounded border border-gray-400 text-xs">
+                <input type="number" id="cad-preco" placeholder="Preço de Venda (R$)" class="w-full p-2 rounded border border-gray-400 text-xs">
+                <button onclick="funcaoSalvarProd()" class="w-full py-2 bg-slate-800 text-white font-bold rounded uppercase text-[10px]">Salvar Manualmente</button>
+            </div>
+
+            <button onclick="btGerente()" class="w-full py-2 font-black uppercase text-[10px] text-red-600 border border-red-200 rounded">Sair</button>
         </div>
     </div>
 
     <script>
-        // Configurações do Firebase
+        // --- CONFIGURAÇÃO FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -103,22 +96,23 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // --- ESTADO DO SISTEMA ---
         let mesas = Array.from({length: 16}, (_, i) => ({ num: i + 1, nome: "", status: 'livre', itens: [], total: 0 }));
         let mesaAtiva = null;
         let produtos = [
             { id: 1, nome: "SKOL LATA", preco: 6.00 },
             { id: 2, nome: "PITU DOSE", preco: 4.50 },
-            { id: 3, nome: "HEINEKEN LN", preco: 11.00 },
-            { id: 4, nome: "SKOL 600ML", preco: 10.00 }
+            { id: 3, nome: "HEINEKEN LN", preco: 11.00 }
         ];
 
+        // --- FUNÇÕES DE INTERFACE ---
         function renderizarMesas() {
             const grid = document.getElementById('grid-mesas');
             grid.innerHTML = mesas.map(m => {
                 let cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
-                let borda = mesaAtiva === m.num ? 'ring-2 ring-white scale-110 z-10' : '';
+                let borda = mesaAtiva === m.num ? 'ring-2 ring-yellow-400 scale-110 z-10' : '';
                 return `
-                    <button onclick="selecionarMesa(${m.num})" class="${cor} ${borda} h-10 rounded flex flex-col items-center justify-center text-[8px] font-black text-white shadow relative">
+                    <button onclick="selecionarMesa(${m.num})" class="mesa-btn ${cor} ${borda} h-10 rounded flex flex-col items-center justify-center text-[8px] font-black text-white shadow-md">
                         <span>M${m.num}</span>
                         <span class="text-[6px] truncate w-full px-1">${m.nome || (m.total > 0 ? 'R$'+m.total.toFixed(0) : '')}</span>
                     </button>`;
@@ -128,33 +122,29 @@
         function selecionarMesa(n) {
             mesaAtiva = n;
             const mesa = mesas.find(m => m.num === n);
-            document.getElementById('status-mesa').innerText = `MESA ${n} ${mesa.nome ? '- ' + mesa.nome : ''}`;
+            document.getElementById('status-mesa').innerText = `MESA ${n} ${mesa.nome ? '[' + mesa.nome + ']' : ''}`;
             atualizarCupom(mesa);
             renderizarMesas();
         }
 
-        function renomearMesa() {
-            if(!mesaAtiva) return;
-            const mesa = mesas.find(m => m.num === mesaAtiva);
-            const novoNome = prompt("Identificar Mesa (Nome do Cliente):", mesa.nome);
-            if(novoNome !== null) {
-                mesa.nome = novoNome.toUpperCase();
-                selecionarMesa(mesaAtiva);
-            }
-        }
-
-        function renderizarProds() {
+        function renderizarProds(listaFiltrada = null) {
             const lista = document.getElementById('lista-prods');
-            lista.innerHTML = produtos.map(p => `
-                <button onclick="addItem(${p.id})" class="w-full bg-slate-700 p-2 rounded border border-slate-600 text-left active:bg-slate-500">
-                    <p class="text-[9px] font-bold uppercase text-white">${p.nome}</p>
+            const dados = listaFiltrada || produtos;
+            lista.innerHTML = dados.map(p => `
+                <button onclick="addItem(${p.id})" class="w-full bg-slate-700 p-2 rounded-lg border border-slate-600 text-left active:bg-slate-500 shadow">
+                    <p class="text-[9px] font-bold uppercase text-white truncate">${p.nome}</p>
                     <p class="text-yellow-500 font-black text-[10px]">R$ ${p.preco.toFixed(2)}</p>
                 </button>
             `).join('');
         }
 
+        function funcaoBusca(valor) {
+            const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(valor.toLowerCase()));
+            renderizarProds(filtrados);
+        }
+
         function addItem(id) {
-            if(!mesaAtiva) return alert("Selecione uma mesa!");
+            if(!mesaAtiva) return alert("⚠️ SELECIONE UMA MESA ANTES!");
             const mesa = mesas.find(m => m.num === mesaAtiva);
             const p = produtos.find(prod => prod.id === id);
             const itemIdx = mesa.itens.findIndex(i => i.id === id);
@@ -172,24 +162,53 @@
             const container = document.getElementById('itens-cupom');
             container.innerHTML = mesa.itens.map(i => `
                 <div class="flex justify-between border-b border-gray-200 py-1 uppercase font-bold text-[8px]">
-                    <span>${i.qtd}x ${i.nome}</span>
-                    <span>R$ ${(i.qtd * i.preco).toFixed(2)}</span>
+                    <span class="w-1/2">${i.qtd}x ${i.nome}</span>
+                    <span class="w-1/2 text-right">R$ ${(i.qtd * i.preco).toFixed(2)}</span>
                 </div>
             `).join('');
             document.getElementById('txt-total').innerText = mesa.total.toFixed(2);
         }
 
+        // --- IMPORTAÇÃO XML ---
+        async function importarXML(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = async (e) => {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(e.target.result, "text/xml");
+                
+                // Trava de Nota Repetida
+                let chave = xml.getElementsByTagName("chNFe")[0]?.textContent || "XML_" + Date.now();
+                const notaExiste = await db.collection("notas_fiscais").doc(chave).get();
+                if (notaExiste.exists) return alert("⚠️ NOTA JÁ LANÇADA NO BOTECO 934!");
+
+                const itens = xml.getElementsByTagName("det");
+                for (let i = 0; i < itens.length; i++) {
+                    let nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                    let custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                    produtos.push({ id: Date.now() + i, nome: nome, preco: custo * 1.4 });
+                }
+
+                await db.collection("notas_fiscais").doc(chave).set({ data: new Date().toLocaleString() });
+                renderizarProds();
+                alert(`✅ ${itens.length} ITENS IMPORTADOS COM SUCESSO!`);
+                btGerente();
+            };
+            leitor.readAsText(arquivo);
+        }
+
+        // --- FINANCEIRO / RECEBER ---
         async function btReceber() {
             if(!mesaAtiva) return;
             const mesa = mesas.find(m => m.num === mesaAtiva);
             if(mesa.total <= 0) return;
 
             const pagto = document.getElementById('select-pagto').value;
-            const valorPago = parseFloat(prompt(`CONTA: R$ ${mesa.total.toFixed(2)}\nQuanto o cliente vai pagar agora?`, mesa.total.toFixed(2)));
+            const valorPago = parseFloat(prompt(`CONTA TOTAL: R$ ${mesa.total.toFixed(2)}\nDigite o valor que o cliente está pagando agora:`, mesa.total.toFixed(2)));
 
             if(isNaN(valorPago) || valorPago <= 0) return;
 
-            // Salva no Banco
             await db.collection("vendas").add({
                 data: new Date().toLocaleString(),
                 mesa: mesaAtiva,
@@ -198,40 +217,6 @@
                 metodo: pagto
             });
 
-            // Lógica de Divisão
             mesa.total -= valorPago;
 
-            if(mesa.total <= 0.05) {
-                mesa.status = 'livre';
-                mesa.itens = [];
-                mesa.total = 0;
-                mesa.nome = "";
-                mesaAtiva = null;
-                document.getElementById('status-mesa').innerText = "Selecione Mesa";
-                atualizarCupom({itens: [], total: 0});
-                alert("CONTA TOTAL PAGA!");
-            } else {
-                alert(`PAGAMENTO PARCIAL! Faltam R$ ${mesa.total.toFixed(2)} nesta mesa.`);
-            }
-            renderizarMesas();
-        }
-
-        function btGerente() { document.getElementById('modal-gerente').classList.toggle('hidden'); }
-        function btContatos() { let tel = prompt("WhatsApp (DDD+Número):", "879"); if(tel) window.open(`https://wa.me/55${tel}`); }
-        function btFecharDia() { window.open(`https://wa.me/5587996806181?text=*BOTECO 934*%0AFechamento solicitado.`); }
-
-        function funcaoSalvarProd() {
-            let n = document.getElementById('cad-nome').value.toUpperCase();
-            let p = parseFloat(document.getElementById('cad-preco').value);
-            if(n && p) {
-                produtos.push({ id: Date.now(), nome: n, preco: p });
-                renderizarProds();
-                btGerente();
-            }
-        }
-
-        renderizarMesas();
-        renderizarProds();
-    </script>
-</body>
-</html>
+            if(mesa.total <= 0
