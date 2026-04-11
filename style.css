@@ -1,44 +1,24 @@
-/* Limpeza Geral */
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #333; }
-h1 { color: #212529; margin-bottom: 20px; }
-
-/* Barra de Botões Superior */
-.topo { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 30px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-input, select { padding: 10px; border: 1px solid #ced4da; border-radius: 4px; }
+body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
+.cabecalho-principal { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.menu-superior { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
 /* Cores dos Botões */
-button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-.btn-azul { background-color: #007bff; color: white; }
-.btn-ciano { background-color: #17a2b8; color: white; }
-.btn-branco { background-color: #ffffff; border: 1px solid #333; }
-.btn-verde { background-color: #28a745; color: white; padding: 15px; font-size: 16px; }
+button { border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+.btn-azul { background: #007bff; color: white; }
+.btn-ciano { background: #17a2b8; color: white; }
+.btn-verde { background: #28a745; color: white; margin-top: 10px; }
+.btn-branco { background: white; border: 1px solid #333; }
 
-/* A MÁGICA QUE FALTOU: Esconder as Janelas */
-.modal { 
-    display: none; /* Isso impede que elas fiquem jogadas na tela */
+/* ESSENCIAL: Esconde as janelas que estavam soltas */
+.janela-flutuante { 
+    display: none; /* Garante que não apareça na tela inicial */
     position: fixed; 
-    z-index: 9999; 
+    z-index: 999; 
     left: 0; top: 0; 
     width: 100%; height: 100%; 
-    background-color: rgba(0,0,0,0.6); 
-    align-items: center; 
-    justify-content: center; 
+    background: rgba(0,0,0,0.7); 
+    align-items: center; justify-content: center; 
 }
+.conteudo-janela { background: white; padding: 30px; border-radius: 15px; width: 300px; display: flex; flex-direction: column; gap: 15px; }
 
-/* Conteúdo da Janela (Branca e Centralizada) */
-.modal-content { 
-    background-color: white; 
-    padding: 30px; 
-    border-radius: 12px; 
-    width: 90%; 
-    max-width: 400px; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
-    display: flex; 
-    flex-direction: column; 
-    gap: 15px; 
-}
-
-/* Grade de Produtos */
-.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
-.card-produto { background: white; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; }
-.card-produto:hover { border-color: #007bff; background: #e7f1ff; }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
