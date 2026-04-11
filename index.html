@@ -10,11 +10,34 @@
             font-family: 'Segoe UI', sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            display: flex; /* Divide a tela em duas partes */
+            display: flex;
             height: 100vh;
         }
 
-        /* Área dos Produtos (Esquerda) */
+        /* Menu de Categorias (Lateral Esquerda) */
+        .categorias-menu {
+            width: 180px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 10px;
+        }
+
+        .btn-categoria {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #34495e;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .btn-categoria:hover { background: #1abc9c; }
+
+        /* Área dos Produtos (Centro) */
         .produtos-container {
             flex: 1;
             padding: 20px;
@@ -27,9 +50,9 @@
             gap: 15px;
         }
 
-        /* Área do Pedido (Direita) */
+        /* Painel de Pedido (Direita) */
         .painel-pedido {
-            width: 300px;
+            width: 320px;
             background: white;
             border-left: 2px solid #ddd;
             display: flex;
@@ -38,6 +61,7 @@
             box-shadow: -4px 0 10px rgba(0,0,0,0.05);
         }
 
+        /* Card de Produto */
         .card {
             background: white;
             border-radius: 12px;
@@ -49,51 +73,43 @@
 
         .img-container {
             width: 100%;
-            height: 100px;
-            margin-bottom: 10px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 5px;
         }
 
         .img-container img { max-width: 100%; max-height: 100%; }
 
-        .nome { display: block; font-weight: bold; font-size: 14px; min-height: 35px; }
-        .preco { display: block; color: #28a745; font-weight: bold; margin-bottom: 10px; }
+        .nome { display: block; font-weight: bold; font-size: 13px; min-height: 32px; }
+        .preco { display: block; color: #28a745; font-weight: bold; margin-bottom: 8px; }
 
         .btn-add {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 8px;
             width: 100%;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .btn-add:active { transform: scale(0.95); }
-
-        /* Lista de Itens no Pedido */
-        #lista-pedido {
-            list-style: none;
-            padding: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .item-pedido {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            padding: 8px 0;
-            font-size: 14px;
+        /* Estilo da Lista de Pedido */
+        #lista-pedido { list-style: none; padding: 0; flex-grow: 1; overflow-y: auto; }
+        .item-pedido { 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid #eee; 
+            padding: 8px 0; 
+            font-size: 14px; 
         }
 
         .total-container {
             border-top: 2px solid #333;
             padding-top: 15px;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: #d9534f;
             text-align: right;
@@ -114,33 +130,23 @@
 </head>
 <body>
 
-    <div class="produtos-container">
-        <h2>Produtos</h2>
-        <div class="grid-container">
-            <div class="card">
-                <div class="img-container">
-                    <img src="https://img.icons8.com/color/96/beer.png" alt="Cerveja">
-                </div>
-                <span class="nome">Cerveja Latão</span>
-                <span class="preco">R$ 7,50</span>
-                <button class="btn-add" onclick="adicionarItem('Cerveja Latão', 7.50)">Adicionar</button>
-            </div>
+    <div class="categorias-menu">
+        <h3 style="margin-top: 0;">Menu</h3>
+        <button class="btn-categoria" onclick="filtrar('Todos')">🍺 Todos</button>
+        <button class="btn-categoria" onclick="filtrar('Bebidas')">Bebidas</button>
+        <button class="btn-categoria" onclick="filtrar('Doses')">Doses</button>
+        <button class="btn-categoria" onclick="filtrar('Boticário')">Boticário</button>
+    </div>
 
-            <div class="card">
-                <div class="img-container">
-                    <img src="https://img.icons8.com/color/96/water-glass.png" alt="Agua">
-                </div>
-                <span class="nome">Água s/ Gás</span>
-                <span class="preco">R$ 3,00</span>
-                <button class="btn-add" onclick="adicionarItem('Água s/ Gás', 3.00)">Adicionar</button>
+    <div class="produtos-container">
+        <h2 id="titulo-categoria">Todos os Produtos</h2>
+        <div id="grid-produtos" class="grid-container">
             </div>
-        </div>
     </div>
 
     <div class="painel-pedido">
-        <h3>Pedido Atual</h3>
-        <ul id="lista-pedido">
-            </ul>
+        <h3>🛒 Pedido Atual</h3>
+        <ul id="lista-pedido"></ul>
         <div class="total-container">
             TOTAL: R$ <span id="valor-total">0,00</span>
         </div>
@@ -148,14 +154,50 @@
     </div>
 
     <script>
+        // AQUI VOCÊ CADASTRA NOVOS PRODUTOS NO FUTURO
+        const produtos = [
+            { id: 1, nome: "Cerveja Latão", preco: 7.50, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer.png" },
+            { id: 2, nome: "Água s/ Gás", preco: 3.00, cat: "Bebidas", img: "https://img.icons8.com/color/96/water-glass.png" },
+            { id: 3, nome: "Dose de Pitu", preco: 4.00, cat: "Doses", img: "https://img.icons8.com/color/96/tequila-shot.png" },
+            { id: 4, nome: "Perfume Malbec", preco: 180.00, cat: "Boticário", img: "https://img.icons8.com/color/96/perfume-bottle.png" }
+        ];
+
         let totalGeral = 0;
 
+        // Função para mostrar os produtos na tela
+        function carregarProdutos(lista) {
+            const grid = document.getElementById('grid-produtos');
+            grid.innerHTML = ""; // Limpa a tela
+
+            lista.forEach(p => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="img-container">
+                            <img src="${p.img}" alt="${p.nome}">
+                        </div>
+                        <span class="nome">${p.nome}</span>
+                        <span class="preco">R$ ${p.preco.toFixed(2)}</span>
+                        <button class="btn-add" onclick="adicionarItem('${p.nome}', ${p.preco})">Adicionar</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Função para filtrar por categoria
+        function filtrar(categoria) {
+            document.getElementById('titulo-categoria').innerText = categoria;
+            if (categoria === 'Todos') {
+                carregarProdutos(produtos);
+            } else {
+                const filtrados = produtos.filter(p => p.cat === categoria);
+                carregarProdutos(filtrados);
+            }
+        }
+
         function adicionarItem(nome, preco) {
-            // 1. Atualiza o Total
             totalGeral += preco;
             document.getElementById('valor-total').innerText = totalGeral.toLocaleString('pt-br', {minimumFractionDigits: 2});
-
-            // 2. Adiciona o item na lista visual
+            
             const lista = document.getElementById('lista-pedido');
             const item = document.createElement('li');
             item.className = 'item-pedido';
@@ -164,18 +206,16 @@
         }
 
         function finalizarVenda() {
-            if(totalGeral === 0) {
-                alert("O pedido está vazio!");
-                return;
-            }
-            alert("Venda de R$ " + totalGeral.toFixed(2) + " finalizada com sucesso!");
-            
-            // Limpa tudo para a próxima venda
+            if(totalGeral === 0) return alert("Pedido vazio!");
+            alert("Venda Finalizada: R$ " + totalGeral.toFixed(2));
             totalGeral = 0;
             document.getElementById('valor-total').innerText = "0,00";
             document.getElementById('lista-pedido').innerHTML = "";
         }
-    </script>
 
+        // Inicia a página mostrando tudo
+        carregarProdutos(produtos);
+
+    </script>
 </body>
 </html>
