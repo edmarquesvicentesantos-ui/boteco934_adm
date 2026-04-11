@@ -3,204 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manus Style - PDV Boteco 934</title>
+    <title>Sistema Boteco 934 - PDV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #f8f8f7;
-            --bg-white: #ffffff;
-            --text-primary: #1a1a1a;
-            --border-color: #e5e7eb;
-            --accent-blue: #0081f2;
+            --bg-body: #f8f8f7;
+            --bg-card: #ffffff;
+            --primary: #0081f2;
+            --text: #1a1a1a;
+            --border: #e5e7eb;
+            --accent-orange: #e67e22;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
-        body { 
-            background-color: var(--bg-main); 
-            display: flex; 
-            height: 100vh; 
-            color: var(--text-primary);
-            overflow: hidden;
-        }
+        body { background-color: var(--bg-body); display: flex; height: 100vh; overflow: hidden; color: var(--text); }
 
-        /* Barra Lateral Estilo Manus */
+        /* Sidebar Lateral */
         aside {
-            width: 260px;
-            background: var(--bg-main);
-            border-right: 1px solid var(--border-color);
+            width: 240px;
+            background: var(--bg-body);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            padding: 20px 12px;
+            padding: 20px 15px;
         }
 
-        .nav-item {
-            padding: 10px 12px;
-            border-radius: 8px;
+        .logo { font-weight: 800; font-size: 22px; margin-bottom: 30px; letter-spacing: -1px; }
+
+        .nav-btn {
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            text-align: left;
             transition: 0.2s;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .nav-item:hover { background: #ececeb; }
-        .nav-item.active { background: var(--bg-white); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .nav-btn:hover { background: #eee; }
+        .nav-btn.active { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Área Central */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-white);
-            margin: 10px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
+        /* Área Principal */
+        main { flex: 1; display: flex; flex-direction: column; background: #fff; margin: 10px; border-radius: 15px; border: 1px solid var(--border); }
 
-        header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 
-        .search-bar {
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 20px;
-            width: 300px;
-            outline: none;
-        }
+        .search-bar { background: var(--bg-body); border: 1px solid var(--border); padding: 10px 20px; border-radius: 25px; width: 350px; outline: none; }
 
-        .grid-produtos {
-            padding: 24px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            overflow-y: auto;
-        }
+        .grid-container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; }
 
+        /* Cards de Produto */
         .card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
+            background: #fff;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 16px;
+            padding: 15px;
             text-align: center;
-            transition: transform 0.2s;
+            transition: 0.2s;
         }
 
-        .card:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
-
-        .price { color: var(--accent-blue); font-weight: 800; font-size: 1.2rem; display: block; margin: 10px 0; }
+        .card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .card img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
+        .card h3 { font-size: 14px; margin-bottom: 5px; height: 34px; overflow: hidden; }
+        .card .price { color: var(--primary); font-weight: 800; font-size: 18px; display: block; margin-bottom: 10px; }
 
         .btn-add {
-            background: var(--text-primary);
-            color: white;
+            background: #000;
+            color: #fff;
             border: none;
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            cursor: pointer;
             font-weight: 600;
-        }
-
-        /* Barra de Checkout (A "Mágica" do código que você enviou) */
-        .checkout-bar {
-            position: sticky;
-            bottom: 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .total-info h2 { font-size: 24px; }
-        
-        .btn-finish {
-            background: var(--accent-blue);
-            color: white;
-            padding: 12px 32px;
-            border-radius: 12px;
-            border: none;
-            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0, 129, 242, 0.3);
         }
+
+        /* Painel de Venda (Direita) */
+        .checkout-panel {
+            width: 350px;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .input-cliente {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .recibo-box {
+            flex-grow: 1;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 13px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .total-container { border-top: 2px dashed var(--border); padding-top: 15px; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .total-row h2 { font-size: 28px; color: var(--primary); }
+
+        .btn-group { display: grid; gap: 8px; }
+        .btn-pay { padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; }
+        .btn-pendura { background: var(--accent-orange); }
+        .btn-concluir { background: #27ae60; font-size: 18px; }
+
     </style>
 </head>
 <body>
 
 <aside>
-    <div style="font-weight: 900; font-size: 20px; margin-bottom: 30px; padding-left: 12px;">BOTECO 934</div>
-    <div class="nav-item active">📦 Estoque Geral</div>
-    <div class="nav-item">🍻 Bebidas Geladas</div>
-    <div class="nav-item">🥃 Doses & Petiscos</div>
-    <div class="nav-item">✨ O Boticário</div>
-    <div class="nav-item" style="margin-top: auto; color: #d63031;">⚠️ Pendura</div>
+    <div class="logo">BOTECO 934</div>
+    <button class="nav-btn active">📦 Estoque Geral</button>
+    <button class="nav-btn">🍻 Bebidas Geladas</button>
+    <button class="nav-btn">🥃 Doses</button>
+    <button class="nav-btn">✨ O Boticário</button>
 </aside>
 
 <main>
     <header>
-        <input type="text" class="search-bar" placeholder="Pesquisar produto...">
-        <div id="status-mesa">Mesa: <strong>Balcão</strong></div>
+        <input type="text" id="inputBusca" class="search-bar" placeholder="O que o cliente deseja?">
+        <div>Mesa: <strong>Balcão</strong></div>
     </header>
 
-    <div class="grid-produtos" id="vitrine">
+    <div class="grid-container" id="gradeProdutos">
         </div>
-
-    <div class="checkout-bar">
-        <div class="total-info">
-            <span style="font-size: 12px; color: #666;">VALOR TOTAL</span>
-            <h2 id="total-venda">R$ 0,00</h2>
-        </div>
-        <button class="btn-finish" onclick="finalizarVenda()">CONCLUIR PEDIDO</button>
-    </div>
 </main>
 
+<section class="checkout-panel">
+    <select class="input-cliente" style="margin-bottom: 5px;">
+        <option>Balcão</option>
+        <option>Mesa 01</option>
+        <option>Mesa 02</option>
+    </select>
+    <input type="text" id="nomeCliente" class="input-cliente" placeholder="Nome do Cliente">
+
+    <div class="recibo-box" id="itensRecibo">
+        <p style="color: #999; text-align: center;">Nenhum item selecionado</p>
+    </div>
+
+    <div class="total-container">
+        <div class="total-row">
+            <span>TOTAL:</span>
+            <h2 id="valorTotalDisplay">R$ 0,00</h2>
+        </div>
+        <div class="btn-group">
+            <button class="btn-pay btn-pendura" onclick="lancarPendura()">Lançar no Pendura</button>
+            <button class="btn-pay btn-concluir" onclick="finalizarVenda()">Finalizar Venda</button>
+        </div>
+    </div>
+</section>
+
 <script>
+    // Seus dados de produtos reais (Adicione mais aqui)
     const produtos = [
-        { nome: "Heineken 600ml", preco: 18.00 },
-        { nome: "Cachaça Artesanal", preco: 5.00 },
-        { nome: "Porção de Fritas", preco: 25.00 },
-        { nome: "Malbec Boticário", preco: 199.90 },
-        { nome: "Combo 934 (Balde)", preco: 45.00 }
+        { id: 1, nome: "Heineken 600ml", preco: 18.00, img: "🍻" },
+        { id: 2, nome: "Cachaça Dose", preco: 5.00, img: "🥃" },
+        { id: 3, nome: "Cerveja Latão", preco: 7.50, img: "🍺" },
+        { id: 4, nome: "Perfume Malbec", preco: 199.90, img: "✨" },
+        { id: 5, nome: "Água s/ Gás", preco: 3.00, img: "💧" }
     ];
 
-    let total = 0;
+    let carrinho = [];
+    let totalGeral = 0;
 
-    function render() {
-        const vitrine = document.getElementById('vitrine');
-        vitrine.innerHTML = produtos.map(p => `
+    // Renderiza os cards na tela
+    function carregarProdutos() {
+        const grade = document.getElementById('gradeProdutos');
+        grade.innerHTML = produtos.map(p => `
             <div class="card">
-                <div style="height: 60px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px;"></div>
-                <h3 style="font-size: 15px;">${p.nome}</h3>
+                <div style="font-size: 40px; margin-bottom: 10px;">${p.img}</div>
+                <h3>${p.nome}</h3>
                 <span class="price">R$ ${p.preco.toFixed(2)}</span>
-                <button class="btn-add" onclick="add(${p.preco})">Adicionar</button>
+                <button class="btn-add" onclick="adicionar(${p.id})">ADICIONAR</button>
             </div>
         `).join('');
     }
 
-    function add(valor) {
-        total += valor;
-        document.getElementById('total-venda').innerText = `R$ ${total.toFixed(2)}`;
+    // Adiciona ao carrinho e atualiza o recibo
+    function adicionar(id) {
+        const prod = produtos.find(p => p.id === id);
+        carrinho.push(prod);
+        totalGeral += prod.preco;
+        atualizarPainel();
+    }
+
+    function atualizarPainel() {
+        const box = document.getElementById('itensRecibo');
+        document.getElementById('valorTotalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
+        
+        if (carrinho.length === 0) {
+            box.innerHTML = '<p style="color: #999; text-align: center;">Nenhum item selecionado</p>';
+            return;
+        }
+
+        box.innerHTML = carrinho.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px;">
+                <span>${item.nome}</span>
+                <strong>R$ ${item.preco.toFixed(2)}</strong>
+            </div>
+        `).join('');
+    }
+
+    // Função de Busca
+    document.getElementById('inputBusca').addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(termo) ? 'block' : 'none';
+        });
+    });
+
+    // Lógica do Pendura via WhatsApp
+    function lancarPendura() {
+        const cliente = document.getElementById('nomeCliente').value;
+        if (!cliente) return alert("⚠️ Digite o nome do cliente para o pendura!");
+        if (carrinho.length === 0) return alert("Carrinho vazio!");
+
+        let msg = `*BOTECO 934 - NOTA DE PENDURA*%0A*Cliente:* ${cliente}%0A----------------------------%0A`;
+        carrinho.forEach(i => msg += `• ${i.nome}: R$ ${i.preco.toFixed(2)}%0A`);
+        msg += `----------------------------%0A*TOTAL: R$ ${totalGeral.toFixed(2)}*`;
+
+        window.open(`https://wa.me/?text=${msg}`); // Abre o WhatsApp para enviar a conta
+        limparTudo();
     }
 
     function finalizarVenda() {
-        if(total === 0) return alert("Adicione produtos primeiro!");
-        alert("Venda de R$ " + total.toFixed(2) + " realizada com sucesso!");
-        total = 0;
-        document.getElementById('total-venda').innerText = `R$ 0,00`;
+        if (carrinho.length === 0) return;
+        alert(`✅ Venda de R$ ${totalGeral.toFixed(2)} finalizada com sucesso!`);
+        limparTudo();
     }
 
-    render();
+    function limparTudo() {
+        carrinho = [];
+        totalGeral = 0;
+        document.getElementById('nomeCliente').value = "";
+        atualizarPainel();
+    }
+
+    carregarProdutos();
 </script>
 
 </body>
