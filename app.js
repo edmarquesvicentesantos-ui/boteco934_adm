@@ -208,6 +208,34 @@
         function buscar() { const t = document.getElementById('busca-produto').value.toLowerCase(); carregar(produtos.filter(p => p.nome.toLowerCase().includes(t))); }
         setInterval(() => { document.getElementById('data-hora').innerText = new Date().toLocaleString('pt-br'); }, 1000);
         carregar(produtos);
+/* Botões de pagamento menores */
+.btn-pg { 
+    padding: 6px !important; 
+    font-size: 9px !important; 
+}
+
+/* Área financeira mais compacta */
+.financeiro { 
+    margin-top: 5px; 
+    padding: 5px; 
+}
+
+.total-info { font-size: 16px; }
+.falta-info { font-size: 13px; }
+
+/* Botão final mais estreito */
+.btn-finalizar { 
+    padding: 10px; 
+    margin-top: 5px; 
+    font-size: 14px; 
+}
+
+/* Garante que o input e o select fiquem alinhados */
+.input-cli {
+    margin-bottom: 0 !important;
+    padding: 8px !important;
+    font-size: 12px;
+}
     </script>
 </body>
 </html>
