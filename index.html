@@ -5,58 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV & XML</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { margin: 0; display: flex; flex-direction: column; height: 100vh; background: #f0f2f5; overflow: hidden; }
         
-        /* Cabeçalho - Conforme image_eba419.png */
         header { background: #1c1e21; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo-circulo { background: #f1c40f; color: black; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .search-bar { flex: 0 1 400px; }
-        #busca-produto { width: 100%; padding: 10px 20px; border-radius: 20px; border: none; outline: none; }
+        .search-bar { flex: 0 1 500px; }
+        #busca-produto { width: 100%; padding: 12px 20px; border-radius: 25px; border: none; outline: none; font-size: 16px; }
 
         main { display: flex; flex: 1; overflow: hidden; }
 
-        /* Navegação Lateral */
-        nav { width: 130px; background: #2c3e50; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .btn-nav { padding: 12px; background: #34495e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        /* Menu Lateral conforme image_ec6ed3.png */
+        nav { width: 140px; background: #2c3e50; padding: 10px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .btn-nav { padding: 15px 10px; background: #34495e; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .btn-xml { background: #27ae60; margin-top: auto; }
 
-        /* Vitrine 5 Colunas - Conforme image_eba419.png */
-        .vitrine { flex: 1; padding: 15px; overflow-y: auto; background: white; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .card { border: 1px solid #eee; padding: 10px; text-align: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .card img { height: 50px; object-fit: contain; margin-bottom: 5px; }
-        .nome-p { display: block; font-size: 11px; font-weight: bold; height: 32px; overflow: hidden; }
-        .preco-p { display: block; color: #27ae60; font-weight: bold; margin: 5px 0; }
-        .btn-add { width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        /* Vitrine de 5 Colunas */
+        .vitrine { flex: 1; padding: 15px; overflow-y: auto; background: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .card { border: 1px solid #eee; padding: 12px; text-align: center; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: white; }
+        .card img { height: 60px; object-fit: contain; margin-bottom: 8px; }
+        .nome-p { display: block; font-size: 11px; font-weight: bold; height: 30px; color: #333; }
+        .preco-p { display: block; color: #27ae60; font-weight: 800; margin: 6px 0; font-size: 14px; }
+        .btn-add { width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-        /* Painel Lateral - Conforme image_ec0884.png */
-        .painel { width: 340px; background: #f8f9fa; border-left: 1px solid #ddd; padding: 10px; display: flex; flex-direction: column; }
+        /* Painel Lateral conforme image_ec6ed3.png */
+        .painel { width: 350px; background: #f8f9fa; border-left: 1px solid #ddd; padding: 10px; display: flex; flex-direction: column; }
         .topo-venda { display: flex; gap: 5px; margin-bottom: 10px; }
-        .input-venda { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
+        .input-v { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-weight: bold; }
 
         .cupom { background: white; border: 1px solid #bbb; flex: 1; padding: 10px; font-family: monospace; overflow-y: auto; font-size: 12px; }
-        .item-linha { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 4px 0; }
+        .item-linha { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 5px 0; }
 
-        .resumo { margin-top: 10px; background: #eee; padding: 10px; border-radius: 5px; }
-        .resumo div { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px; }
-        .val-total { color: #c0392b; font-size: 18px; }
+        .resumo { margin-top: 10px; padding: 10px; background: #eee; border-radius: 5px; }
+        .resumo-linha { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+        .val-total { color: #c0392b; font-size: 20px; }
 
-        /* Botões de Pagamento e Pendura */
-        .acoes-pg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
-        .btn-pg { padding: 10px; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .btn-pendura { grid-column: span 2; background: #e67e22; color: white; border: none; }
+        .pg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .btn-pg { padding: 10px; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; }
+        .btn-pendura { grid-column: span 2; background: #e67e22; color: white; border: none; border-radius: 4px; }
 
-        .btn-fechar { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-fechar { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-fechar:disabled { background: #ccc; cursor: not-allowed; }
 
         /* Modal XML */
         #modal-xml { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; align-items:center; justify-content:center; }
-        .xml-box { background:white; padding:20px; border-radius:8px; width:80%; max-width:600px; }
+        .xml-box { background:white; padding:20px; border-radius:8px; width:90%; max-width:500px; text-align: center; }
 
         @media print {
             .no-print { display: none !important; }
-            body { background: white; }
             .cupom { border: none; width: 54mm; position: absolute; top: 0; left: 0; }
         }
     </style>
@@ -66,19 +64,19 @@
 <header class="no-print">
     <div class="logo-area">
         <div class="logo-circulo">934</div>
-        <h3 style="margin:0">BOTECO 934</h3>
+        <h2 style="margin:0">BOTECO 934</h2>
     </div>
-    <div class="search-bar"><input type="text" id="busca-produto" placeholder="Buscar produto..." oninput="filtrarBusca()"></div>
-    <div id="relogio" style="font-size: 12px; font-weight: bold;"></div>
+    <div class="search-bar"><input type="text" id="busca-produto" placeholder="Buscar produto..." oninput="buscar()"></div>
+    <div id="data-hora" style="font-size: 13px; font-weight: bold;"></div>
 </header>
 
 <main>
     <nav class="no-print">
-        <button class="btn-nav" onclick="renderProdutos(produtos)">Todos</button>
-        <button class="btn-nav" onclick="filtrarCat('Bebidas')">Bebidas</button>
-        <button class="btn-nav" onclick="filtrarCat('Doses')">Doses</button>
-        <button class="btn-nav" onclick="filtrarCat('Boticário')">Boticário</button>
-        <button class="btn-nav btn-xml" onclick="abrirXML()">IMPORTAR XML</button>
+        <button class="btn-nav" onclick="render(produtos)">Todos</button>
+        <button class="btn-nav" onclick="filtrar('Bebidas')">Bebidas</button>
+        <button class="btn-nav" onclick="filtrar('Doses')">Doses</button>
+        <button class="btn-nav" onclick="filtrar('Boticário')">Boticário</button>
+        <button class="btn-nav btn-xml" onclick="document.getElementById('modal-xml').style.display='flex'">IMPORTAR XML</button>
     </nav>
 
     <section class="vitrine no-print">
@@ -87,51 +85,50 @@
 
     <aside class="painel">
         <div class="topo-venda no-print">
-            <select id="mesa-sel" class="input-venda" style="flex:1" onchange="trocarMesa()">
+            <select id="mesa-sel" class="input-v" style="flex:1" onchange="trocarMesa()">
                 <option value="Balcão">Balcão</option>
                 <script>for(let i=1;i<=8;i++) document.write(`<option value="Mesa ${i}">Mesa ${i}</option>`);</script>
             </select>
-            <input type="text" id="cliente-nome" class="input-venda" style="flex:2" placeholder="Nome do Cliente" oninput="vincularCliente()">
+            <input type="text" id="cliente-nome" class="input-v" style="flex:2" placeholder="Nome do Cliente" oninput="salvarVinculo()">
         </div>
 
-        <div class="cupom" id="recibo-print">
+        <div class="cupom" id="recibo">
             <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #000; margin-bottom:10px;">BOTECO 934 - RECIBO</div>
-            <div id="lista-itens"></div>
+            <div id="itens-lista"></div>
             <div style="border-top:1px solid #000; margin-top:10px; padding-top:5px; text-align:right;">
-                <strong id="total-recibo">TOTAL: R$ 0,00</strong>
+                <strong id="print-total">TOTAL: R$ 0,00</strong>
             </div>
         </div>
 
         <div class="resumo no-print">
-            <div><span>TOTAL:</span><span class="val-total">R$ <span id="resumo-total">0,00</span></span></div>
-            <div><span>FALTA:</span><span style="color:#e67e22">R$ <span id="resumo-falta">0,00</span></span></div>
+            <div class="resumo-linha"><span>TOTAL:</span><span class="val-total">R$ <span id="res-total">0,00</span></span></div>
+            <div class="resumo-linha"><span>FALTA:</span><span style="color:#e67e22">R$ <span id="res-falta">0,00</span></span></div>
         </div>
 
-        <div class="acoes-pg no-print">
-            <button class="btn-pg" onclick="pagar('Dinheiro')">DINHEIRO</button>
-            <button class="btn-pg" onclick="pagar('Pix')">PIX</button>
-            <button class="btn-pg" onclick="pagar('Cartão')">CARTÃO</button>
-            <button class="btn-pg btn-pendura" onclick="pagar('Pendura')">LANÇAR NO PENDURA</button>
+        <div class="pg-grid no-print">
+            <button class="btn-pg" onclick="receber('Dinheiro')">DINHEIRO</button>
+            <button class="btn-pg" onclick="receber('Pix')">PIX</button>
+            <button class="btn-pg" onclick="receber('Cartão')" style="grid-column: span 2;">CARTÃO</button>
+            <button class="btn-pg btn-pendura" onclick="receber('Pendura')">LANÇAR NO PENDURA</button>
         </div>
 
-        <button class="btn-fechar no-print" id="btn-finalizar" onclick="finalizar()" disabled>FECHAR E IMPRIMIR</button>
+        <button class="btn-fechar no-print" id="btn-finalizar" onclick="fecharConta()" disabled>FECHAR E IMPRIMIR</button>
     </aside>
 </main>
 
-<div id="modal-xml" class="no-print">
+<div id="modal-xml">
     <div class="xml-box">
-        <h4>Importar Estoque (XML NF-e)</h4>
-        <input type="file" id="xml-input" accept=".xml" onchange="processarXML()">
-        <div id="xml-feedback" style="margin-top:15px; font-size:12px; color:#666;"></div>
-        <button onclick="document.getElementById('modal-xml').style.display='none'" style="margin-top:15px; padding:10px;">Fechar</button>
+        <h3>Entrada de Estoque via XML</h3>
+        <input type="file" id="xml-file" accept=".xml" onchange="lerXML()">
+        <div id="xml-info" style="margin: 15px 0; font-size: 12px; color: #555;"></div>
+        <button class="btn-nav" onclick="document.getElementById('modal-xml').style.display='none'">Fechar</button>
     </div>
 </div>
 
 <script>
-    let mesas = { "Balcão": { itens: [], pagos: 0, cliente: "" } };
-    for(let i=1;i<=8;i++) mesas[`Mesa ${i}`] = { itens: [], pagos: 0, cliente: "" };
+    let banco = { "Balcão": { itens: [], pagos: 0, cliente: "" } };
+    for(let i=1;i<=8;i++) banco[`Mesa ${i}`] = { itens: [], pagos: 0, cliente: "" };
 
-    // Lista de Produtos - Edite aqui para cadastrar novos itens
     const produtos = [
         { nome: "Cerveja Latão", preco: 7.50, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer.png" },
         { nome: "Heineken 600ml", preco: 15.00, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer-bottle.png" },
@@ -140,30 +137,29 @@
         { nome: "Perfume Malbec", preco: 180.00, cat: "Boticário", img: "https://img.icons8.com/color/96/perfume-bottle.png" }
     ];
 
-    function renderProdutos(lista) {
+    function render(lista) {
         document.getElementById('grid-produtos').innerHTML = lista.map(p => `
             <div class="card">
                 <img src="${p.img}">
                 <span class="nome-p">${p.nome}</span>
                 <span class="preco-p">R$ ${p.preco.toFixed(2)}</span>
-                <button class="btn-add" onclick="addAoCarrinho('${p.nome}', ${p.preco})">ADICIONAR</button>
+                <button class="btn-add" onclick="add('${p.nome}', ${p.preco})">ADICIONAR</button>
             </div>
         `).join('');
     }
 
-    function addAoCarrinho(n, p) {
+    function add(n, p) {
         const m = document.getElementById('mesa-sel').value;
-        if(!mesas[m].cliente) return alert("Informe o nome do cliente!");
-        mesas[m].itens.push({nome: n, preco: p});
-        atualizarTela();
+        if(!banco[m].cliente) return alert("Identifique o cliente primeiro!");
+        banco[m].itens.push({nome: n, preco: p});
+        atualizar();
     }
 
-    function atualizarTela() {
+    function atualizar() {
         const m = document.getElementById('mesa-sel').value;
-        const mesa = mesas[m];
-        const listaDiv = document.getElementById('lista-itens');
+        const mesa = banco[m];
+        const listaDiv = document.getElementById('itens-lista');
         
-        // Agrupamento para economizar papel (Lógica 3x Cerveja)
         const agrupados = {};
         mesa.itens.forEach(i => {
             if(agrupados[i.nome]) { agrupados[i.nome].qtd++; agrupados[i.nome].total += i.preco; }
@@ -177,30 +173,25 @@
         const total = mesa.itens.reduce((a, b) => a + b.preco, 0);
         const falta = total - mesa.pagos;
 
-        document.getElementById('resumo-total').innerText = total.toFixed(2);
-        document.getElementById('resumo-falta').innerText = Math.max(0, falta).toFixed(2);
-        document.getElementById('total-recibo').innerText = `TOTAL: R$ ${total.toFixed(2)}`;
+        document.getElementById('res-total').innerText = total.toFixed(2);
+        document.getElementById('res-falta').innerText = Math.max(0, falta).toFixed(2);
+        document.getElementById('print-total').innerText = `TOTAL: R$ ${total.toFixed(2)}`;
         document.getElementById('btn-finalizar').disabled = (falta > 0.01 || total === 0);
     }
 
-    function pagar(tipo) {
+    function receber(tipo) {
         const m = document.getElementById('mesa-sel').value;
-        const total = mesas[m].itens.reduce((a, b) => a + b.preco, 0);
-        const falta = total - mesas[m].pagos;
+        const total = banco[m].itens.reduce((a, b) => a + b.preco, 0);
+        const falta = total - banco[m].pagos;
         if(falta <= 0) return;
 
-        let valor = prompt(`Valor no ${tipo}:`, falta.toFixed(2));
-        if(valor) {
-            mesas[m].pagos += parseFloat(valor.replace(',', '.'));
-            atualizarTela();
-        }
+        let v = prompt(`Receber no ${tipo}:`, falta.toFixed(2));
+        if(v) { banco[m].pagos += parseFloat(v.replace(',', '.')); atualizar(); }
     }
 
-    function finalizar() {
+    function fecharConta() {
         const m = document.getElementById('mesa-sel').value;
-        const mesa = mesas[m];
-        
-        // WhatsApp com itens agrupados para o Pendura
+        const mesa = banco[m];
         const agrupados = {};
         mesa.itens.forEach(i => { agrupados[i.nome] = (agrupados[i.nome] || 0) + 1; });
         
@@ -210,40 +201,34 @@
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         window.print();
-
-        mesas[m] = { itens: [], pagos: 0, cliente: "" };
+        banco[m] = { itens: [], pagos: 0, cliente: "" };
         document.getElementById('cliente-nome').value = "";
-        atualizarTela();
+        atualizar();
     }
 
-    // Módulo de Importação XML NF-e
-    function processarXML() {
-        const file = document.getElementById('xml-input').files[0];
+    function lerXML() {
+        const file = document.getElementById('xml-file').files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
             const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-            const produtosXML = xmlDoc.getElementsByTagName("det");
-            let resumo = `<strong>Produtos importados do XML:</strong><br>`;
-            
-            for(let i=0; i < produtosXML.length; i++) {
-                const nome = produtosXML[i].getElementsByTagName("xProd")[0].textContent;
-                const qtd = produtosXML[i].getElementsByTagName("qCom")[0].textContent;
-                resumo += `- ${nome} (${qtd} un)<br>`;
+            const xml = parser.parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+            let txt = "<strong>Itens detectados:</strong><br>";
+            for(let i=0; i < itens.length; i++) {
+                txt += `- ${itens[i].getElementsByTagName("xProd")[0].textContent}<br>`;
             }
-            document.getElementById('xml-feedback').innerHTML = resumo + `<br><span style="color:green">Entrada realizada!</span>`;
+            document.getElementById('xml-info').innerHTML = txt + "<br><span style='color:green'>Estoque Pronto!</span>";
         };
         reader.readAsText(file);
     }
 
-    function abrirXML() { document.getElementById('modal-xml').style.display='flex'; }
-    function trocarMesa() { document.getElementById('cliente-nome').value = mesas[document.getElementById('mesa-sel').value].cliente; atualizarTela(); }
-    function vincularCliente() { mesas[document.getElementById('mesa-sel').value].cliente = document.getElementById('cliente-nome').value; }
-    function filtrarCat(c) { renderProdutos(produtos.filter(p => p.cat === c)); }
-    function filtrarBusca() { const b = document.getElementById('busca-produto').value.toLowerCase(); renderProdutos(produtos.filter(p => p.nome.toLowerCase().includes(b))); }
+    function trocarMesa() { document.getElementById('cliente-nome').value = banco[document.getElementById('mesa-sel').value].cliente; atualizar(); }
+    function salvarVinculo() { banco[document.getElementById('mesa-sel').value].cliente = document.getElementById('cliente-nome').value; }
+    function filtrar(c) { render(produtos.filter(p => p.cat === c)); }
+    function buscar() { const b = document.getElementById('busca-produto').value.toLowerCase(); render(produtos.filter(p => p.nome.toLowerCase().includes(b))); }
     
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleString('pt-br'); }, 1000);
-    renderProdutos(produtos);
+    setInterval(() => { document.getElementById('data-hora').innerText = new Date().toLocaleString('pt-br'); }, 1000);
+    render(produtos);
 </script>
 </body>
 </html>
