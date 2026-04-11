@@ -269,7 +269,44 @@ async function enviarFechamentoDia() {
     let texto = `*📊 FECHAMENTO BOTECO 934 - ${new Date().toLocaleDateString()}*%0A%0A*Venda Total:* R$ ${document.getElementById('valor-total').innerText}`;
     window.open(`https://api.whatsapp.org/send?phone=${meuZap}&text=${texto}`);
 }
+async function importarXML(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
 
+    alert("Lendo nota fiscal... Aguarde um instante.");
+
+    const leitor = new FileReader();
+    leitor.onload = async (e) => {
+        try {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+            
+            for (let i = 0; i < itens.length; i++) {
+                let nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                let custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                
+                // Aqui o sistema define o preço de venda sozinho (Custo + 40%)
+                let precoVenda = custo * 1.4; 
+
+                const docRef = await db.collection("produtos").add({ 
+                    nome: nome, 
+                    preco: precoVenda 
+                });
+                
+                produtos.push({ id: docRef.id, nome: nome, preco: precoVenda });
+            }
+
+            renderizarProds();
+            btGerente(); // Fecha a tela sozinho
+            alert("✅ " + itens.length + " produtos da nota foram adicionados ao estoque!");
+            
+        } catch (erro) {
+            alert("Erro ao ler este XML. Verifique se é uma nota válida.");
+        }
+    };
+    leitor.readAsText(arquivo);
+}
 // --- INICIALIZAÇÃO ---
 renderizarMesas();
 filtrar('Tudo');
