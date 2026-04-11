@@ -13,29 +13,57 @@
         <div class="controles">
             <select id="select-mesa"><option value="1">Mesa 01</option><option value="balcao">Balcão</option></select>
             <input type="text" id="cliente-nome" placeholder="Nome do Cliente">
-            <button onclick="abrirModal('modal-financeiro')" style="background:#007bff;color:#fff">📊 Finanças</button>
-            <button onclick="abrirModal('modal-nota')" style="background:#17a2b8;color:#fff">📑 Notas</button>
-            <button onclick="abrirModal('modal-produto')" style="background:#f8f9fa;color:#000">➕ Novo Produto</button>
+            <button onclick="abrirModal('modal-financeiro')" class="btn-azul">📊 Finanças</button>
+            <button onclick="abrirModal('modal-nota')" class="btn-ciano">📑 Notas</button>
+            <button onclick="abrirModal('modal-produto')" class="btn-branco">➕ Novo Produto</button>
         </div>
     </div>
 
-    <div id="grade-produtos"></div>
+    <div id="grade-produtos" class="grade"></div>
+
+    <div class="carrinho">
+        <h3>Consumo</h3>
+        <div id="carrinho-itens"></div>
+        <div class="total-venda">Total: R$ <span id="total-valor">0,00</span></div>
+        <button onclick="abrirModal('modal-pagamento')" class="btn-verde">Fechar Recibo</button>
+    </div>
 
     <div id="modal-financeiro" class="modal">
         <div class="modal-content">
-            <h3>Caixa</h3>
-            <p id="f-resumo">Carregando...</p>
-            <button onclick="fecharModal('modal-financeiro')">Fechar</button>
+            <h3>Resumo Financeiro</h3>
+            <p>Dinheiro: R$ <span id="f-dinheiro">0,00</span></p>
+            <p>PIX: R$ <span id="f-pix">0,00</span></p>
+            <p style="color:red">Pendura: R$ <span id="f-pendura">0,00</span></p>
+            <button onclick="fecharModal('modal-financeiro')">Sair</button>
         </div>
     </div>
 
     <div id="modal-produto" class="modal">
         <div class="modal-content">
-            <h3>Cadastrar Item</h3>
+            <h3>Novo Produto/Dose</h3>
             <input type="text" id="p-nome" placeholder="Nome">
-            <input type="number" id="p-preco" placeholder="Preço">
-            <button onclick="salvarProduto()">Salvar</button>
-            <button onclick="fecharModal('modal-produto')">Sair</button>
+            <input type="number" id="p-preco" placeholder="Preço Venda">
+            <select id="p-tipo"><option value="unidade">Garrafa/Lata</option><option value="dose">Dose</option></select>
+            <button onclick="salvarProduto()">Gravar</button>
+            <button onclick="fecharModal('modal-produto')">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modal-pagamento" class="modal">
+        <div class="modal-content">
+            <h3>Finalizar Venda</h3>
+            <select id="metodo"><option>Dinheiro</option><option>PIX</option><option>Pendura</option></select>
+            <button onclick="finalizarVenda()">Confirmar Pagamento</button>
+            <button onclick="fecharModal('modal-pagamento')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="modal-nota" class="modal">
+        <div class="modal-content">
+            <h3>Entrada de Mercadoria</h3>
+            <input type="text" id="n-prod" placeholder="Produto">
+            <input type="number" id="n-custo" placeholder="Custo">
+            <button onclick="fecharModal('modal-nota')">Salvar Nota</button>
         </div>
     </div>
 
