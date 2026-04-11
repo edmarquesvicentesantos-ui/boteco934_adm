@@ -12,13 +12,26 @@
 
     <div class="app-container">
         <aside class="sidebar">
-            <div class="brand">
-                <h2>Boteco 934</h2>
+            <div class="brand"><h2>Boteco 934</h2></div>
+            
+            <div class="mesa-seletor">
+                <label>Mesa/Local:</label>
+                <select id="select-mesa" onchange="trocarMesa()">
+                    <option value="1">Mesa 01</option>
+                    <option value="2">Mesa 02</option>
+                    <option value="3">Mesa 03</option>
+                    <option value="4">Mesa 04</option>
+                    <option value="5">Mesa 05</option>
+                    <option value="balcao">Balcão</option>
+                </select>
+                <input type="text" id="cliente-nome" placeholder="Nome do Cliente" readonly>
+                <button class="btn-abrir" onclick="abrirMesa()">Abrir Mesa</button>
             </div>
+
             <nav>
                 <button onclick="filtrar('bebidas')">Bebidas</button>
                 <button onclick="filtrar('boticario')">Boticário</button>
-                <button class="btn-add" onclick="abrirModal()">+ Produto</button>
+                <button class="btn-add-prod" onclick="abrirModalProd()">+ Novo Produto</button>
             </nav>
             <div id="status-estoque" class="status-box"></div>
         </aside>
@@ -31,31 +44,49 @@
         </main>
 
         <section class="checkout-panel">
-            <h3>Consumo / Pendura</h3>
+            <h3>Consumo Atual</h3>
             <div id="carrinho-itens" class="carrinho-lista"></div>
             <div class="checkout-footer">
-                <div class="total-row">
-                    <span>Total:</span>
-                    <span id="total-valor">R$ 0,00</span>
-                </div>
-                <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar (F1)</button>
-                <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
+                <div id="total-valor">R$ 0,00</div>
+                <button class="btn-fechar" onclick="abrirModalPagamento()">Fechar Recibo</button>
             </div>
         </section>
     </div>
 
+    <div id="modal-pagamento" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Fechar Conta - Boteco 934</h3>
+            <div id="info-recibo"></div>
+            <hr>
+            <label>Dividir por quantas pessoas?</label>
+            <input type="number" id="dividir-pessoas" value="1" oninput="calcularDivisao()">
+            <p id="valor-dividido"></p>
+            
+            <label>Forma de Pagamento:</label>
+            <select id="metodo-pagamento">
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="PIX">PIX</option>
+                <option value="Cartão Débito">Cartão Débito</option>
+                <option value="Cartão Crédito">Cartão Crédito</option>
+                <option value="Pendura">Pendura (Fiado)</option>
+            </select>
+            <button class="btn-confirmar" onclick="finalizarVenda()">Confirmar Pagamento</button>
+            <button class="btn-cancelar" onclick="fecharModalPagamento()">Voltar</button>
+        </div>
+    </div>
+
     <div id="modal-produto" class="modal" style="display:none;">
         <div class="modal-content">
-            <h3>Novo Produto</h3>
-            <input type="text" id="nome-prod" placeholder="Nome do item">
-            <input type="number" id="estoque-prod" placeholder="Estoque Inicial">
-            <input type="number" id="preco-prod" placeholder="Preço de Venda">
-            <select id="cat-prod">
+            <h3>Cadastrar Produto</h3>
+            <input type="text" id="p-nome" placeholder="Nome">
+            <input type="number" id="p-estoque" placeholder="Estoque">
+            <input type="number" id="p-preco" placeholder="Preço">
+            <select id="p-cat">
                 <option value="bebidas">Bebidas</option>
                 <option value="boticario">Boticário</option>
             </select>
-            <button onclick="salvarProduto()">Salvar no Sistema</button>
-            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button onclick="salvarProduto()">Salvar</button>
+            <button onclick="fecharModalProd()">Sair</button>
         </div>
     </div>
 
