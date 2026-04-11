@@ -1,16 +1,11 @@
-body { background: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
-.topo { display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-.controles { display: flex; gap: 5px; flex-wrap: wrap; }
-.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-.card { border: 1px solid #333; padding: 10px; text-align: center; cursor: pointer; border-radius: 5px; }
+body { font-family: sans-serif; padding: 20px; }
+.controles-topo { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+.btn-azul { background: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; }
+.btn-ciano { background: #17a2b8; color: white; border: none; padding: 10px; border-radius: 4px; }
+.btn-verde { background: #28a745; color: white; border: none; padding: 15px; border-radius: 5px; font-weight: bold; }
+.btn-branco { background: #fff; border: 1px solid #000; padding: 10px; border-radius: 4px; }
 
-/* Botões do Print */
-button { padding: 10px; border: 1px solid #333; cursor: pointer; font-weight: bold; border-radius: 3px; }
-.btn-azul { background: #007bff; color: white; }
-.btn-ciano { background: #17a2b8; color: white; }
-.btn-verde { background: #28a745; color: white; }
-.btn-branco { background: #f8f9fa; }
-
-/* MODAL SEGURO */
-.modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
-.modal-content { background: white; padding: 20px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; gap: 10px; border: 2px solid #000; }
+.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
+.modal-content { background: #fff; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 1px solid #000; }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-bottom: 30px; }
+.item-card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; }
