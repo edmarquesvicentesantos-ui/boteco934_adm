@@ -1,63 +1,36 @@
-function renderizar() {
-    const m = document.getElementById('select-mesa').value;
-    const mesa = bancoMesas[m];
-    const lista = document.getElementById('itens-lista');
-    const total = mesa.itens.reduce((acc, i) => acc + i.preco, 0);
-    const falta = total - mesa.pagos;
-
-    // Lógica para somar itens iguais e economizar papel
-    const itensAgrupados = {};
-    mesa.itens.forEach(item => {
-        if (itensAgrupados[item.nome]) {
-            itensAgrupados[item.nome].qtd++;
-            itensAgrupados[item.nome].total += item.preco;
-        } else {
-            itensAgrupados[item.nome] = { qtd: 1, preco: item.preco, total: item.preco };
-        }
-    });
-
-    // Gera o HTML do recibo compacto
-    lista.innerHTML = Object.keys(itensAgrupados).map(nome => {
-        const item = itensAgrupados[nome];
-        return `
-            <div class="item-linha">
-                <span>${item.qtd}x ${nome}</span>
-                <span>${item.total.toFixed(2).replace('.', ',')}</span>
-            </div>`;
-    }).join('');
-
-    document.getElementById('txt-total').innerText = total.toFixed(2).replace('.', ',');
-    document.getElementById('txt-falta').innerText = (falta < 0 ? 0 : falta).toFixed(2).replace('.', ',');
-    document.getElementById('print-total').innerText = `TOTAL: R$ ${total.toFixed(2).replace('.', ',')}`;
-    
-    document.getElementById('btn-fechar').disabled = (falta > 0.01 || total === 0);
+:root {
+    --bg-dark: #121212;
+    --card-bg: #1e1e1e;
+    --accent: #ffc107; /* Cor de cerveja/ouro */
+    --text: #ffffff;
+    --danger: #ff4444;
 }
 
-function fecharVenda() {
-    const m = document.getElementById('select-mesa').value;
-    const mesa = bancoMesas[m];
-    
-    // Agrupa para o WhatsApp também
-    const agrupados = {};
-    mesa.itens.forEach(i => {
-        agrupados[i.nome] = (agrupados[i.nome] || 0) + 1;
-    });
+body { font-family: sans-serif; background: var(--bg-dark); color: var(--text); margin: 0; }
+.container { display: flex; height: 100vh; }
 
-    let zap = `*BOTECO 934 - COMPROVANTE*\n`;
-    zap += `Cliente: ${mesa.cliente}\n`;
-    zap += `Mesa: ${m}\n---\n`;
-    
-    for (let nome in agrupados) {
-        zap += `${agrupados[nome]}x ${nome}\n`;
-    }
-    
-    const totalGeral = mesa.itens.reduce((acc, i) => acc + i.preco, 0);
-    zap += `---\n*TOTAL: R$ ${totalGeral.toFixed(2)}*`;
-    
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(zap)}`, '_blank');
-    window.print();
+.sidebar { width: 200px; background: #000; padding: 20px; border-right: 1px solid #333; }
+.btn-categoria { background: #333; color: #fff; margin-top: 20px; width: 100%; border: none; padding: 10px; cursor: pointer; }
 
-    bancoMesas[m] = { itens: [], pagos: 0, cliente: "" };
-    document.getElementById('nome-cliente').value = "";
-    renderizar();
+.grid-produtos { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 15px; 
+    padding: 20px; 
 }
+
+.card-produto {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.card-produto:hover { border-color: var(--accent); }
+.critico { border-color: var(--danger) !important; background: #3d1a1a; }
+
+.cupom-lateral { width: 350px; background: #f9f9f9; color: #333; padding: 20px; display: flex; flex-direction: column; }
+.totalizador { margin-top: auto; border-top: 2px solid #ccc; padding-top: 10px; }
+.btn-finalizar { width: 100%; padding: 20px; background: #28a745; color: white; border: none; font-size: 1.2rem; cursor: pointer; }
