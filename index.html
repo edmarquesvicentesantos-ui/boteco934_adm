@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | SISTEMA FINAL</title>
+    <title>BOTECO 934 | SISTEMA TURBO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -15,6 +15,7 @@
         <div class="flex gap-2">
             <button onclick="abrirCalc()" class="bg-yellow-600 text-black px-3 py-2 rounded-xl font-black text-[10px] uppercase">📊 CALC</button>
             <button onclick="abrirEstoque()" class="bg-blue-600 px-3 py-2 rounded-xl font-black text-[10px] uppercase">📦 XML</button>
+            <button onclick="zerarProdutos()" class="bg-red-600 px-3 py-2 rounded-xl font-black text-[10px] uppercase">🗑️ LIMPAR</button>
             <button onclick="location.reload()" class="bg-slate-800 px-3 py-2 rounded-xl text-xs">🔄</button>
         </div>
     </header>
@@ -38,36 +39,34 @@
 
     <div id="modal-calc" class="hidden fixed inset-0 bg-black/95 z-[70] flex items-center justify-center p-4">
         <div class="bg-slate-100 p-6 rounded-[32px] w-full max-w-sm text-slate-900 shadow-2xl">
-            <h2 class="font-black text-center mb-4 uppercase text-blue-700 italic">Lucro Real Boteco 934</h2>
-            <div class="space-y-4">
-                <input type="number" id="calc-custo" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Custo da Nota (R$)">
-                <input type="number" id="calc-qtd" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Quantidade (Itens/Doses)">
-                <input type="number" id="calc-extra" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Adicionais (Gelo/Luz)">
+            <h2 class="font-black text-center mb-4 uppercase text-blue-700 italic">Calculadora de Lucro</h2>
+            <div class="space-y-3">
+                <input type="number" id="calc-custo" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Custo Total (R$)">
+                <input type="number" id="calc-qtd" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Quantidade">
+                <input type="number" id="calc-extra" class="w-full p-3 rounded-xl border border-slate-300" placeholder="Extras (Gelo/Energia)">
                 <input type="number" id="calc-venda" oninput="calcularLucro()" class="w-full p-4 rounded-xl border-2 border-green-500 font-bold" placeholder="Preço de Venda">
-                
                 <div class="bg-green-600 p-4 rounded-2xl text-white text-center">
-                    <p class="text-[10px] uppercase font-bold">Seu Lucro Limpo:</p>
+                    <p class="text-[10px] uppercase font-bold">Lucro por Unidade:</p>
                     <p class="text-3xl font-black">R$ <span id="res-lucro">0.00</span></p>
                 </div>
             </div>
-            <button onclick="abrirCalc()" class="w-full mt-4 py-2 text-slate-400 font-black text-[10px] uppercase">Voltar</button>
+            <button onclick="abrirCalc()" class="w-full mt-4 py-2 text-slate-400 font-black text-[10px] uppercase text-center">Voltar</button>
         </div>
     </div>
 
     <div id="modal-xml" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[32px] w-full max-w-sm text-black shadow-2xl text-center">
-            <h2 class="font-black mb-6 uppercase italic text-lg border-b pb-2">Entrada de Nota</h2>
+            <h2 class="font-black mb-4 uppercase italic text-lg">Entrada de Nota</h2>
             <div class="bg-blue-50 p-6 rounded-3xl border-2 border-dashed border-blue-400 mb-4">
                 <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6">
-                <button onclick="processarXML()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl text-sm">🚀 IMPORTAR XML AGORA</button>
+                <button onclick="processarXMLTurbo()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl text-sm">🚀 IMPORTAR AGORA</button>
             </div>
-            <p id="status-msg" class="text-[10px] text-gray-500 mb-4 uppercase font-bold"></p>
-            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase">Cancelar / Sair</button>
+            <p id="status-msg" class="text-[10px] text-blue-600 mb-4 uppercase font-bold tracking-widest"></p>
+            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase">Sair</button>
         </div>
     </div>
 
     <script>
-        // Configuração do Banco de Dados
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -90,26 +89,14 @@
             desenharMesas();
         }
 
-        function abrirCalc() { document.getElementById('modal-calc').classList.toggle('hidden'); }
-        function abrirEstoque() { document.getElementById('modal-xml').classList.toggle('hidden'); }
-
-        function calcularLucro() {
-            const custo = parseFloat(document.getElementById('calc-custo').value) || 0;
-            const qtd = parseFloat(document.getElementById('calc-qtd').value) || 1;
-            const extra = parseFloat(document.getElementById('calc-extra').value) || 0;
-            const venda = parseFloat(document.getElementById('calc-venda').value) || 0;
-            const lucro = venda - ((custo + extra) / qtd);
-            document.getElementById('res-lucro').innerText = lucro.toFixed(2);
-        }
-
-        async function processarXML() {
+        async function processarXMLTurbo() {
             const file = document.getElementById('input-xml').files[0];
             const btn = document.getElementById('btn-importar');
             const status = document.getElementById('status-msg');
 
-            if(!file) return alert("Selecione o arquivo!");
+            if(!file) return alert("Selecione a nota!");
 
-            btn.innerText = "⏳ SALVANDO NO FIREBASE...";
+            btn.innerText = "⚡ PROCESSANDO...";
             btn.disabled = true;
 
             const reader = new FileReader();
@@ -119,28 +106,53 @@
                     const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
                     const itens = xmlDoc.getElementsByTagName("det");
                     
-                    if(itens.length === 0) throw new Error("XML não é nota fiscal!");
+                    const batch = db.batch(); // CRIA UM LOTE PARA ENVIAR TUDO DE UMA VEZ
 
                     for (let i = 0; i < itens.length; i++) {
                         const nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
                         const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-                        // Salva direto no seu banco de dados
-                        await db.collection("produtos").add({ nome: nome, preco: custo * 1.4 });
-                        status.innerText = "IMPORTANDO: " + (i + 1) + "/" + itens.length;
+                        
+                        const novoRef = db.collection("produtos").doc();
+                        batch.set(novoRef, { nome: nome, preco: custo * 1.4 });
+                        status.innerText = "LENDO ITENS: " + (i + 1) + "/" + itens.length;
                     }
 
-                    alert("SUCESSO! " + itens.length + " ITENS ADICIONADOS.");
+                    status.innerText = "🚀 ENVIANDO PARA O BANCO...";
+                    await batch.commit(); // MANDA O LOTE INTEIRO
+
+                    alert("✅ NOTA IMPORTADA COM SUCESSO!");
                     location.reload();
                 } catch (err) {
-                    alert("Erro na leitura: " + err.message);
-                    btn.innerText = "🚀 IMPORTAR XML AGORA";
+                    alert("Erro: " + err.message);
+                    btn.innerText = "🚀 IMPORTAR AGORA";
                     btn.disabled = false;
                 }
             };
             reader.readAsText(file);
         }
 
-        // Funções de Venda
+        async function zerarProdutos() {
+            if(confirm("Deseja APAGAR TODOS os produtos do sistema?")){
+                const snap = await db.collection("produtos").get();
+                const batch = db.batch();
+                snap.docs.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                alert("Sistema limpo!");
+                location.reload();
+            }
+        }
+
+        // Funções da calculadora e vendas
+        function abrirCalc() { document.getElementById('modal-calc').classList.toggle('hidden'); }
+        function abrirEstoque() { document.getElementById('modal-xml').classList.toggle('hidden'); }
+        function calcularLucro() {
+            const c = parseFloat(document.getElementById('calc-custo').value) || 0;
+            const q = parseFloat(document.getElementById('calc-qtd').value) || 1;
+            const e = parseFloat(document.getElementById('calc-extra').value) || 0;
+            const v = parseFloat(document.getElementById('calc-venda').value) || 0;
+            document.getElementById('res-lucro').innerText = (v - ((c + e) / q)).toFixed(2);
+        }
+
         function desenharMesas() {
             document.getElementById('grid-mesas').innerHTML = mesas.map(m => `
                 <button onclick="setMesa(${m.id})" class="h-12 ${m.id === mesaSelecionada ? 'ring-4 ring-yellow-500' : ''} ${m.total > 0 ? 'bg-red-600 animate-pulse' : 'bg-green-600'} rounded-lg text-[10px] font-black">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : ''}</button>
@@ -163,7 +175,7 @@
         }
 
         function add(id) {
-            if(!mesaSelecionada) return alert("Selecione a MESA!");
+            if(!mesaSelecionada) return alert("Clique na MESA!");
             const p = produtos.find(x => x.id === id);
             const m = mesas.find(x => x.id === mesaSelecionada);
             m.itens.push(p);
@@ -179,11 +191,11 @@
 
         async function finalizarVenda() {
             const m = mesas.find(x => x.id === mesaSelecionada);
-            if(!m || m.total === 0) return alert("Mesa vazia!");
+            if(!m || m.total === 0) return;
             await db.collection("vendas").add({ mesa: mesaSelecionada, total: m.total, data: new Date() });
             m.itens = []; m.total = 0;
             atualizarCupom(); desenharMesas();
-            alert("Venda registrada!");
+            alert("Venda Salva!");
         }
 
         carregar();
