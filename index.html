@@ -60,8 +60,9 @@
             
             <div class="p-4 bg-blue-600 rounded-xl mb-6 text-white shadow-lg">
                 <p class="text-[11px] font-black uppercase mb-3 italic underline">Lançar Nota Fiscal (XML)</p>
-                <input type="file" id="xml-input" accept=".xml" onchange="importarXML(event)" class="text-[10px] w-full file:bg-white file:text-blue-600 file:font-bold file:rounded file:px-3 file:py-1 file:border-0 cursor-pointer">
-                <p class="text-[8px] mt-2 opacity-80">Ao selecionar, o estoque carrega na hora!</p>
+                <input type="file" id="xml-input" accept=".xml" class="text-[10px] w-full file:bg-white file:text-blue-600 file:font-bold file:rounded file:px-3 file:py-1 file:border-0 mb-3">
+                
+                <button onclick="forcarImportacaoXML()" class="w-full py-2 bg-yellow-500 text-black font-black rounded uppercase text-[10px] shadow-inner">🚀 Importar Agora</button>
             </div>
 
             <div class="border-t pt-4 mb-4">
@@ -76,7 +77,6 @@
     </div>
 
     <script>
-        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
             authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -98,29 +98,43 @@
             renderizarProds();
         }
 
-        // LÓGICA DO XML - AGORA AUTOMÁTICA
-        async function importarXML(event) {
-            const arquivo = event.target.files[0];
-            if (!arquivo) return;
+        // FUNÇÃO PARA LER O XML QUANDO CLICAR NO BOTÃO
+        async function forcarImportacaoXML() {
+            const fileInput = document.getElementById('xml-input');
+            const arquivo = fileInput.files[0];
+            
+            if (!arquivo) {
+                alert("Primeiro clique em 'Escolher arquivo'!");
+                return;
+            }
 
             const leitor = new FileReader();
             leitor.onload = async (e) => {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(e.target.result, "text/xml");
-                const itens = xml.getElementsByTagName("det");
-                
-                for (let i = 0; i < itens.length; i++) {
-                    let nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                    let custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-                    let precoVenda = custo * 1.4; // LUCRO DE 40%
+                try {
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(e.target.result, "text/xml");
+                    const itens = xml.getElementsByTagName("det");
+                    
+                    if (itens.length === 0) {
+                        alert("Arquivo inválido. Certifique-se de que é um XML de Nota Fiscal.");
+                        return;
+                    }
 
-                    const docRef = await db.collection("produtos").add({ nome, preco: precoVenda });
-                    produtos.push({ id: docRef.id, nome, preco: precoVenda });
+                    for (let i = 0; i < itens.length; i++) {
+                        let nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                        let custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                        let precoVenda = custo * 1.4; 
+
+                        const docRef = await db.collection("produtos").add({ nome, preco: precoVenda });
+                        produtos.push({ id: docRef.id, nome, preco: precoVenda });
+                    }
+                    
+                    renderizarProds();
+                    btGerente();
+                    alert("✅ " + itens.length + " ITENS ADICIONADOS!");
+                } catch (err) {
+                    alert("Erro ao processar arquivo.");
                 }
-                
-                renderizarProds();
-                btGerente(); // FECHA O MODAL SOZINHO
-                alert("✅ ESTOQUE ATUALIZADO!");
             };
             leitor.readAsText(arquivo);
         }
@@ -129,7 +143,6 @@
             const n = document.getElementById('cad-nome').value.toUpperCase();
             const p = parseFloat(document.getElementById('cad-preco').value);
             if(!n || !p) return alert("Preencha tudo!");
-            
             const docRef = await db.collection("produtos").add({ nome: n, preco: p });
             produtos.push({ id: docRef.id, nome: n, preco: p });
             renderizarProds();
