@@ -20,35 +20,36 @@ function salvarProduto() {
     const preco = parseFloat(document.getElementById('p-preco').value);
     if(nome && preco) {
         db.ref('produtos').push({ nome, preco });
-        alert("Salvo!");
-        fecharModal('modal-produto');
+        alert("Salvo!"); fecharModal('modal-produto');
     }
 }
 
+// Carrega os produtos na grade
 db.ref('produtos').on('value', snap => {
     const grid = document.getElementById('grade-produtos');
     grid.innerHTML = '';
     snap.forEach(item => {
         let p = item.val();
-        grid.innerHTML += `<div class="item-card" onclick="add('${p.nome}', ${p.preco})"><b>${p.nome}</b><br>R$ ${p.preco.toFixed(2)}</div>`;
+        grid.innerHTML += `<div class="card-prod" onclick="addCarrinho('${p.nome}', ${p.preco})">
+            <strong>${p.nome}</strong><br>R$ ${p.preco.toFixed(2)}</div>`;
     });
 });
 
-function add(nome, preco) {
-    if(!document.getElementById('cliente-nome').value) return alert("Dê nome ao cliente!");
+function addCarrinho(nome, preco) {
+    if(!document.getElementById('cliente-nome').value) return alert("Digite o nome do cliente!");
     carrinho.push({ nome, preco });
-    renderCarrinho();
+    atualizarConsumo();
 }
 
-function renderCarrinho() {
+function atualizarConsumo() {
     let t = 0; document.getElementById('lista-carrinho').innerHTML = '';
     carrinho.forEach(i => { t += i.preco; document.getElementById('lista-carrinho').innerHTML += `<div>${i.nome}</div>`; });
-    document.getElementById('valor-total').innerText = t.toFixed(2);
+    document.getElementById('total-venda').innerText = t.toFixed(2);
 }
 
-function fecharVenda() {
-    const total = parseFloat(document.getElementById('valor-total').innerText);
-    db.ref('vendas').push({ total, data: new Date().toLocaleString() });
-    alert("Venda Fechada!");
-    location.reload();
+function finalizarVenda() {
+    const met = document.getElementById('metodo-final').value;
+    const total = parseFloat(document.getElementById('total-venda').innerText);
+    db.ref('vendas_realizadas').push({ total, metodo: met, data: new Date().toLocaleString() });
+    alert("Venda encerrada!"); location.reload();
 }
