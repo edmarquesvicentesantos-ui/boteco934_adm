@@ -5,16 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
             background-color: #f0f2f5;
+            margin: 0;
+            display: flex; /* Divide a tela em duas partes */
+            height: 100vh;
+        }
+
+        /* Área dos Produtos (Esquerda) */
+        .produtos-container {
+            flex: 1;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
+        }
+
+        /* Área do Pedido (Direita) */
+        .painel-pedido {
+            width: 300px;
+            background: white;
+            border-left: 2px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: -4px 0 10px rgba(0,0,0,0.05);
         }
 
         .card {
@@ -26,30 +47,16 @@
             border: 1px solid #ddd;
         }
 
-        /* BOX DA IMAGEM: Garante que o espaço sempre exista */
         .img-container {
             width: 100%;
             height: 100px;
-            background-color: #e9ecef; /* Cor cinza caso não tenha foto */
-            border-radius: 8px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Se a imagem quebrar, o texto ALT não bagunça o layout */
-        .card img[alt] {
-            font-size: 10px;
-            color: #888;
-        }
+        .img-container img { max-width: 100%; max-height: 100%; }
 
         .nome { display: block; font-weight: bold; font-size: 14px; min-height: 35px; }
         .preco { display: block; color: #28a745; font-weight: bold; margin-bottom: 10px; }
@@ -64,37 +71,109 @@
             font-weight: bold;
             cursor: pointer;
         }
+
+        .btn-add:active { transform: scale(0.95); }
+
+        /* Lista de Itens no Pedido */
+        #lista-pedido {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .item-pedido {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .total-container {
+            border-top: 2px solid #333;
+            padding-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #d9534f;
+            text-align: right;
+        }
+
+        .btn-finalizar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Produtos</h2>
-
-    <div class="grid-container">
-        <div class="card">
-            <div class="img-container">
-                <img src="nao-existe.jpg" alt="[ Foto ]">
+    <div class="produtos-container">
+        <h2>Produtos</h2>
+        <div class="grid-container">
+            <div class="card">
+                <div class="img-container">
+                    <img src="https://img.icons8.com/color/96/beer.png" alt="Cerveja">
+                </div>
+                <span class="nome">Cerveja Latão</span>
+                <span class="preco">R$ 7,50</span>
+                <button class="btn-add" onclick="adicionarItem('Cerveja Latão', 7.50)">Adicionar</button>
             </div>
-            <span class="nome">Cerveja Latão</span>
-            <span class="preco">R$ 7,50</span>
-            <button class="btn-add" onclick="vender('Cerveja Latão', 7.50)">Adicionar</button>
-        </div>
 
-        <div class="card">
-            <div class="img-container">
-                <img src="nao-existe.jpg" alt="[ Foto ]">
+            <div class="card">
+                <div class="img-container">
+                    <img src="https://img.icons8.com/color/96/water-glass.png" alt="Agua">
+                </div>
+                <span class="nome">Água s/ Gás</span>
+                <span class="preco">R$ 3,00</span>
+                <button class="btn-add" onclick="adicionarItem('Água s/ Gás', 3.00)">Adicionar</button>
             </div>
-            <span class="nome">Água s/ Gás</span>
-            <span class="preco">R$ 3,00</span>
-            <button class="btn-add" onclick="vender('Água s/ Gás', 3.00)">Adicionar</button>
         </div>
     </div>
 
+    <div class="painel-pedido">
+        <h3>Pedido Atual</h3>
+        <ul id="lista-pedido">
+            </ul>
+        <div class="total-container">
+            TOTAL: R$ <span id="valor-total">0,00</span>
+        </div>
+        <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar Venda</button>
+    </div>
+
     <script>
-        function vender(nome, valor) {
-            // O botão mantém você na página
-            console.log("Vendido: " + nome);
-            alert(nome + " adicionado!");
+        let totalGeral = 0;
+
+        function adicionarItem(nome, preco) {
+            // 1. Atualiza o Total
+            totalGeral += preco;
+            document.getElementById('valor-total').innerText = totalGeral.toLocaleString('pt-br', {minimumFractionDigits: 2});
+
+            // 2. Adiciona o item na lista visual
+            const lista = document.getElementById('lista-pedido');
+            const item = document.createElement('li');
+            item.className = 'item-pedido';
+            item.innerHTML = `<span>${nome}</span> <b>R$ ${preco.toFixed(2)}</b>`;
+            lista.appendChild(item);
+        }
+
+        function finalizarVenda() {
+            if(totalGeral === 0) {
+                alert("O pedido está vazio!");
+                return;
+            }
+            alert("Venda de R$ " + totalGeral.toFixed(2) + " finalizada com sucesso!");
+            
+            // Limpa tudo para a próxima venda
+            totalGeral = 0;
+            document.getElementById('valor-total').innerText = "0,00";
+            document.getElementById('lista-pedido').innerHTML = "";
         }
     </script>
 
