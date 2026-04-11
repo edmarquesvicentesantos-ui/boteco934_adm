@@ -118,3 +118,6 @@ function salvarCliente() {
         fecharModal('modal-cliente');
     }
 }
+// Configuração corrigida com sua chave
+const firebaseConfig = {
+    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX
