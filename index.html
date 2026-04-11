@@ -8,7 +8,7 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { margin: 0; display: flex; flex-direction: column; height: 100vh; background: #f0f2f5; overflow: hidden; }
         
-        /* Cabeçalho Profissional conforme capturas */
+        /* Cabeçalho - Conforme image_eba419.png */
         header { background: #1c1e21; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo-circulo { background: #f1c40f; color: black; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -22,7 +22,7 @@
         .btn-nav { padding: 12px; background: #34495e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         .btn-xml { background: #27ae60; margin-top: auto; }
 
-        /* Vitrine 5 Colunas */
+        /* Vitrine 5 Colunas - Conforme image_eba419.png */
         .vitrine { flex: 1; padding: 15px; overflow-y: auto; background: white; }
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .card { border: 1px solid #eee; padding: 10px; text-align: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -31,7 +31,7 @@
         .preco-p { display: block; color: #27ae60; font-weight: bold; margin: 5px 0; }
         .btn-add { width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
-        /* Painel de Venda Lateral */
+        /* Painel Lateral - Conforme image_ec0884.png */
         .painel { width: 340px; background: #f8f9fa; border-left: 1px solid #ddd; padding: 10px; display: flex; flex-direction: column; }
         .topo-venda { display: flex; gap: 5px; margin-bottom: 10px; }
         .input-venda { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
@@ -43,6 +43,7 @@
         .resumo div { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px; }
         .val-total { color: #c0392b; font-size: 18px; }
 
+        /* Botões de Pagamento e Pendura */
         .acoes-pg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
         .btn-pg { padding: 10px; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-pendura { grid-column: span 2; background: #e67e22; color: white; border: none; }
@@ -130,9 +131,11 @@
     let mesas = { "Balcão": { itens: [], pagos: 0, cliente: "" } };
     for(let i=1;i<=8;i++) mesas[`Mesa ${i}`] = { itens: [], pagos: 0, cliente: "" };
 
+    // Lista de Produtos - Edite aqui para cadastrar novos itens
     const produtos = [
         { nome: "Cerveja Latão", preco: 7.50, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer.png" },
         { nome: "Heineken 600ml", preco: 15.00, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer-bottle.png" },
+        { nome: "Água s/ Gás", preco: 3.00, cat: "Bebidas", img: "https://img.icons8.com/color/96/water-glass.png" },
         { nome: "Dose Pitu", preco: 4.00, cat: "Doses", img: "https://img.icons8.com/color/96/tequila-shot.png" },
         { nome: "Perfume Malbec", preco: 180.00, cat: "Boticário", img: "https://img.icons8.com/color/96/perfume-bottle.png" }
     ];
@@ -160,7 +163,7 @@
         const mesa = mesas[m];
         const listaDiv = document.getElementById('lista-itens');
         
-        // Agrupamento para economizar papel e somar itens iguais
+        // Agrupamento para economizar papel (Lógica 3x Cerveja)
         const agrupados = {};
         mesa.itens.forEach(i => {
             if(agrupados[i.nome]) { agrupados[i.nome].qtd++; agrupados[i.nome].total += i.preco; }
@@ -197,7 +200,7 @@
         const m = document.getElementById('mesa-sel').value;
         const mesa = mesas[m];
         
-        // Formatar mensagem para WhatsApp com itens somados
+        // WhatsApp com itens agrupados para o Pendura
         const agrupados = {};
         mesa.itens.forEach(i => { agrupados[i.nome] = (agrupados[i.nome] || 0) + 1; });
         
@@ -208,12 +211,12 @@
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         window.print();
 
-        // Resetar mesa
         mesas[m] = { itens: [], pagos: 0, cliente: "" };
         document.getElementById('cliente-nome').value = "";
         atualizarTela();
     }
 
+    // Módulo de Importação XML NF-e
     function processarXML() {
         const file = document.getElementById('xml-input').files[0];
         const reader = new FileReader();
@@ -221,14 +224,14 @@
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
             const produtosXML = xmlDoc.getElementsByTagName("det");
-            let resumo = `<strong>Produtos importados:</strong><br>`;
+            let resumo = `<strong>Produtos importados do XML:</strong><br>`;
             
             for(let i=0; i < produtosXML.length; i++) {
                 const nome = produtosXML[i].getElementsByTagName("xProd")[0].textContent;
                 const qtd = produtosXML[i].getElementsByTagName("qCom")[0].textContent;
                 resumo += `- ${nome} (${qtd} un)<br>`;
             }
-            document.getElementById('xml-feedback').innerHTML = resumo + `<br><span style="color:green">Estoque atualizado com sucesso!</span>`;
+            document.getElementById('xml-feedback').innerHTML = resumo + `<br><span style="color:green">Entrada realizada!</span>`;
         };
         reader.readAsText(file);
     }
