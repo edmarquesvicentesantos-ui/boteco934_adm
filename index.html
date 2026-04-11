@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão Financeira</title>
+    <title>Boteco 934 - PDV</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -24,10 +24,10 @@
             </div>
 
             <nav>
-                <button onclick="abrirModalFinanceiro()" style="background: #007bff; color: white;">📊 Finanças / Caixa</button>
-                <button onclick="abrirModalNota()" style="background: #17a2b8; color: white;">📑 Lançar Nota (Entrada)</button>
-                <button onclick="abrirModalCliente()" style="background: #25d366; color: white;">👤 Novo Cliente</button>
-                <button onclick="abrirModalProd()">➕ Novo Produto/Dose</button>
+                <button onclick="abrirModal('modal-financeiro')" style="background: #007bff; color: white;">📊 Finanças / Caixa</button>
+                <button onclick="abrirModal('modal-nota')" style="background: #17a2b8; color: white;">📑 Lançar Nota (Entrada)</button>
+                <button onclick="abrirModal('modal-cliente')" style="background: #25d366; color: white;">👤 Novo Cliente</button>
+                <button onclick="abrirModal('modal-produto')" style="background: #f8f9fa; color: #333;">➕ Novo Produto/Dose</button>
             </nav>
         </aside>
 
@@ -42,25 +42,54 @@
             <div class="checkout-footer">
                 <div id="total-valor">R$ 0,00</div>
                 <button class="btn-zap" onclick="enviarWhatsApp()">Enviar Recibo (Zap)</button>
-                <button class="btn-fechar" onclick="abrirModalPagamento()">Fechar Recibo</button>
+                <button class="btn-fechar" onclick="abrirModal('modal-pagamento')">Fechar Recibo</button>
             </div>
         </section>
     </div>
 
-    <div id="modal-financeiro" class="modal" style="display:none;">
-        <div class="modal-content finance-content">
-            <h3>Fluxo de Caixa / Finanças</h3>
-            <div id="resumo-caixa">
+    <div id="modal-financeiro" class="modal">
+        <div class="modal-content">
+            <h3>Resumo Financeiro</h3>
+            <div id="resumo-dados">
                 <p>Dinheiro: <span id="f-dinheiro">R$ 0,00</span></p>
                 <p>PIX: <span id="f-pix">R$ 0,00</span></p>
-                <p>Cartão Débito: <span id="f-debito">R$ 0,00</span></p>
-                <p>Cartão Crédito: <span id="f-credito">R$ 0,00</span></p>
-                <p style="color: red;">Pendura (Fiado): <span id="f-pendura">R$ 0,00</span></p>
+                <p>Pendura: <span id="f-pendura">R$ 0,00</span></p>
             </div>
-            <hr>
-            <h4>Histórico de Compras (Notas)</h4>
-            <div id="historico-notas" class="lista-rolavel"></div>
-            <button onclick="fecharModalFinanceiro()">Fechar</button>
+            <button onclick="fecharModal('modal-financeiro')">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modal-nota" class="modal">
+        <div class="modal-content">
+            <h3>Lançar Nota de Entrada</h3>
+            <input type="text" id="nota-prod" placeholder="Produto">
+            <input type="number" id="nota-qtd" placeholder="Quantidade">
+            <input type="number" id="nota-custo" placeholder="Custo na Nota">
+            <button onclick="confirmarNota()">Salvar Entrada</button>
+            <button onclick="fecharModal('modal-nota')">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modal-cliente" class="modal">
+        <div class="modal-content">
+            <h3>Cadastrar Novo Cliente</h3>
+            <input type="text" id="c-nome" placeholder="Nome">
+            <input type="text" id="c-fone" placeholder="Zap (Ex: 5587...)">
+            <button onclick="salvarCliente()">Salvar</button>
+            <button onclick="fecharModal('modal-cliente')">Sair</button>
+        </div>
+    </div>
+
+    <div id="modal-pagamento" class="modal">
+        <div class="modal-content">
+            <h3>Finalizar Venda</h3>
+            <select id="metodo-pagamento">
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="PIX">PIX</option>
+                <option value="Pendura">Pendura (Fiado)</option>
+            </select>
+            <button onclick="finalizarVenda()">Confirmar Pagamento</button>
+            <button onclick="fecharModal('modal-pagamento')">Voltar</button>
         </div>
     </div>
 
