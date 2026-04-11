@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV</title>
+    <title>Boteco 934 - PDV Profissional</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -11,150 +11,176 @@
             background-color: #f0f2f5;
             margin: 0;
             display: flex;
+            flex-direction: column; /* Para o Header ficar no topo */
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Menu de Categorias (Lateral Esquerda) */
-        .categorias-menu {
-            width: 180px;
-            background: #2c3e50;
+        /* --- CABEÇALHO --- */
+        header {
+            background-color: #1c1e21;
             color: white;
-            padding: 20px 10px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-placeholder { 
+            width: 45px; height: 45px; background: #f1c40f; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #000; font-size: 20px;
+        }
+
+        /* --- CORPO DO SISTEMA --- */
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Lateral Esquerda Menor */
+        .categorias-menu {
+            width: 140px; /* Reduzido para ganhar espaço no centro */
+            background: #2c3e50;
+            padding: 15px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .btn-categoria {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
+            padding: 10px;
             background: #34495e;
             border: none;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            text-align: left;
-            font-weight: bold;
+            font-size: 13px;
+            transition: 0.3s;
         }
 
         .btn-categoria:hover { background: #1abc9c; }
 
-        /* Área dos Produtos (Centro) */
+        /* Centro: Produtos */
         .produtos-container {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
+            background: #fff;
         }
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
             gap: 15px;
         }
 
-        /* Painel de Pedido (Direita) */
-        .painel-pedido {
-            width: 320px;
-            background: white;
-            border-left: 2px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: -4px 0 10px rgba(0,0,0,0.05);
-        }
-
-        /* Card de Produto */
+        /* --- CARDS --- */
         .card {
-            background: white;
+            background: #fff;
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .img-container {
-            width: 100%;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-
+        .img-container { height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
         .img-container img { max-width: 100%; max-height: 100%; }
-
-        .nome { display: block; font-weight: bold; font-size: 13px; min-height: 32px; }
-        .preco { display: block; color: #28a745; font-weight: bold; margin-bottom: 8px; }
+        .nome { display: block; font-weight: bold; font-size: 13px; min-height: 32px; color: #333; }
+        .preco { display: block; color: #27ae60; font-weight: bold; margin: 5px 0; }
 
         .btn-add {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px;
-            width: 100%;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
+            background: #007bff; color: white; border: none; padding: 8px;
+            width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold;
         }
 
-        /* Estilo da Lista de Pedido */
-        #lista-pedido { list-style: none; padding: 0; flex-grow: 1; overflow-y: auto; }
-        .item-pedido { 
-            display: flex; 
-            justify-content: space-between; 
-            border-bottom: 1px solid #eee; 
-            padding: 8px 0; 
-            font-size: 14px; 
+        /* --- RECIBO (LATERAL DIREITA) --- */
+        .painel-pedido {
+            width: 320px;
+            background: #f8f9fa;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
         }
+
+        .recibo {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        }
+
+        .recibo-header { border-bottom: 1px dashed #aaa; padding-bottom: 10px; margin-bottom: 10px; text-align: center; }
+        
+        #lista-pedido { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; font-family: monospace; }
+        .item-pedido { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px dotted #eee; }
 
         .total-container {
             border-top: 2px solid #333;
-            padding-top: 15px;
+            margin-top: 10px;
+            padding-top: 10px;
+            text-align: right;
             font-size: 22px;
             font-weight: bold;
-            color: #d9534f;
-            text-align: right;
+            color: #c0392b;
         }
 
         .btn-finalizar {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+            background: #27ae60; color: white; border: none; padding: 15px;
+            border-radius: 8px; margin-top: 15px; font-size: 16px; font-weight: bold; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="categorias-menu">
-        <h3 style="margin-top: 0;">Menu</h3>
-        <button class="btn-categoria" onclick="filtrar('Todos')">🍺 Todos</button>
-        <button class="btn-categoria" onclick="filtrar('Bebidas')">Bebidas</button>
-        <button class="btn-categoria" onclick="filtrar('Doses')">Doses</button>
-        <button class="btn-categoria" onclick="filtrar('Boticário')">Boticário</button>
-    </div>
-
-    <div class="produtos-container">
-        <h2 id="titulo-categoria">Todos os Produtos</h2>
-        <div id="grid-produtos" class="grid-container">
-            </div>
-    </div>
-
-    <div class="painel-pedido">
-        <h3>🛒 Pedido Atual</h3>
-        <ul id="lista-pedido"></ul>
-        <div class="total-container">
-            TOTAL: R$ <span id="valor-total">0,00</span>
+    <header>
+        <div class="logo-area">
+            <div class="logo-placeholder">934</div>
+            <h2 style="margin:0; font-size: 20px;">Boteco 934</h2>
         </div>
-        <button class="btn-finalizar" onclick="finalizarVenda()">Finalizar Venda</button>
-    </div>
+        <div id="data-hora" style="font-size: 14px; opacity: 0.8;"></div>
+    </header>
+
+    <main>
+        <nav class="categorias-menu">
+            <button class="btn-categoria" onclick="filtrar('Todos')">TUDO</button>
+            <button class="btn-categoria" onclick="filtrar('Bebidas')">BEBIDAS</button>
+            <button class="btn-categoria" onclick="filtrar('Doses')">DOSES</button>
+            <button class="btn-categoria" onclick="filtrar('Boticário')">BOTICÁRIO</button>
+        </nav>
+
+        <section class="produtos-container">
+            <h3 id="titulo-categoria" style="margin-top:0; color:#555;">Todos os Produtos</h3>
+            <div id="grid-produtos" class="grid-container"></div>
+        </section>
+
+        <aside class="painel-pedido">
+            <div class="recibo">
+                <div class="recibo-header">
+                    <strong>RECIBO DE VENDA</strong><br>
+                    <small>Boteco 934 - PDV</small>
+                </div>
+                <ul id="lista-pedido"></ul>
+                <div class="total-container">
+                    TOTAL R$ <span id="valor-total">0,00</span>
+                </div>
+            </div>
+            <button class="btn-finalizar" onclick="finalizarVenda()">FINALIZAR (F2)</button>
+        </aside>
+    </main>
 
     <script>
-        // AQUI VOCÊ CADASTRA NOVOS PRODUTOS NO FUTURO
         const produtos = [
             { id: 1, nome: "Cerveja Latão", preco: 7.50, cat: "Bebidas", img: "https://img.icons8.com/color/96/beer.png" },
             { id: 2, nome: "Água s/ Gás", preco: 3.00, cat: "Bebidas", img: "https://img.icons8.com/color/96/water-glass.png" },
@@ -164,17 +190,13 @@
 
         let totalGeral = 0;
 
-        // Função para mostrar os produtos na tela
         function carregarProdutos(lista) {
             const grid = document.getElementById('grid-produtos');
-            grid.innerHTML = ""; // Limpa a tela
-
+            grid.innerHTML = "";
             lista.forEach(p => {
                 grid.innerHTML += `
                     <div class="card">
-                        <div class="img-container">
-                            <img src="${p.img}" alt="${p.nome}">
-                        </div>
+                        <div class="img-container"><img src="${p.img}" alt="${p.nome}"></div>
                         <span class="nome">${p.nome}</span>
                         <span class="preco">R$ ${p.preco.toFixed(2)}</span>
                         <button class="btn-add" onclick="adicionarItem('${p.nome}', ${p.preco})">Adicionar</button>
@@ -183,39 +205,38 @@
             });
         }
 
-        // Função para filtrar por categoria
         function filtrar(categoria) {
             document.getElementById('titulo-categoria').innerText = categoria;
-            if (categoria === 'Todos') {
-                carregarProdutos(produtos);
-            } else {
-                const filtrados = produtos.filter(p => p.cat === categoria);
-                carregarProdutos(filtrados);
-            }
+            const filtrados = categoria === 'Todos' ? produtos : produtos.filter(p => p.cat === categoria);
+            carregarProdutos(filtrados);
         }
 
         function adicionarItem(nome, preco) {
             totalGeral += preco;
             document.getElementById('valor-total').innerText = totalGeral.toLocaleString('pt-br', {minimumFractionDigits: 2});
-            
             const lista = document.getElementById('lista-pedido');
             const item = document.createElement('li');
             item.className = 'item-pedido';
-            item.innerHTML = `<span>${nome}</span> <b>R$ ${preco.toFixed(2)}</b>`;
+            item.innerHTML = `<span>${nome}</span> <span>${preco.toFixed(2)}</span>`;
             lista.appendChild(item);
+            lista.scrollTop = lista.scrollHeight; // Auto-scroll para baixo
         }
 
         function finalizarVenda() {
-            if(totalGeral === 0) return alert("Pedido vazio!");
-            alert("Venda Finalizada: R$ " + totalGeral.toFixed(2));
+            if(totalGeral === 0) return;
+            alert("Venda Finalizada!\nTotal: R$ " + totalGeral.toFixed(2));
             totalGeral = 0;
             document.getElementById('valor-total').innerText = "0,00";
             document.getElementById('lista-pedido').innerHTML = "";
         }
 
-        // Inicia a página mostrando tudo
-        carregarProdutos(produtos);
+        // Data e Hora em tempo real
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('data-hora').innerText = now.toLocaleString('pt-br');
+        }, 1000);
 
+        carregarProdutos(produtos);
     </script>
 </body>
 </html>
