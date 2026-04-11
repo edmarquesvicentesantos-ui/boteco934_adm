@@ -3,256 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Boteco 934 - PDV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-body: #f8f8f7;
-            --bg-card: #ffffff;
-            --primary: #0081f2;
-            --text: #1a1a1a;
-            --border: #e5e7eb;
-            --accent-orange: #e67e22;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body { background-color: var(--bg-body); display: flex; height: 100vh; overflow: hidden; color: var(--text); }
-
-        /* Sidebar Lateral */
-        aside {
-            width: 240px;
-            background: var(--bg-body);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 15px;
-        }
-
-        .logo { font-weight: 800; font-size: 22px; margin-bottom: 30px; letter-spacing: -1px; }
-
-        .nav-btn {
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            font-weight: 600;
-            border: none;
-            background: transparent;
-            text-align: left;
-            transition: 0.2s;
-        }
-
-        .nav-btn:hover { background: #eee; }
-        .nav-btn.active { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
-        /* Área Principal */
-        main { flex: 1; display: flex; flex-direction: column; background: #fff; margin: 10px; border-radius: 15px; border: 1px solid var(--border); }
-
-        header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-
-        .search-bar { background: var(--bg-body); border: 1px solid var(--border); padding: 10px 20px; border-radius: 25px; width: 350px; outline: none; }
-
-        .grid-container { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; }
-
-        /* Cards de Produto */
-        .card {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            transition: 0.2s;
-        }
-
-        .card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .card img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
-        .card h3 { font-size: 14px; margin-bottom: 5px; height: 34px; overflow: hidden; }
-        .card .price { color: var(--primary); font-weight: 800; font-size: 18px; display: block; margin-bottom: 10px; }
-
-        .btn-add {
-            background: #000;
-            color: #fff;
-            border: none;
-            width: 100%;
-            padding: 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Painel de Venda (Direita) */
-        .checkout-panel {
-            width: 350px;
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            background: #fafafa;
-        }
-
-        .input-cliente {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .recibo-box {
-            flex-grow: 1;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 13px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-        }
-
-        .total-container { border-top: 2px dashed var(--border); padding-top: 15px; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .total-row h2 { font-size: 28px; color: var(--primary); }
-
-        .btn-group { display: grid; gap: 8px; }
-        .btn-pay { padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; }
-        .btn-pendura { background: var(--accent-orange); }
-        .btn-concluir { background: #27ae60; font-size: 18px; }
-
-    </style>
+    <title>Boteco 934 - PDV GOLD</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<aside>
-    <div class="logo">BOTECO 934</div>
-    <button class="nav-btn active">📦 Estoque Geral</button>
-    <button class="nav-btn">🍻 Bebidas Geladas</button>
-    <button class="nav-btn">🥃 Doses</button>
-    <button class="nav-btn">✨ O Boticário</button>
-</aside>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Boteco 934</h2>
+            </div>
+            <nav>
+                <button onclick="carregarProdutos('bebidas')">Bebidas</button>
+                <button onclick="carregarProdutos('boticario')">Boticário</button>
+                <button class="btn-categoria">+ Categorias</button>
+            </nav>
+            <div id="alerta-estoque" class="alerta-minimo"></div>
+        </aside>
 
-<main>
-    <header>
-        <input type="text" id="inputBusca" class="search-bar" placeholder="O que o cliente deseja?">
-        <div>Mesa: <strong>Balcão</strong></div>
-    </header>
+        <main class="pdv-area">
+            <header class="busca">
+                <input type="text" placeholder="Buscar produto ou bipar código..." id="input-busca">
+            </header>
+            <div class="grid-produtos" id="grid-produtos">
+                </div>
+        </main>
 
-    <div class="grid-container" id="gradeProdutos">
-        </div>
-</main>
-
-<section class="checkout-panel">
-    <select class="input-cliente" style="margin-bottom: 5px;">
-        <option>Balcão</option>
-        <option>Mesa 01</option>
-        <option>Mesa 02</option>
-    </select>
-    <input type="text" id="nomeCliente" class="input-cliente" placeholder="Nome do Cliente">
-
-    <div class="recibo-box" id="itensRecibo">
-        <p style="color: #999; text-align: center;">Nenhum item selecionado</p>
+        <section class="cupom-lateral">
+            <h3>Consumo / Mesa</h3>
+            <div id="lista-venda"></div>
+            <div class="totalizador">
+                <span>Total: R$ <strong id="total-venda">0,00</strong></span>
+                <button class="btn-finalizar" onclick="abrirPagamento()">Finalizar (F1)</button>
+            </div>
+        </section>
     </div>
 
-    <div class="total-container">
-        <div class="total-row">
-            <span>TOTAL:</span>
-            <h2 id="valorTotalDisplay">R$ 0,00</h2>
-        </div>
-        <div class="btn-group">
-            <button class="btn-pay btn-pendura" onclick="lancarPendura()">Lançar no Pendura</button>
-            <button class="btn-pay btn-concluir" onclick="finalizarVenda()">Finalizar Venda</button>
-        </div>
-    </div>
-</section>
-
-<script>
-    // Seus dados de produtos reais (Adicione mais aqui)
-    const produtos = [
-        { id: 1, nome: "Heineken 600ml", preco: 18.00, img: "🍻" },
-        { id: 2, nome: "Cachaça Dose", preco: 5.00, img: "🥃" },
-        { id: 3, nome: "Cerveja Latão", preco: 7.50, img: "🍺" },
-        { id: 4, nome: "Perfume Malbec", preco: 199.90, img: "✨" },
-        { id: 5, nome: "Água s/ Gás", preco: 3.00, img: "💧" }
-    ];
-
-    let carrinho = [];
-    let totalGeral = 0;
-
-    // Renderiza os cards na tela
-    function carregarProdutos() {
-        const grade = document.getElementById('gradeProdutos');
-        grade.innerHTML = produtos.map(p => `
-            <div class="card">
-                <div style="font-size: 40px; margin-bottom: 10px;">${p.img}</div>
-                <h3>${p.nome}</h3>
-                <span class="price">R$ ${p.preco.toFixed(2)}</span>
-                <button class="btn-add" onclick="adicionar(${p.id})">ADICIONAR</button>
-            </div>
-        `).join('');
-    }
-
-    // Adiciona ao carrinho e atualiza o recibo
-    function adicionar(id) {
-        const prod = produtos.find(p => p.id === id);
-        carrinho.push(prod);
-        totalGeral += prod.preco;
-        atualizarPainel();
-    }
-
-    function atualizarPainel() {
-        const box = document.getElementById('itensRecibo');
-        document.getElementById('valorTotalDisplay').innerText = `R$ ${totalGeral.toFixed(2)}`;
-        
-        if (carrinho.length === 0) {
-            box.innerHTML = '<p style="color: #999; text-align: center;">Nenhum item selecionado</p>';
-            return;
-        }
-
-        box.innerHTML = carrinho.map((item, index) => `
-            <div style="display:flex; justify-content:space-between; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px;">
-                <span>${item.nome}</span>
-                <strong>R$ ${item.preco.toFixed(2)}</strong>
-            </div>
-        `).join('');
-    }
-
-    // Função de Busca
-    document.getElementById('inputBusca').addEventListener('input', (e) => {
-        const termo = e.target.value.toLowerCase();
-        document.querySelectorAll('.card').forEach(card => {
-            card.style.display = card.innerText.toLowerCase().includes(termo) ? 'block' : 'none';
-        });
-    });
-
-    // Lógica do Pendura via WhatsApp
-    function lancarPendura() {
-        const cliente = document.getElementById('nomeCliente').value;
-        if (!cliente) return alert("⚠️ Digite o nome do cliente para o pendura!");
-        if (carrinho.length === 0) return alert("Carrinho vazio!");
-
-        let msg = `*BOTECO 934 - NOTA DE PENDURA*%0A*Cliente:* ${cliente}%0A----------------------------%0A`;
-        carrinho.forEach(i => msg += `• ${i.nome}: R$ ${i.preco.toFixed(2)}%0A`);
-        msg += `----------------------------%0A*TOTAL: R$ ${totalGeral.toFixed(2)}*`;
-
-        window.open(`https://wa.me/?text=${msg}`); // Abre o WhatsApp para enviar a conta
-        limparTudo();
-    }
-
-    function finalizarVenda() {
-        if (carrinho.length === 0) return;
-        alert(`✅ Venda de R$ ${totalGeral.toFixed(2)} finalizada com sucesso!`);
-        limparTudo();
-    }
-
-    function limparTudo() {
-        carrinho = [];
-        totalGeral = 0;
-        document.getElementById('nomeCliente').value = "";
-        atualizarPainel();
-    }
-
-    carregarProdutos();
-</script>
-
+    <script src="app.js"></script>
 </body>
 </html>
