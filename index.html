@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 | SISTEMA FINAL</title>
+    <title>BOTECO 934 | SISTEMA GOLD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-900 text-white min-h-screen flex flex-col overflow-hidden font-sans">
 
-    <header class="p-2 bg-black border-b border-yellow-500 flex justify-between items-center shadow-lg">
-        <h1 class="font-black text-yellow-500 italic text-lg">BOTECO 934</h1>
+    <header class="p-2 bg-black border-b border-yellow-500 flex justify-between items-center shadow-2xl">
+        <h1 class="font-black text-yellow-500 italic text-xl tracking-tighter">BOTECO 934</h1>
         <div class="flex gap-2">
-            <button onclick="abrirEstoque()" class="bg-blue-600 px-4 py-2 rounded-lg font-black text-xs uppercase shadow-md active:scale-95">📦 ESTOQUE (XML)</button>
-            <button onclick="location.reload()" class="bg-slate-700 px-3 py-2 rounded-lg font-black text-xs">🔄</button>
+            <button onclick="abrirEstoque()" class="bg-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg active:scale-95">📦 ENTRADA XML</button>
+            <button onclick="location.reload()" class="bg-slate-800 px-3 py-2 rounded-xl text-xs">🔄</button>
         </div>
     </header>
 
-    <div id="grid-mesas" class="p-1 grid grid-cols-8 gap-1 bg-slate-950 border-b border-slate-800"></div>
+    <div id="grid-mesas" class="p-1 grid grid-cols-8 gap-1 bg-slate-950 border-b border-slate-800 overflow-y-auto max-h-24"></div>
 
     <div class="flex flex-1 overflow-hidden">
         <aside class="w-1/3 bg-slate-800 border-r border-slate-700 overflow-y-auto p-1" id="lista-prods"></aside>
@@ -26,27 +26,27 @@
         <main class="w-2/3 bg-black p-2 flex flex-col">
             <div class="bg-yellow-50 text-black flex-1 p-2 rounded shadow-inner overflow-y-auto">
                 <p class="font-black border-b border-black mb-2 text-center uppercase text-[10px]" id="mesa-titulo">Selecione uma mesa</p>
-                <div id="itens-lista" class="text-[10px] space-y-1 font-mono"></div>
+                <div id="itens-lista" class="text-[11px] space-y-1 font-mono"></div>
             </div>
-            <div class="mt-2 text-right">
-                <p class="text-yellow-500 font-black text-xl">TOTAL: R$ <span id="total-val">0.00</span></p>
-                <button onclick="finalizarVenda()" class="w-full bg-green-600 py-4 mt-2 rounded-xl font-black text-white uppercase shadow-lg active:bg-green-700">Receber / Finalizar</button>
+            <div class="mt-2 text-right p-2 bg-slate-900 rounded-xl">
+                <p class="text-yellow-500 font-black text-2xl">R$ <span id="total-val">0.00</span></p>
+                <button onclick="finalizarVenda()" class="w-full bg-green-600 py-4 mt-2 rounded-2xl font-black text-white uppercase shadow-lg active:bg-green-700 text-sm">Finalizar Venda</button>
             </div>
         </main>
     </div>
 
-    <div id="modal-xml" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-3xl w-full max-w-sm text-black shadow-2xl">
-            <h2 class="font-black text-center mb-4 uppercase border-b pb-2">Entrada de Nota</h2>
+    <div id="modal-xml" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-[32px] w-full max-w-sm text-black shadow-2xl">
+            <h2 class="font-black text-center mb-6 uppercase text-lg italic">Entrada de Estoque</h2>
             
-            <div class="bg-blue-50 p-4 rounded-2xl border-2 border-dashed border-blue-400 mb-4">
-                <label class="block text-[10px] font-black text-blue-800 mb-2 uppercase">1. Selecione o XML</label>
-                <input type="file" id="input-xml" accept=".xml" class="text-[10px] w-full mb-5">
+            <div class="bg-blue-50 p-6 rounded-3xl border-2 border-dashed border-blue-400 mb-6">
+                <label class="block text-[10px] font-black text-blue-900 mb-4 uppercase text-center">Selecione o arquivo da nota fiscal:</label>
+                <input type="file" id="input-xml" accept=".xml" class="text-xs w-full mb-6 file:bg-blue-600 file:text-white file:border-0 file:px-4 file:py-2 file:rounded-full file:font-black">
                 
-                <button onclick="processarXML()" id="btn-importar" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase shadow-lg active:scale-95 transition-all">🚀 IMPORTAR AGORA</button>
+                <button onclick="processarXML()" id="btn-importar" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl active:scale-95 transition-all text-sm">🚀 IMPORTAR XML AGORA</button>
             </div>
 
-            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase">Sair</button>
+            <button onclick="abrirEstoque()" class="w-full py-2 text-gray-400 font-black text-[10px] uppercase tracking-widest">Fechar Janela</button>
         </div>
     </div>
 
@@ -67,7 +67,7 @@
         let mesas = Array.from({length: 16}, (_, i) => ({ id: i+1, itens: [], total: 0 }));
 
         async function carregar() {
-            const snap = await db.collection("produtos").get();
+            const snap = await db.collection("produtos").orderBy("nome").get();
             produtos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             desenharProds();
             desenharMesas();
@@ -75,28 +75,28 @@
 
         function desenharMesas() {
             document.getElementById('grid-mesas').innerHTML = mesas.map(m => `
-                <button onclick="setMesa(${m.id})" class="h-10 ${m.total > 0 ? 'bg-red-600' : 'bg-green-600'} rounded text-[9px] font-black shadow-md">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : ''}</button>
+                <button onclick="setMesa(${m.id})" class="h-12 ${m.id === mesaSelecionada ? 'ring-4 ring-yellow-500' : ''} ${m.total > 0 ? 'bg-red-600 animate-pulse' : 'bg-green-600'} rounded-lg text-[10px] font-black shadow-md transition-all">M${m.id}<br>${m.total > 0 ? 'R$'+m.total.toFixed(0) : ''}</button>
             `).join('');
         }
 
         function setMesa(id) {
             mesaSelecionada = id;
-            document.getElementById('mesa-titulo').innerText = "MESA " + id;
+            document.getElementById('mesa-titulo').innerText = "ATENDENDO MESA " + id;
             atualizarCupom();
             desenharMesas();
         }
 
         function desenharProds() {
             document.getElementById('lista-prods').innerHTML = produtos.map(p => `
-                <button onclick="add('${p.id}')" class="w-full bg-slate-700 p-2 rounded mb-1 text-left border border-slate-600 active:bg-slate-500">
-                    <p class="text-[9px] font-black uppercase text-white truncate">${p.nome}</p>
-                    <p class="text-yellow-400 font-black text-xs">R$ ${p.preco.toFixed(2)}</p>
+                <button onclick="add('${p.id}')" class="w-full bg-slate-700 p-3 rounded-xl mb-2 text-left border border-slate-600 active:bg-slate-500 shadow-sm">
+                    <p class="text-[10px] font-black uppercase text-white leading-tight mb-1">${p.nome}</p>
+                    <p class="text-yellow-400 font-black text-xs italic">R$ ${p.preco.toFixed(2)}</p>
                 </button>
             `).join('');
         }
 
         function add(id) {
-            if(!mesaSelecionada) return alert("Selecione a MESA!");
+            if(!mesaSelecionada) return alert("Clique em uma MESA primeiro!");
             const p = produtos.find(x => x.id === id);
             const m = mesas.find(x => x.id === mesaSelecionada);
             m.itens.push(p);
@@ -106,56 +106,43 @@
 
         function atualizarCupom() {
             const m = mesas.find(x => x.id === mesaSelecionada);
-            document.getElementById('itens-lista').innerHTML = m.itens.map(i => `<div class="flex justify-between border-b border-gray-200 py-1 uppercase"><span>1x ${i.nome}</span><span>${i.preco.toFixed(2)}</span></div>`).join('');
+            if(!m) return;
+            document.getElementById('itens-lista').innerHTML = m.itens.map(i => `<div class="flex justify-between border-b border-gray-200 py-2 uppercase italic"><span>1x ${i.nome}</span><span class="font-bold">${i.preco.toFixed(2)}</span></div>`).join('');
             document.getElementById('total-val').innerText = m.total.toFixed(2);
         }
 
-        // LÓGICA DE XML REFORÇADA - TESTADA PARA NÃO TRAVAR
         async function processarXML() {
             const fileInput = document.getElementById('input-xml');
             const file = fileInput.files[0];
             const btn = document.getElementById('btn-importar');
 
-            if(!file) return alert("Por favor, selecione o arquivo da nota!");
+            if(!file) return alert("Selecione o arquivo da nota fiscal!");
 
-            btn.innerText = "LENDO... AGUARDE";
+            btn.innerText = "⏳ LENDO NOTA...";
             btn.disabled = true;
 
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
-                    const texto = e.target.result;
                     const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(texto, "text/xml");
+                    const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+                    const itens = xmlDoc.getElementsByTagName("det");
                     
-                    // Busca todos os produtos na nota
-                    const produtosNota = xmlDoc.getElementsByTagName("det");
-                    
-                    if(produtosNota.length === 0) {
-                        alert("Arquivo XML não reconhecido como Nota Fiscal!");
-                        btn.innerText = "🚀 IMPORTAR AGORA";
-                        btn.disabled = false;
-                        return;
+                    if(itens.length === 0) throw new Error("XML Inválido");
+
+                    for (let i = 0; i < itens.length; i++) {
+                        const nomeProd = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                        const valorUn = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                        const pVenda = valorUn * 1.4; // Margem de 40%
+
+                        await db.collection("produtos").add({ nome: nomeProd, preco: pVenda });
                     }
 
-                    for (let i = 0; i < produtosNota.length; i++) {
-                        const nomeProd = produtosNota[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                        const valorUn = parseFloat(produtosNota[i].getElementsByTagName("vUnCom")[0].textContent);
-                        
-                        // Define preço de venda com margem de 40%
-                        const pVenda = valorUn * 1.4;
-
-                        await db.collection("produtos").add({
-                            nome: nomeProd,
-                            preco: pVenda
-                        });
-                    }
-
-                    alert("✅ " + produtosNota.length + " ITENS ADICIONADOS COM SUCESSO!");
+                    alert("✅ " + itens.length + " PRODUTOS CARREGADOS!");
                     location.reload();
 
                 } catch (err) {
-                    alert("Erro ao ler o arquivo: " + err.message);
+                    alert("Erro ao ler XML. Verifique se é uma NF-e válida.");
                     btn.innerText = "🚀 IMPORTAR AGORA";
                     btn.disabled = false;
                 }
@@ -168,10 +155,13 @@
         async function finalizarVenda() {
             const m = mesas.find(x => x.id === mesaSelecionada);
             if(!m || m.total === 0) return alert("Mesa vazia!");
-            await db.collection("vendas").add({ mesa: mesaSelecionada, total: m.total, data: new Date() });
-            m.itens = []; m.total = 0;
-            atualizarCupom(); desenharMesas();
-            alert("Venda Salva!");
+            
+            if(confirm("Deseja finalizar a Mesa " + mesaSelecionada + "?")){
+                await db.collection("vendas").add({ mesa: mesaSelecionada, total: m.total, data: new Date() });
+                m.itens = []; m.total = 0;
+                atualizarCupom(); desenharMesas();
+                alert("Venda registrada!");
+            }
         }
 
         carregar();
