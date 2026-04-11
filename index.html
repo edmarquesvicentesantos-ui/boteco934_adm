@@ -3,7 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOTECO 934 | SISTEMA GOLD</title><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOTECO 934 | SISTEMA GOLD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { background-color: #0f172a; color: white; touch-action: manipulation; }
+        .cupom { background-color: #fffdec; color: black; font-family: monospace; border-radius: 4px; }
+        ::-webkit-scrollbar { display: none; }
+        .mesa-btn { border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-slate-900 p-2 border-b border-yellow-600 flex justify-between items-center">
+        <h1 class="text-lg font-black text-yellow-500 italic">BOTECO 934 <span class="text-[8px] bg-yellow-500 text-black px-1 rounded">GOLD</span></h1>
+        <div class="flex gap-1">
+            <button onclick="btContatos()" class="bg-blue-600 px-2 py-1 rounded text-[9px] font-bold uppercase">👥 Zap</button>
+            <button onclick="btGerente()" class="bg-slate-700 px-2 py-1 rounded text-[9px] font-bold uppercase border border-slate-500">⚙️ Gerente</button>
+            <button onclick="btFecharDia()" class="bg-red-700 px-2 py-1 rounded text-[9px] font-bold uppercase">📊 Fim</button>
+        </div>
+    </header>
+
+    <div id="grid-mesas" class="p-1 bg-slate-950 grid grid-cols-8 gap-1 border-b border-slate-800"></div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-[40%] bg-slate-800 flex flex-col border-r border-slate-700">
+            <input type="text" oninput="funcaoBusca(this.value)" placeholder="🔍 Buscar..." class="m-2 p-2 bg-slate-900 rounded text-xs border border-slate-700 outline-none">
+            <div id="lista-prods" class="p-1 space-y-1 overflow-y-auto pb-10"></div>
+        </aside>
+
+        <main class="w-[60%] p-2 flex flex-col bg-black">
+            <div class="cupom p-2 flex-1 flex flex-col text-[10px]">
+                <div class="flex justify-between items-center mb-1 border-b border-gray-300 pb-1">
+                    <p id="status-mesa" class="font-black text-blue-800 uppercase">Selecione uma mesa</p>
+                    <button onclick="renomearMesa()" class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-[8px] font-black">NOME/REF</button>
+                </div>
+                <div id="itens-cupom" class="flex-1 overflow-y-auto"></div>
+                <div class="border-t-2 border-black mt-1 pt-1 font-black text-red-600 flex justify-between">
+                    <span>TOTAL</span>
+                    <span>R$ <span id="txt-total">0.00</span></span>
+                </div>
+            </div>
+            <div class="mt-2 flex flex-col gap-1">
+                <select id="select-pagto" class="p-2 bg-slate-800 text-yellow-500 rounded font-bold text-[10px] uppercase">
+                    <option value="DINHEIRO">💵 DINHEIRO</option>
+                    <option value="PIX">💎 PIX</option>
+                    <option value="CARTAO">💳 CARTÃO</option>
+                </select>
+                <button onclick="btReceber()" class="bg-yellow-500 text-black py-4 rounded-xl font-black uppercase text-[11px]">Finalizar / Dividir</button>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-gerente" class="hidden fixed inset-0 bg-black/95 z-50 p-6 flex items-center justify-center">
+        <div class="bg-white p-5 rounded-2xl w-full max-w-sm text-black shadow-2xl">
+            <h2 class="font-black mb-4 uppercase text-center text-sm border-b pb-2">Gerenciar Itens</h2>
+            
+            <div class="p-3 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl mb-4">
+                <p class="text-[10px] font-black text-blue-800 mb-2">IMPORTAR XML</p>
+                <input type="file" id="xml-input" accept=".xml" onchange="importarXML(event)" class="text-[9px] w-full">
+            </div>
+
+            <p class="text-[9px] font-bold text-gray-500 mb-1">CADASTRO MANUAL</p>
+            <input type="text" id="cad-nome" placeholder="Nome do Produto" class="w-full p-2 mb-2 rounded border border-gray-400 text-xs uppercase">
+            <input type="number" id="cad-preco" placeholder="Preço de Venda (R$)" class="w-full p-2 mb-4 rounded border border-gray-400 text-xs">
+            
+            <div class="flex gap-2">
+                <button onclick="btGerente()" class="flex-1 py-3 font-bold text-xs text-gray-400">CANCELAR</button>
+                <button onclick="funcaoSalvarProd()" class="flex-1 py-3 bg-green-600 text-white font-black rounded text-xs shadow-lg active:scale-95 transition-transform">SALVAR AGORA</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
+            authDomain: "boteco934-afc3f.firebaseapp.com",
+            projectId: "boteco934-afc3f",
+            storageBucket: "boteco934-afc3f.firebasestorage.app",
+            messagingSenderId: "182023728304",
+            appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let mesas = Array.from({length: 16}, (_, i) => ({ num: i + 1, nome: "", status: 'livre', itens: [], total: 0 }));
+        let mesaAtiva = null;
+        let produtos = [];
+
+        async function carregarProdutos() {
+            const snapshot = await db.collection("produtos").orderBy("nome").get();
+            produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderizarProds();
+        }
+
+        async function funcaoSalvarProd() {
+            const nomeInput = document.getElementById('cad-nome');
+            const precoInput = document.getElementById('cad-preco');
+            const nome = nomeInput.value.trim().toUpperCase();
+            const preco = parseFloat(precoInput.value);
+
+            if (!nome || isNaN(preco)) {
+                alert("Preencha Nome e Preço corretamente!");
+                return;
+            }
+
+            try {
+                const docRef = await db.collection("produtos").add({ nome, preco });
+                produtos.push({ id: docRef.id, nome, preco });
+                
+                nomeInput.value = "";
+                precoInput.value = "";
+                
+                renderizarProds();
+                btGerente();
+                alert("✅ PRODUTO SALVO!");
+            } catch (e) {
+                alert("Erro ao salvar no banco!");
+            }
+        }
+
+        async function importarXML(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = async (e) => {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(e.target.result, "text/xml");
+                const itens = xml.getElementsByTagName("det");
+                
+                for (let i = 0; i < itens.length; i++) {
+                    let nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                    let custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                    let prodData = { nome: nome, preco: custo * 1.4 };
+                    const docRef = await db.collection("produtos").add(prodData);
+                    produtos.push({ id: docRef.id, ...prodData });
+                }
+                renderizarProds();
+                alert("✅ XML IMPORTADO!");
+                btGerente();
+            };
+            leitor.readAsText(arquivo);
+        }
+
+        function renderizarMesas() {
+            const grid = document.getElementById('grid-mesas');
+            grid.innerHTML = mesas.map(m => {
+                let cor = m.status === 'ocupada' ? 'bg-red-600' : 'bg-green-600';
+                let borda = mesaAtiva === m.num ? 'ring-2 ring-white scale-105' : '';
+                return `<button onclick="selecionarMesa(${m.num})" class="mesa-btn ${cor} ${borda} h-10 rounded text-[8px] font-black text-white shadow">M${m.num}<br>${m.nome || ''}</button>`;
+            }).join('');
+        }
+
+        function renderizarProds(lista = null) {
+            const container = document.getElementById('lista-prods');
+            const dados = lista || produtos;
+            container.innerHTML = dados.map(p => `
+                <button onclick="addItem('${p.id}')" class="w-full bg-slate-700 p-2 rounded border border-slate-600 text-left active:bg-slate-500">
+                    <p class="text-[9px] font-bold text-white uppercase">${p.nome}</p>
+                    <p class="text-yellow-500 font-black text-[10px]">R$ ${p.preco.toFixed(2)}</p>
+                </button>
+            `).join('');
+        }
+
+        function selecionarMesa(n) {
+            mesaAtiva = n;
+            const mesa = mesas.find(m => m.num === n);
+            document.getElementById('status-mesa').innerText = `MESA ${n} ${mesa.nome ? '- ' + mesa.nome : ''}`;
+            atualizarCupom(mesa);
+            renderizarMesas();
+        }
+
+        function addItem(id) {
+            if(!mesaAtiva) return alert("Selecione a mesa!");
+            const mesa = mesas.find(m => m.num === mesaAtiva);
+            const p = produtos.find(prod => prod.id === id);
+            const itemIdx = mesa.itens.findIndex(i => i.id === id);
+            if(itemIdx >= 0) mesa.itens[itemIdx].qtd++;
+            else mesa.itens.push({ ...p, qtd: 1 });
+            mesa.status = 'ocupada';
+            mesa.total = mesa.itens.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
+            atualizarCupom(mesa);
+            renderizarMesas();
+        }
+
+        function atualizarCupom(mesa) {
+            const container = document.getElementById('itens-cupom');
+            container.innerHTML = mesa.itens.map(i => `
+                <div class="flex justify-between border-b border-gray-200 py-1 font-bold text-[8px]">
+                    <span>${i.qtd}x ${i.nome}</span>
+                    <span>R$ ${(i.qtd * i.preco).toFixed(2)}</span>
+                </div>
+            `).join('');
+            document.getElementById('txt-total').innerText = mesa.total.toFixed(2);
+        }
+
+        async function btReceber() {
+            if(!mesaAtiva) return;
+            const mesa = mesas.find(m => m.num === mesaAtiva);
+            const valor = parseFloat(prompt("Valor a receber:", mesa.total.toFixed(2)));
+            if(!valor) return;
+            await db.collection("vendas").add({ mesa: mesaAtiva, total: valor, data: new Date() });
+            mesa.total -= valor;
+            if(mesa.total <= 0) { mesa.status = 'livre'; mesa.itens = []; mesa.nome = ""; mesaAtiva = null; }
+            renderizarMesas(); atualizarCupom(mesa);
+        }
+
+        function btGerente() { document.getElementById('modal-gerente').classList.toggle('hidden'); }
+        function renomearMesa() { 
+            const mesa = mesas.find(m => m.num === mesaAtiva);
+            const n = prompt("Nome:"); if(n) { mesa.nome = n.toUpperCase(); renderizarMesas(); selecionarMesa(mesaAtiva); }
+        }
+        function funcaoBusca(v) { renderizarProds(produtos.filter(p => p.nome.includes(v.toUpperCase()))); }
+
+        carregarProdutos();
+        renderizarMesas();
+    </script>
+</body>
+</html>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
