@@ -1,0 +1,33 @@
+:root {
+    --bg: #121212;
+    --side: #000000;
+    --accent: #ffc107;
+    --danger: #ff4444;
+    --text: #ffffff;
+}
+
+body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+.app-container { display: flex; height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 180px; background: var(--side); padding: 15px; border-right: 1px solid #333; }
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 60px; }
+nav button { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 5px; border: none; background: #222; color: #fff; cursor: pointer; }
+.btn-add-cat { background: #333; border: 1px dashed var(--accent); }
+
+/* Grid de Produtos */
+.main-content { flex: 1; display: flex; flex-direction: column; padding: 15px; }
+.top-bar input { width: 100%; padding: 15px; border-radius: 8px; border: none; font-size: 1.1rem; }
+.grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; overflow-y: auto; }
+
+.card { background: #1e1e1e; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+.card:hover { border-color: var(--accent); }
+.card.alerta { border-color: var(--danger); background: #3d1a1a; }
+
+/* Checkout */
+.checkout-panel { width: 320px; background: #fff; color: #000; display: flex; flex-direction: column; padding: 15px; }
+.carrinho-lista { flex: 1; overflow-y: auto; }
+.total-row { font-size: 1.5rem; font-weight: bold; margin: 15px 0; display: flex; justify-content: space-between; }
+.btn-finalizar { background: #28a745; color: white; padding: 15px; width: 100%; border: none; font-weight: bold; font-size: 1.1rem; border-radius: 5px; cursor: pointer; }
+.btn-whatsapp { background: #25d366; color: white; padding: 10px; width: 100%; border: none; margin-top: 10px; border-radius: 5px; cursor: pointer; }
