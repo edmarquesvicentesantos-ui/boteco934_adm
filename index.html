@@ -1,78 +1,69 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8"><!DOCTYPE html>
-<html lang="pt-br">
-<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão</title>
+    <title>Boteco 934 - Gestão Profissional</title>
     <style>
         :root {
-            --primary: #ffcc00; /* Amarelo Boteco 934 */
-            --dark: #000000;
-            --glass: rgba(255, 255, 255, 0.05);
-            /* Cores Harmonizadas para a Tabela */
-            --bg-custo: #fff9e6; --text-custo: #856404;
-            --bg-venda: #eef2ff; --text-venda: #1e3a8a;
-            --bg-lucro: #fdf2f2; --text-lucro: #9b1c1c;
-            --bg-margem: #f0fdf4; --text-margem: #166534;
+            --primary: #ffcc00;
+            --bg-dark: #121212;
+            /* Cores Harmonizadas da Tabela */
+            --col-prod: #3b5998;
+            --col-custo: #fff2cc;
+            --col-venda: #d9e1f2;
+            --col-lucro: #fce4ec;
+            --col-margem: #e2efda;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--dark); color: #fff; }
+        body { background: #000; color: #fff; }
 
-        /* Banner Superior */
-        header { background: var(--primary); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; color: #000; }
-        .logo-box { display: flex; align-items: center; gap: 10px; }
-        .badge { background: #000; color: var(--primary); padding: 5px 10px; border-radius: 4px; font-weight: 900; }
+        header { background: var(--primary); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #000; color: var(--primary); padding: 5px 12px; border-radius: 4px; font-weight: 900; }
 
-        /* Navegação */
-        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 1px solid #333; }
-        .nav-item { padding: 18px 25px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; transition: 0.3s; }
-        .nav-item:hover, .active { color: var(--primary); border-bottom: 3px solid var(--primary); background: rgba(255, 204, 0, 0.05); }
+        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 2px solid #333; }
+        .nav-item { padding: 18px 25px; cursor: pointer; color: #888; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .nav-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
         .container { padding: 30px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* Grid de Mesas (Abrem sem cliente) */
+        /* Mesas Independentes */
         .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .mesa { background: var(--glass); border: 1px solid #333; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; }
-        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.3); }
+        .mesa { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.4); }
 
-        /* Tabela Profissional */
-        .card { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; color: #000; border-radius: 10px; overflow: hidden; }
+        /* Tabela Estilizada */
+        .card { background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; border-radius: 10px; overflow: hidden; }
         th { background: #2b579a; color: #fff; padding: 15px; text-align: left; font-size: 12px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; }
+        td { padding: 15px; font-weight: bold; border-bottom: 1px solid #eee; }
 
-        /* Harmonização de Colunas */
-        .col-custo { background: var(--bg-custo); color: var(--text-custo); }
-        .col-venda { background: var(--bg-venda); color: var(--text-venda); }
-        .col-lucro { background: var(--bg-lucro); color: var(--text-lucro); }
-        .col-margem { background: var(--bg-margem); color: var(--text-margem); }
+        /* Aplicação das Cores Harmonizadas */
+        .c-prod { background: var(--col-prod); color: #fff; }
+        .c-custo { background: var(--col-custo); }
+        .c-venda { background: var(--col-venda); }
+        .c-lucro { background: var(--col-lucro); }
+        .c-margem { background: var(--col-margem); }
 
-        input, button { padding: 12px; border-radius: 8px; border: 1px solid #444; }
-        input { background: #2a2a2a; color: #fff; margin-right: 10px; }
-        button { background: var(--primary); color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
-        button:hover { transform: scale(1.05); }
+        button { background: var(--primary); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 8px; }
+        input[type="file"] { background: #333; color: #fff; padding: 10px; border-radius: 8px; margin-right: 10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-box">
+    <div style="display:flex; align-items:center; gap:15px;">
         <div class="badge">934</div>
-        <h1 style="letter-spacing: -1.5px;">BOTECO</h1>
+        <h1 style="letter-spacing:-1.5px;">BOTECO</h1>
     </div>
-    <div style="font-weight: bold;">Petrolina-PE | 32°C</div>
+    <div>Petrolina-PE | 32°C</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('operacional', this)">Mesas/Operacional</div>
-    <div class="nav-item" onclick="mudar('estoque', this)">Estoque XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">Clientes/Fiado</div>
+    <div class="nav-item active" onclick="tela('operacional', this)">Mesas/Operacional</div>
+    <div class="nav-item" onclick="tela('estoque', this)">Estoque XML</div>
 </nav>
 
 <div class="container">
@@ -82,9 +73,9 @@
 
     <div id="estoque" class="secao">
         <div class="card">
-            <h3 style="margin-bottom:15px; color:var(--primary)">IMPORTAR NOTA FISCAL (XML)</h3>
+            <h3 style="color:var(--primary); margin-bottom:15px;">IMPORTAR NOTA FISCAL (XML)</h3>
             <input type="file" id="xmlInput" accept=".xml">
-            <button onclick="processarXML()">LANÇAR NO FIREBASE</button>
+            <button onclick="importarXML()">LANÇAR NO FIREBASE</button>
         </div>
 
         <table>
@@ -92,10 +83,10 @@
                 <tr>
                     <th>PRODUTO</th>
                     <th>QTD</th>
-                    <th style="background: #ffecb3; color: #000">CUSTO UNIT.</th>
-                    <th style="background: #c5cae9; color: #000">VENDA UNIT.</th>
-                    <th style="background: #ffcdd2; color: #000">LUCRO</th>
-                    <th style="background: #c8e6c9; color: #000">MARGEM %</th>
+                    <th>CUSTO UNIT.</th>
+                    <th>VENDA UNIT.</th>
+                    <th>LUCRO</th>
+                    <th>MARGEM %</th>
                 </tr>
             </thead>
             <tbody id="corpoTabela"></tbody>
@@ -107,7 +98,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Configuração oficial Boteco 934
+    // Configuração do seu Firebase
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -119,16 +110,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 1. Geração de Mesas (Livres para uso imediato)
+    // Mesas Dinâmicas
     const grade = document.getElementById('gradeMesas');
     for(let i=1; i<=15; i++) {
         grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
     }
 
-    // 2. Processamento de XML direto para o Firebase
-    window.processarXML = function() {
+    // Processamento de XML
+    window.importarXML = function() {
         const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Selecione o arquivo XML!");
+        if(!file) return alert("Selecione o arquivo!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -138,22 +129,23 @@
             for(let i=0; i<itens.length; i++) {
                 const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
                 const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                const custoUn = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
                 
-                // Cálculo automático: Margem de 50% para harmonizar com seu sistema
-                const venda = custo * 2;
-                const lucro = venda - custo;
+                // Cálculo automático de margem (Ex: 50% de lucro sobre o custo)
+                const vendaSugestao = custoUn * 2;
+                const lucro = vendaSugestao - custoUn;
 
+                // Envio para a pasta 'produtos' no Firebase
                 push(ref(db, 'produtos'), {
-                    nome, qtd, custo, venda, lucro, margem: 50
+                    nome, qtd, custo: custoUn, venda: vendaSugestao, lucro, margem: 50
                 });
             }
-            alert("Produtos lançados na nuvem com sucesso!");
+            alert("Estoque atualizado na nuvem!");
         };
         reader.readAsText(file);
     };
 
-    // 3. Atualização em Tempo Real (Leitura do Firebase)
+    // Atualização da Tabela em Tempo Real
     onValue(ref(db, 'produtos'), (snapshot) => {
         const corpo = document.getElementById('corpoTabela');
         corpo.innerHTML = "";
@@ -162,18 +154,18 @@
             Object.values(data).forEach(p => {
                 corpo.innerHTML += `
                     <tr>
-                        <td>${p.nome.toUpperCase()}</td>
+                        <td class="c-prod">${p.nome}</td>
                         <td>${p.qtd}</td>
-                        <td class="col-custo">R$ ${p.custo.toFixed(2)}</td>
-                        <td class="col-venda">R$ ${p.venda.toFixed(2)}</td>
-                        <td class="col-lucro">R$ ${p.lucro.toFixed(2)}</td>
-                        <td class="col-margem">${p.margem}%</td>
+                        <td class="c-custo">R$ ${p.custo.toFixed(2)}</td>
+                        <td class="c-venda">R$ ${p.venda.toFixed(2)}</td>
+                        <td class="c-lucro">R$ ${p.lucro.toFixed(2)}</td>
+                        <td class="c-margem">${p.margem}%</td>
                     </tr>`;
             });
         }
     });
 
-    window.mudar = (id, el) => {
+    window.tela = (id, el) => {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
@@ -182,73 +174,3 @@
 </script>
 </body>
 </html>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão Profissional</title>
-    <style>
-        :root {
-            --primary: #ffcc00;
-            --dark-bg: #121212;
-            --card-bg: #1e1e1e;
-            --text-gray: #b0b0b0;
-            --accent-blue: #2b579a;
-            --success: #2e7d32;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--dark-bg); color: #fff; line-height: 1.6; }
-        
-        /* Cabeçalho e Nav */
-        header { background: var(--primary); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .badge { background: #000; color: var(--primary); padding: 5px 12px; border-radius: 4px; font-weight: 900; }
-        
-        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 1px solid #333; overflow-x: auto; }
-        .nav-item { padding: 18px 25px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-gray); transition: 0.3s; white-space: nowrap; }
-        .nav-item:hover, .active { color: var(--primary); border-bottom: 3px solid var(--primary); background: rgba(255, 204, 0, 0.05); }
-
-        .container { padding: 25px 40px; }
-        .secao { display: none; }
-        .ativa { display: block; }
-
-        /* Mesas Corrigidas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-top: 20px; }
-        .mesa { background: var(--card-bg); border: 1px solid #333; padding: 30px 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.2s; font-weight: bold; }
-        .mesa:hover { border-color: var(--primary); transform: translateY(-3px); }
-        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.3); }
-
-        /* Tabela Harmonizada */
-        .card { background: var(--card-bg); padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
-        
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; background: #fff; color: #333; border-radius: 10px; overflow: hidden; }
-        th { background: var(--accent-blue); color: #fff; padding: 14px; text-align: left; font-size: 12px; text-transform: uppercase; }
-        td { padding: 12px 14px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 600; }
-        
-        /* Cores da Barra de Produtos */
-        .col-custo { background: #fff9e6; color: #856404; } /* Amarelo suave para Custo */
-        .col-venda { background: #eef2ff; color: #1e3a8a; } /* Azul suave para Venda */
-        .col-lucro { background: #fdf2f2; color: #9b1c1c; } /* Vermelho suave para Lucro */
-        .col-margem { background: #f0fdf4; color: #166534; font-weight: 800; } /* Verde para Margem */
-
-        input, button { padding: 12px; border-radius: 8px; border: 1px solid #444; }
-        input { background: #2a2a2a; color: #fff; margin-right: 10px; }
-        button { background: var(--primary); color: #000; font-weight: bold; border: none; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-<header>
-    <div style="display:flex; align-items:center; gap:12px;">
-        <div class="badge">934</div>
-        <h1 style="letter-spacing:-1.5px;">BOTECO</h1>
-    </div>
-    <div style="font-size: 13px;">Petrolina-PE | <span id="data-atual"></span></div>
-</header>
-
-<nav>
-    <div class="nav-item active" onclick="mudar('operacional', this)">Mesas/Operacional</div>
-    <div class="nav-item" onclick="mudar('estoque', this)">Estoque XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">Clientes/Fiado</div>
-</nav>
-
-<div class="container">
-    <div id="operacional" class="secao ativa">
-        <div class="grid-mesas" id="gradeMesas"></div>
