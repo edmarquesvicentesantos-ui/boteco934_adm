@@ -3,116 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Sistema Integrado</title>
+    <title>Boteco 934 - Portal de Gestão</title>
     <style>
-        :root { --azul-uol: #2b579a; --amarelo-uol: #ffcc00; --cor-custo: #fff2cc; --cor-lucro: #fce4d6; --cor-margem: #c6efce; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f4f4f4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --uol-red: #d32f2f; --uol-blue: #2b579a; --amarelo: #ffcc00; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #fff; height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER ESTILO PORTAL */
-        header { background: #fff; border-bottom: 4px solid var(--amarelo-uol); padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-934 { width: 50px; height: 50px; background: #000; color: var(--amarelo-uol); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--amarelo-uol); }
+        /* HEADER ESTILO PORTAL UOL */
+        .uol-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .uol-logo-area { display: flex; align-items: center; gap: 15px; }
+        .uol-badge { background: linear-gradient(45deg, #ffcc00, #ff6600); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 1.5em; }
+        .uol-brand { font-size: 2.5em; font-weight: 900; letter-spacing: -2px; color: #000; }
         
-        nav { background: #111; color: #fff; display: flex; padding: 0 20px; font-size: 0.75em; }
-        .nav-item { position: relative; padding: 12px 18px; cursor: pointer; border-right: 1px solid #333; font-weight: bold; }
-        .nav-item:hover { background: var(--amarelo-uol); color: #000; }
-        .submenu { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; }
-        .nav-item:hover .submenu { display: block; }
-        .submenu button, .submenu label { width: 100%; padding: 12px; border: none; background: none; text-align: left; cursor: pointer; border-bottom: 1px solid #eee; color: #333; display: block; }
+        .uol-stats { display: flex; gap: 25px; font-size: 0.85em; color: #444; align-items: center; }
+        .uol-stats b { color: var(--uol-red); }
 
-        /* CONTEÚDO PRINCIPAL */
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-        .content-area { flex: 1; padding: 20px; overflow-y: auto; background: #dfe4ea; }
+        .uol-clima { display: flex; align-items: center; gap: 10px; font-size: 0.85em; }
+
+        /* MENU DE NAVEGAÇÃO */
+        .uol-nav { border-bottom: 1px solid #eee; display: flex; padding: 0 30px; gap: 20px; overflow-x: auto; }
+        .uol-nav-item { padding: 12px 0; color: #333; font-weight: bold; font-size: 0.75em; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .uol-nav-item:hover { border-bottom: 3px solid var(--amarelo); color: var(--amarelo); }
+
+        /* ÁREA DA PLANILHA */
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
+        .tabela-vendas { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
+        .tabela-vendas th { background: var(--uol-blue); color: white; padding: 12px; border: 1px solid #ccc; text-align: center; }
+        .tabela-vendas td { padding: 10px; border: 1px solid #ccc; text-align: center; vertical-align: middle; }
         
-        /* TABELA ESTILO PLANILHA (IGUAL À IMAGEM ENVIADA) */
-        .tabela-vendas { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.8em; margin-top: 10px; }
-        .tabela-vendas th { background: var(--azul-uol); color: white; padding: 10px; border: 1px solid #ccc; }
-        .tabela-vendas td { padding: 8px; border: 1px solid #ccc; text-align: center; }
-        .custo { background: var(--cor-custo); font-weight: bold; }
-        .lucro { background: var(--cor-lucro); font-weight: bold; }
-        .margem { background: var(--cor-margem); color: #006100; font-weight: bold; }
-
-        /* GRID DE MESAS */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-        .mesa { background: #fff; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border-bottom: 4px solid #ccc; }
-        .livre { border-top: 5px solid #2e7d32; }
-        .ocupada { border-top: 5px solid #d32f2f; background: #fff5f5; }
-
-        /* PAINEL LATERAL */
-        .sidebar { width: 300px; background: #fff; border-left: 1px solid #ccc; display: flex; flex-direction: column; }
-        .recibo { flex: 1; padding: 15px; font-family: monospace; font-size: 0.85em; }
-        .total-box { padding: 20px; background: var(--amarelo-uol); font-size: 1.4em; font-weight: 900; text-align: right; }
+        .col-custo { background: #fff2cc; font-weight: bold; }
+        .col-lucro { background: #fce4d6; font-weight: bold; }
+        .col-margem { background: #c6efce; color: #006100; font-weight: bold; }
+        .img-prod { width: 45px; height: auto; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-area">
-        <div class="logo-934">934</div>
-        <div><h1 style="font-size:1.4em">Boteco 934</h1><small>Gestão de Bar e Distribuidora</small></div>
+<header class="uol-header">
+    <div class="uol-logo-area">
+        <div class="uol-badge">934</div>
+        <div class="uol-brand">BOTECO</div>
     </div>
-    <div id="relogio" style="font-weight:bold; color:#666"></div>
+    
+    <div class="uol-stats">
+        <div>Dólar <b>▼ 5,011</b></div>
+        <div>Euro <b>▼ 5,877</b></div>
+    </div>
+
+    <div class="uol-clima">
+        <div style="text-align: right">
+            <b>Petrolina</b><br>
+            <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
+        </div>
+    </div>
 </header>
 
-<nav>
-    <div class="nav-item">OPERACIONAL
-        <div class="submenu">
-            <button onclick="setVisao('mesas')">Painel de Mesas</button>
-            <button onclick="zerarMesas()">Zerar Tudo</button>
-        </div>
-    </div>
-    <div class="nav-item">ESTOQUE / XML
-        <div class="submenu">
-            <button onclick="setVisao('estoque')">Planilha de Vendas</button>
-            <label>📁 Importar XML <input type="file" accept=".xml" style="display:none" onchange="lerXML(this)"></label>
-        </div>
-    </div>
+<nav class="uol-nav">
+    <div class="uol-nav-item" onclick="location.reload()">PRODUTOS</div>
+    <div class="uol-nav-item">FLASH</div>
+    <div class="uol-nav-item">ECONOMIA</div>
+    <div class="uol-nav-item">COPA 2026</div>
+    <div class="uol-nav-item">GUIA DE COMPRAS</div>
 </nav>
 
-<div class="main-container">
-    <main class="content-area" id="view-principal"></main>
-    <aside class="sidebar">
-        <div style="padding:15px; border-bottom:1px solid #eee; background:#f9f9f9"><strong>CUPOM ATUAL</strong></div>
-        <div class="recibo" id="recibo-corpo"></div>
-        <div class="total-box" id="total-venda">R$ 0,00</div>
-    </aside>
-</div>
+<main class="main-content">
+    <h3 style="margin-bottom:15px; color:#333; text-transform: uppercase">Planilha de Vendas - Distribuidora</h3>
+    <table class="tabela-vendas">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Código de Barra</th>
+                <th>Produto</th>
+                <th>Quat. pacote</th>
+                <th>Venda uni.</th>
+                <th>Total Vend.</th>
+                <th style="background:#ffd966; color:#000">Custo</th>
+                <th style="background:#ffd966; color:#000">Total da Caixa</th>
+                <th style="background:#f4b084; color:#000">Lucro</th>
+                <th style="background:#a9d08e; color:#000">Margem %</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-prod"></td>
+                <td>789456123858</td>
+                <td style="text-align:left">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
+                <td>12</td>
+                <td>R$ 10,00</td>
+                <td>R$ 120,00</td>
+                <td class="col-custo">R$ 5,04</td>
+                <td class="col-custo">R$ 60,48</td>
+                <td class="col-lucro">R$ 59,52</td>
+                <td class="col-margem">49,60%</td>
+            </tr>
+            <tr>
+                <td><img src="https://choppmaia.com.br/wp-content/uploads/2021/05/Heineken-600ml.png" class="img-prod"></td>
+                <td>789456123658</td>
+                <td style="text-align:left">Cerveja Heineken - Garrafa 600ml C/24 Retornável</td>
+                <td>24</td>
+                <td>R$ 16,00</td>
+                <td>R$ 384,00</td>
+                <td class="col-custo">R$ 9,58</td>
+                <td class="col-custo">R$ 229,92</td>
+                <td class="col-lucro">R$ 154,08</td>
+                <td class="col-margem">40,13%</td>
+            </tr>
+        </tbody>
+    </table>
+</main>
 
-<script>
-    let visaoAtual = 'mesas';
-    let mesas = JSON.parse(localStorage.getItem('b934_mesas')) || Array.from({length: 20}, (_, i) => ({id: i+1, ocupada: false, cliente: "", total: 0, itens: []}));
-    let estoque = JSON.parse(localStorage.getItem('b934_estoque_v2')) || [];
-
-    function salvar() {
-        localStorage.setItem('b934_mesas', JSON.stringify(mesas));
-        localStorage.setItem('b934_estoque_v2', JSON.stringify(estoque));
-        render();
-    }
-
-    function setVisao(v) { visaoAtual = v; render(); }
-
-    function render() {
-        const area = document.getElementById('view-principal');
-        if (visaoAtual === 'mesas') {
-            area.innerHTML = `<div class="grid-mesas">${mesas.map(m => `
-                <div class="mesa ${m.ocupada ? 'ocupada' : 'livre'}" onclick="clickMesa(${m.id})">
-                    <div style="font-size:0.7em">MESA ${m.id}</div>
-                    <div style="font-weight:bold">${m.ocupada ? m.cliente : 'LIVRE'}</div>
-                    <div style="color:red; font-weight:bold">${m.ocupada ? 'R$ '+m.total.toFixed(2) : ''}</div>
-                </div>`).join('')}</div>`;
-        } else {
-            area.innerHTML = `<h2>📊 Planilha de Vendas</h2><table class="tabela-vendas">
-                <thead><tr><th>Produto</th><th>Qtd/Cx</th><th>Venda Uni.</th><th>Total Vend.</th><th class="custo">Custo</th><th class="lucro">Lucro</th><th class="margem">Margem %</th></tr></thead>
-                <tbody>${estoque.map(p => {
-                    const totalV = p.venda * p.qtd;
-                    const totalC = p.custo * p.qtd;
-                    const lucro = totalV - totalC;
-                    const margem = (lucro / totalV) * 100;
-                    return `<tr><td>${p.nome}</td><td>${p.qtd}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${totalV.toFixed(2)}</td><td class="custo">R$ ${p.custo.toFixed(2)}</td><td class="lucro">R$ ${lucro.toFixed(2)}</td><td class="margem">${margem.toFixed(2)}%</td></tr>`;
-                }).join('')}</tbody></table>`;
-        }
-    }
-
-    function clickMesa(id) {
-        let m = mesas.find(x =>
+</body>
+</html>
