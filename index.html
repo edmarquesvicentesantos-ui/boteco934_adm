@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - GESTÃO XML E ESTOQUE</title>
+    <title>934 BOTECO - SISTEMA PROFISSIONAL</title>
     <style>
-        :root { --gold: #ffcc00; --blue: #00d4ff; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
+        :root { --gold: #ffcc00; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: #fff; min-height: 100vh; }
-        header { background: var(--gold); padding: 12px 25px; color: #000; font-weight: 900; display: flex; justify-content: space-between; }
-        nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 1000; }
+
+        header { background: var(--gold); padding: 12px 25px; color: #000; display: flex; justify-content: space-between; font-weight: 900; }
+        nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; sticky; top: 0; z-index: 1000; }
         .nav-item { padding: 18px 20px; cursor: pointer; color: #666; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
         .nav-item.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
+
+        .container { padding: 20px; max-width: 1250px; margin: auto; }
         .secao { display: none; }
         .ativa { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .card { background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
         input, select { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
         .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: #000; }
-        .btn-blue { background: var(--blue); color: #000; }
+        
+        /* GRID MESAS */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .mesa { background: #1a1a1a; padding: 15px 5px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .mesa.ocupada { background: #440000; border-color: #ff4444; }
+        .mesa.selecionada { border-color: var(--gold); }
+
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid #333; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
-        .xml-drop { border: 2px dashed #444; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .xml-drop:hover { border-color: var(--gold); background: rgba(255,204,0,0.05); }
+        td { padding: 10px; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -38,62 +45,81 @@
 <nav>
     <div class="nav-item active" onclick="mudarTela('vendas', this)">🛒 Vendas</div>
     <div class="nav-item" onclick="mudarTela('estoque', this)">📦 Estoque / XML</div>
-    <div class="nav-item" onclick="mudarTela('calculadora', this)">📊 Precificação</div>
+    <div class="nav-item" onclick="mudarTela('precificacao', this)">🥃 Doses / Precificação</div>
 </nav>
 
 <div class="container">
     
-    <div id="estoque" class="secao ativa">
-        <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">📥 Importar Nota Fiscal (XML)</h3>
-            <div class="xml-drop" onclick="document.getElementById('fileXml').click()">
-                <p>Clique aqui para carregar o arquivo XML da Nota</p>
-                <input type="file" id="fileXml" accept=".xml" style="display:none" onchange="lerXML(this)">
+    <div id="vendas" class="secao ativa">
+        <div style="display:grid; grid-template-columns: 1fr 380px; gap:20px;">
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">Painel de Mesas</h3>
+                <div class="grid-mesas" id="gridMesas"></div>
+            </div>
+            <div class="card" style="background:#fff; color:#000;">
+                <div id="areaAbrir">
+                    <h3>Nova Ocupação</h3>
+                    <input type="text" id="nomeCliente" placeholder="Nome do Cliente" style="background:#f4f4f4; color:#000; margin-top:15px;">
+                    <button class="btn btn-gold" onclick="abrirMesa()">Abrir Mesa</button>
+                </div>
+                <div id="areaConsumo" style="display:none;">
+                    <h3 id="hMesa">Mesa --</h3>
+                    <p id="hCliente" style="font-weight:bold; color:#666;"></p>
+                    <div style="min-height:200px; border-bottom:1px solid #eee; margin:15px 0;">
+                        <p style="font-size:12px; color:#999;">Consumo registrado...</p>
+                    </div>
+                    <h2>TOTAL: R$ <span id="totalVenda">0,00</span></h2>
+                    
+                    <label style="color:#000; font-size:11px; font-weight:bold; display:block; margin-top:15px;">FORMA DE RECEBIMENTO:</label>
+                    <select id="meioPgto" style="background:#f4f4f4; color:#000;">
+                        <option value="Dinheiro">💵 Dinheiro</option>
+                        <option value="PIX">📱 PIX</option>
+                        <option value="Débito">💳 Cartão Débito</option>
+                        <option value="Crédito">💳 Cartão Crédito</option>
+                        <option value="Pendura">📝 Pendura (Fiado)</option>
+                    </select>
+                    <button class="btn btn-gold" style="background:#25d366; color:#fff;" onclick="gerarRecibo()">Fechar e Gerar Recibo</button>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div id="estoque" class="secao">
         <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">📦 Lista de Produtos</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; margin-bottom:15px;">
-                <input type="text" id="p_nome" placeholder="Nome do Produto">
-                <input type="number" id="p_custo" placeholder="Custo Unitário">
-                <input type="number" id="p_venda" placeholder="Preço de Venda">
-                <button class="btn btn-gold" onclick="addProdutoManual()" style="width:120px">Adicionar</button>
-            </div>
-            <table>
-                <thead>
-                    <tr><th>PRODUTO</th><th>CUSTO</th><th>VENDA</th><th>MARGEM</th><th>AÇÕES</th></tr>
-                </thead>
-                <tbody id="tabelaEstoque">
-                    </tbody>
+            <h3 style="color:var(--gold)">📥 Importar XML da Nota</h3>
+            <input type="file" id="xmlFile" accept=".xml" onchange="importarXML(this)" style="margin-top:10px;">
+        </div>
+        <div class="card">
+            <h3>📦 Lista de Produtos</h3>
+            <table id="tabEstoque">
+                <thead><tr><th>PRODUTO</th><th>CUSTO</th><th>VENDA</th><th>MARGEM</th></tr></thead>
+                <tbody id="corpoEstoque"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="vendas" class="secao">
-        <div style="display:grid; grid-template-columns: 1fr 350px; gap:20px;">
+    <div id="precificacao" class="secao">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
             <div class="card">
-                <h3>Vitrine de Produtos</h3>
-                <div id="vitrinePdv" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:10px; margin-top:15px;">
-                    </div>
+                <h3 style="color:var(--gold)">🥃 Calculadora de Dose</h3>
+                <label>Custo Garrafa</label><input type="number" id="dc" oninput="calcDose()">
+                <label>ML Garrafa</label><input type="number" id="dml" value="1000" oninput="calcDose()">
+                <label>ML Dose</label><input type="number" id="dmld" value="50" oninput="calcDose()">
+                <label>Preço Venda Dose</label><input type="number" id="dv" oninput="calcDose()">
+                <div style="background:#111; padding:15px; border-radius:10px; border-left:5px solid var(--gold);">
+                    <p style="font-size:11px;">MARGEM DA DOSE:</p>
+                    <h2 id="resDose" style="color:var(--gold)">0%</h2>
+                </div>
             </div>
-            <div class="card" style="background:#fff; color:#000;">
-                <h3>Comanda</h3>
-                <div id="itensVenda" style="min-height:300px; margin-top:20px;"></div>
-                <h2 id="totalPdv">TOTAL: R$ 0,00</h2>
-                <button class="btn btn-gold" style="margin-top:20px">Finalizar Venda</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="calculadora" class="secao">
-        <div class="card" style="max-width:500px; margin:auto;">
-            <h3 style="color:var(--gold)">Análise de Lucro</h3>
-            <label>Custo Unitário</label><input type="number" id="ca" oninput="calcP()">
-            <label>Preço Venda</label><input type="number" id="cb" oninput="calcP()">
-            <div id="resP" style="background:#111; padding:20px; border-radius:10px; margin-top:15px; border-left:5px solid var(--gold);">
-                <p style="font-size:11px">MARGEM REAL:</p>
-                <h2 id="outM" style="color:var(--gold)">0%</h2>
+            <div class="card">
+                <h3 style="color:var(--blue)">📊 Margem Fardo/Caixa</h3>
+                <label>Custo Fardo</label><input type="number" id="fc" oninput="calcFardo()">
+                <label>Qtd Itens</label><input type="number" id="fq" oninput="calcFardo()">
+                <label>Venda Unitária</label><input type="number" id="fv" oninput="calcFardo()">
+                <div style="background:#111; padding:15px; border-radius:10px; border-left:5px solid var(--blue);">
+                    <p style="font-size:11px;">MARGEM REAL:</p>
+                    <h2 id="resFardo" style="color:var(--blue)">0%</h2>
+                </div>
             </div>
         </div>
     </div>
@@ -101,80 +127,53 @@
 </div>
 
 <script>
-    let estoque = JSON.parse(localStorage.getItem('estoque_934')) || [];
+    let mesaSel = null;
+    let mesas = {};
 
-    // FUNÇÃO PARA LER XML
-    function lerXML(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-            const produtos = xmlDoc.getElementsByTagName("det");
-            
-            for (let i = 0; i < produtos.length; i++) {
-                const nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
-                const vUnCom = produtos[i].getElementsByTagName("vUnCom")[0].textContent;
-                
-                estoque.push({
-                    nome: nome,
-                    custo: parseFloat(vUnCom),
-                    venda: parseFloat(vUnCom) * 1.4 // Sugere 40% de margem inicial
-                });
-            }
-            atualizarTabelas();
-            alert("Nota Fiscal importada com sucesso!");
-        };
-        reader.readAsText(file);
+    // Inicia Mesas
+    const g = document.getElementById('gridMesas');
+    for(let i=1; i<=20; i++){
+        g.innerHTML += `<div class="mesa" id="m${i}" onclick="selMesa(${i})"><b>Mesa ${i}</b><br><small id="s${i}">Livre</small></div>`;
+        mesas[i] = { ocupada: false, cliente: '' };
     }
 
-    function addProdutoManual() {
-        const nome = document.getElementById('p_nome').value;
-        const custo = parseFloat(document.getElementById('p_custo').value);
-        const venda = parseFloat(document.getElementById('p_venda').value);
+    function selMesa(n) {
+        mesaSel = n;
+        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+        document.getElementById(`m${n}`).classList.add('selecionada');
         
-        if(nome && custo && venda) {
-            estoque.push({ nome, custo, venda });
-            atualizarTabelas();
-            document.getElementById('p_nome').value = '';
-            document.getElementById('p_custo').value = '';
-            document.getElementById('p_venda').value = '';
+        if(mesas[n].ocupada){
+            document.getElementById('areaAbrir').style.display = 'none';
+            document.getElementById('areaConsumo').style.display = 'block';
+            document.getElementById('hMesa').innerText = `Mesa ${n}`;
+            document.getElementById('hCliente').innerText = `Cliente: ${mesas[n].cliente}`;
+        } else {
+            document.getElementById('areaAbrir').style.display = 'block';
+            document.getElementById('areaConsumo').style.display = 'none';
         }
     }
 
-    function atualizarTabelas() {
-        localStorage.setItem('estoque_934', JSON.stringify(estoque));
-        const tb = document.getElementById('tabelaEstoque');
-        const vitrine = document.getElementById('vitrinePdv');
-        tb.innerHTML = '';
-        vitrine.innerHTML = '';
-
-        estoque.forEach((prod, index) => {
-            const margem = ((prod.venda - prod.custo) / prod.venda) * 100;
-            
-            // Tabela de Estoque
-            tb.innerHTML += `
-                <tr>
-                    <td>${prod.nome}</td>
-                    <td>R$ ${prod.custo.toFixed(2)}</td>
-                    <td>R$ ${prod.venda.toFixed(2)}</td>
-                    <td style="color:${margem > 20 ? '#00ff88' : '#ff4444'}">${margem.toFixed(1)}%</td>
-                    <td><button onclick="remover(${index})" style="background:red; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer">X</button></td>
-                </tr>
-            `;
-
-            // Vitrine do PDV
-            vitrine.innerHTML += `
-                <div onclick="alert('Adicionado: ${prod.nome}')" style="background:#fff; color:#000; padding:15px; border-radius:10px; text-align:center; font-weight:bold; cursor:pointer">
-                    ${prod.nome}<br><span style="color:var(--blue)">R$ ${prod.venda.toFixed(2)}</span>
-                </div>
-            `;
-        });
+    function abrirMesa() {
+        const nome = document.getElementById('nomeCliente').value;
+        if(!nome) return alert("Edmarques, coloque o nome do cliente!");
+        mesas[mesaSel] = { ocupada: true, cliente: nome };
+        document.getElementById(`m${mesaSel}`).classList.add('ocupada');
+        document.getElementById(`s${mesaSel}`).innerText = nome;
+        selMesa(mesaSel);
+        document.getElementById('nomeCliente').value = '';
     }
 
-    function remover(index) {
-        estoque.splice(index, 1);
-        atualizarTabelas();
+    function gerarRecibo() {
+        const meio = document.getElementById('meioPgto').value;
+        const cli = mesas[mesaSel].cliente;
+        const texto = `*BOTECO 934 - RECIBO*%0A---%0A*Cliente:* ${cli}%0A*Mesa:* ${mesaSel}%0A*Pagamento:* ${meio}%0A---%0A*Obrigado!*`;
+        window.open(`https://wa.me/?text=${texto}`, '_blank');
+        
+        // Limpar mesa
+        document.getElementById(`m${mesaSel}`).classList.remove('ocupada');
+        document.getElementById(`s${mesaSel}`).innerText = "Livre";
+        mesas[mesaSel] = { ocupada: false, cliente: '' };
+        selMesa(mesaSel);
     }
 
     function mudarTela(id, el) {
@@ -184,15 +183,26 @@
         el.classList.add('active');
     }
 
-    function calcP() {
-        const a = document.getElementById('ca').value || 0;
-        const b = document.getElementById('cb').value || 1;
-        const m = ((b - a) / b) * 100;
-        document.getElementById('outM').innerText = m.toFixed(1) + '%';
+    function calcDose() {
+        const c = document.getElementById('dc').value || 0;
+        const mlG = document.getElementById('dml').value || 1;
+        const mlD = document.getElementById('dmld').value || 1;
+        const v = document.getElementById('dv').value || 0;
+        const custoD = c / (mlG / mlD);
+        const margem = v > 0 ? ((v - custoD) / v) * 100 : 0;
+        document.getElementById('resDose').innerText = margem.toFixed(1) + '%';
+    }
+
+    function calcFardo() {
+        const c = document.getElementById('fc').value || 0;
+        const q = document.getElementById('fq').value || 1;
+        const v = document.getElementById('fv').value || 0;
+        const custoU = c / q;
+        const margem = v > 0 ? ((v - custoU) / v) * 100 : 0;
+        document.getElementById('resFardo').innerText = margem.toFixed(1) + '%';
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    atualizarTabelas();
 </script>
 </body>
 </html>
