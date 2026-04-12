@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - GESTÃO COMPLETA</title>
+    <title>934 BOTECO - SISTEMA INTEGRADO</title>
     <style>
-        :root { --gold: #ffcc00; --blue: #00d4ff; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
+        :root { --gold: #ffcc00; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: #fff; min-height: 100vh; }
         header { background: var(--gold); padding: 12px 25px; color: #000; font-weight: 900; display: flex; justify-content: space-between; }
         nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 1000; }
-        .nav-item { padding: 18px 20px; cursor: pointer; color: #666; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        .nav-item.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
-        .secao { display: none; }
-        .ativa { display: block; animation: fadeIn 0.3s ease; }
+        .nav-item { padding: 18px 20px; cursor: pointer; color: #666; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(255,204,0,0.05); }
+        .container { padding: 20px; max-width: 1250px; margin: auto; }
+        .secao { display: none; animation: fadeIn 0.3s ease; }
+        .ativa { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
-        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
-        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 16px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         .btn-gold { background: var(--gold); color: #000; }
+        .btn-zap { background: #25d366; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid #333; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
-        .btn-zap { background: #25d366; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 11px; }
+        th { text-align: left; color: var(--gold); padding: 12px; border-bottom: 1px solid #333; font-size: 11px; }
+        td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .mesa { background: #1a1a1a; padding: 15px 5px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .mesa.ocupada { background: #440000; border-color: #ff4444; }
+        .mesa.selecionada { border-color: var(--gold); background: #333; }
     </style>
 </head>
 <body>
@@ -42,93 +47,113 @@
 
 <div class="container">
     
+    <div id="vendas" class="secao ativa">
+        <div style="display:grid; grid-template-columns: 1fr 380px; gap:20px;">
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">Painel de Atendimento</h3>
+                <div class="grid-mesas" id="gridMesas"></div>
+            </div>
+            <div class="card" style="background:#fff; color:#000;">
+                <div id="areaAbrir">
+                    <h3 style="border-bottom:1px solid #eee; padding-bottom:10px;">Abrir Mesa</h3>
+                    <input type="text" id="nomePDV" placeholder="Nome do Cliente" style="background:#f4f4f4; color:#000; margin-top:15px;">
+                    <button class="btn btn-gold" onclick="abrirMesa()">Iniciar Consumo</button>
+                </div>
+                <div id="areaConsumo" style="display:none;">
+                    <h3 id="hMesa">Mesa --</h3>
+                    <p id="hCli" style="font-weight:bold; color:#666; margin-bottom:20px;"></p>
+                    <div style="min-height:200px; border-bottom:1px solid #eee;">
+                        <p style="font-size:12px; color:#999;">Itens do pedido...</p>
+                    </div>
+                    <h2 style="margin:15px 0;">TOTAL: R$ <span id="totalVenda">0,00</span></h2>
+                    <label style="color:#000; font-weight:bold; font-size:11px;">FORMA DE RECEBIMENTO:</label>
+                    <select id="meioPgto" style="background:#f4f4f4; color:#000;">
+                        <option value="Dinheiro">💵 Dinheiro</option>
+                        <option value="PIX">📱 PIX</option>
+                        <option value="Débito">💳 Cartão Débito</option>
+                        <option value="Crédito">💳 Cartão Crédito</option>
+                        <option value="Pendura">📝 Pendura (Fiado)</option>
+                    </select>
+                    <button class="btn btn-gold" style="background:#25d366; color:#fff;" onclick="fecharComanda()">Fechar e Enviar WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="clientes" class="secao">
         <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">👥 Cadastro de Clientes / Revenda</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:10px;">
-                <input type="text" id="cli_nome" placeholder="Nome do Cliente">
-                <input type="text" id="cli_zap" placeholder="WhatsApp (ex: 87999999999)">
-                <button class="btn btn-gold" onclick="salvarCliente()" style="width:120px;">Salvar</button>
+            <h3 style="color:var(--gold); margin-bottom:15px;">👥 Gestão de Clientes</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:10px; margin-bottom:20px;">
+                <input type="text" id="c_nome" placeholder="Nome Completo">
+                <input type="text" id="c_fone" placeholder="WhatsApp (ex: 879...)">
+                <button class="btn btn-gold" onclick="addCli()" style="width:120px;">Salvar</button>
             </div>
             <table>
-                <thead>
-                    <tr><th>NOME</th><th>CONTATO</th><th>AÇÕES</th></tr>
-                </thead>
-                <tbody id="corpoClientes">
-                    </tbody>
+                <thead><tr><th>NOME</th><th>CONTATO</th><th>AÇÕES</th></tr></thead>
+                <tbody id="tabClientes"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="vendas" class="secao ativa">
-        <div style="display:grid; grid-template-columns: 1fr 380px; gap:20px;">
-            <div class="card">
-                <h3>Painel de Mesas</h3>
-                <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; margin-top:15px;" id="gradeMesas"></div>
-            </div>
-            <div class="card" style="background:#fff; color:#000;">
-                <div id="areaAbrir">
-                    <h3>Abrir Mesa</h3>
-                    <input type="text" id="nomeAtendimento" placeholder="Nome do Cliente" style="background:#f4f4f4; color:#000; margin-top:15px;">
-                    <button class="btn btn-gold" onclick="abrirMesa()">Iniciar</button>
-                </div>
-                <div id="areaConsumo" style="display:none;">
-                    <h3 id="hMesa">Mesa --</h3>
-                    <p id="hCli" style="font-weight:bold; color:#666;"></p>
-                    <div style="min-height:200px; margin-top:15px;">Total: R$ 0,00</div>
-                    <select id="pagamento" style="background:#f4f4f4; color:#000;">
-                        <option value="Dinheiro">Dinheiro</option>
-                        <option value="PIX">PIX</option>
-                        <option value="Pendura">Pendura (Fiado)</option>
-                    </select>
-                    <button class="btn btn-gold" onclick="fechar()">Fechar Conta</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="precificacao" class="secao">
-        <div class="card" style="max-width:500px; margin:auto;">
-            <h3 style="color:var(--gold)">Cálculo de Margem Real</h3>
-            <label>Custo</label><input type="number" id="c_custo" oninput="calc()">
-            <label>Venda</label><input type="number" id="c_venda" oninput="calc()">
-            <div style="background:#111; padding:20px; border-radius:10px; border-left:5px solid var(--gold); margin-top:15px;">
-                <p style="font-size:11px;">LUCRO PORCENTAGEM:</p>
-                <h2 id="resMargem" style="color:var(--gold)">0%</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div class="card">
+                <h3 style="color:var(--gold)">🥃 Precificação de Dose</h3>
+                <label>Custo Garrafa</label><input type="number" id="dc" oninput="calcD()">
+                <label>ML Dose</label><input type="number" id="dml" value="50" oninput="calcD()">
+                <label>Venda Dose</label><input type="number" id="dv" oninput="calcD()">
+                <div style="background:#111; padding:15px; border-radius:10px; border-left:5px solid var(--gold); margin-top:10px;">
+                    <p style="font-size:11px;">MARGEM:</p><h2 id="resD" style="color:var(--gold)">0%</h2>
+                </div>
+            </div>
+            <div class="card">
+                <h3 style="color:var(--blue)">📊 Margem Fardo / Geral</h3>
+                <label>Custo Unitário</label><input type="number" id="fc" oninput="calcF()">
+                <label>Venda Unitária</label><input type="number" id="fv" oninput="calcF()">
+                <div style="background:#111; padding:15px; border-radius:10px; border-left:5px solid var(--blue); margin-top:10px;">
+                    <p style="font-size:11px;">LUCRO REAL:</p><h2 id="resF" style="color:var(--blue)">0%</h2>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="estoque" class="secao">
         <div class="card">
-            <h3>Importar XML</h3>
-            <input type="file" accept=".xml">
+            <h3 style="color:var(--gold)">📥 Importar XML</h3>
+            <input type="file" accept=".xml" style="margin-top:10px;">
+        </div>
+        <div class="card">
+            <h3>📦 Itens em Estoque</h3>
+            <table>
+                <thead><tr><th>PRODUTO</th><th>CUSTO</th><th>VENDA</th><th>MARGEM</th></tr></thead>
+                <tbody id="tabEstoque"></tbody>
+            </table>
         </div>
     </div>
 
 </div>
 
 <script>
-    let mesaSel = null;
+    let mSel = null;
     let mesas = {};
-    let listaClientes = JSON.parse(localStorage.getItem('clientes_934')) || [];
+    let clientes = JSON.parse(localStorage.getItem('cli_934')) || [];
 
-    // Gerar Mesas
-    const grade = document.getElementById('gradeMesas');
+    // Iniciar Mesas
+    const g = document.getElementById('gridMesas');
     for(let i=1; i<=20; i++){
-        grade.innerHTML += `<div class="card" id="m${i}" style="padding:10px; text-align:center; cursor:pointer; background:#222;" onclick="selMesa(${i})">M${i}<br><small id="s${i}">Livre</small></div>`;
-        mesas[i] = { ativa: false, cliente: '' };
+        g.innerHTML += `<div class="mesa" id="m${i}" onclick="selMesa(${i})"><b>Mesa ${i}</b><br><small id="s${i}">Livre</small></div>`;
+        mesas[i] = { ocupada: false, cliente: '' };
     }
 
     function selMesa(n) {
-        mesaSel = n;
-        document.querySelectorAll('[id^="m"]').forEach(m => m.style.borderColor = "transparent");
-        document.getElementById(`m${n}`).style.borderColor = "var(--gold)";
-        if(mesas[n].ativa) {
+        mSel = n;
+        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+        document.getElementById(`m${n}`).classList.add('selecionada');
+        if(mesas[n].ocupada) {
             document.getElementById('areaAbrir').style.display='none';
             document.getElementById('areaConsumo').style.display='block';
             document.getElementById('hMesa').innerText = `Mesa ${n}`;
-            document.getElementById('hCli').innerText = mesas[n].cliente;
+            document.getElementById('hCli').innerText = `Cliente: ${mesas[n].cliente}`;
         } else {
             document.getElementById('areaAbrir').style.display='block';
             document.getElementById('areaConsumo').style.display='none';
@@ -136,45 +161,23 @@
     }
 
     function abrirMesa() {
-        const nome = document.getElementById('nomeAtendimento').value;
-        if(!nome) return alert("Dê um nome ao cliente!");
-        mesas[mesaSel] = { ativa: true, cliente: nome };
-        document.getElementById(`m${mesaSel}`).style.background = "#440000";
-        document.getElementById(`s${mesaSel}`).innerText = nome;
-        selMesa(mesaSel);
+        const nome = document.getElementById('nomePDV').value;
+        if(!nome) return alert("Digite o nome!");
+        mesas[mSel] = { ocupada: true, cliente: nome };
+        document.getElementById(`m${mSel}`).classList.add('ocupada');
+        document.getElementById(`s${mSel}`).innerText = nome;
+        selMesa(mSel);
     }
 
-    function fechar() {
-        const forma = document.getElementById('pagamento').value;
-        alert(`Recibo enviado para ${mesas[mesaSel].cliente} via ${forma}`);
-        document.getElementById(`m${mesaSel}`).style.background = "#222";
-        document.getElementById(`s${mesaSel}`).innerText = "Livre";
-        mesas[mesaSel] = { ativa: false, cliente: '' };
-        selMesa(mesaSel);
-    }
-
-    function salvarCliente() {
-        const nome = document.getElementById('cli_nome').value;
-        const zap = document.getElementById('cli_zap').value;
-        if(nome && zap) {
-            listaClientes.push({ nome, zap });
-            localStorage.setItem('clientes_934', JSON.stringify(listaClientes));
-            renderizarClientes();
-            document.getElementById('cli_nome').value = '';
-            document.getElementById('cli_zap').value = '';
-        }
-    }
-
-    function renderizarClientes() {
-        const corpo = document.getElementById('corpoClientes');
-        corpo.innerHTML = '';
-        listaClientes.forEach(c => {
-            corpo.innerHTML += `<tr>
-                <td>${c.nome}</td>
-                <td>${c.zap}</td>
-                <td><a href="https://wa.me/55${c.zap}" target="_blank" class="btn-zap">WhatsApp</a></td>
-            </tr>`;
-        });
+    function fecharComanda() {
+        const meio = document.getElementById('meioPgto').value;
+        const cli = mesas[mSel].cliente;
+        const texto = `*BOTECO 934*%0A---%0A*Cliente:* ${cli}%0A*Mesa:* ${mSel}%0A*Pagamento:* ${meio}%0A---%0A*Obrigado!*`;
+        window.open(`https://wa.me/?text=${texto}`, '_blank');
+        document.getElementById(`m${mSel}`).classList.remove('ocupada');
+        document.getElementById(`s${mSel}`).innerText = "Livre";
+        mesas[mSel] = { ocupada: false, cliente: '' };
+        selMesa(mSel);
     }
 
     function mudarTela(id, el) {
@@ -184,15 +187,43 @@
         el.classList.add('active');
     }
 
-    function calc() {
-        const c = document.getElementById('c_custo').value || 0;
-        const v = document.getElementById('c_venda').value || 1;
-        const m = ((v - c) / v) * 100;
-        document.getElementById('resMargem').innerText = m.toFixed(1) + '%';
+    function addCli() {
+        const n = document.getElementById('c_nome').value;
+        const f = document.getElementById('c_fone').value;
+        if(n && f) {
+            clientes.push({ n, f });
+            localStorage.setItem('cli_934', JSON.stringify(clientes));
+            renderCli();
+            document.getElementById('c_nome').value = '';
+            document.getElementById('c_fone').value = '';
+        }
+    }
+
+    function renderCli() {
+        const t = document.getElementById('tabClientes'); t.innerHTML = '';
+        clientes.forEach(c => {
+            t.innerHTML += `<tr><td>${c.n}</td><td>${c.f}</td><td><a href="https://wa.me/55${c.f}" target="_blank" class="btn-zap">WhatsApp</a></td></tr>`;
+        });
+    }
+
+    function calcD() {
+        const c = document.getElementById('dc').value || 0;
+        const mld = document.getElementById('dml').value || 1;
+        const v = document.getElementById('dv').value || 0;
+        const custoD = c / (1000 / mld);
+        const margem = v > 0 ? ((v - custoD) / v) * 100 : 0;
+        document.getElementById('resD').innerText = margem.toFixed(1) + '%';
+    }
+
+    function calcF() {
+        const c = document.getElementById('fc').value || 0;
+        const v = document.getElementById('fv').value || 0;
+        const margem = v > 0 ? ((v - c) / v) * 100 : 0;
+        document.getElementById('resF').innerText = margem.toFixed(1) + '%';
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    renderizarClientes();
+    renderCli();
 </script>
 </body>
 </html>
