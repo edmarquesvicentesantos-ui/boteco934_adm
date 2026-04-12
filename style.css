@@ -1,18 +1,40 @@
-body { font-family: sans-serif; background: #f8f9fa; padding: 20px; color: #333; }
-.card-topo { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
-.controles { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.modal-content-largo {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
 
-.titulo { font-size: 42px; margin: 0 0 20px 0; font-weight: bold; }
-input, select { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+.grid-produtos-pequeno {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+}
 
-/* Botões conforme seu print */
-.btn-azul { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
-.btn-ciano { background: #17a2b8; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
-.btn-branco { background: white; border: 2px solid #333; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
-.btn-fechar { background: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: bold; }
+.card-mini {
+    background: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid #007bff;
+}
 
-/* MODAIS (JANELAS) - AQUI ESTÁ A CORREÇÃO */
-.modal-bg { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
-.modal-caixa { background: white; padding: 30px; border-radius: 15px; width: 320px; display: flex; flex-direction: column; gap: 15px; text-align: center; }
+.card-mini:active { background: #e0e0e0; }
 
-.grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin: 20px 0; }
+.btn-sucesso {
+    background: #28a745;
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
