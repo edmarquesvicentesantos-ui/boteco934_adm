@@ -3,58 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Sistema Operacional</title>
+    <title>Boteco 934 - Sistema Integrado</title>
     <style>
-        /* Estilo Neo-Noir / Glassmorphism solicitado por Edmarques */
+        /* Estilo Neo-Noir e Glassmorphism */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #1a1a1a; color: #fff; }
-        header { background: #ffcc00; padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; }
-        .logo-box { display: flex; align-items: center; gap: 10px; }
-        .badge { background: #000; color: #ffcc00; padding: 5px 10px; border-radius: 4px; font-weight: 900; }
+        body { background: #121212; color: #fff; }
+        header { background: #ffcc00; padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
+        .badge { background: #000; color: #ffcc00; padding: 5px 12px; border-radius: 4px; font-weight: 900; font-size: 1.4em; }
         
-        nav { background: #333; display: flex; padding: 0 40px; border-bottom: 2px solid #444; }
-        .nav-item { padding: 15px 20px; cursor: pointer; font-size: 13px; font-weight: bold; text-transform: uppercase; color: #aaa; transition: 0.3s; }
-        .nav-item:hover, .active { color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 1px solid #333; }
+        .nav-item { padding: 18px 25px; cursor: pointer; font-size: 12px; font-weight: bold; text-transform: uppercase; color: #888; transition: 0.3s; }
+        .nav-item:hover, .active { color: #ffcc00; border-bottom: 3px solid #ffcc00; background: rgba(255, 204, 0, 0.05); }
 
         .container { padding: 30px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* Estilo das Mesas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .mesa { background: rgba(255, 255, 255, 0.1); border: 1px solid #555; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.2em; }
-        .mesa.ocupada { background: #d32f2f; border-color: #f44336; }
+        /* Grid de Mesas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; }
+        .mesa { background: rgba(255, 255, 255, 0.05); border: 1px solid #444; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .mesa:hover { border-color: #ffcc00; transform: translateY(-3px); }
+        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; color: #fff; box-shadow: 0 0 15px rgba(211, 47, 47, 0.4); }
 
-        /* Formulários e Tabelas */
-        .card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
-        input { padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; margin-right: 10px; margin-bottom: 10px; }
-        button { padding: 12px 25px; background: #ffcc00; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; color: #000; border-radius: 8px; overflow: hidden; }
-        th { background: #2b579a; color: #fff; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #ddd; font-weight: bold; }
+        /* Cards e Tabelas */
+        .card { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
+        input { padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 8px; margin-right: 10px; margin-bottom: 10px; width: 200px; }
+        button { padding: 12px 25px; background: #ffcc00; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        button:hover { background: #e6b800; transform: scale(1.02); }
+        .btn-limpar { background: #f44336; color: white; margin-left: 10px; }
+
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        th { background: #2b579a; color: #fff; padding: 15px; text-align: left; font-size: 13px; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; }
         .c-custo { background: #fff2cc; }
-        .c-margem { background: #c6efce; color: #006100; }
+        .c-lucro { background: #fce4ec; }
+        .c-margem { background: #e8f5e9; color: #2e7d32; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-box">
+    <div style="display:flex; align-items:center; gap:15px;">
         <div class="badge">934</div>
-        <h1 style="letter-spacing: -2px;">BOTECO</h1>
+        <h1 style="letter-spacing:-2px; font-size: 2em;">BOTECO</h1>
     </div>
-    <div id="info">Petrolina-PE | <span id="temp">32°C</span></div>
+    <div style="text-align:right;">
+        <strong>Petrolina-PE</strong><br>
+        <span style="color: #555; font-size: 12px;">Dólar: R$ 5,01 | Euro: R$ 5,87</span>
+    </div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="irPara('operacional', this)">Operacional (Mesas)</div>
-    <div class="nav-item" onclick="irPara('estoque', this)">Estoque / XML</div>
-    <div class="nav-item" onclick="irPara('clientes', this)">Clientes (Fiado)</div>
+    <div class="nav-item active" onclick="mudarTela('operacional', this)">Operacional</div>
+    <div class="nav-item" onclick="mudarTela('estoque', this)">Estoque / XML</div>
+    <div class="nav-item" onclick="mudarTela('clientes', this)">Clientes</div>
 </nav>
 
 <div class="container">
     
     <div id="operacional" class="secao ativa">
-        <h2>ATENDIMENTO DE BALCÃO</h2>
-        <div id="gradeMesas" class="grid-mesas"
+        <h2 style="color:#ffcc00">SISTEMA OPERACIONAL - BALCÃO</h2>
+        <div id="gradeMesas" class="grid-mesas"></div>
+    </div>
+
+    <div id="estoque" class="secao">
+        <div class="card">
+            <h3 style="margin-bottom:15px; color:#ffcc00">IMPORTAR OU CADASTRAR PRODUTO</h3>
+            <input type="text" id="pNome" placeholder="Nome (Ex: Heineken)">
+            <input type="number" id="pQtd" placeholder="Qtd no Fardo">
+            <input type="number" id="pCusto" placeholder="Custo Fardo (R$)">
+            <input type="number" id="pVenda" placeholder="Venda Unit. (R$)">
+            <button onclick="salvarProduto()">SALVAR NO CLOUD</button>
+            <button class="btn-limpar" onclick="limparBanco()">LIMPAR TUDO</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>PRODUTO</th>
+                    <th>QTD</th>
+                    <th class="c-custo">CUSTO UNIT.</th>
+                    <th>VENDA UNIT.</th>
+                    <th class="c-lucro">LUCRO UNIT.</th>
+                    <th class="c-margem">MARGEM %</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaCorpo"></tbody>
+        </table>
+    </div>
+
+    <div id="clientes" class="secao">
+        <div class="card">
+            <h2 style="color:#ffcc00">GESTÃO DE CLIENTES</h2>
+            <div id="listaClientes" style="margin-top:20px;">Carregando lista de fiados...</div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Dados do seu Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSy...", // Sua chave da foto
+        authDomain: "boteco934-afc3f.firebaseapp.com",
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+        projectId: "boteco934-afc3f",
+        storageBucket: "boteco934-afc3f.appspot.com",
+        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Navegação
+    window.mudarTela = (id, el) => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa');
+        el.classList.add('active');
+    };
+
+    // Criar Mesas Dinamicamente
+    const grade = document.getElementById('gradeMesas');
+    for(let i=1; i<=15; i++) {
+        grade.innerHTML += `<div class="mesa" id="mesa-${i}" onclick="toggleMesa(${i})">MESA ${i}</div>`;
+    }
+
+    window.toggleMesa = (num) => {
+        document.getElementById(`mesa-${num}`).classList.toggle('ocupada');
+    };
+
+    // SALVAR PRODUTO NO FIREBASE
+    window.salvarProduto = function() {
+        const nome = document.getElementById('pNome').value;
+        const qtdFardo = parseFloat(document.getElementById('pQtd').value) || 1;
+        const custoFardo = parseFloat(document.getElementById('pCusto').value);
+        const vendaUnit = parseFloat(document.getElementById('pVenda').value);
+
+        if(!nome || !custoFardo || !vendaUnit) return alert("Preencha os campos!");
+
+        const custoUnit = custoFardo / qtdFardo;
+        const lucroUnit = vendaUnit - custoUnit;
+        const margem = ((lucroUnit / vendaUnit) * 100).toFixed(2);
+
+        const refProd = push(ref(db, 'produtos')); // Salva na pasta 'produtos' da foto
+        set(refProd, {
+            nome, qtd: qtdFardo, custo: custoUnit, venda: vendaUnit, lucro: lucroUnit, margem
+        }).then(() => {
+            alert("✅ Produto Enviado para a Nuvem!");
+            document.getElementById('pNome').value = "";
+        });
+    };
+
+    // LER PRODUTOS DO FIREBASE EM TEMPO REAL
+    onValue(ref(db, 'produtos'), (snapshot) => {
+        const tabela = document.getElementById('tabelaCorpo');
+        tabela.innerHTML = "";
+        const data = snapshot.val();
+        
+        if(data) {
+            Object.values(data).forEach(p => {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${p.nome.toUpperCase()}</td>
+                        <td>${p.qtd}</td>
+                        <td class="c-custo">R$ ${p.custo.toFixed(2)}</td>
+                        <td>R$ ${p.venda.toFixed(2)}</td>
+                        <td class="c-lucro">R$ ${p.lucro.toFixed(2)}</td>
+                        <td class="c-margem">${p.margem}%</td>
+                    </tr>`;
+            });
+        } else {
+            tabela.innerHTML = "<tr><td colspan='6' style='text-align:center'>Sem produtos no estoque online.</td></tr>";
+        }
+    });
+
+    window.limparBanco = () => {
+        if(confirm("Deseja apagar TODO o estoque da nuvem?")) {
+            remove(ref(db, 'produtos'));
+        }
+    };
+</script>
+</body>
+</html>
