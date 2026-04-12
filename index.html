@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - SISTEMA GERAL</title>
+    <title>934 BOTECO - GESTÃO TOTAL</title>
     <style>
         :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --vermelho: #ff4444; --cinza: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -18,20 +18,22 @@
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* PDV VITRINE */
+        /* ESTILO PDV */
         .pdv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 15px; }
         .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
         .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; height: 110px; display: flex; flex-direction: column; justify-content: center; }
         .card-prod span { display: block; color: var(--azul); font-size: 1.2em; margin-top: 5px; }
 
-        /* CUPOM E CALCULADORA */
+        /* ESTILO CALCULADORA (IGUAL À FOTO) */
+        .card-calc { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; max-width: 550px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-calc { background: var(--amarelo); color: #000; padding: 18px; border: none; width: 100%; font-weight: 900; cursor: pointer; border-radius: 10px; font-size: 16px; text-transform: uppercase; margin-top: 10px; }
+
+        /* RECIBO */
         .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; min-height: 350px; }
-        .card-calc { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; max-width: 550px; margin: 20px auto; }
-        
         .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .btn-pgto button { padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; color: #fff; text-transform: uppercase; font-size: 11px; }
         
-        input, select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 10px; }
+        input, select { background: #222; border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-size: 16px; }
         
         @media print { body * { visibility: hidden; } #reciboDigital, #reciboDigital * { visibility: visible; } #reciboDigital { position: absolute; left: 0; top: 0; width: 100%; } }
         @media (max-width: 800px) { .pdv-layout { grid-template-columns: 1fr; } }
@@ -68,7 +70,7 @@
                     <div style="text-align:center; border-bottom:1px dashed #000; margin-bottom:10px; padding-bottom:10px;">
                         <b>934 BOTECO - PETROLINA</b><br>RECIBO DE VENDA<br>----------------------------
                     </div>
-                    <div id="itensCupom" style="margin-bottom:20px;">Aguardando...</div>
+                    <div id="itensCupom" style="margin-bottom:20px;">Selecione os itens...</div>
                     <div style="border-top:1px dashed #000; padding-top:10px;">
                         <b style="font-size:1.4em;">TOTAL: R$ <span id="totalTxt">0.00</span></b>
                     </div>
@@ -87,13 +89,13 @@
 
     <div id="calculadora" class="secao">
         <div class="card-calc">
-            <h2 style="color:var(--amarelo); text-align:center; margin-bottom:25px;">Calculadora de Margem</h2>
+            <h2 style="color:var(--amarelo); text-align:center; margin-bottom:30px;">Calculadora de Margem</h2>
             <label>Custo Unitário (R$):</label>
             <input type="number" id="c_custo" placeholder="Ex: 5.50">
             <label>Preço de Venda (R$):</label>
             <input type="number" id="c_venda" placeholder="Ex: 12.00">
-            <button onclick="calcularMargem()" style="background:var(--amarelo); color:#000; padding:15px; border:none; width:100%; font-weight:bold; cursor:pointer; border-radius:8px; margin-top:10px;">ANALISAR AGORA</button>
-            <div id="resCalc" style="margin-top:20px;"></div>
+            <button class="btn-calc" onclick="calcularMargem()">ANALISAR AGORA</button>
+            <div id="resCalc" style="margin-top:25px;"></div>
         </div>
     </div>
 
@@ -103,7 +105,11 @@
     </div>
 
     <div id="clientes" class="secao">
-        <input type="text" id="nCli" placeholder="Nome"><input type="text" id="tCli" placeholder="WhatsApp"><button onclick="addCli()" style="background:var(--verde); color:#fff; border:none; padding:12px; width:100%; border-radius:6px; font-weight:bold;">CADASTRAR</button>
+        <div class="card-calc" style="max-width: 100%;">
+            <input type="text" id="nCli" placeholder="Nome do Cliente">
+            <input type="text" id="tCli" placeholder="WhatsApp">
+            <button onclick="addCli()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; cursor:pointer;">CADASTRAR CLIENTE</button>
+        </div>
         <div id="listaCliView" style="margin-top:20px;"></div>
     </div>
 </div>
@@ -112,14 +118,18 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    const firebaseConfig = { apiKey: "AIzaSy...", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
+    const firebaseConfig = { 
+        apiKey: "AIzaSy...", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     let carrinho = [], produtosDados = {};
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // VITRINE ANTI-REPETIÇÃO
+    // CARREGA PRODUTOS SEM DUPLICADOS
     onValue(ref(db, 'produtos'), (s) => {
         const g = document.getElementById('gridProdutos'); g.innerHTML = "";
         produtosDados = s.val() || {};
@@ -136,15 +146,26 @@
     window.addCar = (id) => {
         carrinho.push({ nome: produtosDados[id].nome, preco: produtosDados[id].venda });
         const d = document.getElementById('itensCupom'); d.innerHTML = ""; let t = 0;
-        carrinho.forEach(i => { d.innerHTML += `<div style="display:flex; justify-content:space-between"><span>${i.nome}</span><b>R$ ${Number(i.preco).toFixed(2)}</b></div>`; t += Number(i.preco); });
+        carrinho.forEach(i => { 
+            d.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.nome}</span><b>R$ ${Number(i.preco).toFixed(2)}</b></div>`; 
+            t += Number(i.preco); 
+        });
         document.getElementById('totalTxt').innerText = t.toFixed(2);
     };
 
     window.calcularMargem = () => {
-        const c = parseFloat(document.getElementById('c_custo').value), v = parseFloat(document.getElementById('c_venda').value);
+        const c = parseFloat(document.getElementById('c_custo').value);
+        const v = parseFloat(document.getElementById('c_venda').value);
         if(!c || !v) return;
         const lucro = v - c; const margem = (lucro / v) * 100;
-        document.getElementById('resCalc').innerHTML = `<div style="background:#222; padding:15px; border-radius:10px; border-left:5px solid var(--amarelo)">Lucro: R$ ${lucro.toFixed(2)} | Margem: ${margem.toFixed(1)}%</div>`;
+        document.getElementById('resCalc').innerHTML = `
+            <div style="background:#222; padding:20px; border-radius:12px; border-left:6px solid var(--amarelo); line-height:1.6;">
+                <p>Lucro Real: <b>R$ ${lucro.toFixed(2)}</b></p>
+                <p>Margem: <b>${margem.toFixed(1)}%</b></p>
+                <p style="color:${margem < 35 ? 'var(--vermelho)' : 'var(--verde)'}; font-size:14px; margin-top:5px;">
+                    ${margem < 35 ? '⚠️ Margem Baixa' : '✅ Margem Saudável'}
+                </p>
+            </div>`;
     };
 
     window.fechar = (metodo) => {
@@ -152,11 +173,19 @@
         const total = parseFloat(document.getElementById('totalTxt').innerText);
         const cli = document.getElementById('selCliente').value;
         const dV = new Date(); dV.setDate(dV.getDate() + 4);
-        const venda = { cliente: cli, total, metodo, data: new Date().toLocaleDateString('pt-BR'), vencimento: metodo === 'PENDURA' ? dV.toLocaleDateString('pt-BR') : 'Pago' };
+        const vencF = dV.toLocaleDateString('pt-BR');
+
+        const venda = { 
+            cliente: cli, 
+            total, 
+            metodo, 
+            data: new Date().toLocaleDateString('pt-BR'), 
+            vencimento: metodo === 'PENDURA' ? vencF : 'Pago' 
+        };
 
         push(ref(db, 'vendas_fin'), venda).then(() => {
             if(metodo === 'PENDURA') {
-                const msg = `*BOTECO 934*%0AConta: *R$ ${total.toFixed(2)}*%0AVencimento: *${venda.vencimento}*`;
+                const msg = `*BOTECO 934 - COBRANÇA*%0A%0AOlá *${cli}*, sua conta de hoje ficou em *R$ ${total.toFixed(2)}*.%0A🗓️ Vencimento: *${vencF}*%0A%0AAté a próxima! 🍻`;
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
             }
             window.print();
@@ -171,7 +200,7 @@
 
     window.addCli = () => {
         const n = document.getElementById('nCli').value, t = document.getElementById('tCli').value;
-        if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(()=> { alert("OK"); document.getElementById('nCli').value=""; });
+        if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(()=> { alert("Cliente cadastrado!"); document.getElementById('nCli').value=""; });
     };
 
     window.mudar = (id, el) => {
