@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - GESTÃO BLINDADA</title>
+    <title>934 BOTECO - GESTÃO & LUCRO</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza: #1a1a1a; --txt-cor: #eee; }
+        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza: #1a1a1a; --vermelho: #ff4444; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--preto); color: var(--txt-cor); }
+        body { background: var(--preto); color: #fff; }
         
         header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
         nav { background: var(--cinza); display: flex; border-bottom: 1px solid #333; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
@@ -18,28 +18,29 @@
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* CALCULADORA DE REALIDADE (Markup vs Margem) */
-        .grid-calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        /* CALCULADORA DE REALIDADE */
+        .grid-calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .card-calc { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; }
         .res-box { background: #222; padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 5px solid #444; }
-        .res-box b { color: var(--amarelo); font-size: 1.1em; }
+        .res-box b { color: var(--amarelo); }
         .markup { border-left-color: var(--azul); }
         .margem-real { border-left-color: var(--verde); }
+        .praticado { border-left-color: var(--amarelo); background: #332b00; }
 
         /* PDV E ESTOQUE */
         .pdv-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
         .grid-vendas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .card-produto-venda { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; }
         .card-produto-venda span { display: block; color: var(--azul); font-size: 1.2em; }
-        
         .resumo-venda { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
+        
         .grid-header { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; background: var(--azul); padding: 12px; font-weight: bold; font-size: 10px; text-align: center; }
         .grid-linha { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; background: #fff; color: #000; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 11px; }
 
         input, select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 10px; }
         button { background: var(--amarelo); color: #000; font-weight: bold; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; text-transform: uppercase; }
 
-        @media (max-width: 768px) { .pdv-container { grid-template-columns: 1fr; } }
+        .card-cliente { background: #fff; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,21 +52,22 @@
 
 <nav>
     <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vender</div>
-    <div class="nav-item" onclick="mudar('calculadora', this)">🧮 Calculadora Realidade</div>
+    <div class="nav-item" onclick="mudar('calculadora', this)">🧮 Calculadora de Lucro</div>
     <div class="nav-item" onclick="mudar('estoque', this)">📦 Estoque XML</div>
     <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
 </nav>
 
 <div class="container">
+    
     <div id="vendas" class="secao ativa">
         <div class="pdv-container">
             <div id="gradeProdutos" class="grid-vendas"></div>
             <div class="resumo-venda">
-                <h3>Pedido</h3>
+                <h3>Novo Pedido</h3>
                 <select id="selectCliente"></select>
                 <div id="itensCarrinho" style="margin: 15px 0;"></div>
-                <div style="font-size: 30px; color: var(--amarelo); font-weight: 900;">R$ <span id="valorTotal">0.00</span></div>
-                <button onclick="finalizarVenda()" style="background: var(--verde); color: #fff; margin-top:10px;">Fechar Venda</button>
+                <div style="font-size: 32px; color: var(--amarelo); font-weight: 900;">R$ <span id="valorTotal">0.00</span></div>
+                <button onclick="finalizarVenda()" style="background: var(--verde); color: #fff; margin-top: 15px;">Finalizar e Baixar Estoque</button>
             </div>
         </div>
     </div>
@@ -73,32 +75,41 @@
     <div id="calculadora" class="secao">
         <div class="grid-calc">
             <div class="card-calc">
-                <h3>Cervejas & Caixas</h3>
+                <h3 style="color:var(--amarelo); margin-bottom:15px;">Cervejas & Caixas</h3>
                 <input type="number" id="c_qtd" placeholder="Qtd na Caixa (ex: 12)">
                 <input type="number" id="c_custo" placeholder="Custo da Caixa (R$)">
-                <input type="number" id="c_perc" value="50" placeholder="Porcentagem (%)">
-                <button onclick="calcCerveja()">Comparar Markup vs Margem</button>
+                <input type="number" id="c_praticado" placeholder="Seu Preço Atual (R$)">
+                <input type="number" id="c_perc" value="50" placeholder="Margem Desejada (%)">
+                <button onclick="calcCerveja()">Analisar Lucro</button>
                 <div id="resCerveja"></div>
             </div>
             <div class="card-calc">
-                <h3>Destilados & Doses</h3>
-                <input type="number" id="d_custo" placeholder="Custo Garrafa (R$)">
-                <input type="number" id="d_mlG" placeholder="ML Garrafa (ex: 1000)">
-                <input type="number" id="d_mlD" value="50" placeholder="ML Dose">
-                <button onclick="calcDestilado()">Calcular Lucro Dose</button>
+                <h3 style="color:var(--amarelo); margin-bottom:15px;">Destilados & Doses</h3>
+                <input type="number" id="d_custo" placeholder="Custo da Garrafa (R$)">
+                <input type="number" id="d_mlG" placeholder="ML da Garrafa (ex: 1000)">
+                <input type="number" id="d_praticado" placeholder="Preço da Dose Atual (R$)">
+                <input type="number" id="d_mlD" value="50" placeholder="ML da Dose (50)">
+                <button onclick="calcDestilado()">Analisar Dose</button>
                 <div id="resDestilado"></div>
             </div>
         </div>
     </div>
 
     <div id="estoque" class="secao">
-        <div style="display:flex; gap:10px; margin-bottom:20px;"><input type="file" id="xmlInput" accept=".xml"><button onclick="lancarXML()" style="width:auto">Importar XML</button></div>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="file" id="xmlInput" accept=".xml">
+            <button onclick="lancarXML()" style="width:auto">Lançar XML</button>
+        </div>
         <div class="grid-header"><div>PRODUTO</div><div>QTD</div><div>CUSTO</div><div>VENDA</div><div>LUCRO</div></div>
         <div id="listaProdutos"></div>
     </div>
 
     <div id="clientes" class="secao">
-        <div style="display:flex; gap:10px; margin-bottom:20px;"><input type="text" id="nCli" placeholder="Nome"><input type="text" id="tCli" placeholder="Zap"><button onclick="salvarCliente()" style="width:auto">Salvar</button></div>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="text" id="nCli" placeholder="Nome">
+            <input type="text" id="tCli" placeholder="WhatsApp">
+            <button onclick="salvarCliente()" style="width:auto">Salvar</button>
+        </div>
         <div id="listaClientes"></div>
     </div>
 </div>
@@ -121,57 +132,67 @@
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // --- LÓGICA DAS CALCULADORAS (MARKUP VS MARGEM) ---
+    // --- CALCULADORAS COM COMPARAÇÃO ---
     window.calcCerveja = () => {
         const q = parseFloat(document.getElementById('c_qtd').value) || 0;
         const c = parseFloat(document.getElementById('c_custo').value) || 0;
+        const prat = parseFloat(document.getElementById('c_praticado').value) || 0;
         const p = parseFloat(document.getElementById('c_perc').value) || 50;
         if(!q || !c) return;
-        const uniCusto = c / q;
-        const mkp = uniCusto * (1 + p/100); // Markup
-        const mrg = uniCusto / (1 - p/100); // Margem Real
-        document.getElementById('resCerveja').innerHTML = `
-            <div class="res-box">Custo Unitário: <b>R$ ${uniCusto.toFixed(2)}</b></div>
-            <div class="res-box markup">MARKUP (${p}%): <b>R$ ${mkp.toFixed(2)}</b><br><small>Sobra: R$ ${(mkp-uniCusto).toFixed(2)}</small></div>
-            <div class="res-box margem-real">MARGEM REAL (${p}%): <b>R$ ${mrg.toFixed(2)}</b><br><small>Sobra: R$ ${(mrg-uniCusto).toFixed(2)}</small></div>
-        `;
+
+        const uCusto = c / q;
+        const mkp = uCusto * (1 + p/100);
+        const mrg = uCusto / (1 - p/100);
+
+        let html = `<div class="res-box">Custo Unitário: <b>R$ ${uCusto.toFixed(2)}</b></div>`;
+        if(prat > 0) {
+            const lucro = prat - uCusto;
+            const mReal = (lucro / prat) * 100;
+            html += `<div class="res-box praticado">SEU PREÇO ATUAL: <b>R$ ${prat.toFixed(2)}</b><br><small>Lucro: R$ ${lucro.toFixed(2)} | Margem Real: ${mReal.toFixed(1)}%</small></div>`;
+        }
+        html += `<div class="res-box markup">Sugestão Markup (${p}%): <b>R$ ${mkp.toFixed(2)}</b></div>`;
+        html += `<div class="res-box margem-real">Sugestão Margem Real (${p}%): <b>R$ ${mrg.toFixed(2)}</b></div>`;
+        document.getElementById('resCerveja').innerHTML = html;
     };
 
     window.calcDestilado = () => {
         const c = parseFloat(document.getElementById('d_custo').value) || 0;
         const mG = parseFloat(document.getElementById('d_mlG').value) || 0;
         const mD = parseFloat(document.getElementById('d_mlD').value) || 50;
+        const prat = parseFloat(document.getElementById('d_praticado').value) || 0;
         if(!c || !mG) return;
-        const custoDose = (c / mG) * mD * 1.10; // +10% perda
-        document.getElementById('resDestilado').innerHTML = `
-            <div class="res-box">Custo da Dose: <b>R$ ${custoDose.toFixed(2)}</b></div>
-            <div class="res-box markup">Venda (Markup 100%): <b>R$ ${Math.ceil(custoDose*2)}.00</b></div>
-            <div class="res-box margem-real">Venda (Margem 50%): <b>R$ ${Math.ceil(custoDose/0.5)}.00</b></div>
-        `;
+
+        const cDose = (c / mG) * mD * 1.10; // +10% perda
+        let html = `<div class="res-box">Custo da Dose (c/ perda): <b>R$ ${cDose.toFixed(2)}</b></div>`;
+        if(prat > 0) {
+            html += `<div class="res-box praticado">SUA DOSE HOJE: <b>R$ ${prat.toFixed(2)}</b><br><small>Lucro Líquido: R$ ${(prat - cDose).toFixed(2)}</small></div>`;
+        }
+        html += `<div class="res-box markup">Venda Markup 100%: <b>R$ ${Math.ceil(cDose*2)}.00</b></div>`;
+        html += `<div class="res-box margem-real">Venda Margem 50%: <b>R$ ${Math.ceil(cDose/0.5)}.00</b></div>`;
+        document.getElementById('resDestilado').innerHTML = html;
     };
 
-    // --- PRODUTOS & VENDA ---
+    // --- PDV E ESTOQUE (ORDEM ALFABÉTICA) ---
     onValue(ref(db, 'produtos'), (s) => {
         const g = document.getElementById('gradeProdutos'), l = document.getElementById('listaProdutos');
         g.innerHTML = ""; l.innerHTML = ""; produtosDados = s.val() || {};
         const ord = Object.entries(produtosDados).sort((a,b) => a[1].nome.localeCompare(b[1].nome));
         ord.forEach(([id, p]) => {
             g.innerHTML += `<div class="card-produto-venda" onclick="addCar('${id}')">${p.nome.substring(0,18)}<span>R$ ${Number(p.venda).toFixed(2)}</span><small>Est: ${p.qtd}</small></div>`;
-            l.innerHTML += `<div class="grid-linha"><div style="text-align:left">${p.nome}</div><div>${p.qtd}</div><div>${Number(p.custo).toFixed(2)}</div><div>${Number(p.venda).toFixed(2)}</div><div style="color:var(--verde)">${Number(p.lucro).toFixed(2)}</div></div>`;
+            l.innerHTML += `<div class="grid-linha"><div style="text-align:left">${p.nome}</div><div>${p.qtd}</div><div>R$ ${Number(p.custo).toFixed(2)}</div><div>R$ ${Number(p.venda).toFixed(2)}</div><div style="color:var(--verde)">R$ ${Number(p.lucro).toFixed(2)}</div></div>`;
         });
     });
 
     window.addCar = (id) => {
-        const p = produtosDados[id];
-        if(p.qtd <= 0) return alert("Sem estoque!");
-        carrinho.push({ id, nome: p.nome, preco: p.venda });
+        if(produtosDados[id].qtd <= 0) return alert("Estoque Zerado!");
+        carrinho.push({ id, nome: produtosDados[id].nome, preco: produtosDados[id].venda });
         attCar();
     };
 
     function attCar() {
         const d = document.getElementById('itensCarrinho'); d.innerHTML = ""; let t = 0, agr = {};
         carrinho.forEach(i => { if(agr[i.nome]) { agr[i.nome].q++; agr[i.nome].v += Number(i.preco); } else { agr[i.nome] = {q:1, v:Number(i.preco)}; } t += Number(i.preco); });
-        for(let n in agr) { d.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px;"><span><b>${agr[n].q}x</b> ${n}</span><b>R$ ${agr[n].v.toFixed(2)}</b></div>`; }
+        for(let n in agr) { d.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span><b>${agr[n].q}x</b> ${n}</span><b>R$ ${agr[n].v.toFixed(2)}</b></div>`; }
         document.getElementById('valorTotal').innerText = t.toFixed(2);
     }
 
@@ -180,10 +201,10 @@
         const cli = document.getElementById('selectCliente').value;
         push(ref(db, 'vendas_gerais'), { cliente: cli, total: document.getElementById('valorTotal').innerText, data: new Date().toLocaleString() });
         carrinho.forEach(i => { update(ref(db, `produtos/${i.id}`), { qtd: produtosDados[i.id].qtd - 1 }); });
-        alert("Venda OK!"); carrinho = []; attCar();
+        alert("Venda Concluída!"); carrinho = []; attCar();
     };
 
-    // --- CLIENTES & XML ---
+    // --- CLIENTES ---
     onValue(ref(db, 'clientes'), (s) => {
         const sel = document.getElementById('selectCliente'), list = document.getElementById('listaClientes');
         sel.innerHTML = '<option value="Avulso">Venda Avulsa</option>'; list.innerHTML = "";
@@ -193,7 +214,7 @@
         }
     });
 
-    window.salvarCliente = () => { 
+    window.salvarCliente = () => {
         const n = document.getElementById('nCli').value, t = document.getElementById('tCli').value;
         if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(() => { document.getElementById('nCli').value = ""; document.getElementById('tCli').value = ""; });
     };
