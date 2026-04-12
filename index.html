@@ -138,4 +138,121 @@
     window.calcCerveja = () => {
         const qtd = parseFloat(document.getElementById('c_qtdCx').value) || 0;
         const custo = parseFloat(document.getElementById('c_custoCx').value) || 0;
-        const margem = parseFloat(document.getElementById('c_margem').value) ||
+        const margem = parseFloat(document.getElementById('c_margem').value) || 0;
+        if(!qtd || !custo) return;
+
+        const uniCusto = custo / qtd;
+        const vendaNat = uniCusto * (1 + (margem/100));
+        const vendaGel = vendaNat * 1.20; // +20% energia/gelo
+
+        document.getElementById('resCerveja').innerHTML = `
+            <div class="res-box">Custo Uni: <b>R$ ${uniCusto.toFixed(2)}</b></div>
+            <div class="res-box">Sugerido Natural: <b>R$ ${vendaNat.toFixed(2)}</b></div>
+            <div class="res-box">Sugerido Gelada: <b>R$ ${Math.ceil(vendaGel)}.00</b></div>
+        `;
+    };
+
+    // --- CALCULADORA DESTILADO ---
+    window.calcDestilado = () => {
+        const custoG = parseFloat(document.getElementById('d_custoG').value) || 0;
+        const mlG = parseFloat(document.getElementById('d_mlG').value) || 0;
+        const mlD = parseFloat(document.getElementById('d_mlD').value) || 50;
+        if(!custoG || !mlG) return;
+
+        const custoDose = (custoG / mlG) * mlD * 1.10; // +10% perda
+        const vendaDose = custoDose * 3.5;
+
+        document.getElementById('resDestilado').innerHTML = `
+            <div class="res-box">Custo da Dose: <b>R$ ${custoDose.toFixed(2)}</b></div>
+            <div class="res-box">Preço da Dose: <b>R$ ${Math.ceil(vendaDose)}.00</b></div>
+            <div class="res-box">Garrafa Gelada: <b>R$ ${(custoG * 2.1).toFixed(2)}</b></div>
+        `;
+    };
+
+    // --- PRODUTOS E ESTOQUE (ORDEM ALFABÉTICA) ---
+    onValue(ref(db, 'produtos'), (snapshot) => {
+        const grade = document.getElementById('gradeProdutos');
+        const lista = document.getElementById('listaProdutos');
+        grade.innerHTML = ""; lista.innerHTML = "";
+        produtosDados = snapshot.val() || {};
+
+        const ord = Object.entries(produtosDados).sort((a,b) => a[1].nome.localeCompare(b[1].nome));
+
+        ord.forEach(([id, p]) => {
+            grade.innerHTML += `<div class="card-produto-venda" onclick="adicionarAoCarrinho('${id}')">${p.nome.substring(0,20)}<span>R$ ${Number(p.venda).toFixed(2)}</span><small>Est: ${p.qtd}</small></div>`;
+            lista.innerHTML += `<div class="grid-linha"><div style="text-align:left">${p.nome}</div><div>${p.qtd}</div><div style="background:#fff2cc">R$ ${Number(p.custo).toFixed(2)}</div><div style="background:#d9e1f2">R$ ${Number(p.venda).toFixed(2)}</div><div style="background:#fce4ec">R$ ${Number(p.lucro).toFixed(2)}</div><div style="background:#e2efda">${p.margem}%</div></div>`;
+        });
+    });
+
+    // --- CARRINHO AGRUPADO ---
+    window.adicionarAoCarrinho = (id) => {
+        const p = produtosDados[id];
+        if(p.qtd <= 0) return alert("Estoque Zerado!");
+        carrinho.push({ id, nome: p.nome, preco: p.venda });
+        atualizarResumo();
+    };
+
+    function atualizarResumo() {
+        const div = document.getElementById('itensCarrinho');
+        div.innerHTML = ""; let total = 0; const agrupado = {};
+        carrinho.forEach(i => {
+            if(agrupado[i.nome]) { agrupado[i.nome].q++; agrupado[i.nome].v += Number(i.preco); }
+            else { agrupado[i.nome] = { q:1, v: Number(i.preco) }; }
+            total += Number(i.preco);
+        });
+        for(let n in agrupado) { div.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span><b>${agrupado[n].q}x</b> ${n}</span><b>R$ ${agrupado[n].v.toFixed(2)}</b></div>`; }
+        document.getElementById('valorTotal').innerText = total.toFixed(2);
+    }
+
+    window.finalizarVenda = () => {
+        if(!carrinho.length) return;
+        const cliente = document.getElementById('selectCliente').value;
+        push(ref(db, 'vendas_gerais'), { cliente, total: document.getElementById('valorTotal').innerText, data: new Date().toLocaleString(), itens: carrinho });
+        carrinho.forEach(i => { update(ref(db, `produtos/${i.id}`), { qtd: produtosDados[i.id].qtd - 1 }); });
+        alert("Venda Concluída!"); carrinho = []; atualizarResumo();
+    };
+
+    // --- CLIENTES ---
+    onValue(ref(db, 'clientes'), (snapshot) => {
+        const sel = document.getElementById('selectCliente');
+        const list = document.getElementById('listaClientes');
+        sel.innerHTML = '<option value="Avulso">Venda Avulsa</option>'; list.innerHTML = "";
+        if(snapshot.exists()) {
+            const ord = Object.values(snapshot.val()).sort((a,b) => a.nome.localeCompare(b.nome));
+            ord.forEach(c => {
+                sel.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                list.innerHTML += `<div class="card-cliente"><span>👤 ${c.nome.toUpperCase()}</span><a href="https://wa.me/55${c.contato}" target="_blank" style="background:var(--verde); color:#fff; padding:5px; border-radius:4px; text-decoration:none;">📞 WhatsApp</a></div>`;
+            });
+        }
+    });
+
+    window.salvarCliente = () => {
+        const n = document.getElementById('nomeCliente').value;
+        const c = document.getElementById('contatoCliente').value;
+        if(n && c) push(ref(db, 'clientes'), { nome: n, contato: c }).then(() => { document.getElementById('nomeCliente').value = ""; document.getElementById('contatoCliente').value = ""; });
+    };
+
+    window.lancarXML = () => {
+        const file = document.getElementById('xmlInput').files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent) || 0;
+                push(ref(db, 'produtos'), { nome, qtd: 12, custo, venda: custo * 1.5, lucro: custo * 0.5, margem: 50 });
+            }
+            alert("Estoque Atualizado!");
+        };
+        reader.readAsText(file);
+    };
+
+    window.mudar = (id, el) => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa'); el.classList.add('active');
+    };
+</script>
+</body>
+</html>
