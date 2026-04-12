@@ -3,71 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - SISTEMA OFICIAL</title>
+    <title>934 BOTECO - PDV & MARGEM</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza: #1a1a1a; }
+        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #0b0b0b; --cinza: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--preto); color: #fff; }
         
-        header { background: var(--amarelo); padding: 10px 20px; color: #000; display: flex; justify-content: space-between; align-items: center; }
-        nav { background: var(--cinza); display: flex; border-bottom: 2px solid #333; }
-        .nav-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px; }
+        header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; }
+        nav { background: var(--cinza); display: flex; border-bottom: 2px solid #333; overflow-x: auto; }
+        .nav-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
         .nav-item.active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
 
-        .container { padding: 15px; }
+        .container { padding: 20px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* PDV E VITRINE (Visual das Imagens) */
-        .pdv-layout { display: grid; grid-template-columns: 1fr 400px; gap: 15px; }
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; min-height: 100px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        /* CALCULADORA IGUAL À FOTO */
+        .card-calc { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(15px); 
+            padding: 40px; 
+            border-radius: 25px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            max-width: 500px; 
+            margin: 20px auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .btn-calc { 
+            background: var(--amarelo); 
+            color: #000; 
+            padding: 20px; 
+            border: none; 
+            width: 100%; 
+            font-weight: 900; 
+            cursor: pointer; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            text-transform: uppercase; 
+            margin-top: 20px;
+        }
+
+        /* PDV E VITRINE */
+        .pdv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+        .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; min-height: 110px; display: flex; flex-direction: column; justify-content: center; }
         .card-prod span { display: block; color: var(--azul); font-size: 1.2em; margin-top: 5px; }
 
-        /* CALCULADORA DE MARGEM (Design image_4ea9a5) */
-        .card-calc { background: #111; padding: 40px; border-radius: 25px; border: 1px solid #333; max-width: 600px; margin: 40px auto; }
-        .btn-calc { background: var(--amarelo); color: #000; padding: 18px; border: none; width: 100%; font-weight: 900; cursor: pointer; border-radius: 12px; font-size: 18px; text-transform: uppercase; margin-top: 20px; }
+        /* CUPOM E BOTÕES */
+        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; min-height: 380px; }
+        .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-pgto button { padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; color: #fff; text-transform: uppercase; font-size: 12px; }
 
-        /* RECIBO E BOTÕES DE PAGAMENTO (Design image_4d5c44) */
-        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; min-height: 400px; }
-        .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .btn-pgto button { padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; color: #fff; text-transform: uppercase; }
-        
-        input { background: #222; border: 1px solid #444; color: #fff; padding: 15px; border-radius: 10px; width: 100%; margin-bottom: 15px; font-size: 16px; }
-        select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        input, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <header>
     <h1 style="font-weight: 900;">934 BOTECO</h1>
-    <div id="relogio" style="font-weight: 900;">00:00:00</div>
+    <div id="relogio" style="font-weight: 900; background: #000; padding: 5px 15px; border-radius: 20px; color: var(--amarelo);">00:00:00</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas / Mesas</div>
-    <div class="nav-item" onclick="mudar('calculadora', this)">📊 Calculadora de Lucro</div>
-    <div class="nav-item" onclick="mudar('produtos', this)">📦 Cadastrar Produtos</div>
+    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas</div>
+    <div class="nav-item" onclick="mudar('calculadora', this)">📊 Calculadora</div>
+    <div class="nav-item" onclick="mudar('produtos', this)">📦 Produtos</div>
 </nav>
 
 <div class="container">
     
     <div id="vendas" class="secao ativa">
-        <input type="text" id="inputLeitor" placeholder="Código de Barras..." oninput="lerBarras(this.value)" autofocus style="border: 2px solid var(--amarelo);">
+        <input type="text" id="inputLeitor" placeholder="Passe o código de barras..." oninput="lerBarras(this.value)" autofocus style="border: 2px solid var(--amarelo);">
         
         <div class="pdv-layout">
             <div>
-                <div style="display:flex; gap:10px;">
-                    <select id="selMesa"><option>Balcão</option><script>for(let i=1;i<=20;i++) document.write(`<option>Mesa ${i}</option>`)</script></select>
-                    <select id="selCliente"></select>
+                <div style="display:flex; gap:10px; margin-bottom: 15px;">
+                    <select id="selMesa" style="flex:1"><option>Balcão</option><script>for(let i=1;i<=20;i++) document.write(`<option>Mesa ${i}</option>`)</script></select>
+                    <select id="selCliente" style="flex:2"></select>
                 </div>
                 <div id="gridProdutos" class="grid-produtos"></div>
             </div>
 
             <div>
                 <div id="reciboDigital" class="cupom">
-                    <div style="text-align:center; border-bottom:1px dashed #000; margin-bottom:10px; padding-bottom:10px;">
-                        <b>934 BOTECO - PETROLINA</b><br>----------------------------
+                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:10px; margin-bottom:10px;">
+                        <b>934 BOTECO - GESTÃO</b>
                     </div>
                     <div id="itensCupom"></div>
                     <div style="border-top:1px dashed #000; margin-top:10px; padding-top:10px;">
@@ -78,7 +98,7 @@
                     <button style="background:#32bcad" onclick="fechar('PIX')">PIX</button>
                     <button style="background:#4caf50" onclick="fechar('DINHEIRO')">DINHEIRO</button>
                     <button style="background:#2196f3" onclick="fechar('CARTÃO')">CARTÃO</button>
-                    <button style="background:#ff9800" onclick="fechar('PENDURA')">PENDURAR (4 DIAS)</button>
+                    <button style="background:#ff9800" onclick="fechar('PENDURA')">PENDURAR</button>
                 </div>
             </div>
         </div>
@@ -86,7 +106,7 @@
 
     <div id="calculadora" class="secao">
         <div class="card-calc">
-            <h2 style="color:var(--amarelo); text-align:center; margin-bottom:30px; font-size: 28px;">Calculadora de Margem</h2>
+            <h2 style="color:var(--amarelo); text-align:center; margin-bottom:30px; font-size: 26px;">Calculadora de Margem</h2>
             <label>Custo Unitário (R$):</label>
             <input type="number" id="c_custo" placeholder="0.00">
             <label>Preço de Venda (R$):</label>
@@ -97,12 +117,12 @@
     </div>
 
     <div id="produtos" class="secao">
-        <div class="card-calc" style="max-width: 100%;">
+        <div class="card-calc" style="max-width: 100%; text-align: left;">
             <h3 style="color:var(--amarelo); margin-bottom:20px;">Cadastrar Produto</h3>
             <input type="text" id="p_ean" placeholder="Código de Barras">
             <input type="text" id="p_nome" placeholder="Nome do Produto">
             <input type="number" id="p_venda" placeholder="Preço de Venda">
-            <button onclick="salvarProd()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; cursor:pointer;">SALVAR PRODUTO</button>
+            <button onclick="salvarProd()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold;">SALVAR</button>
         </div>
     </div>
 </div>
@@ -121,12 +141,8 @@
     onValue(ref(db, 'produtos'), (s) => {
         const g = document.getElementById('gridProdutos'); g.innerHTML = "";
         produtosDados = s.val() || {};
-        const nomesVistos = new Set();
         Object.entries(produtosDados).forEach(([id, p]) => {
-            if(!nomesVistos.has(p.nome.toUpperCase())){
-                nomesVistos.add(p.nome.toUpperCase());
-                g.innerHTML += `<div class="card-prod" onclick="addCar('${id}')">${p.nome.substring(0,22)}<span>R$ ${Number(p.venda).toFixed(2)}</span></div>`;
-            }
+            g.innerHTML += `<div class="card-prod" onclick="addCar('${id}')">${p.nome}<span>R$ ${Number(p.venda).toFixed(2)}</span></div>`;
         });
     });
 
@@ -140,7 +156,7 @@
         const p = produtosDados[id];
         carrinho.push({ nome: p.nome, preco: p.venda });
         const d = document.getElementById('itensCupom'); d.innerHTML = ""; let t = 0;
-        carrinho.forEach(i => { d.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.nome}</span><b>R$ ${Number(i.preco).toFixed(2)}</b></div>`; t += Number(i.preco); });
+        carrinho.forEach(i => { d.innerHTML += `<div style="display:flex; justify-content:space-between"><span>${i.nome}</span><b>R$ ${Number(i.preco).toFixed(2)}</b></div>`; t += Number(i.preco); });
         document.getElementById('totalTxt').innerText = t.toFixed(2);
     };
 
@@ -149,9 +165,9 @@
         const v = parseFloat(document.getElementById('c_venda').value);
         if(!c || !v) return;
         const lucro = v - c; const margem = (lucro / v) * 100;
-        document.getElementById('resCalc').innerHTML = `<div style="background:#222; padding:20px; border-radius:15px; border-left:8px solid var(--amarelo);">
+        document.getElementById('resCalc').innerHTML = `<div style="background:rgba(255,255,255,0.1); padding:20px; border-radius:15px; border-left:8px solid var(--amarelo);">
             <p>Lucro: <b>R$ ${lucro.toFixed(2)}</b></p>
-            <p style="font-size: 20px; margin-top: 10px;">Margem: <b style="color:var(--amarelo)">${margem.toFixed(1)}%</b></p>
+            <p style="font-size: 22px; color:var(--amarelo)">Margem: <b>${margem.toFixed(1)}%</b></p>
         </div>`;
     };
 
@@ -159,23 +175,7 @@
         const ean = document.getElementById('p_ean').value;
         const nome = document.getElementById('p_nome').value;
         const venda = document.getElementById('p_venda').value;
-        if(nome && venda) {
-            push(ref(db, 'produtos'), { ean, nome, venda: parseFloat(venda) });
-            alert("Salvo!");
-            document.getElementById('p_ean').value = ""; document.getElementById('p_nome').value = ""; document.getElementById('p_venda').value = "";
-        }
-    };
-
-    window.fechar = (metodo) => {
-        if(!carrinho.length) return;
-        const total = document.getElementById('totalTxt').innerText;
-        const dV = new Date(); dV.setDate(dV.getDate() + 4);
-        const venda = { total, metodo, data: new Date().toLocaleDateString('pt-BR'), vencimento: metodo === 'PENDURA' ? dV.toLocaleDateString('pt-BR') : 'Pago' };
-        push(ref(db, 'vendas_fin'), venda).then(() => {
-            if(metodo === 'PENDURA') window.open(`https://wa.me/?text=*BOTECO 934*%0AConta: *R$ ${total}*`, '_blank');
-            window.print();
-            location.reload();
-        });
+        if(nome && venda) { push(ref(db, 'produtos'), { ean, nome, venda: parseFloat(venda) }); alert("Salvo!"); }
     };
 
     window.mudar = (id, el) => {
