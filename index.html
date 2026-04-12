@@ -4,111 +4,120 @@
     <meta charset="UTF-8">
     <title>934 - PDV</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #0b0b0b; --gray: #1a1a1a; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; } /* Fonte reduzida */
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #161616; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 12px; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Área das Mesas e Mercadorias */
-        .pdv-main { flex: 1; padding: 15px; overflow-y: auto; }
-        .grid-mesas { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 20px; }
-        .mesa { background: var(--gray); padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
-        .mesa b { font-size: 14px; }
-        .mesa.ocupada { background: #4a0000; border-color: #ff4444; }
-        .mesa.selecionada { border-color: var(--gold); background: #333; }
+        /* Cabeçalho Profissional */
+        header { background: #000; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-placeholder { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--gold); background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
+        .brand-name { font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .pdv-area { flex: 1; padding: 10px; overflow-y: auto; }
         
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; border-top: 1px solid #333; padding-top: 15px; }
-        .prod-btn { background: #fff; color: #000; padding: 12px 8px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; line-height: 1.2; }
+        /* 15 Mesas em Grid Compacto */
+        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
+        .mesa { background: var(--gray); padding: 8px; border-radius: 4px; text-align: center; cursor: pointer; border: 1px solid #333; }
+        .mesa.ocupada { background: #400; border-color: #f44; }
+        .mesa.selecionada { border-color: var(--gold); background: #222; }
         
-        /* Lateral do Caixa */
-        .caixa-lateral { width: 300px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; box-shadow: -2px 0 10px rgba(0,0,0,0.5); }
-        .itens-lista { flex: 1; margin-top: 10px; border-top: 1px solid #eee; overflow-y: auto; padding-top: 5px; }
-        .item-linha { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; padding-bottom: 2px; }
-        .total-container { border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
-        .btn-whats { background: #25d366; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; }
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; border-top: 1px solid #333; padding-top: 10px; }
+        .prod-btn { background: #fff; color: #000; padding: 10px 5px; border-radius: 4px; text-align: center; cursor: pointer; font-weight: bold; }
+        
+        .caixa-lateral { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; }
+        .itens-lista { flex: 1; overflow-y: auto; border-top: 1px solid #eee; padding-top: 5px; }
+        .btn-whats { background: #25d366; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; }
     </style>
 </head>
 <body>
-    <div class="pdv-main">
-        <h3 style="color:var(--gold); margin-bottom:10px;">MESAS</h3>
-        <div id="gridMesas" class="grid-mesas"></div>
-        
-        <h3 style="color:var(--gold); margin-bottom:10px; margin-top:10px;">MERCADORIAS</h3>
+
+<header>
+    <div class="logo-area">
+        <div class="logo-placeholder">934</div> <div class="brand-name">BOTECO 934</div>
+    </div>
+    <div id="relogio" style="color: var(--gold); font-weight: bold;">00:00</div>
+</header>
+
+<div class="main-container">
+    <div class="pdv-area">
+        <div class="grid-mesas" id="gridMesas"></div>
         <div id="vitrine" class="vitrine"></div>
     </div>
 
     <div class="caixa-lateral">
-        <h2 id="infoMesa" style="font-size: 16px;">Selecione uma mesa</h2>
+        <h2 id="infoMesa" style="font-size: 14px; margin-bottom: 5px;">Mesa --</h2>
         <div id="consumo" class="itens-lista"></div>
-        <div class="total-container">
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                <span>TOTAL:</span>
-                <span>R$ <span id="total">0,00</span></span>
-            </div>
+        <div style="padding: 10px 0; border-top: 2px solid #000; font-weight: bold; display: flex; justify-content: space-between;">
+            <span>TOTAL:</span>
+            <span>R$ <span id="total">0,00</span></span>
         </div>
         <button class="btn-whats" onclick="fechar()">FECHAR CONTA</button>
     </div>
+</div>
 
-    <script>
-        let mSel = null;
-        let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
-        let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
+<script>
+    let mSel = null;
+    let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
+    let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
 
-        function init() {
-            const grid = document.getElementById('gridMesas');
-            // Criando 12 mesas inicialmente (fácil mudar para 15 no futuro)
-            for(let i=1; i<=12; i++) {
-                if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
-                grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})"><b>M${i}</b></div>`;
+    function init() {
+        const grid = document.getElementById('gridMesas');
+        for(let i=1; i<=15; i++) { // Agora com 15 mesas
+            if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
+            grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})">M${i}</div>`;
+        }
+        renderVitrine();
+    }
+
+    function renderVitrine() {
+        document.getElementById('vitrine').innerHTML = estoque.map(p => 
+            `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br><span style="font-size:10px; color:#555;">R$ ${p.venda.toFixed(2)}</span></div>`
+        ).join('');
+    }
+
+    function sel(n) {
+        mSel = n;
+        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+        document.getElementById(`m${n}`).classList.add('selecionada');
+        document.getElementById('infoMesa').innerText = "Mesa " + n;
+        if(!mesas[n].ocupada) {
+            if(confirm("Abrir mesa " + n + "?")) {
+                mesas[n].ocupada = true;
+                document.getElementById(`m${n}`).classList.add('ocupada');
+                salvar();
             }
-            renderVitrine();
         }
+        atualizar();
+    }
 
-        function renderVitrine() {
-            document.getElementById('vitrine').innerHTML = estoque.map(p => 
-                `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br><span style="color:#666; font-size:11px;">R$ ${p.venda.toFixed(2)}</span></div>`
-            ).join('');
-        }
+    function add(n, v) {
+        if(!mSel || !mesas[mSel].ocupada) return alert("Abra a mesa!");
+        mesas[mSel].itens.push({ n, v });
+        mesas[mSel].total += v;
+        salvar();
+        atualizar();
+    }
 
-        function sel(n) {
-            mSel = n;
-            document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
-            document.getElementById(`m${n}`).classList.add('selecionada');
-            document.getElementById('infoMesa').innerText = "Mesa " + n;
-            if(!mesas[n].ocupada) {
-                if(confirm("Abrir mesa " + n + "?")) {
-                    mesas[n].ocupada = true;
-                    document.getElementById(`m${n}`).classList.add('ocupada');
-                    salvar();
-                }
-            }
-            atualizar();
-        }
+    function atualizar() {
+        if(!mSel) return;
+        document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>${i.n}</span><span>${i.v.toFixed(2)}</span></div>`).join('');
+        document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
+    }
 
-        function add(n, v) {
-            if(!mSel || !mesas[mSel].ocupada) return alert("Selecione uma mesa aberta!");
-            mesas[mSel].itens.push({ n, v });
-            mesas[mSel].total += v;
-            salvar();
-            atualizar();
-        }
+    function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
 
-        function atualizar() {
-            if(!mSel) return;
-            document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div class="item-linha"><span>${i.n}</span><span>${i.v.toFixed(2)}</span></div>`).join('');
-            document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
-        }
+    function fechar() {
+        if(!mSel || mesas[mSel].total == 0) return;
+        window.open(`https://wa.me/?text=*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`);
+        mesas[mSel] = { ocupada: false, itens: [], total: 0 };
+        salvar();
+        location.reload();
+    }
 
-        function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
-
-        function fechar() {
-            if(!mSel || mesas[mSel].total == 0) return;
-            const texto = `*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
-            window.open(`https://wa.me/?text=${texto}`);
-            mesas[mSel] = { ocupada: false, itens: [], total: 0 };
-            salvar();
-            location.reload();
-        }
-        init();
-    </script>
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
+    init();
+</script>
 </body>
 </html>
