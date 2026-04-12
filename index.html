@@ -3,40 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV</title>
+    <title>Boteco 934 - Gestão de Distribuidora</title>
     <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding: 20px; }
         h1 { color: #ffcc00; margin-bottom: 5px; }
-        #grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 30px; }
-        .card-mesa { padding: 20px; border-radius: 10px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .status-livre { background-color: #2e7d32; }
-        .status-ocupada { background-color: #c62828; }
-        .mesa-header { font-weight: bold; font-size: 0.9em; opacity: 0.8; }
-        .mesa-body { margin-top: 10px; font-size: 1.1em; font-weight: bold; }
-        .mesa-valor { color: #ffcc00; margin-top: 5px; }
+        .subtitulo { color: #aaa; margin-bottom: 20px; }
+        
+        #grid-mesas { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); 
+            gap: 15px; 
+            margin-top: 20px; 
+        }
+        
+        .card-mesa { 
+            padding: 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            border: 2px solid rgba(255,255,255,0.1); 
+            transition: 0.3s; 
+        }
+        
+        .status-livre { background-color: #2e7d32; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .status-ocupada { background-color: #c62828; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        .mesa-header { font-weight: bold; font-size: 0.8em; opacity: 0.7; text-transform: uppercase; }
+        .mesa-body { margin-top: 10px; font-size: 1.2em; font-weight: bold; overflow: hidden; text-overflow: ellipsis; }
+        .mesa-valor { color: #ffcc00; margin-top: 8px; font-weight: bold; font-size: 1.1em; }
+
+        .btn-reset { 
+            margin-top: 40px; 
+            background: none; 
+            border: 1px solid #444; 
+            color: #888; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
     </style>
 </head>
 <body>
 
     <h1>🍻 Boteco 934</h1>
-    <p>Controle de Mesas e Distribuição</p>
+    <p class="subtitulo">Distribuidora e Bar - Gestão Operacional</p>
 
     <div id="grid-mesas"></div>
 
+    <button class="btn-reset" onclick="zerarSistema()">Reiniciar Todas as Mesas</button>
+
     <script>
-        // --- TUDO EM UM LUGAR SÓ ---
+        // --- FOCO TOTAL NA DISTRIBUIDORA ---
         let produtos = [
-            { id: 1, nome: "Cerveja 600ml", preco: 10.00 },
-            { id: 2, nome: "Dose Whisky", preco: 15.00 },
-            { id: 3, nome: "Perfume Boticário", preco: 120.00 }
+            { id: 1, nome: "Cerveja 600ml (Gelada)", preco: 12.00 },
+            { id: 2, nome: "Cerveja 600ml (Prateleira)", preco: 9.50 },
+            { id: 3, nome: "Litro de Whisky (Selo)", preco: 110.00 },
+            { id: 4, nome: "Dose Whisky", preco: 12.00 },
+            { id: 5, nome: "Cerveja Lata", preco: 5.50 },
+            { id: 6, nome: "Refrigerante lata", preco: 6.00 },
+            { id: 7, nome: "Água com Gás", preco: 4.00 },
+            { id: 8, nome: "Cachaça (Dose)", preco: 3.00 },
+            { id: 9, nome: "Gelo (Pacote)", preco: 15.00 }
         ];
 
-        let mesas = JSON.parse(localStorage.getItem('dados_boteco')) || Array.from({ length: 12 }, (_, i) => ({
+        let mesas = JSON.parse(localStorage.getItem('dados_boteco_934')) || Array.from({ length: 15 }, (_, i) => ({
             id: i + 1, ocupada: false, cliente: "", total: 0
         }));
 
         function salvar() {
-            localStorage.setItem('dados_boteco', JSON.stringify(mesas));
+            localStorage.setItem('dados_boteco_934', JSON.stringify(mesas));
         }
 
         function renderizar() {
@@ -54,29 +88,41 @@
             let mesa = mesas.find(m => m.id === id);
             
             if (!mesa.ocupada) {
-                let nome = prompt("Nome do Cliente:");
+                let nome = prompt("Abrir mesa para qual cliente?");
                 if (nome) {
                     mesa.ocupada = true;
                     mesa.cliente = nome;
                 }
             } else {
-                let acao = prompt("(1) Lançar Produto\n(2) Fechar Conta (Paga)\n(3) Pendura\n(4) Cancelar");
+                let acao = prompt("CLIENTE: " + mesa.cliente + "\nTOTAL: R$ " + mesa.total.toFixed(2) + 
+                                  "\n\n(1) Lançar Bebida\n(2) Fechar Pago (PIX/Dinheiro)\n(3) Pendura\n(4) Cancelar");
                 
                 if (acao === "1") {
-                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco})`).join('\n');
-                    let cod = prompt("Digite o código do produto:\n" + lista);
+                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco.toFixed(2)})`).join('\n');
+                    let cod = prompt("CÓDIGO DA BEBIDA:\n" + lista);
                     let prod = produtos.find(p => p.id == cod);
-                    if (prod) mesa.total += prod.preco;
+                    if (prod) {
+                        mesa.total += prod.preco;
+                        alert(prod.nome + " adicionado!");
+                    }
                 } else if (acao === "2") {
-                    alert("Conta de R$" + mesa.total.toFixed(2) + " paga!");
+                    alert("Recebido R$ " + mesa.total.toFixed(2) + ". Mesa liberada!");
                     mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
                 } else if (acao === "3") {
-                    alert("R$" + mesa.total.toFixed(2) + " enviado para o PENDURA de " + mesa.cliente);
+                    alert("R$ " + mesa.total.toFixed(2) + " anotado no PENDURA de " + mesa.cliente);
                     mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
                 }
             }
             salvar();
             renderizar();
+        }
+
+        function zerarSistema() {
+            if (confirm("Deseja realmente limpar todas as mesas para o novo dia?")) {
+                mesas.forEach(m => { m.ocupada = false; m.cliente = ""; m.total = 0; });
+                salvar();
+                renderizar();
+            }
         }
 
         renderizar();
