@@ -3,75 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Oficial</title>
+    <title>Boteco 934 - Sistema de Gestão</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #fff; }
+        body { background: #fff; color: #333; }
 
-        /* CABEÇALHO BRANCO (ESTILO UOL) */
-        .topo-uol {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 40px;
-            border-bottom: 1px solid #eee;
-        }
+        /* HEADER ESTILO PORTAL UOL */
+        .uol-header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         .logo-area { display: flex; align-items: center; gap: 10px; }
-        .badge-934 { 
-            background: #ffcc00; color: #000; padding: 10px; 
-            border-radius: 5px; font-weight: 900; font-size: 1.8em; 
-        }
-        .nome-marca { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
+        .badge-934 { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.8em; }
+        .brand-name { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
+        .stats { display: flex; gap: 25px; font-size: 0.85em; color: #444; }
+        .stats b { color: #d32f2f; }
+        .clima { text-align: right; font-size: 0.85em; }
 
-        .indicadores { display: flex; gap: 30px; font-size: 0.85em; color: #444; }
-        .indicadores b { color: #d32f2f; }
-
-        .clima { text-align: right; font-size: 0.85em; line-height: 1.2; }
-
-        /* BARRA DE MENU CINZA/BRANCA */
-        nav {
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            padding: 0 40px;
-            gap: 20px;
-            background: #fff;
-        }
-        .nav-link {
-            padding: 15px 0;
-            font-size: 11px;
-            font-weight: bold;
-            color: #333;
-            text-transform: uppercase;
-            text-decoration: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-        }
+        /* MENU DE NAVEGAÇÃO */
+        nav { display: flex; padding: 0 40px; gap: 20px; border-bottom: 1px solid #eee; background: #fff; }
+        .nav-link { padding: 15px 0; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
         .nav-link:hover { border-bottom: 3px solid #ffcc00; }
+        .nav-active { border-bottom: 3px solid #ffcc00; }
 
-        /* TABELA DE ESTOQUE */
-        .container { padding: 20px 40px; }
-        .tabela-vendas { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        .tabela-vendas th { background: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; }
-        .tabela-vendas td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
+        /* ÁREAS DE CONTEÚDO */
+        .container { padding: 30px 40px; }
+        .secao { display: none; }
+        .ativa { display: block; }
+
+        /* ESTILO DAS TABELAS (ESTOQUE E CLIENTES) */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th { background: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; }
+        td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
         
-        .c-custo { background: #fff2cc; }
-        .c-lucro { background: #fce4d6; }
-        .c-margem { background: #c6efce; color: #006100; }
+        .c-amarelo { background: #fff2cc; }
+        .c-laranja { background: #fce4d6; }
+        .c-verde { background: #c6efce; color: #006100; }
+        .img-p { width: 45px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<header class="topo-uol">
+<header class="uol-header">
     <div class="logo-area">
         <div class="badge-934">934</div>
-        <div class="nome-marca">BOTECO</div>
+        <div class="brand-name">BOTECO</div>
     </div>
-    
-    <div class="indicadores">
+    <div class="stats">
         <div>Dólar <b>▼ 5,011</b></div>
         <div>Euro <b>▼ 5,877</b></div>
     </div>
-
     <div class="clima">
         <strong>Petrolina</strong><br>
         <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
@@ -79,47 +57,80 @@
 </header>
 
 <nav>
-    <a class="nav-link">Produtos</a>
-    <a class="nav-link">Flash</a>
-    <a class="nav-link">Economia</a>
-    <a class="nav-link">Copa 2026</a>
-    <a class="nav-link">Guia de Compras</a>
+    <div class="nav-link" onclick="mostrar('vendas')">Operacional</div>
+    <div class="nav-link" onclick="mostrar('estoque')">Estoque / XML</div>
+    <div class="nav-link" onclick="mostrar('clientes')">Clientes</div>
 </nav>
 
 <div class="container">
-    <h2 style="margin-top: 20px; letter-spacing: -1px; color: #333;">PLANILHA DE VENDAS - DISTRIBUIDORA</h2>
     
-    <table class="tabela-vendas">
-        <thead>
-            <tr>
-                <th>Foto</th>
-                <th>Código de Barra</th>
-                <th>Produto</th>
-                <th>Quat. Pacote</th>
-                <th>Venda Uni.</th>
-                <th>Total Vend.</th>
-                <th style="background:#ffd966; color:#000">Custo</th>
-                <th style="background:#ffd966; color:#000">Total Caixa</th>
-                <th style="background:#f4b084; color:#000">Lucro</th>
-                <th style="background:#a9d08e; color:#000">Margem %</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" width="40"></td>
-                <td>789456123858</td>
-                <td style="text-align:left">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
-                <td>12</td>
-                <td>R$ 10,00</td>
-                <td>R$ 120,00</td>
-                <td class="c-custo">R$ 5,04</td>
-                <td class="c-custo">R$ 60,48</td>
-                <td class="c-lucro">R$ 59,52</td>
-                <td class="c-margem">49,60%</td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="estoque" class="secao">
+        <h2 style="letter-spacing: -1px;">PLANILHA DE VENDAS - ESTOQUE</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Produto</th>
+                    <th>Qtd Pacote</th>
+                    <th>Venda Uni.</th>
+                    <th class="c-amarelo" style="color:#000">Custo</th>
+                    <th class="c-laranja" style="color:#000">Lucro</th>
+                    <th class="c-verde">Margem %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-p"></td>
+                    <td style="text-align:left">Cerveja Heineken - Lata 350ml</td>
+                    <td>12</td>
+                    <td>R$ 10,00</td>
+                    <td class="c-amarelo">R$ 5,04</td>
+                    <td class="c-laranja">R$ 59,52</td>
+                    <td class="c-verde">49,60%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="clientes" class="secao">
+        <h2 style="letter-spacing: -1px;">GESTÃO DE CLIENTES</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome do Cliente</th>
+                    <th>WhatsApp</th>
+                    <th>Limite de Crédito</th>
+                    <th>Saldo Devedor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Exemplo de Cliente</td>
+                    <td>(87) 99999-0000</td>
+                    <td>R$ 300,00</td>
+                    <td>R$ 0,00</td>
+                    <td class="c-verde">EM DIA</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="vendas" class="secao ativa">
+        <h2 style="letter-spacing: -1px;">SISTEMA OPERACIONAL - BALCÃO</h2>
+        <p style="margin-top:20px;">Área de atendimento e mesas carregando...</p>
+    </div>
+
 </div>
+
+<script>
+    function mostrar(id) {
+        // Esconde todas as seções
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        // Mostra a seção clicada
+        document.getElementById(id).classList.add('ativa');
+    }
+</script>
 
 </body>
 </html>
