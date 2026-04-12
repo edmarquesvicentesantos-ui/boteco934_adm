@@ -5,32 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV</title>
     <style>
-        /* O ESTILO AGORA ESTÁ AQUI DENTRO PARA NÃO DAR ERRO */
-        body {
-            font-family: sans-serif;
-            background-color: #1a1a1a;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 { color: #ffcc00; }
-        #grid-mesas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .card-mesa {
-            padding: 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-        .status-livre { background-color: #2e7d32; } /* Verde */
-        .status-ocupada { background-color: #c62828; } /* Vermelho */
-        
-        .mesa-header { font-weight: bold; font-size: 0.9em; }
-        .mesa-body { margin-top: 10px; font-size: 1.1em; }
+        body { font-family: sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        h1 { color: #ffcc00; margin-bottom: 5px; }
+        #grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 30px; }
+        .card-mesa { padding: 20px; border-radius: 10px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .status-livre { background-color: #2e7d32; }
+        .status-ocupada { background-color: #c62828; }
+        .mesa-header { font-weight: bold; font-size: 0.9em; opacity: 0.8; }
+        .mesa-body { margin-top: 10px; font-size: 1.1em; font-weight: bold; }
+        .mesa-valor { color: #ffcc00; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -38,9 +21,65 @@
     <h1>🍻 Boteco 934</h1>
     <p>Controle de Mesas e Distribuição</p>
 
-    <div id="grid-mesas">
-        </div>
+    <div id="grid-mesas"></div>
 
-    <script src="app.js"></script>
+    <script>
+        // --- TUDO EM UM LUGAR SÓ ---
+        let produtos = [
+            { id: 1, nome: "Cerveja 600ml", preco: 10.00 },
+            { id: 2, nome: "Dose Whisky", preco: 15.00 },
+            { id: 3, nome: "Perfume Boticário", preco: 120.00 }
+        ];
+
+        let mesas = JSON.parse(localStorage.getItem('dados_boteco')) || Array.from({ length: 12 }, (_, i) => ({
+            id: i + 1, ocupada: false, cliente: "", total: 0
+        }));
+
+        function salvar() {
+            localStorage.setItem('dados_boteco', JSON.stringify(mesas));
+        }
+
+        function renderizar() {
+            const grid = document.getElementById('grid-mesas');
+            grid.innerHTML = mesas.map(m => `
+                <div class="card-mesa ${m.ocupada ? 'status-ocupada' : 'status-livre'}" onclick="gerenciarMesa(${m.id})">
+                    <div class="mesa-header">MESA ${m.id}</div>
+                    <div class="mesa-body">${m.ocupada ? m.cliente : 'LIVRE'}</div>
+                    <div class="mesa-valor">${m.ocupada ? 'R$ ' + m.total.toFixed(2) : '---'}</div>
+                </div>
+            `).join('');
+        }
+
+        function gerenciarMesa(id) {
+            let mesa = mesas.find(m => m.id === id);
+            
+            if (!mesa.ocupada) {
+                let nome = prompt("Nome do Cliente:");
+                if (nome) {
+                    mesa.ocupada = true;
+                    mesa.cliente = nome;
+                }
+            } else {
+                let acao = prompt("(1) Lançar Produto\n(2) Fechar Conta (Paga)\n(3) Pendura\n(4) Cancelar");
+                
+                if (acao === "1") {
+                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco})`).join('\n');
+                    let cod = prompt("Digite o código do produto:\n" + lista);
+                    let prod = produtos.find(p => p.id == cod);
+                    if (prod) mesa.total += prod.preco;
+                } else if (acao === "2") {
+                    alert("Conta de R$" + mesa.total.toFixed(2) + " paga!");
+                    mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
+                } else if (acao === "3") {
+                    alert("R$" + mesa.total.toFixed(2) + " enviado para o PENDURA de " + mesa.cliente);
+                    mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
+                }
+            }
+            salvar();
+            renderizar();
+        }
+
+        renderizar();
+    </script>
 </body>
 </html>
