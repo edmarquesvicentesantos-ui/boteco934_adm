@@ -3,79 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - SISTEMA COMPLETO</title>
+    <title>934 BOTECO - SISTEMA PROFISSIONAL</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
+        :root { --gold: #ffcc00; --bg: #0b0b0b; --card: #161616; --border: #333; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
-        header { background: var(--gold); padding: 10px 20px; color: #000; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
-        nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 1000; }
-        .nav-item { padding: 15px 20px; cursor: pointer; color: #666; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        .nav-item.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(255,204,0,0.05); }
+        body { background: var(--bg); color: #fff; }
+        header { background: var(--gold); padding: 12px 20px; color: #000; font-weight: 900; display: flex; justify-content: space-between; }
+        nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+        .nav-item { padding: 15px 20px; cursor: pointer; color: #777; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+        .nav-item.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
         .container { padding: 15px; max-width: 1200px; margin: auto; }
-        .secao { display: none; animation: fadeIn 0.3s ease; }
+        .secao { display: none; }
         .ativa { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: var(--glass); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
-        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: 14px; }
-        .btn { padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
+        input, select { background: #000; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: #000; }
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
-        .mesa { background: #1a1a1a; padding: 10px 5px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; font-size: 12px; }
-        .mesa.ocupada { background: #440000; border-color: #ff4444; }
-        .mesa.selecionada { border-color: var(--gold); }
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 10px; }
-        .produto-item { background: #fff; color: #000; padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; font-size: 12px; }
+        
+        /* Estilo das Mesas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .mesa { background: #222; padding: 15px 5px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .mesa.ocupada { background: #4a0000; border-color: #ff4444; }
+        .mesa.selecionada { border-color: var(--gold); background: #333; }
+        
+        /* Vitrine de Bebidas (Onde você clica para vender) */
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+        .prod-btn { background: #fff; color: #000; padding: 15px 10px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 4px 0 #bbb; }
+        .prod-btn:active { transform: translateY(3px); box-shadow: none; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: var(--gold); padding: 8px; border-bottom: 1px solid #333; font-size: 10px; }
-        td { padding: 8px; border-bottom: 1px solid #222; font-size: 12px; }
+        th { text-align: left; color: var(--gold); font-size: 11px; padding: 10px; border-bottom: 1px solid #444; }
+        td { padding: 10px; border-bottom: 1px solid #222; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>BOTECO 934</div>
-    <div id="relogio" style="font-size: 14px;">00:00:00</div>
+    <div>934 BOTECO - PDV</div>
+    <div id="relogio">00:00:00</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudarTela('vendas', this)">🛒 Caixa/Mesas</div>
-    <div class="nav-item" onclick="mudarTela('estoque', this)">📦 Estoque/XML</div>
+    <div class="nav-item active" onclick="mudarTela('vendas', this)">🛒 Vendas</div>
+    <div class="nav-item" onclick="mudarTela('estoque', this)">📦 Estoque / XML</div>
     <div class="nav-item" onclick="mudarTela('calc', this)">📊 Calculadora</div>
 </nav>
 
 <div class="container">
     
     <div id="vendas" class="secao ativa">
-        <div style="display:grid; grid-template-columns: 1fr 350px; gap:15px;">
+        <div style="display:grid; grid-template-columns: 1fr 380px; gap:20px;">
             <div>
                 <div class="card">
-                    <h3>Mesas</h3>
+                    <h3>Painel de Mesas</h3>
                     <div class="grid-mesas" id="gridMesas"></div>
                 </div>
                 <div class="card">
-                    <h3>Mercadorias (Clique para vender)</h3>
-                    <div id="vitrineVenda" class="vitrine"></div>
+                    <h3>Mercadorias Disponíveis</h3>
+                    <div id="vitrineVendas" class="vitrine">
+                        <p style="color:#666; font-size: 12px;">Cadastre produtos no estoque para aparecerem aqui.</p>
+                    </div>
                 </div>
             </div>
+
             <div class="card" style="background:#fff; color:#000;">
                 <div id="areaAbrir">
-                    <h3>Nova Venda</h3>
-                    <input type="text" id="cliNome" placeholder="Nome do Cliente" style="background:#f0f0f0; color:#000;">
-                    <button class="btn btn-gold" onclick="abrirMesa()">Abrir Mesa</button>
+                    <h3>Abrir Nova Mesa</h3>
+                    <input type="text" id="nomeCliente" placeholder="Nome do Cliente" style="background:#f4f4f4; color:#000; margin-top:15px;">
+                    <button class="btn btn-gold" onclick="abrirMesa()">Iniciar Consumo</button>
                 </div>
                 <div id="areaConsumo" style="display:none;">
-                    <h3 id="txtMesa">Mesa --</h3>
-                    <p id="txtCli" style="font-weight:bold; color:#666;"></p>
-                    <div id="listaConsumo" style="min-height:180px; border-bottom:1px solid #ddd; margin:10px 0; font-size:13px;"></div>
-                    <h2 style="margin-bottom:10px;">TOTAL: R$ <span id="valTotal">0,00</span></h2>
-                    <select id="meioPgto" style="background:#f0f0f0; color:#000;">
-                        <option value="Dinheiro">Dinheiro</option>
-                        <option value="PIX">PIX</option>
-                        <option value="Cartão">Cartão</option>
-                        <option value="Pendura">Pendura</option>
+                    <h3 id="hMesa">Mesa --</h3>
+                    <p id="hCli" style="font-weight:bold; color:#888; margin-bottom:10px;"></p>
+                    <div id="listaItens" style="min-height:200px; border-top:1px solid #eee; padding-top:10px; font-size:14px;"></div>
+                    <h2 style="border-top:2px solid #000; padding-top:10px;">TOTAL: R$ <span id="totalVenda">0,00</span></h2>
+                    
+                    <select id="meioPagamento" style="background:#f4f4f4; color:#000; margin-top:15px;">
+                        <option value="Dinheiro">💵 Dinheiro</option>
+                        <option value="PIX">📱 PIX</option>
+                        <option value="Cartão">💳 Cartão</option>
+                        <option value="Pendura">📝 Pendura</option>
                     </select>
-                    <button class="btn btn-gold" style="background:#25d366; color:#fff;" onclick="fecharConta()">FECHAR E ENVIAR WHATSAPP</button>
+                    <button class="btn btn-gold" style="background:#25d366; color:#fff;" onclick="finalizarVenda()">FECHAR CONTA E ENVIAR</button>
                 </div>
             </div>
         </div>
@@ -83,40 +92,21 @@
 
     <div id="estoque" class="secao">
         <div class="card">
-            <h3>📥 Entrada XML</h3>
-            <input type="file" id="xmlFile" accept=".xml" onchange="lerXML(this)">
-            <div id="previaXML" style="margin:10px 0; font-size:12px; color:var(--gold);"></div>
-            <button class="btn btn-gold" id="btnConfirmaXML" style="display:none;" onclick="salvarXML()">✅ Confirmar e Salvar Itens</button>
-        </div>
-        <div class="card">
-            <h3>➕ Entrada Unitária (Um item só)</h3>
-            <input type="text" id="mNome" placeholder="Nome do Produto">
-            <div style="display:flex; gap:5px;">
-                <input type="number" id="mCusto" placeholder="Custo Total">
-                <input type="number" id="mQtd" placeholder="Qtd" value="1">
-                <input type="number" id="mVenda" placeholder="Venda UN">
+            <h3>📥 Entrada Manual (Um item só)</h3>
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:10px; margin-top:10px;">
+                <input type="text" id="p_nome" placeholder="Produto (Ex: Heineken)">
+                <input type="number" id="p_custo" placeholder="Custo Total">
+                <input type="number" id="p_qtd" placeholder="Qtd" value="1">
+                <input type="number" id="p_venda" placeholder="Venda UN">
+                <button class="btn btn-gold" onclick="addEstoqueManual()" style="width:120px;">Adicionar</button>
             </div>
-            <button class="btn btn-gold" onclick="addManual()">Salvar no Estoque</button>
         </div>
         <div class="card">
-            <h3>📦 Lista de Mercadorias</h3>
+            <h3>📦 Mercadorias no Sistema</h3>
             <table>
-                <thead><tr><th>ITEM</th><th>CUSTO UN</th><th>VENDA UN</th><th>AÇÃO</th></tr></thead>
-                <tbody id="listaEstoque"></tbody>
+                <thead><tr><th>PRODUTO</th><th>CUSTO UN.</th><th>VENDA UN.</th><th>AÇÕES</th></tr></thead>
+                <tbody id="tabelaEstoque"></tbody>
             </table>
-        </div>
-    </div>
-
-    <div id="calc" class="secao">
-        <div class="card">
-            <h3>📊 Calculadora de Margem</h3>
-            <label>Custo (Fardo ou Unidade)</label><input type="number" id="cc" oninput="calcularMargem()">
-            <label>Qtd de Itens (se for fardo)</label><input type="number" id="cq" value="1" oninput="calcularMargem()">
-            <label>Preço de Venda Unitário</label><input type="number" id="cv" oninput="calcularMargem()">
-            <div style="background:#111; padding:20px; border-radius:10px; border-left:5px solid var(--gold); margin-top:15px;">
-                <p style="font-size:11px;">LUCRO REAL POR UNIDADE:</p>
-                <h2 id="resMargem" style="color:var(--gold)">0%</h2>
-            </div>
         </div>
     </div>
 
@@ -125,123 +115,15 @@
 <script>
     let mSel = null;
     let mesas = {};
-    let estoque = JSON.parse(localStorage.getItem('est_934')) || [];
-    let tempXML = [];
+    let estoque = JSON.parse(localStorage.getItem('boteco_934_estoque')) || [];
 
     function init() {
-        const g = document.getElementById('gridMesas');
+        const grid = document.getElementById('gridMesas');
         for(let i=1; i<=20; i++) {
-            g.innerHTML += `<div class="mesa" id="m${i}" onclick="selMesa(${i})"><b>M${i}</b><br><small id="s${i}">Livre</small></div>`;
-            mesas[i] = { ativa: false, cliente: '', itens: [], total: 0 };
+            grid.innerHTML += `<div class="mesa" id="m${i}" onclick="selecionarMesa(${i})"><b>M${i}</b><br><small id="s${i}">Livre</small></div>`;
+            mesas[i] = { ocupada: false, cliente: '', itens: [], total: 0 };
         }
-        renderEstoque();
-    }
-
-    function selMesa(n) {
-        mSel = n;
-        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
-        document.getElementById(`m${n}`).classList.add('selecionada');
-        if(mesas[n].ativa) {
-            document.getElementById('areaAbrir').style.display='none';
-            document.getElementById('areaConsumo').style.display='block';
-            document.getElementById('txtMesa').innerText = `Mesa ${n}`;
-            document.getElementById('txtCli').innerText = `Cliente: ${mesas[n].cliente}`;
-            renderConsumo();
-        } else {
-            document.getElementById('areaAbrir').style.display='block';
-            document.getElementById('areaConsumo').style.display='none';
-        }
-    }
-
-    function abrirMesa() {
-        const nome = document.getElementById('cliNome').value;
-        if(!nome) return alert("Digite o nome do cliente!");
-        mesas[mSel] = { ativa: true, cliente: nome, itens: [], total: 0 };
-        document.getElementById(`m${mSel}`).classList.add('ocupada');
-        document.getElementById(`s${mSel}`).innerText = nome;
-        selMesa(mSel);
-        document.getElementById('cliNome').value = '';
-    }
-
-    function lerXML(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const produtos = xml.getElementsByTagName("det");
-            tempXML = [];
-            let resumo = "";
-            for (let i = 0; i < produtos.length; i++) {
-                const nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
-                const valor = parseFloat(produtos[i].getElementsByTagName("vUnCom")[0].textContent);
-                const q = prompt(`Produto: ${nome}\nValor: R$ ${valor}\nQuantas unidades vem dentro?`, "12");
-                const unitario = valor / (parseInt(q) || 1);
-                tempXML.push({ nome, custo: unitario, venda: unitario * 1.5 });
-                resumo += `• ${nome} (Un: R$ ${unitario.toFixed(2)})<br>`;
-            }
-            document.getElementById('previaXML').innerHTML = resumo;
-            document.getElementById('btnConfirmaXML').style.display = 'block';
-        };
-        reader.readAsText(file);
-    }
-
-    function salvarXML() {
-        estoque = [...estoque, ...tempXML];
-        save();
-        document.getElementById('btnConfirmaXML').style.display = 'none';
-        document.getElementById('previaXML').innerText = "Itens salvos!";
-    }
-
-    function addManual() {
-        const n = document.getElementById('mNome').value;
-        const c = parseFloat(document.getElementById('mCusto').value);
-        const q = parseInt(document.getElementById('mQtd').value) || 1;
-        const v = parseFloat(document.getElementById('mVenda').value);
-        if(n && c && v) {
-            estoque.push({ nome: n, custo: c/q, venda: v });
-            save();
-            document.getElementById('mNome').value = ''; document.getElementById('mCusto').value = ''; document.getElementById('mVenda').value = '';
-        }
-    }
-
-    function save() {
-        localStorage.setItem('est_934', JSON.stringify(estoque));
-        renderEstoque();
-    }
-
-    function renderEstoque() {
-        const lista = document.getElementById('listaEstoque');
-        const vitrine = document.getElementById('vitrineVenda');
-        lista.innerHTML = ''; vitrine.innerHTML = '';
-        estoque.forEach((p, i) => {
-            lista.innerHTML += `<tr><td>${p.nome}</td><td>${p.custo.toFixed(2)}</td><td>${p.venda.toFixed(2)}</td><td onclick="removeEst(${i})" style="color:red; cursor:pointer;">❌</td></tr>`;
-            vitrine.innerHTML += `<div class="produto-item" onclick="vender('${p.nome}', ${p.venda})">${p.nome}<br>R$ ${p.venda.toFixed(2)}</div>`;
-        });
-    }
-
-    function removeEst(i) { estoque.splice(i, 1); save(); }
-
-    function vender(n, v) {
-        if(!mSel || !mesas[mSel].ativa) return alert("Selecione uma mesa aberta!");
-        mesas[mSel].itens.push({ n, v });
-        mesas[mSel].total += v;
-        renderConsumo();
-    }
-
-    function renderConsumo() {
-        const area = document.getElementById('listaConsumo');
-        area.innerHTML = mesas[mSel].itens.map(i => `<div>${i.n} - R$ ${i.v.toFixed(2)}</div>`).join('');
-        document.getElementById('valTotal').innerText = mesas[mSel].total.toFixed(2);
-    }
-
-    function fecharConta() {
-        const pgto = document.getElementById('meioPgto').value;
-        const txt = `*BOTECO 934*%0A*Mesa:* ${mSel}%0A*Cliente:* ${mesas[mSel].cliente}%0A*Total:* R$ ${mesas[mSel].total.toFixed(2)}%0A*Pgto:* ${pgto}`;
-        window.open(`https://wa.me/?text=${txt}`, '_blank');
-        document.getElementById(`m${mSel}`).classList.remove('ocupada');
-        document.getElementById(`s${mSel}`).innerText = "Livre";
-        mesas[mSel] = { ativa: false, cliente: '', itens: [], total: 0 };
-        selMesa(mSel);
+        renderizarEstoque();
     }
 
     function mudarTela(id, el) {
@@ -249,15 +131,108 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
         el.classList.add('active');
+        if(id === 'vendas') renderizarVitrine();
     }
 
-    function calcularMargem() {
-        const c = document.getElementById('cc').value || 0;
-        const q = document.getElementById('cq').value || 1;
-        const v = document.getElementById('cv').value || 0;
-        const custoUn = c / q;
-        const margem = v > 0 ? ((v - custoUn) / v) * 100 : 0;
-        document.getElementById('resMargem').innerText = margem.toFixed(1) + '%';
+    function selecionarMesa(n) {
+        mSel = n;
+        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+        document.getElementById(`m${n}`).classList.add('selecionada');
+        
+        if(mesas[n].ocupada) {
+            document.getElementById('areaAbrir').style.display = 'none';
+            document.getElementById('areaConsumo').style.display = 'block';
+            document.getElementById('hMesa').innerText = `Mesa ${n}`;
+            document.getElementById('hCli').innerText = `Cliente: ${mesas[n].cliente}`;
+            atualizarListaConsumo();
+        } else {
+            document.getElementById('areaAbrir').style.display = 'block';
+            document.getElementById('areaConsumo').style.display = 'none';
+        }
+    }
+
+    function abrirMesa() {
+        const nome = document.getElementById('nomeCliente').value;
+        if(!nome) return alert("Digite o nome do cliente!");
+        mesas[mSel] = { ocupada: true, cliente: nome, itens: [], total: 0 };
+        document.getElementById(`m${mSel}`).classList.add('ocupada');
+        document.getElementById(`s${mSel}`).innerText = nome;
+        selecionarMesa(mSel);
+        document.getElementById('nomeCliente').value = '';
+    }
+
+    // --- LÓGICA DE PRODUTOS ---
+    function addEstoqueManual() {
+        const nome = document.getElementById('p_nome').value;
+        const custoTotal = parseFloat(document.getElementById('p_custo').value);
+        const qtd = parseInt(document.getElementById('p_qtd').value) || 1;
+        const venda = parseFloat(document.getElementById('p_venda').value);
+
+        if(!nome || !venda) return alert("Preencha Nome e Preço de Venda!");
+
+        estoque.push({ nome, custo: custoTotal/qtd, venda });
+        salvar();
+        alert("Produto cadastrado!");
+        document.getElementById('p_nome').value = '';
+        document.getElementById('p_custo').value = '';
+        document.getElementById('p_venda').value = '';
+    }
+
+    function salvar() {
+        localStorage.setItem('boteco_934_estoque', JSON.stringify(estoque));
+        renderizarEstoque();
+        renderizarVitrine();
+    }
+
+    function renderizarEstoque() {
+        const tb = document.getElementById('tabelaEstoque');
+        tb.innerHTML = '';
+        estoque.forEach((p, index) => {
+            tb.innerHTML += `<tr><td>${p.nome}</td><td>R$ ${p.custo.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td><button onclick="remover(${index})" style="background:none; border:none; color:red; cursor:pointer;">🗑️</button></td></tr>`;
+        });
+    }
+
+    // ESTA É A FUNÇÃO QUE FAZ AS VENDAS COMEÇAREM
+    function renderizarVitrine() {
+        const vitrine = document.getElementById('vitrineVendas');
+        if(estoque.length === 0) {
+            vitrine.innerHTML = '<p style="color:#666; font-size: 12px;">Nenhum produto no estoque.</p>';
+            return;
+        }
+        vitrine.innerHTML = '';
+        estoque.forEach(p => {
+            vitrine.innerHTML += `<div class="prod-btn" onclick="adicionarItem('${p.nome}', ${p.venda})">${p.nome}<br><span style="color:#888; font-size:11px;">R$ ${p.venda.toFixed(2)}</span></div>`;
+        });
+    }
+
+    function adicionarItem(nome, preco) {
+        if(!mSel || !mesas[mSel].ocupada) return alert("Selecione uma mesa aberta!");
+        mesas[mSel].itens.push({ nome, preco });
+        mesas[mSel].total += preco;
+        atualizarListaConsumo();
+    }
+
+    function atualizarListaConsumo() {
+        const lista = document.getElementById('listaItens');
+        lista.innerHTML = mesas[mSel].itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.nome}</span><span>R$ ${i.preco.toFixed(2)}</span></div>`).join('');
+        document.getElementById('totalVenda').innerText = mesas[mSel].total.toFixed(2);
+    }
+
+    function finalizarVenda() {
+        const pgto = document.getElementById('meioPagamento').value;
+        const msg = `*BOTECO 934*%0A*Cliente:* ${mesas[mSel].cliente}%0A*Total:* R$ ${mesas[mSel].total.toFixed(2)}%0A*Pagamento:* ${pgto}`;
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+        
+        // Reseta a mesa
+        document.getElementById(`m${mSel}`).classList.remove('ocupada');
+        document.getElementById(`s${mSel}`).innerText = "Livre";
+        mesas[mSel] = { ocupada: false, cliente: '', itens: [], total: 0 };
+        selecionarMesa(mSel);
+    }
+
+    function remover(i) {
+        estoque.splice(i, 1);
+        salvar();
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
