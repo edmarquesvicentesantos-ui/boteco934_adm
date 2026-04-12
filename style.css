@@ -76,3 +76,14 @@
         z-index: 1000;
         margin-top: 10px;
     }
+
+/* Estilo para o alerta de aumento */
+.alerta-preco {
+    background: #440000;
+    color: #ffcccc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 5px solid var(--vermelho);
+    display: none; /* Inicia escondido */
+}
