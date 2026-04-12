@@ -2,11 +2,10 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão Inteligente</title>
+    <title>Boteco 934 - Gestão Blindada</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #333; }
+        body { background: #fff; }
         header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         .badge { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.8em; }
         .brand { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
@@ -21,58 +20,58 @@
         td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
         .c-custo { background: #fff2cc; }
         .c-margem { background: #c6efce; color: #006100; }
-        .form-add { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; margin-bottom: 20px; border-radius: 5px; }
-        input { padding: 8px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; background: #2b579a; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .form-box { background: #f4f4f4; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+        input { padding: 10px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #2b579a; color: white; border: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo-box"><div class="badge">934</div><div class="brand">BOTECO</div></div>
-    <div class="clima"><strong>Petrolina</strong><br><span style="color:#ff6600">32°C</span></div>
+    <div class="indicadores">Dólar <b>▼ 5,011</b> | Euro <b>▼ 5,877</b></div>
 </header>
 
 <nav>
-    <div class="nav-link active" onclick="mudarTela('operacional', this)">Operacional</div>
-    <div class="nav-link" onclick="mudarTela('estoque', this)">Estoque / XML</div>
-    <div class="nav-link" onclick="mudarTela('clientes', this)">Clientes</div>
+    <div class="nav-link active" onclick="navegar('operacional', this)">Operacional</div>
+    <div class="nav-link" onclick="navegar('estoque', this)">Estoque / XML</div>
+    <div class="nav-link" onclick="navegar('clientes', this)">Clientes</div>
 </nav>
 
 <div class="container">
     
     <div id="operacional" class="secao ativa">
-        <h2>BALCÃO DE ATENDIMENTO</h2>
-        <p>Sistema pronto para vendas.</p>
+        <h2>SISTEMA DE BALCÃO</h2>
+        <p>Pronto para vender.</p>
     </div>
 
     <div id="estoque" class="secao">
-        <h2>IMPORTAR NOTA FISCAL (XML)</h2>
-        <div class="form-add">
-            <input type="file" id="arquivoXML" accept=".xml">
-            <button onclick="processarXML()">SUBIR NOTA E ATUALIZAR ESTOQUE</button>
+        <h2>ESTOQUE E ENTRADA XML</h2>
+        <div class="form-box">
+            <input type="file" id="xmlFile" accept=".xml">
+            <button onclick="lerXML()">IMPORTAR E SOMAR ESTOQUE</button>
         </div>
-        <table id="tabelaEstoque">
+        <table>
             <thead>
                 <tr>
                     <th>Produto</th>
-                    <th>Qtd Atual</th>
+                    <th>Qtd em Mãos</th>
                     <th>Custo Unit.</th>
                     <th>Venda</th>
                     <th class="c-margem">Margem %</th>
                 </tr>
             </thead>
-            <tbody id="corpoEstoque"></tbody>
+            <tbody id="listaEstoque"></tbody>
         </table>
     </div>
 
     <div id="clientes" class="secao">
-        <h2>ADICIONAR NOVO CLIENTE</h2>
-        <div class="form-add">
-            <input type="text" id="nomeCliente" placeholder="Nome Completo">
-            <input type="text" id="zapCliente" placeholder="WhatsApp">
-            <input type="number" id="limiteCliente" placeholder="Limite de Crédito">
-            <button onclick="addCliente()">CADASTRAR</button>
+        <h2>NOVO CLIENTE</h2>
+        <div class="form-box">
+            <input type="text" id="cNome" placeholder="Nome">
+            <input type="text" id="cZap" placeholder="WhatsApp">
+            <input type="number" id="cLimite" placeholder="Limite">
+            <button onclick="salvarCliente()">CADASTRAR</button>
         </div>
         <table>
             <thead>
@@ -80,113 +79,86 @@
                     <th>Nome</th>
                     <th>WhatsApp</th>
                     <th>Limite</th>
-                    <th>Saldo Devedor</th>
+                    <th>Saldo</th>
                 </tr>
             </thead>
-            <tbody id="corpoClientes"></tbody>
+            <tbody id="listaClientes"></tbody>
         </table>
     </div>
+
 </div>
 
 <script>
-    // BANCO DE DADOS LOCAL
-    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || {};
-    let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
-    let notasLidas = JSON.parse(localStorage.getItem('b934_notas')) || [];
+    // Memória do Boteco 934 - Carrega o que foi salvo
+    let db_estoque = JSON.parse(localStorage.getItem('b934_estoque')) || {};
+    let db_clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
+    let db_notas = JSON.parse(localStorage.getItem('b934_notas')) || [];
 
-    function mudarTela(id, btn) {
+    function navegar(id, btn) {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
         btn.classList.add('active');
-        renderizarEstoque();
-        renderizarClientes();
+        atualizarTelas();
     }
 
-    // --- LÓGICA DE CLIENTES ---
-    function addCliente() {
-        const nome = document.getElementById('nomeCliente').value;
-        const zap = document.getElementById('zapCliente').value;
-        const limite = document.getElementById('limiteCliente').value;
+    // --- SALVAR CLIENTE ---
+    function salvarCliente() {
+        const nome = document.getElementById('cNome').value;
+        const zap = document.getElementById('cZap').value;
+        const limite = document.getElementById('cLimite').value;
 
         if(!nome || !limite) return alert("Preencha Nome e Limite!");
 
-        clientes.push({ nome, zap, limite, saldo: 0 });
-        localStorage.setItem('b934_clientes', JSON.stringify(clientes));
-        alert("Cliente cadastrado!");
-        renderizarClientes();
+        db_clientes.push({ nome, zap, limite: parseFloat(limite), saldo: 0 });
+        localStorage.setItem('b934_clientes', JSON.stringify(db_clientes));
+        
+        alert("Cliente Salvo!");
+        document.getElementById('cNome').value = "";
+        document.getElementById('cZap').value = "";
+        document.getElementById('cLimite').value = "";
+        atualizarTelas();
     }
 
-    function renderizarClientes() {
-        const corpo = document.getElementById('corpoClientes');
-        corpo.innerHTML = clientes.map(c => `
-            <tr>
-                <td>${c.nome}</td>
-                <td>${c.zap}</td>
-                <td>R$ ${c.limite}</td>
-                <td style="color:${c.saldo > 0 ? 'red' : 'green'}">R$ ${c.saldo}</td>
-            </tr>
-        `).join('');
-    }
-
-    // --- LÓGICA DE XML E ESTOQUE ---
-    function processarXML() {
-        const file = document.getElementById('arquivoXML').files[0];
-        if(!file) return alert("Selecione um arquivo XML!");
+    // --- LER XML E SOMAR ---
+    function lerXML() {
+        const file = document.getElementById('xmlFile').files[0];
+        if(!file) return alert("Escolha o arquivo!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            
-            // TRAVA DE SEGURANÇA (CHAVE DA NOTA)
-            const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id");
-            if(notasLidas.includes(chave)) return alert("ERRO: Esta nota já foi usada!");
+            const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id") || "";
+
+            if(db_notas.includes(chave)) return alert("Nota já lançada!");
 
             const itens = xml.getElementsByTagName("det");
             for(let i = 0; i < itens.length; i++) {
                 const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
                 const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                const valor = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
 
-                // ALIMENTA O ESTOQUE
-                if(estoque[nome]) {
-                    estoque[nome].qtd += qtd;
-                    estoque[nome].custo = valor; // Atualiza para o custo mais recente
+                if(db_estoque[nome]) {
+                    db_estoque[nome].qtd += qtd; // SOMA À QUANTIDADE ANTIGA
+                    db_estoque[nome].custo = custo;
                 } else {
-                    estoque[nome] = { qtd: qtd, custo: valor, venda: valor * 1.5 }; // Sugere 50% margem
+                    db_estoque[nome] = { qtd: qtd, custo: custo, venda: custo * 1.5 };
                 }
             }
 
-            notasLidas.push(chave);
-            localStorage.setItem('b934_notas', JSON.stringify(notasLidas));
-            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
+            db_notas.push(chave);
+            localStorage.setItem('b934_estoque', JSON.stringify(db_estoque));
+            localStorage.setItem('b934_notas', JSON.stringify(db_notas));
             alert("Estoque Atualizado!");
-            renderizarEstoque();
+            atualizarTelas();
         };
         reader.readAsText(file);
     }
 
-    function renderizarEstoque() {
-        const corpo = document.getElementById('corpoEstoque');
-        corpo.innerHTML = "";
-        for(let p in estoque) {
-            let margem = ((estoque[p].venda - estoque[p].custo) / estoque[p].venda * 100).toFixed(2);
-            corpo.innerHTML += `
-                <tr>
-                    <td style="text-align:left">${p}</td>
-                    <td>${estoque[p].qtd}</td>
-                    <td class="c-custo">R$ ${estoque[p].custo.toFixed(2)}</td>
-                    <td>R$ ${estoque[p].venda.toFixed(2)}</td>
-                    <td class="c-margem">${margem}%</td>
-                </tr>
-            `;
-        }
-    }
-
-    // Inicia as tabelas
-    renderizarEstoque();
-    renderizarClientes();
-</script>
-
-</body>
-</html>
+    function atualizarTelas() {
+        // Tabela Estoque
+        const tEstoque = document.getElementById('listaEstoque');
+        tEstoque.innerHTML = "";
+        for(let p in db_estoque) {
+            let m = ((db_estoque[p].venda - db_estoque[p].custo) / db_estoque[p].venda * 100).toFixed(2);
+            tEstoque.innerHTML += `<tr><td>${p}</td><td>${db
