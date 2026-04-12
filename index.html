@@ -6,7 +6,8 @@
     <style>
         :root {
             --primary: #ffcc00;
-            --bg-dark: #121212;
+            --dark-bg: #000;
+            --card-gray: #1a1a1a;
             /* Cores Harmonizadas da Tabela */
             --col-prod: #3b5998;
             --col-custo: #fff2cc;
@@ -16,8 +17,9 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #000; color: #fff; }
+        body { background: var(--dark-bg); color: #fff; }
 
+        /* Cabeçalho Profissional */
         header { background: var(--primary); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; }
         .badge { background: #000; color: var(--primary); padding: 5px 12px; border-radius: 4px; font-weight: 900; }
 
@@ -29,26 +31,26 @@
         .secao { display: none; }
         .ativa { display: block; }
 
+        /* Card de Importação */
+        .card-import { background: var(--card-gray); padding: 30px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
+        .btn-lancar { background: var(--primary); color: #000; border: none; padding: 15px 30px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
+
+        /* Barra de Tabela Azul */
+        .header-tabela { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; background: #2b579a; border-radius: 10px; padding: 15px; text-align: center; font-size: 12px; font-weight: bold; }
+
+        /* Linhas de Dados com Cores Harmonizadas */
+        .linha-produto { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; margin-top: 5px; border-radius: 8px; overflow: hidden; color: #000; font-weight: bold; text-align: center; }
+        .c-prod { background: #3b5998; color: #fff; padding: 12px; }
+        .c-qtd { background: #4a7ebb; color: #fff; padding: 12px; }
+        .c-custo { background: var(--col-custo); padding: 12px; }
+        .c-venda { background: var(--col-venda); padding: 12px; }
+        .c-lucro { background: var(--col-lucro); padding: 12px; }
+        .c-margem { background: var(--col-margem); padding: 12px; }
+
         /* Mesas Independentes */
         .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
         .mesa { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.4); }
-
-        /* Tabela Estilizada */
-        .card { background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #000; border-radius: 10px; overflow: hidden; }
-        th { background: #2b579a; color: #fff; padding: 15px; text-align: left; font-size: 12px; }
-        td { padding: 15px; font-weight: bold; border-bottom: 1px solid #eee; }
-
-        /* Aplicação das Cores Harmonizadas */
-        .c-prod { background: var(--col-prod); color: #fff; }
-        .c-custo { background: var(--col-custo); }
-        .c-venda { background: var(--col-venda); }
-        .c-lucro { background: var(--col-lucro); }
-        .c-margem { background: var(--col-margem); }
-
-        button { background: var(--primary); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 8px; }
-        input[type="file"] { background: #333; color: #fff; padding: 10px; border-radius: 8px; margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -58,39 +60,35 @@
         <div class="badge">934</div>
         <h1 style="letter-spacing:-1.5px;">BOTECO</h1>
     </div>
-    <div>Petrolina-PE | 32°C</div>
+    <div style="font-weight: bold;">Petrolina-PE | 32°C</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="tela('operacional', this)">Mesas/Operacional</div>
+    <div class="nav-item active" onclick="tela('mesas', this)">Mesas/Operacional</div>
     <div class="nav-item" onclick="tela('estoque', this)">Estoque XML</div>
 </nav>
 
 <div class="container">
-    <div id="operacional" class="secao ativa">
+    <div id="mesas" class="secao ativa">
         <div class="grid-mesas" id="gradeMesas"></div>
     </div>
 
     <div id="estoque" class="secao">
-        <div class="card">
-            <h3 style="color:var(--primary); margin-bottom:15px;">IMPORTAR NOTA FISCAL (XML)</h3>
-            <input type="file" id="xmlInput" accept=".xml">
-            <button onclick="importarXML()">LANÇAR NO FIREBASE</button>
+        <div class="card-import">
+            <h3 style="color:var(--primary); margin-bottom:20px; text-transform: uppercase;">Importar Nota Fiscal (XML)</h3>
+            <input type="file" id="xmlInput" accept=".xml" style="color:#fff; margin-right:15px;">
+            <button class="btn-lancar" onclick="importarXML()">Lançar no Firebase</button>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>PRODUTO</th>
-                    <th>QTD</th>
-                    <th>CUSTO UNIT.</th>
-                    <th>VENDA UNIT.</th>
-                    <th>LUCRO</th>
-                    <th>MARGEM %</th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-        </table>
+        <div class="header-tabela">
+            <div>PRODUTO</div>
+            <div>QTD</div>
+            <div>CUSTO UNIT.</div>
+            <div>VENDA UNIT.</div>
+            <div>LUCRO</div>
+            <div>MARGEM %</div>
+        </div>
+        <div id="corpoTabela"></div>
     </div>
 </div>
 
@@ -98,7 +96,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Configuração do seu Firebase
+    // Suas credenciais oficiais do Boteco 934
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -110,16 +108,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Mesas Dinâmicas
+    // Gerar mesas (Abrem sem cliente)
     const grade = document.getElementById('gradeMesas');
     for(let i=1; i<=15; i++) {
         grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
     }
 
-    // Processamento de XML
+    // Processamento do XML direto para o Firebase
     window.importarXML = function() {
         const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Selecione o arquivo!");
+        if(!file) return alert("Escolha um arquivo XML primeiro!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -129,23 +127,23 @@
             for(let i=0; i<itens.length; i++) {
                 const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
                 const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                const custoUn = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
                 
-                // Cálculo automático de margem (Ex: 50% de lucro sobre o custo)
-                const vendaSugestao = custoUn * 2;
-                const lucro = vendaSugestao - custoUn;
+                // Cálculo de venda sugerida (Ex: 50% de lucro)
+                const venda = custo * 1.5;
+                const lucro = venda - custo;
 
-                // Envio para a pasta 'produtos' no Firebase
+                // USANDO PUSH PARA EVITAR O ERRO "NOTA JÁ IMPORTADA"
                 push(ref(db, 'produtos'), {
-                    nome, qtd, custo: custoUn, venda: vendaSugestao, lucro, margem: 50
+                    nome, qtd, custo, venda, lucro, margem: 50
                 });
             }
-            alert("Estoque atualizado na nuvem!");
+            alert("Produtos lançados com sucesso no Firebase!");
         };
         reader.readAsText(file);
     };
 
-    // Atualização da Tabela em Tempo Real
+    // Sincronização em Tempo Real com a Tabela Colorida
     onValue(ref(db, 'produtos'), (snapshot) => {
         const corpo = document.getElementById('corpoTabela');
         corpo.innerHTML = "";
@@ -153,14 +151,14 @@
         if(data) {
             Object.values(data).forEach(p => {
                 corpo.innerHTML += `
-                    <tr>
-                        <td class="c-prod">${p.nome}</td>
-                        <td>${p.qtd}</td>
-                        <td class="c-custo">R$ ${p.custo.toFixed(2)}</td>
-                        <td class="c-venda">R$ ${p.venda.toFixed(2)}</td>
-                        <td class="c-lucro">R$ ${p.lucro.toFixed(2)}</td>
-                        <td class="c-margem">${p.margem}%</td>
-                    </tr>`;
+                    <div class="linha-produto">
+                        <div class="c-prod">${p.nome}</div>
+                        <div class="c-qtd">${p.qtd}</div>
+                        <div class="c-custo">R$ ${p.custo.toFixed(2)}</div>
+                        <div class="c-venda">R$ ${p.venda.toFixed(2)}</div>
+                        <div class="c-lucro">R$ ${p.lucro.toFixed(2)}</div>
+                        <div class="c-margem">${p.margem}%</div>
+                    </div>`;
             });
         }
     });
