@@ -2,97 +2,136 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 - VENDAS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>934 - MERCADORIAS PDV</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #0b0b0b; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
-        .mesas-area { flex: 1; padding: 20px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .mesa { background: #222; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; }
-        .mesa.ocupada { background: #4a0000; border-color: #ff4444; }
-        .mesa.selecionada { border-color: var(--gold); }
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; border-top: 1px solid #333; padding-top: 20px; }
-        .prod-btn { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .caixa { width: 350px; background: #fff; color: #000; padding: 20px; display: flex; flex-direction: column; }
-        .btn-whats { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #121212; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Cabeçalho Compacto */
+        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+        .logo-circulo { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
+        .brand { font-weight: bold; letter-spacing: 1px; color: #fff; }
+
+        /* Área de Busca e Leitor */
+        .secao-busca { padding: 15px; background: #0a0a0a; border-bottom: 1px solid #222; }
+        .input-leitor { width: 100%; padding: 15px; background: #1a1a1a; border: 2px solid #333; color: var(--gold); border-radius: 8px; font-size: 16px; font-weight: bold; text-align: center; outline: none; }
+        .input-leitor:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,204,0,0.2); }
+
+        .conteudo-venda { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Grid de Mercadorias (Ordem Alfabética) */
+        .vitrine-produtos { flex: 1; padding: 10px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; align-content: start; }
+        .card-prod { background: #fff; color: #000; padding: 15px 5px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; border: none; min-height: 70px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 0 #bbb; active: transform: translateY(2px); }
+        .card-prod span { font-size: 10px; color: #666; margin-top: 4px; }
+
+        /* Lateral da Comanda Atual */
+        .painel-checkout { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; border-left: 1px solid #ddd; }
+        .lista-venda { flex: 1; overflow-y: auto; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
+        .linha-venda { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; font-size: 12px; }
+        .total-venda { border-top: 2px solid #000; padding-top: 10px; font-weight: 900; display: flex; justify-content: space-between; font-size: 18px; color: #d32f2f; }
+        .btn-confirmar { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="mesas-area">
-        <h2 style="color:var(--gold)">MESAS</h2>
-        <div id="gridMesas" class="grid"></div>
+
+<header>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <div class="logo-circulo">934</div>
+        <div class="brand">PDV MERCADORIAS</div>
+    </div>
+    <div id="hora" style="color:var(--gold); font-weight:bold;">00:00</div>
+</header>
+
+<div class="secao-busca">
+    <input type="text" id="campoBusca" class="input-leitor" placeholder="[ BIPAR CÓDIGO OU DIGITAR NOME ]" oninput="filtrar()" autofocus>
+</div>
+
+<div class="conteudo-venda">
+    <div id="vitrine" class="vitrine-produtos"></div>
+
+    <div class="painel-checkout">
+        <h3 style="font-size: 14px; text-transform: uppercase; color: #444;">Venda Atual</h3>
+        <div id="carrinho" class="lista-venda"></div>
         
-        <h2 style="color:var(--gold)">MERCADORIAS</h2>
-        <div id="vitrine" class="vitrine"></div>
+        <div class="total-venda">
+            <span>TOTAL</span>
+            <span>R$ <span id="totalGeral">0,00</span></span>
+        </div>
+        <button class="btn-confirmar" onclick="finalizarVenda()">FINALIZAR E ENVIAR</button>
     </div>
+</div>
 
-    <div class="caixa">
-        <h3 id="infoMesa">Selecione uma mesa</h3>
-        <div id="consumo" style="flex:1; margin-top:20px; border-top:1px solid #ddd;"></div>
-        <hr>
-        <h2>TOTAL: R$ <span id="total">0,00</span></h2>
-        <button class="btn-whats" onclick="fechar()">FECHAR CONTA</button>
-    </div>
+<script>
+    let itensVenda = [];
+    let totalVenda = 0;
+    // Puxa o estoque do mesmo banco da Gestão
+    let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
 
-    <script>
-        let mSel = null;
-        let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
-        let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
+    // Organiza por ordem alfabética logo no início
+    estoque.sort((a, b) => a.nome.localeCompare(b.nome));
 
-        function init() {
-            const grid = document.getElementById('gridMesas');
-            for(let i=1; i<=20; i++) {
-                if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
-                grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})">M${i}</div>`;
-            }
-            renderVitrine();
+    function renderVitrine(lista) {
+        const vitrine = document.getElementById('vitrine');
+        vitrine.innerHTML = lista.map(p => `
+            <button class="card-prod" onclick="adicionar('${p.nome}', ${p.venda})">
+                ${p.nome}
+                <span>R$ ${p.venda.toFixed(2)}</span>
+            </button>
+        `).join('');
+    }
+
+    function filtrar() {
+        const termo = document.getElementById('campoBusca').value.toLowerCase();
+        const filtrados = estoque.filter(p => p.nome.toLowerCase().includes(termo));
+        renderVitrine(filtrados);
+        
+        // Se houver apenas 1 resultado e for um código de barras exato, pode adicionar automático
+        if(filtrados.length === 1 && termo === filtrados[0].codigo) { // Se você usar campo 'codigo' no futuro
+             adicionar(filtrados[0].nome, filtrados[0].venda);
+             document.getElementById('campoBusca').value = '';
         }
+    }
 
-        function sel(n) {
-            mSel = n;
-            document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
-            document.getElementById(`m${n}`).classList.add('selecionada');
-            document.getElementById('infoMesa').innerText = "Mesa " + n;
-            if(!mesas[n].ocupada) {
-                if(confirm("Abrir mesa?")) {
-                    mesas[n].ocupada = true;
-                    document.getElementById(`m${n}`).classList.add('ocupada');
-                    salvar();
-                }
-            }
-            atualizar();
-        }
+    function adicionar(nome, preco) {
+        itensVenda.push({ nome, preco });
+        totalVenda += preco;
+        atualizarCarrinho();
+        document.getElementById('campoBusca').value = '';
+        document.getElementById('campoBusca').focus();
+        renderVitrine(estoque); // Reseta a vitrine para mostrar todos após adicionar
+    }
 
-        function renderVitrine() {
-            document.getElementById('vitrine').innerHTML = estoque.map(p => 
-                `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br>R$ ${p.venda.toFixed(2)}</div>`
-            ).join('');
-        }
+    function atualizarCarrinho() {
+        const container = document.getElementById('carrinho');
+        container.innerHTML = itensVenda.map(item => `
+            <div class="linha-venda">
+                <span>${item.nome}</span>
+                <span>${item.preco.toFixed(2)}</span>
+            </div>
+        `).join('');
+        document.getElementById('totalGeral').innerText = totalVenda.toFixed(2);
+    }
 
-        function add(n, v) {
-            if(!mSel || !mesas[mSel].ocupada) return alert("Abra a mesa primeiro!");
-            mesas[mSel].itens.push({ n, v });
-            mesas[mSel].total += v;
-            salvar();
-            atualizar();
-        }
+    function finalizarVenda() {
+        if(itensVenda.length === 0) return alert("Carrinho vazio!");
+        const texto = `*BOTECO 934*%0A*Venda Balcão*%0ATotal: R$ ${totalVenda.toFixed(2)}`;
+        window.open(`https://wa.me/?text=${texto}`);
+        
+        // Limpa tudo para a próxima venda
+        itensVenda = [];
+        totalVenda = 0;
+        atualizarCarrinho();
+    }
 
-        function atualizar() {
-            if(!mSel) return;
-            document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div>${i.n} - R$ ${i.v.toFixed(2)}</div>`).join('');
-            document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
-        }
+    // Relógio
+    setInterval(() => { 
+        document.getElementById('hora').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); 
+    }, 1000);
 
-        function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
-
-        function fechar() {
-            const texto = `*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
-            window.open(`https://wa.me/?text=${texto}`);
-            mesas[mSel] = { ocupada: false, itens: [], total: 0 };
-            location.reload();
-            salvar();
-        }
-        init();
-    </script>
+    // Inicializa a tela com todos os produtos em ordem alfabética
+    renderVitrine(estoque);
+</script>
 </body>
 </html>
