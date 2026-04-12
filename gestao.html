@@ -4,123 +4,144 @@
     <meta charset="UTF-8">
     <title>934 - GESTÃO E ESTRATÉGIA</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --gray: #111; --destilado: #ff4500; }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #111; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 15px; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         
-        .card { background: var(--gray); padding: 15px; border-radius: 8px; border: 1px solid #222; margin-bottom: 15px; }
-        label { font-size: 11px; color: #888; text-transform: uppercase; display: block; margin-top: 10px; }
+        .card { background: var(--gray); padding: 20px; border-radius: 8px; border: 1px solid #222; margin-bottom: 20px; }
+        h2 { color: var(--gold); margin-bottom: 15px; text-transform: uppercase; font-size: 14px; }
         
-        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin-top: 5px; border-radius: 4px; outline: none; }
+        label { font-size: 11px; color: #888; text-transform: uppercase; display: block; margin-top: 12px; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; margin-top: 5px; border-radius: 4px; outline: none; font-weight: bold; }
         input:focus { border-color: var(--gold); }
         
-        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .res-destaque { background: #000; padding: 20px; border-radius: 8px; border: 2px solid var(--gold); text-align: center; }
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .res-destaque { background: #000; padding: 25px; border-radius: 8px; border: 2px solid var(--gold); text-align: center; display: flex; flex-direction: column; justify-content: center; }
         
-        .btn-copy { width: 100%; padding: 15px; background: #fff; color: #000; font-weight: bold; border-radius: 4px; margin-top: 15px; cursor: pointer; border: none; }
-        .btn-save { width: 100%; padding: 15px; background: var(--gold); color: #000; font-weight: bold; border-radius: 4px; margin-top: 15px; cursor: pointer; border: none; }
+        .btn-copy { width: 100%; padding: 15px; background: #fff; color: #000; font-weight: bold; border-radius: 4px; margin-top: 20px; cursor: pointer; border: none; text-transform: uppercase; }
+        .btn-save { width: 100%; padding: 15px; background: var(--gold); color: #000; font-weight: bold; border-radius: 4px; margin-top: 15px; cursor: pointer; border: none; text-transform: uppercase; }
+        
+        .info-linha { display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card" style="border-top: 4px solid var(--gold);">
-    <h2 style="color: var(--gold); margin-bottom: 15px;">📊 Calculadora Robusta 934</h2>
+<div class="card">
+    <h2>📊 Calculadora Mix Inteligente 934</h2>
     
     <div class="calc-grid">
         <div>
-            <label>O que você vai precificar?</label>
-            <select id="tipo_prod" onchange="ajustarMargem()">
-                <option value="cerveja">Cervejas / Bebidas (Geral)</option>
-                <option value="destilado">Destilados / Doses</option>
+            <label>Categoria de Produto</label>
+            <select id="tipo_prod" onchange="configurarCategoria()">
+                <option value="cerveja">Cervejas / Refrigerantes</option>
+                <option value="destilado">Destilados / Doses / Combos</option>
             </select>
 
-            <label id="label_custo">Custo da Garrafa/Fardo (R$)</label>
-            <input type="number" id="c_custo" placeholder="0.00" oninput="calcularPreco()">
+            <label id="label_custo">Custo do Fardo/Caixa (R$)</label>
+            <input type="number" id="c_custo" value="0.00" step="0.01" oninput="calcularTudo()">
 
-            <label id="label_unidades">Unidades ou Doses (Quantidade)</label>
-            <input type="number" id="c_unidades" value="1" oninput="calcularPreco()">
+            <label id="label_qtd">Qtd de Unidades no Fardo</label>
+            <input type="number" id="c_qtd" value="1" oninput="calcularTudo()">
 
-            <label>Margem de Lucro (%)</label>
-            <input type="number" id="c_margem" value="30" oninput="calcularPreco()">
+            <label>Margem de Lucro Desejada (%)</label>
+            <input type="number" id="c_margem" value="30" oninput="calcularTudo()">
         </div>
 
         <div class="res-destaque">
-            <label style="color:var(--gold)">Sugestão de Venda (Un/Dose)</label>
-            <div id="venda_final" style="font-size: 32px; font-weight: 900; color: #fff; margin: 15px 0;">R$ 0,00</div>
+            <label style="color:var(--gold)">Sugestão de Venda (Unid/Dose)</label>
+            <div id="venda_final" style="font-size: 35px; font-weight: 900; color: #fff; margin: 10px 0;">R$ 0,00</div>
             
-            <div style="text-align: left; border-top: 1px solid #222; padding-top: 10px;">
-                <p>Custo por Dose/Un: <span id="res_custo" style="float: right;">R$ 0,00</span></p>
-                <p style="color:#25d366">Lucro por Dose/Un: <span id="res_lucro" style="float: right;">R$ 0,00</span></p>
+            <div class="info-linha">
+                <span style="color:#888">Custo Unitário:</span>
+                <span id="res_custo_un" style="font-weight:bold">R$ 0,00</span>
+            </div>
+            <div class="info-linha">
+                <span style="color:#25d366">Lucro Líquido Un:</span>
+                <span id="res_lucro_un" style="color:#25d366; font-weight:bold">R$ 0,00</span>
             </div>
         </div>
     </div>
 
-    <button class="btn-copy" onclick="copiarValores()">COPIAR PARA O CADASTRO ↓</button>
+    <button class="btn-copy" onclick="copiarParaCadastro()">Copiar valores para o Cadastro ↓</button>
 </div>
 
 <div class="card">
-    <h2 style="margin-bottom: 10px;">📦 Cadastro Final</h2>
-    <input type="text" id="nome_final" placeholder="Nome do Produto">
+    <h2>📦 Cadastro de Mercadoria</h2>
+    <label>Nome do Produto</label>
+    <input type="text" id="nome_prod" placeholder="Ex: Black Label 1L">
+    
     <div style="display: flex; gap: 10px;">
-        <input type="number" id="form_custo" placeholder="Custo Un.">
-        <input type="number" id="form_venda" placeholder="Venda Un.">
+        <div style="flex:1">
+            <label>Custo Un. (R$)</label>
+            <input type="number" id="f_custo" step="0.01">
+        </div>
+        <div style="flex:1">
+            <label>Venda Un. (R$)</label>
+            <input type="number" id="f_venda" step="0.01">
+        </div>
     </div>
-    <button class="btn-save" onclick="salvarEstoque()">SALVAR NO ESTOQUE</button>
+    <button class="btn-save" onclick="salvarEstoque()">Salvar no Sistema 934</button>
 </div>
 
 <script>
-    function ajustarMargem() {
+    // Função para mudar os nomes dos campos se for destilado
+    function configurarCategoria() {
         const tipo = document.getElementById('tipo_prod').value;
-        const margemInput = document.getElementById('c_margem');
+        const margem = document.getElementById('c_margem');
         
         if (tipo === 'destilado') {
-            margemInput.value = 100; // Sugestão inicial de 100% para doses
-            document.getElementById('label_custo').innerText = "Custo da Garrafa (R$)";
-            document.getElementById('label_unidades').innerText = "Quantas Doses por Garrafa?";
+            document.getElementById('label_custo').innerText = "Custo da Garrafa/Combo (R$)";
+            document.getElementById('label_qtd').innerText = "Quantidade de Doses/Dose Única";
+            margem.value = 100; // Margem sugerida para destilados
         } else {
-            margemInput.value = 30;
             document.getElementById('label_custo').innerText = "Custo do Fardo/Caixa (R$)";
-            document.getElementById('label_unidades').innerText = "Unidades no Fardo";
+            document.getElementById('label_qtd').innerText = "Qtd de Unidades no Fardo";
+            margem.value = 30; // Margem sugerida para cervejas
         }
-        calcularPreco();
+        calcularTudo();
     }
 
-    function calcularPreco() {
+    function calcularTudo() {
         const custoTotal = parseFloat(document.getElementById('c_custo').value) || 0;
-        const qtd = parseFloat(document.getElementById('c_unidades').value) || 1;
+        const qtd = parseFloat(document.getElementById('c_qtd').value) || 1;
         const margem = parseFloat(document.getElementById('c_margem').value) || 0;
 
         const custoUnitario = custoTotal / qtd;
-        // Cálculo de Markup: (Custo * (1 + Margem/100))
         const precoVenda = custoUnitario * (1 + (margem / 100));
-        const lucroReal = precoVenda - custoUnitario;
+        const lucroBruto = precoVenda - custoUnitario;
 
-        document.getElementById('res_custo').innerText = `R$ ${custoUnitario.toFixed(2)}`;
+        // Atualiza a tela
         document.getElementById('venda_final').innerText = `R$ ${precoVenda.toFixed(2)}`;
-        document.getElementById('res_lucro').innerText = `R$ ${lucroReal.toFixed(2)}`;
+        document.getElementById('res_custo_un').innerText = `R$ ${custoUnitario.toFixed(2)}`;
+        document.getElementById('res_lucro_un').innerText = `R$ ${lucroBruto.toFixed(2)}`;
     }
 
-    function copiarValores() {
-        const venda = document.getElementById('venda_final').innerText.replace('R$ ', '');
-        const custo = document.getElementById('res_custo').innerText.replace('R$ ', '');
-        document.getElementById('form_venda').value = venda;
-        document.getElementById('form_custo').value = custo;
-        document.getElementById('nome_final').focus();
+    function copiarParaCadastro() {
+        const v = document.getElementById('venda_final').innerText.replace('R$ ', '');
+        const c = document.getElementById('res_custo_un').innerText.replace('R$ ', '');
+        document.getElementById('f_venda').value = v;
+        document.getElementById('f_custo').value = c;
+        document.getElementById('nome_prod').focus();
     }
 
     function salvarEstoque() {
-        const nome = document.getElementById('nome_final').value;
-        const c = document.getElementById('form_custo').value;
-        const v = document.getElementById('form_venda').value;
-        
-        if(!nome || !v) return alert("Preencha o nome e o preço!");
+        const nome = document.getElementById('nome_prod').value;
+        const custo = document.getElementById('f_custo').value;
+        const venda = document.getElementById('f_venda').value;
 
-        let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
-        estoque.push({ nome, custo: parseFloat(c), venda: parseFloat(v) });
-        localStorage.setItem('boteco_est', JSON.stringify(estoque));
-        alert("Salvo com sucesso!");
+        if(!nome || !venda) return alert("Preencha os campos!");
+
+        let lista = JSON.parse(localStorage.getItem('boteco_est')) || [];
+        lista.push({ nome, custo: parseFloat(custo), venda: parseFloat(venda) });
+        localStorage.setItem('boteco_est', JSON.stringify(lista));
+
+        alert("Produto salvo com sucesso!");
         location.reload();
     }
+
+    // Inicia o cálculo ao carregar a página
+    window.onload = calcularTudo;
 </script>
+
 </body>
 </html>
