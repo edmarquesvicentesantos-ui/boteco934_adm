@@ -2,73 +2,27 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Portal de Gestão</title>
+    <title>Estoque Boteco 934</title>
     <style>
-        :root { --uol-red: #d32f2f; --uol-blue: #2b579a; --amarelo: #ffcc00; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #fff; height: 100vh; display: flex; flex-direction: column; }
-
-        /* HEADER ESTILO PORTAL UOL */
-        .uol-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .uol-logo-area { display: flex; align-items: center; gap: 15px; }
-        .uol-badge { background: linear-gradient(45deg, #ffcc00, #ff6600); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 1.5em; }
-        .uol-brand { font-size: 2.5em; font-weight: 900; letter-spacing: -2px; color: #000; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        /* Estilo da Tabela igual à imagem */
+        .tabela-estoque { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .tabela-estoque th { background-color: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; font-size: 14px; }
+        .tabela-estoque td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
         
-        .uol-stats { display: flex; gap: 25px; font-size: 0.85em; color: #444; align-items: center; }
-        .uol-stats b { color: var(--uol-red); }
-
-        .uol-clima { display: flex; align-items: center; gap: 10px; font-size: 0.85em; }
-
-        /* MENU DE NAVEGAÇÃO */
-        .uol-nav { border-bottom: 1px solid #eee; display: flex; padding: 0 30px; gap: 20px; overflow-x: auto; }
-        .uol-nav-item { padding: 12px 0; color: #333; font-weight: bold; font-size: 0.75em; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
-        .uol-nav-item:hover { border-bottom: 3px solid var(--amarelo); color: var(--amarelo); }
-
-        /* ÁREA DA PLANILHA */
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
-        .tabela-vendas { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
-        .tabela-vendas th { background: var(--uol-blue); color: white; padding: 12px; border: 1px solid #ccc; text-align: center; }
-        .tabela-vendas td { padding: 10px; border: 1px solid #ccc; text-align: center; vertical-align: middle; }
+        /* Cores das colunas de cálculo */
+        .col-custo { background-color: #fff2cc; }
+        .col-lucro { background-color: #fce4d6; }
+        .col-margem { background-color: #c6efce; color: #006100; }
         
-        .col-custo { background: #fff2cc; font-weight: bold; }
-        .col-lucro { background: #fce4d6; font-weight: bold; }
-        .col-margem { background: #c6efce; color: #006100; font-weight: bold; }
-        .img-prod { width: 45px; height: auto; border-radius: 4px; }
+        .img-produto { width: 50px; height: auto; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<header class="uol-header">
-    <div class="uol-logo-area">
-        <div class="uol-badge">934</div>
-        <div class="uol-brand">BOTECO</div>
-    </div>
-    
-    <div class="uol-stats">
-        <div>Dólar <b>▼ 5,011</b></div>
-        <div>Euro <b>▼ 5,877</b></div>
-    </div>
+    <h2 style="padding: 20px; color: #333;">PLANILHA DE VENDAS - DISTRIBUIDORA</h2>
 
-    <div class="uol-clima">
-        <div style="text-align: right">
-            <b>Petrolina</b><br>
-            <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
-        </div>
-    </div>
-</header>
-
-<nav class="uol-nav">
-    <div class="uol-nav-item" onclick="location.reload()">PRODUTOS</div>
-    <div class="uol-nav-item">FLASH</div>
-    <div class="uol-nav-item">ECONOMIA</div>
-    <div class="uol-nav-item">COPA 2026</div>
-    <div class="uol-nav-item">GUIA DE COMPRAS</div>
-</nav>
-
-<main class="main-content">
-    <h3 style="margin-bottom:15px; color:#333; text-transform: uppercase">Planilha de Vendas - Distribuidora</h3>
-    <table class="tabela-vendas">
+    <table class="tabela-estoque">
         <thead>
             <tr>
                 <th>Foto</th>
@@ -77,17 +31,17 @@
                 <th>Quat. pacote</th>
                 <th>Venda uni.</th>
                 <th>Total Vend.</th>
-                <th style="background:#ffd966; color:#000">Custo</th>
-                <th style="background:#ffd966; color:#000">Total da Caixa</th>
-                <th style="background:#f4b084; color:#000">Lucro</th>
-                <th style="background:#a9d08e; color:#000">Margem %</th>
+                <th>Custo</th>
+                <th>Total da Caixa</th>
+                <th>Lucro</th>
+                <th>Margem %</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="lista-produtos">
             <tr>
-                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-prod"></td>
+                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-produto"></td>
                 <td>789456123858</td>
-                <td style="text-align:left">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
+                <td style="text-align: left;">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
                 <td>12</td>
                 <td>R$ 10,00</td>
                 <td>R$ 120,00</td>
@@ -99,7 +53,7 @@
             <tr>
                 <td><img src="https://choppmaia.com.br/wp-content/uploads/2021/05/Heineken-600ml.png" class="img-prod"></td>
                 <td>789456123658</td>
-                <td style="text-align:left">Cerveja Heineken - Garrafa 600ml C/24 Retornável</td>
+                <td style="text-align: left;">Cerveja Heineken - Garrafa 600ml C/24 Retornável</td>
                 <td>24</td>
                 <td>R$ 16,00</td>
                 <td>R$ 384,00</td>
@@ -110,7 +64,6 @@
             </tr>
         </tbody>
     </table>
-</main>
 
 </body>
 </html>
