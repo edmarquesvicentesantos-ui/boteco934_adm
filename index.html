@@ -3,80 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão de Distribuidora</title>
+    <title>Boteco 934 - PDV Oficial</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding: 20px; }
-        h1 { color: #ffcc00; margin-bottom: 5px; }
-        .subtitulo { color: #aaa; margin-bottom: 20px; }
+        /* DESIGN MODERNO E PROFISSIONAL */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0d0d0d; color: white; padding: 15px; }
         
+        /* ESPAÇO PARA SUA LOGO */
+        .header-container { 
+            text-align: center; 
+            padding: 20px; 
+            border-bottom: 2px solid #ffcc00; 
+            margin-bottom: 25px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+        }
+        .logo-placeholder {
+            width: 80px; height: 80px;
+            background-color: #333;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+            border: 2px solid #ffcc00;
+            font-size: 0.7em; color: #888;
+        }
+        h1 { color: #ffcc00; font-size: 1.5em; letter-spacing: 1px; }
+
+        /* GRADE DE MESAS - FOCO EM CLAREZA */
         #grid-mesas { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); 
-            gap: 15px; 
-            margin-top: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 12px; 
         }
-        
         .card-mesa { 
-            padding: 20px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            border: 2px solid rgba(255,255,255,0.1); 
-            transition: 0.3s; 
+            padding: 18px; border-radius: 15px; cursor: pointer; 
+            transition: 0.2s; position: relative; border: 1px solid rgba(255,255,255,0.05);
         }
+        .status-livre { background: linear-gradient(145deg, #1b5e20, #2e7d32); }
+        .status-ocupada { background: linear-gradient(145deg, #b71c1c, #c62828); }
         
-        .status-livre { background-color: #2e7d32; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .status-ocupada { background-color: #c62828; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        
-        .mesa-header { font-weight: bold; font-size: 0.8em; opacity: 0.7; text-transform: uppercase; }
-        .mesa-body { margin-top: 10px; font-size: 1.2em; font-weight: bold; overflow: hidden; text-overflow: ellipsis; }
-        .mesa-valor { color: #ffcc00; margin-top: 8px; font-weight: bold; font-size: 1.1em; }
+        .mesa-header { font-size: 0.75em; opacity: 0.8; font-weight: bold; }
+        .mesa-body { margin-top: 8px; font-size: 1.1em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mesa-valor { color: #ffcc00; margin-top: 5px; font-size: 1em; }
 
         .btn-reset { 
-            margin-top: 40px; 
-            background: none; 
-            border: 1px solid #444; 
-            color: #888; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
+            margin-top: 50px; background: transparent; border: 1px solid #333; 
+            color: #555; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.8em;
         }
     </style>
 </head>
 <body>
 
-    <h1>🍻 Boteco 934</h1>
-    <p class="subtitulo">Distribuidora e Bar - Gestão Operacional</p>
+    <div class="header-container">
+        <div class="logo-placeholder">SUA LOGO</div>
+        <h1>BOTECO 934</h1>
+        <p style="font-size: 0.8em; opacity: 0.6;">SISTEMA DE GESTÃO E DISTRIBUIÇÃO</p>
+    </div>
 
     <div id="grid-mesas"></div>
 
-    <button class="btn-reset" onclick="zerarSistema()">Reiniciar Todas as Mesas</button>
+    <button class="btn-reset" onclick="zerarSistema()">Reiniciar dia (Zerar Tudo)</button>
 
     <script>
-        // --- FOCO TOTAL NA DISTRIBUIDORA ---
-        let produtos = [
-            { id: 1, nome: "Cerveja 600ml (Gelada)", preco: 12.00 },
-            { id: 2, nome: "Cerveja 600ml (Prateleira)", preco: 9.50 },
-            { id: 3, nome: "Litro de Whisky (Selo)", preco: 110.00 },
-            { id: 4, nome: "Dose Whisky", preco: 12.00 },
+        // LISTA DE PRODUTOS ESTRATÉGICA
+        const produtos = [
+            { id: 1, nome: "Cerveja 600ml Gelada", preco: 12.00 },
+            { id: 2, nome: "Cerveja 600ml Grade", preco: 9.50 },
+            { id: 3, nome: "Whisky Dose", preco: 12.00 },
+            { id: 4, nome: "Whisky Garrafa", preco: 110.00 },
             { id: 5, nome: "Cerveja Lata", preco: 5.50 },
-            { id: 6, nome: "Refrigerante lata", preco: 6.00 },
-            { id: 7, nome: "Água com Gás", preco: 4.00 },
-            { id: 8, nome: "Cachaça (Dose)", preco: 3.00 },
-            { id: 9, nome: "Gelo (Pacote)", preco: 15.00 }
+            { id: 6, nome: "Refrigerante", preco: 6.00 },
+            { id: 7, nome: "Gelo Pacote", preco: 15.00 },
+            { id: 8, nome: "Cachaça Dose", preco: 3.00 }
         ];
 
-        let mesas = JSON.parse(localStorage.getItem('dados_boteco_934')) || Array.from({ length: 15 }, (_, i) => ({
+        let mesas = JSON.parse(localStorage.getItem('boteco_934_final')) || Array.from({ length: 12 }, (_, i) => ({
             id: i + 1, ocupada: false, cliente: "", total: 0
         }));
 
-        function salvar() {
-            localStorage.setItem('dados_boteco_934', JSON.stringify(mesas));
-        }
+        function salvar() { localStorage.setItem('boteco_934_final', JSON.stringify(mesas)); }
 
         function renderizar() {
             const grid = document.getElementById('grid-mesas');
             grid.innerHTML = mesas.map(m => `
-                <div class="card-mesa ${m.ocupada ? 'status-ocupada' : 'status-livre'}" onclick="gerenciarMesa(${m.id})">
+                <div class="card-mesa ${m.ocupada ? 'status-ocupada' : 'status-livre'}" onclick="gerenciar(${m.id})">
                     <div class="mesa-header">MESA ${m.id}</div>
                     <div class="mesa-body">${m.ocupada ? m.cliente : 'LIVRE'}</div>
                     <div class="mesa-valor">${m.ocupada ? 'R$ ' + m.total.toFixed(2) : '---'}</div>
@@ -84,47 +94,33 @@
             `).join('');
         }
 
-        function gerenciarMesa(id) {
+        function gerenciar(id) {
             let mesa = mesas.find(m => m.id === id);
-            
             if (!mesa.ocupada) {
-                let nome = prompt("Abrir mesa para qual cliente?");
-                if (nome) {
-                    mesa.ocupada = true;
-                    mesa.cliente = nome;
-                }
+                let n = prompt("Nome do Cliente:");
+                if (n) { mesa.ocupada = true; mesa.cliente = n; }
             } else {
-                let acao = prompt("CLIENTE: " + mesa.cliente + "\nTOTAL: R$ " + mesa.total.toFixed(2) + 
-                                  "\n\n(1) Lançar Bebida\n(2) Fechar Pago (PIX/Dinheiro)\n(3) Pendura\n(4) Cancelar");
-                
-                if (acao === "1") {
-                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco.toFixed(2)})`).join('\n');
-                    let cod = prompt("CÓDIGO DA BEBIDA:\n" + lista);
-                    let prod = produtos.find(p => p.id == cod);
-                    if (prod) {
-                        mesa.total += prod.preco;
-                        alert(prod.nome + " adicionado!");
-                    }
-                } else if (acao === "2") {
-                    alert("Recebido R$ " + mesa.total.toFixed(2) + ". Mesa liberada!");
-                    mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
-                } else if (acao === "3") {
-                    alert("R$ " + mesa.total.toFixed(2) + " anotado no PENDURA de " + mesa.cliente);
+                let op = prompt("1: + Adicionar | 2: PAGO | 3: PENDURA | 4: Sair");
+                if (op === "1") {
+                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco})`).join('\n');
+                    let cod = prompt("Código:\n" + lista);
+                    let p = produtos.find(item => item.id == cod);
+                    if (p) mesa.total += p.preco;
+                } else if (op === "2" || op === "3") {
+                    let msg = op === "2" ? "PAGO!" : "ENVIADO AO PENDURA!";
+                    alert(`Total: R$ ${mesa.total.toFixed(2)}\nStatus: ${msg}`);
                     mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
                 }
             }
-            salvar();
-            renderizar();
+            salvar(); renderizar();
         }
 
         function zerarSistema() {
-            if (confirm("Deseja realmente limpar todas as mesas para o novo dia?")) {
+            if (confirm("Limpar todas as mesas para amanhã?")) {
                 mesas.forEach(m => { m.ocupada = false; m.cliente = ""; m.total = 0; });
-                salvar();
-                renderizar();
+                salvar(); renderizar();
             }
         }
-
         renderizar();
     </script>
 </body>
