@@ -1,268 +1,85 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - AUDITORIA XML</title>
-    <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza: #1a1a1a; --vermelho: #ff4444; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--preto); color: #fff; }
-        
-        header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
-        nav { background: var(--cinza); display: flex; border-bottom: 1px solid #333; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
-        .nav-item { padding: 15px 20px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px; white-space: nowrap; }
-        .nav-item.active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
-
-        .container { padding: 20px; }
-        .secao { display: none; }
-        .ativa { display: block; }
-
-        /* PAINEL DE ALERTA DE AUMENTO */
-        .painel-alerta { background: #3d0000; border: 2px solid var(--vermelho); padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
-        .painel-alerta h4 { color: var(--vermelho); margin-bottom: 10px; }
-        .item-aumento { background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 12px; border-left: 4px solid var(--vermelho); }
-
-        /* CALCULADORA */
-        .grid-calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .card-calc { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; }
-        .res-box { background: #222; padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 5px solid #444; }
-        .markup { border-left-color: var(--azul); }
-        .margem-real { border-left-color: var(--verde); }
-        .praticado { border-left-color: var(--amarelo); background: #332b00; }
-
-        /* PDV E ESTOQUE */
-        .pdv-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
-        .grid-vendas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .card-produto-venda { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; }
-        .card-produto-venda span { display: block; color: var(--azul); font-size: 1.2em; }
-        
-        .resumo-venda { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
-        .grid-header { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; background: var(--azul); padding: 12px; font-weight: bold; font-size: 10px; text-align: center; }
-        .grid-linha { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; background: #fff; color: #000; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 11px; }
-
-        input, select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 10px; }
-        button { background: var(--amarelo); color: #000; font-weight: bold; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; text-transform: uppercase; }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>934 BOTECO - AUDITORIA</h1>
-    <span id="relogio" style="font-weight: 900;">00:00:00</span>
-</header>
-
-<nav>
-    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vender</div>
-    <div class="nav-item" onclick="mudar('calculadora', this)">🧮 Analisar Lucro</div>
-    <div class="nav-item" onclick="mudar('estoque', this)">📦 Estoque XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
-</nav>
-
-<div class="container">
-    
-    <div id="painelInflacao" class="painel-alerta">
-        <h4>⚠️ AUMENTO DETECTADO NA NOTA</h4>
-        <div id="listaAumentos"></div>
-        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; background:#666; color:#fff; padding:5px; font-size:10px;">Ciente</button>
-    </div>
-
-    <div id="vendas" class="secao ativa">
-        <div class="pdv-container">
-            <div id="gradeProdutos" class="grid-vendas"></div>
-            <div class="resumo-venda">
-                <h3>Pedido</h3>
-                <select id="selectCliente"></select>
-                <div id="itensCarrinho" style="margin: 15px 0;"></div>
-                <div style="font-size: 32px; color: var(--amarelo); font-weight: 900;">R$ <span id="valorTotal">0.00</span></div>
-                <button onclick="finalizarVenda()" style="background: var(--verde); color: #fff; margin-top: 15px;">Finalizar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="calculadora" class="secao">
-        <div class="grid-calc">
-            <div class="card-calc">
-                <h3>Cervejas & Caixas</h3>
-                <input type="number" id="c_qtd" placeholder="Qtd na Caixa">
-                <input type="number" id="c_custo" placeholder="Custo da Caixa (R$)">
-                <input type="number" id="c_prat" placeholder="Preço Atual no Boteco (R$)">
-                <button onclick="calcCerveja()">Comparar Realidade</button>
-                <div id="resCerveja"></div>
-            </div>
-            <div class="card-calc">
-                <h3>Doses</h3>
-                <input type="number" id="d_custo" placeholder="Custo Garrafa (R$)">
-                <input type="number" id="d_mlG" placeholder="ML Garrafa (ex: 1000)">
-                <input type="number" id="d_prat" placeholder="Preço Dose Hoje (R$)">
-                <button onclick="calcDestilado()">Analisar Dose</button>
-                <div id="resDestilado"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="estoque" class="secao">
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <input type="file" id="xmlInput" accept=".xml">
-            <button onclick="lancarXML()" style="width:auto">Processar XML</button>
-        </div>
-        <div class="grid-header"><div>PRODUTO</div><div>QTD</div><div>CUSTO</div><div>VENDA</div><div>LUCRO</div></div>
-        <div id="listaProdutos"></div>
-    </div>
-
-    <div id="clientes" class="secao">
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <input type="text" id="nCli" placeholder="Nome"><input type="text" id="tCli" placeholder="Zap"><button onclick="salvarCliente()" style="width:auto">Salvar</button>
-        </div>
-        <div id="listaClientes"></div>
-    </div>
-</div>
+<style>
+    @media print {
+        body * { visibility: hidden; }
+        #reciboDigital, #reciboDigital * { visibility: visible; }
+        #reciboDigital { position: absolute; left: 0; top: 0; width: 100%; font-size: 14px; color: #000; }
+        button, input, select { display: none !important; }
+    }
+</style>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    // ... (mantenha seu import e config do Firebase)
 
-    const firebaseConfig = {
-        apiKey: "AIzaSy...", // Sua API Key aqui
-        authDomain: "boteco934-afc3f.firebaseapp.com",
-        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
-        projectId: "boteco934-afc3f",
-        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    let carrinho = [], produtosDados = {};
-
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-
-    // --- AUDITORIA XML (ANTI-ERRO) ---
-    window.lancarXML = () => {
-        const f = document.getElementById('xmlInput').files[0];
-        const r = new FileReader();
-        const painel = document.getElementById('painelInflacao');
-        const lista = document.getElementById('listaAumentos');
+    window.finalizar = (metodo) => {
+        if(!carrinho.length) return;
         
-        r.onload = (e) => {
-            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const itens = xml.getElementsByTagName("det");
-            lista.innerHTML = ""; painel.style.display = "none";
+        const mesa = document.getElementById('selMesa').value;
+        const clienteNome = document.getElementById('selCliente').value;
+        const total = parseFloat(document.getElementById('totalTxt').innerText);
+        const dataAtual = new Date();
+        
+        // Regra dos 4 dias para o Pendura
+        const dataVencimento = new Date();
+        dataVencimento.setDate(dataAtual.getDate() + 4);
 
-            for(let i=0; i<itens.length; i++) {
-                const nomeXML = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                const custoNovo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent) || 0;
-                const qtdNova = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent) || 0;
-
-                // Localiza por nome para não duplicar
-                let idExistente = null;
-                for(let id in produtosDados) {
-                    if(produtosDados[id].nome === nomeXML) { idExistente = id; break; }
-                }
-
-                if(idExistente) {
-                    const antigo = produtosDados[idExistente].custo;
-                    if(custoNovo > antigo) {
-                        painel.style.display = "block";
-                        lista.innerHTML += `<div class="item-aumento">📈 <b>${nomeXML}</b>: Subiu R$ ${(custoNovo - antigo).toFixed(2)}</div>`;
-                    }
-                    // Atualiza o que já existe
-                    update(ref(db, `produtos/${idExistente}`), {
-                        custo: custoNovo,
-                        qtd: produtosDados[idExistente].qtd + qtdNova,
-                        lucro: produtosDados[idExistente].venda - custoNovo
-                    });
-                } else {
-                    // Cria novo
-                    push(ref(db, 'produtos'), {
-                        nome: nomeXML, custo: custoNovo, qtd: qtdNova,
-                        venda: custoNovo * 1.5, lucro: custoNovo * 0.5, margem: 50
-                    });
-                }
-            }
-            alert("Processamento concluído!");
+        const venda = {
+            mesa,
+            cliente: clienteNome,
+            total,
+            metodo,
+            data: dataAtual.toLocaleDateString(),
+            vencimento: metodo === 'PENDURA' ? dataVencimento.toLocaleDateString() : 'Pago',
+            hora: dataAtual.toLocaleTimeString()
         };
-        r.readAsText(f);
-    };
 
-    // --- PDV ---
-    onValue(ref(db, 'produtos'), (s) => {
-        const g = document.getElementById('gradeProdutos'), l = document.getElementById('listaProdutos');
-        g.innerHTML = ""; l.innerHTML = ""; produtosDados = s.val() || {};
-        const ord = Object.entries(produtosDados).sort((a,b) => a[1].nome.localeCompare(b[1].nome));
-        ord.forEach(([id, p]) => {
-            g.innerHTML += `<div class="card-produto-venda" onclick="addCar('${id}')">${p.nome.substring(0,18)}<span>R$ ${Number(p.venda).toFixed(2)}</span><small>Est: ${p.qtd}</small></div>`;
-            l.innerHTML += `<div class="grid-linha"><div style="text-align:left">${p.nome}</div><div>${p.qtd}</div><div>R$ ${Number(p.custo).toFixed(2)}</div><div>R$ ${Number(p.venda).toFixed(2)}</div><div style="color:var(--verde)">R$ ${Number(p.lucro).toFixed(2)}</div></div>`;
+        push(ref(db, 'vendas_financeiro'), venda).then(() => {
+            // Baixa no estoque
+            carrinho.forEach(i => {
+                update(ref(db, `produtos/${i.id}`), { qtd: produtosDados[i.id].qtd - 1 });
+            });
+
+            // Se for pendura, já prepara o Zap
+            if(metodo === 'PENDURA') {
+                enviarZapPendura(clienteNome, total, dataVencimento.toLocaleDateString());
+            }
+
+            alert(`Venda registrada como ${metodo}!`);
+            imprimirRecibo(); // Chama a impressão automática
+            carrinho = []; 
+            attCar();
         });
-    });
-
-    window.addCar = (id) => {
-        if(produtosDados[id].qtd <= 0) return alert("Estoque Zerado!");
-        carrinho.push({ id, nome: produtosDados[id].nome, preco: produtosDados[id].venda });
-        attCar();
     };
 
-    function attCar() {
-        const d = document.getElementById('itensCarrinho'); d.innerHTML = ""; let t = 0, agr = {};
-        carrinho.forEach(i => { if(agr[i.nome]) { agr[i.nome].q++; agr[i.nome].v += Number(i.preco); } else { agr[i.nome] = {q:1, v:Number(i.preco)}; } t += Number(i.preco); });
-        for(let n in agr) { d.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span><b>${agr[n].q}x</b> ${n}</span><b>R$ ${agr[n].v.toFixed(2)}</b></div>`; }
-        document.getElementById('valorTotal').innerText = t.toFixed(2);
+    window.imprimirRecibo = () => {
+        window.print(); // Abre a tela de impressão configurada pelo CSS @media print
+    };
+
+    function enviarZapPendura(nome, valor, dataVenc) {
+        // Busca o contato do cliente nos dados carregados
+        // Nota: Assumindo que você tem os dados dos clientes em uma variável global 'clientesDados'
+        const msg = `Olá ${nome}! Passando para registrar sua conta de hoje no *Boteco 934*.\n\n*Total:* R$ ${valor.toFixed(2)}\n*Vencimento:* ${dataVenc}\n\nAté a próxima! 🍻`;
+        const linkZap = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        
+        // Abre em uma nova aba para não travar o PDV
+        window.open(linkZap, '_blank');
     }
 
-    window.finalizarVenda = () => {
-        if(!carrinho.length) return;
-        const cli = document.getElementById('selectCliente').value;
-        push(ref(db, 'vendas_gerais'), { cliente: cli, total: document.getElementById('valorTotal').innerText, data: new Date().toLocaleString() });
-        carrinho.forEach(i => { update(ref(db, `produtos/${i.id}`), { qtd: produtosDados[i.id].qtd - 1 }); });
-        alert("Venda OK!"); carrinho = []; attCar();
-    };
-
-    // --- CALCULADORAS ---
-    window.calcCerveja = () => {
-        const q = parseFloat(document.getElementById('c_qtd').value) || 0;
-        const c = parseFloat(document.getElementById('c_custo').value) || 0;
-        const prat = parseFloat(document.getElementById('c_prat').value) || 0;
-        if(!q || !c) return;
-        const u = c / q;
-        document.getElementById('resCerveja').innerHTML = `
-            <div class="res-box">Custo Unitário: <b>R$ ${u.toFixed(2)}</b></div>
-            <div class="res-box praticado">SEU PREÇO: <b>R$ ${prat.toFixed(2)}</b><br><small>Lucro: R$ ${(prat-u).toFixed(2)} | Margem: ${(((prat-u)/prat)*100).toFixed(1)}%</small></div>
-            <div class="res-box margem-real">SUGESTÃO 50%: <b>R$ ${(u/0.5).toFixed(2)}</b></div>
-        `;
-    };
-
-    window.calcDestilado = () => {
-        const c = parseFloat(document.getElementById('d_custo').value) || 0;
-        const mG = parseFloat(document.getElementById('d_mlG').value) || 0;
-        const prat = parseFloat(document.getElementById('d_prat').value) || 0;
-        if(!c || !mG) return;
-        const cD = (c / mG) * 50 * 1.10;
-        document.getElementById('resDestilado').innerHTML = `
-            <div class="res-box">Custo da Dose: <b>R$ ${cD.toFixed(2)}</b></div>
-            <div class="res-box praticado">SUA DOSE: <b>R$ ${prat.toFixed(2)}</b><br><small>Lucro: R$ ${(prat-cD).toFixed(2)}</small></div>
-            <div class="res-box markup">SUGESTÃO BAR: <b>R$ ${Math.ceil(cD*3.5)}.00</b></div>
-        `;
-    };
-
-    // --- CLIENTES ---
-    onValue(ref(db, 'clientes'), (s) => {
-        const sel = document.getElementById('selectCliente'), list = document.getElementById('listaClientes');
-        sel.innerHTML = '<option value="Avulso">Venda Avulsa</option>'; list.innerHTML = "";
+    // --- ATUALIZAÇÃO DO FINANCEIRO PARA MOSTRAR VENCIMENTOS ---
+    onValue(ref(db, 'vendas_financeiro'), (s) => {
+        const hist = document.getElementById('listaVendasDia');
+        hist.innerHTML = "<h4>Movimentação de Hoje</h4>";
+        
         if(s.exists()){
-            const ord = Object.values(s.val()).sort((a,b) => a.nome.localeCompare(b.nome));
-            ord.forEach(c => { sel.innerHTML += `<option value="${c.nome}">${c.nome}</option>`; list.innerHTML += `<div class="card-cliente"><span>👤 ${c.nome}</span><a href="https://wa.me/55${c.contato}" target="_blank" style="text-decoration:none; color:var(--verde)">📞 Zap</a></div>`; });
+            Object.values(s.val()).reverse().forEach(v => {
+                const corStatus = v.metodo === 'PENDURA' ? 'color:var(--vermelho)' : 'color:var(--verde)';
+                hist.innerHTML += `
+                    <div class="card-fin">
+                        <b>${v.hora} - ${v.mesa}</b> | ${v.cliente}<br>
+                        Pagamento: <span style="${corStatus}">${v.metodo}</span><br>
+                        Total: <b>R$ ${v.total.toFixed(2)}</b><br>
+                        ${v.metodo === 'PENDURA' ? `<small>⏳ Vence em: ${v.vencimento}</small>` : ''}
+                    </div>`;
+            });
         }
     });
-
-    window.salvarCliente = () => {
-        const n = document.getElementById('nCli').value, t = document.getElementById('tCli').value;
-        if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(() => { document.getElementById('nCli').value=""; document.getElementById('tCli').value=""; });
-    };
-
-    window.mudar = (id, el) => {
-        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('ativa'); el.classList.add('active');
-    };
 </script>
-</body>
-</html>
