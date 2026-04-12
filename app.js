@@ -1,37 +1,45 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX70Jks",
-    authDomain: "boteco934-afc3f.firebaseapp.com",
-    databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
-    projectId: "boteco934-afc3f",
-    storageBucket: "boteco934-afc3f.firebasestorage.app",
-    messagingSenderId: "182023728304",
-    appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Controla o abre e fecha das janelas
-function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
-function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
-
-function salvarProduto() {
-    const nome = document.getElementById('p-nome').value;
-    const preco = parseFloat(document.getElementById('p-preco').value);
-    if(nome && preco) {
-        db.ref('produtos').push({ nome, preco });
-        alert("Produto Gravado!");
-        fecharModal('modal-produto');
-    }
+// Função para abrir o painel de vendas da mesa
+function verDetalhes(id) {
+    mesaSelecionada = id;
+    const mesa = mesas.find(m => m.id === id);
+    
+    document.getElementById('titulo-mesa-ativa').innerText = `Lançar para: ${mesa.cliente}`;
+    document.getElementById('modal-lancamento').style.display = 'flex';
+    
+    exibirProdutosParaVenda();
+    atualizarListaConsumo(mesa);
 }
 
-// Carrega os produtos na tela
-db.ref('produtos').on('value', snap => {
-    const grid = document.getElementById('grade-produtos');
-    grid.innerHTML = '';
-    snap.forEach(item => {
-        let p = item.val();
-        grid.innerHTML += `<div class="card-p" style="background:white;padding:15px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid #ccc">
-            <b>${p.nome}</b><br>R$ ${p.preco.toFixed(2)}</div>`;
-    });
-});
+// Exibe os produtos como cards pequenos para agilizar
+function exibirProdutosParaVenda() {
+    const container = document.getElementById('lista-produtos-lancamento');
+    // Usando a lista de 'produtos' que definimos anteriormente
+    container.innerHTML = produtos.map(p => `
+        <div class="card-mini" onclick="adicionarItemAMesa(${p.id})">
+            <span>${p.nome}</span>
+            <strong>R$ ${(p.custo * (1 + p.markup/100)).toFixed(2)}</strong>
+        </div>
+    `).join('');
+}
+
+function adicionarItemAMesa(produtoId) {
+    const mesa = mesas.find(m => m.id === mesaSelecionada);
+    const produto = produtos.find(p => p.id === produtoId);
+    const precoVenda = produto.custo * (1 + produto.markup/100);
+
+    mesa.total += precoVenda;
+    mesa.pedidos.push(produto.nome); // Registra o que foi consumido
+
+    // Atualiza a visualização
+    atualizarListaConsumo(mesa);
+    renderizarMesas(); // Atualiza o valor no painel principal
+}
+
+function atualizarListaConsumo(mesa) {
+    const lista = document.getElementById('itens-consumidos');
+    lista.innerHTML = mesa.pedidos.map(item => `<li>${item}</li>`).join('');
+}
+
+function fecharModalLancamento() {
+    document.getElementById('modal-lancamento').style.display = 'none';
+}
