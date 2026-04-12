@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - PDV FINAL</title>
+    <title>934 BOTECO - SISTEMA COMPLETO</title>
     <style>
         :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -24,11 +24,11 @@
         .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; height: 110px; display: flex; flex-direction: column; justify-content: center; }
         .card-prod span { display: block; color: var(--azul); font-size: 1.2em; margin-top: 5px; }
 
-        /* CALCULADORA */
-        .card-calc { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; max-width: 550px; margin: 20px auto; }
+        /* CALCULADORA (VISUAL DA FOTO) */
+        .card-calc { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; max-width: 550px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .btn-calc { background: var(--amarelo); color: #000; padding: 18px; border: none; width: 100%; font-weight: 900; cursor: pointer; border-radius: 10px; font-size: 16px; text-transform: uppercase; margin-top: 10px; }
 
-        /* CUPOM E BOTÕES */
+        /* CUPOM */
         .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; min-height: 350px; }
         .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .btn-pgto button { padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; color: #fff; text-transform: uppercase; font-size: 11px; }
@@ -48,14 +48,14 @@
 <nav>
     <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas / Mesas</div>
     <div class="nav-item" onclick="mudar('calculadora', this)">🧮 Calculadora de Lucro</div>
-    <div class="nav-item" onclick="mudar('produtos', this)">📦 Produtos</div>
+    <div class="nav-item" onclick="mudar('produtos', this)">📦 Cadastrar Produtos</div>
     <div class="nav-item" onclick="mudar('financeiro', this)">💰 Financeiro</div>
 </nav>
 
 <div class="container">
     
     <div id="vendas" class="secao ativa">
-        <input type="text" id="inputLeitor" placeholder="Escaneie o Código de Barras aqui..." oninput="lerBarras(this.value)" autofocus style="border: 2px solid var(--amarelo); margin-bottom: 20px;">
+        <input type="text" id="inputLeitor" placeholder="Escaneie o Código de Barras..." oninput="lerBarras(this.value)" autofocus style="border: 2px solid var(--amarelo); margin-bottom: 20px;">
         
         <div class="pdv-layout">
             <div>
@@ -69,9 +69,9 @@
             <div>
                 <div id="reciboDigital" class="cupom">
                     <div style="text-align:center; border-bottom:1px dashed #000; margin-bottom:10px; padding-bottom:10px;">
-                        <b>934 BOTECO - PETROLINA</b><br>WhatsApp: (87) 9...<br>----------------------------
+                        <b>934 BOTECO - PETROLINA</b><br>----------------------------
                     </div>
-                    <div id="itensCupom" style="margin-bottom:20px;">Aguardando pedido...</div>
+                    <div id="itensCupom" style="margin-bottom:20px;">Aguardando...</div>
                     <div style="border-top:1px dashed #000; padding-top:10px;">
                         <b style="font-size:1.4em;">TOTAL: R$ <span id="totalTxt">0.00</span></b>
                     </div>
@@ -89,9 +89,9 @@
     <div id="calculadora" class="secao">
         <div class="card-calc">
             <h2 style="color:var(--amarelo); text-align:center; margin-bottom:30px;">Calculadora de Margem</h2>
-            <label>Custo (R$):</label>
+            <label>Custo Unitário (R$):</label>
             <input type="number" id="c_custo" placeholder="0.00">
-            <label>Venda (R$):</label>
+            <label>Preço de Venda (R$):</label>
             <input type="number" id="c_venda" placeholder="0.00">
             <button class="btn-calc" onclick="calcularMargem()">ANALISAR MARGEM</button>
             <div id="resCalc" style="margin-top:25px;"></div>
@@ -100,11 +100,11 @@
 
     <div id="produtos" class="secao">
         <div class="card-calc" style="max-width: 100%;">
-            <h3 style="margin-bottom:15px;">Novo Produto</h3>
-            <input type="text" id="p_ean" placeholder="Código de Barras (EAN)">
+            <h3 style="margin-bottom:15px;">Cadastrar Produto com Código de Barras</h3>
+            <input type="text" id="p_ean" placeholder="Código EAN (Passe o leitor aqui)">
             <input type="text" id="p_nome" placeholder="Nome do Produto">
             <input type="number" id="p_venda" placeholder="Preço de Venda">
-            <button onclick="salvarProd()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold;">SALVAR NO SISTEMA</button>
+            <button onclick="salvarProd()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; cursor:pointer;">SALVAR PRODUTO</button>
         </div>
     </div>
 
@@ -124,7 +124,7 @@
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // VITRINE SEM DUPLICADOS
+    // VITRINE E FILTRO DE REPETIÇÃO
     onValue(ref(db, 'produtos'), (s) => {
         const g = document.getElementById('gridProdutos'); g.innerHTML = "";
         produtosDados = s.val() || {};
@@ -138,6 +138,7 @@
         });
     });
 
+    // LEITOR DE BARRAS NO PDV
     window.lerBarras = (valor) => {
         Object.entries(produtosDados).forEach(([id, p]) => {
             if(p.ean === valor) {
@@ -155,6 +156,14 @@
         document.getElementById('totalTxt').innerText = t.toFixed(2);
     };
 
+    window.calcularMargem = () => {
+        const c = parseFloat(document.getElementById('c_custo').value);
+        const v = parseFloat(document.getElementById('c_venda').value);
+        if(!c || !v) return;
+        const lucro = v - c; const margem = (lucro / v) * 100;
+        document.getElementById('resCalc').innerHTML = `<div style="background:#222; padding:15px; border-radius:10px; border-left:5px solid var(--amarelo)">Lucro: R$ ${lucro.toFixed(2)} | Margem: ${margem.toFixed(1)}%</div>`;
+    };
+
     window.salvarProd = () => {
         const ean = document.getElementById('p_ean').value;
         const nome = document.getElementById('p_nome').value;
@@ -164,14 +173,6 @@
             alert("Produto Salvo!");
             document.getElementById('p_ean').value = ""; document.getElementById('p_nome').value = ""; document.getElementById('p_venda').value = "";
         }
-    };
-
-    window.calcularMargem = () => {
-        const c = parseFloat(document.getElementById('c_custo').value);
-        const v = parseFloat(document.getElementById('c_venda').value);
-        if(!c || !v) return;
-        const lucro = v - c; const margem = (lucro / v) * 100;
-        document.getElementById('resCalc').innerHTML = `<div style="background:#222; padding:15px; border-radius:10px; border-left:5px solid var(--amarelo)">Lucro: R$ ${lucro.toFixed(2)} | Margem: ${margem.toFixed(1)}%</div>`;
     };
 
     window.fechar = (metodo) => {
