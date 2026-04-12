@@ -3,184 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão 360º</title>
+    <title>Boteco 934 - Sistema Integrado</title>
     <style>
-        :root { --amarelo: #ffcc00; --preto: #111; --cinza: #f4f4f4; --vermelho: #d32f2f; --verde: #2e7d32; }
+        :root { --azul-uol: #2b579a; --amarelo-uol: #ffcc00; --cor-custo: #fff2cc; --cor-lucro: #fce4d6; --cor-margem: #c6efce; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--cinza); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background: #f4f4f4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* CABEÇALHO PORTAL */
-        header { background: #fff; border-bottom: 4px solid var(--amarelo); padding: 10px 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .header-main { display: flex; justify-content: space-between; align-items: center; }
-        .marca { display: flex; align-items: center; gap: 15px; }
-        .logo-circulo { width: 55px; height: 55px; background: var(--preto); color: var(--amarelo); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--amarelo); }
-        .titulo h1 { font-size: 1.6em; color: #000; letter-spacing: -1px; text-transform: uppercase; }
-        .titulo span { font-size: 0.65em; color: var(--vermelho); font-weight: bold; letter-spacing: 1px; }
-
-        /* BARRA DE NAVEGAÇÃO DROP-DOWN */
-        nav { background: var(--preto); color: #fff; display: flex; padding: 0 20px; font-size: 0.75em; font-weight: bold; }
-        .nav-item { position: relative; padding: 12px 18px; cursor: pointer; border-right: 1px solid #333; transition: 0.3s; }
-        .nav-item:hover { background: var(--amarelo); color: #000; }
+        /* HEADER ESTILO PORTAL */
+        header { background: #fff; border-bottom: 4px solid var(--amarelo-uol); padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-934 { width: 50px; height: 50px; background: #000; color: var(--amarelo-uol); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--amarelo-uol); }
+        
+        nav { background: #111; color: #fff; display: flex; padding: 0 20px; font-size: 0.75em; }
+        .nav-item { position: relative; padding: 12px 18px; cursor: pointer; border-right: 1px solid #333; font-weight: bold; }
+        .nav-item:hover { background: var(--amarelo-uol); color: #000; }
         .submenu { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1000; }
         .nav-item:hover .submenu { display: block; }
-        .submenu button, .submenu label { width: 100%; padding: 12px; border: none; background: none; text-align: left; cursor: pointer; border-bottom: 1px solid #eee; color: #333; font-size: 1.1em; display: block; }
-        .submenu button:hover { background: #f5f5f5; color: var(--vermelho); }
+        .submenu button, .submenu label { width: 100%; padding: 12px; border: none; background: none; text-align: left; cursor: pointer; border-bottom: 1px solid #eee; color: #333; display: block; }
 
-        /* ÁREA DE TRABALHO */
-        .workspace { display: flex; flex: 1; overflow: hidden; }
+        /* CONTEÚDO PRINCIPAL */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .content-area { flex: 1; padding: 20px; overflow-y: auto; background: #dfe4ea; }
         
-        /* MESAS E ESTOQUE */
-        .conteudo-principal { flex: 1; padding: 20px; overflow-y: auto; background: #dfe4ea; }
-        #grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .mesa { background: #fff; padding: 15px 5px; border-radius: 8px; cursor: pointer; text-align: center; border-bottom: 4px solid #ced4da; }
-        .livre { border-top: 5px solid var(--verde); }
-        .ocupada { border-top: 5px solid var(--vermelho); background: #fff5f5; }
+        /* TABELA ESTILO PLANILHA (IGUAL À IMAGEM ENVIADA) */
+        .tabela-vendas { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.8em; margin-top: 10px; }
+        .tabela-vendas th { background: var(--azul-uol); color: white; padding: 10px; border: 1px solid #ccc; }
+        .tabela-vendas td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+        .custo { background: var(--cor-custo); font-weight: bold; }
+        .lucro { background: var(--cor-lucro); font-weight: bold; }
+        .margem { background: var(--cor-margem); color: #006100; font-weight: bold; }
 
-        /* CARDS DE ESTOQUE VISUAL */
-        .estoque-card { background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 8px solid var(--amarelo); display: flex; justify-content: space-between; align-items: center; }
-        .barra-bg { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 8px; }
-        .barra-fill { height: 100%; background: var(--verde); border-radius: 4px; transition: 0.5s; }
-        .baixo { background: var(--vermelho) !important; }
+        /* GRID DE MESAS */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        .mesa { background: #fff; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border-bottom: 4px solid #ccc; }
+        .livre { border-top: 5px solid #2e7d32; }
+        .ocupada { border-top: 5px solid #d32f2f; background: #fff5f5; }
 
-        /* PAINEL RECIBO */
-        .painel-recibo { width: 320px; background: #fff; border-left: 1px solid #ccc; display: flex; flex-direction: column; }
-        .recibo-itens { flex: 1; padding: 15px; font-family: 'Courier New', monospace; font-size: 0.85em; overflow-y: auto; }
-        .recibo-total { padding: 20px; background: var(--amarelo); color: #000; font-size: 1.4em; font-weight: 900; text-align: right; }
-        .caixa-info { padding: 10px; background: var(--preto); color: var(--amarelo); font-size: 0.75em; text-align: center; }
+        /* PAINEL LATERAL */
+        .sidebar { width: 300px; background: #fff; border-left: 1px solid #ccc; display: flex; flex-direction: column; }
+        .recibo { flex: 1; padding: 15px; font-family: monospace; font-size: 0.85em; }
+        .total-box { padding: 20px; background: var(--amarelo-uol); font-size: 1.4em; font-weight: 900; text-align: right; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-main">
-            <div class="marca">
-                <div class="logo-circulo">934</div>
-                <div class="titulo"><h1>Boteco 934</h1><span>Gestão & Distribuição</span></div>
-            </div>
-            <div style="text-align:center; font-size:0.8em; color:#666;">
-                Petrolina-PE | <span id="relogio">00:00:00</span><br>
-                <strong>Dólar: R$ 5,01</strong>
-            </div>
-        </div>
-    </header>
-
-    <nav>
-        <div class="nav-item">OPERACIONAL
-            <div class="submenu">
-                <button onclick="mostrarMesas()">Painel de Mesas</button>
-                <button onclick="zerarMesas()">Zerar Todas as Mesas</button>
-            </div>
-        </div>
-        <div class="nav-item">ESTOQUE / XML
-            <div class="submenu">
-                <button onclick="mostrarEstoque()">Ver Estoque Visual</button>
-                <label>📁 Importar XML <input type="file" accept=".xml" style="display:none" onchange="processarXML(this)"></label>
-            </div>
-        </div>
-        <div class="nav-item">FINANCEIRO
-            <div class="submenu">
-                <button onclick="alert('Relatório de Vendas: R$ ' + totalVendido.toFixed(2))">Vendas do Dia</button>
-                <button onclick="alert('Módulo Pendura em breve')">Lista de Penduras</button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="workspace">
-        <main class="conteudo-principal" id="area-principal">
-            <div id="grade"></div>
-        </main>
-
-        <aside class="painel-recibo">
-            <div style="padding:15px; border-bottom:1px solid #eee; background:#fafafa;"><strong>RECIBO ATUAL</strong><br><small id="cli-nome">Selecione uma mesa</small></div>
-            <div class="recibo-itens" id="recibo-lista"></div>
-            <div class="recibo-total" id="vlr-total">R$ 0,00</div>
-            <div class="caixa-info">VENDAS HOJE: <span id="venda-dia">R$ 0,00</span></div>
-        </aside>
+<header>
+    <div class="logo-area">
+        <div class="logo-934">934</div>
+        <div><h1 style="font-size:1.4em">Boteco 934</h1><small>Gestão de Bar e Distribuidora</small></div>
     </div>
+    <div id="relogio" style="font-weight:bold; color:#666"></div>
+</header>
 
-    <script>
-        let mesas = JSON.parse(localStorage.getItem('b934_mesas')) || Array.from({ length: 24 }, (_, i) => ({ id: i + 1, ocupada: false, cliente: "", total: 0, itens: [] }));
-        let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || [];
-        let totalVendido = JSON.parse(localStorage.getItem('b934_total')) || 0;
+<nav>
+    <div class="nav-item">OPERACIONAL
+        <div class="submenu">
+            <button onclick="setVisao('mesas')">Painel de Mesas</button>
+            <button onclick="zerarMesas()">Zerar Tudo</button>
+        </div>
+    </div>
+    <div class="nav-item">ESTOQUE / XML
+        <div class="submenu">
+            <button onclick="setVisao('estoque')">Planilha de Vendas</button>
+            <label>📁 Importar XML <input type="file" accept=".xml" style="display:none" onchange="lerXML(this)"></label>
+        </div>
+    </div>
+</nav>
 
-        function salvar() {
-            localStorage.setItem('b934_mesas', JSON.stringify(mesas));
-            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
-            localStorage.setItem('b934_total', JSON.stringify(totalVendido));
-            document.getElementById('venda-dia').innerText = "R$ " + totalVendido.toFixed(2);
+<div class="main-container">
+    <main class="content-area" id="view-principal"></main>
+    <aside class="sidebar">
+        <div style="padding:15px; border-bottom:1px solid #eee; background:#f9f9f9"><strong>CUPOM ATUAL</strong></div>
+        <div class="recibo" id="recibo-corpo"></div>
+        <div class="total-box" id="total-venda">R$ 0,00</div>
+    </aside>
+</div>
+
+<script>
+    let visaoAtual = 'mesas';
+    let mesas = JSON.parse(localStorage.getItem('b934_mesas')) || Array.from({length: 20}, (_, i) => ({id: i+1, ocupada: false, cliente: "", total: 0, itens: []}));
+    let estoque = JSON.parse(localStorage.getItem('b934_estoque_v2')) || [];
+
+    function salvar() {
+        localStorage.setItem('b934_mesas', JSON.stringify(mesas));
+        localStorage.setItem('b934_estoque_v2', JSON.stringify(estoque));
+        render();
+    }
+
+    function setVisao(v) { visaoAtual = v; render(); }
+
+    function render() {
+        const area = document.getElementById('view-principal');
+        if (visaoAtual === 'mesas') {
+            area.innerHTML = `<div class="grid-mesas">${mesas.map(m => `
+                <div class="mesa ${m.ocupada ? 'ocupada' : 'livre'}" onclick="clickMesa(${m.id})">
+                    <div style="font-size:0.7em">MESA ${m.id}</div>
+                    <div style="font-weight:bold">${m.ocupada ? m.cliente : 'LIVRE'}</div>
+                    <div style="color:red; font-weight:bold">${m.ocupada ? 'R$ '+m.total.toFixed(2) : ''}</div>
+                </div>`).join('')}</div>`;
+        } else {
+            area.innerHTML = `<h2>📊 Planilha de Vendas</h2><table class="tabela-vendas">
+                <thead><tr><th>Produto</th><th>Qtd/Cx</th><th>Venda Uni.</th><th>Total Vend.</th><th class="custo">Custo</th><th class="lucro">Lucro</th><th class="margem">Margem %</th></tr></thead>
+                <tbody>${estoque.map(p => {
+                    const totalV = p.venda * p.qtd;
+                    const totalC = p.custo * p.qtd;
+                    const lucro = totalV - totalC;
+                    const margem = (lucro / totalV) * 100;
+                    return `<tr><td>${p.nome}</td><td>${p.qtd}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${totalV.toFixed(2)}</td><td class="custo">R$ ${p.custo.toFixed(2)}</td><td class="lucro">R$ ${lucro.toFixed(2)}</td><td class="margem">${margem.toFixed(2)}%</td></tr>`;
+                }).join('')}</tbody></table>`;
         }
+    }
 
-        function mostrarMesas() {
-            const area = document.getElementById('area-principal');
-            area.innerHTML = '<div id="grade"></div>';
-            const grade = document.getElementById('grade');
-            grade.innerHTML = mesas.map(m => `
-                <div class="mesa ${m.ocupada ? 'ocupada' : 'livre'}" onclick="gerenciarMesa(${m.id})">
-                    <div style="font-size:0.6em">MESA ${m.id}</div>
-                    <div style="font-weight:bold; font-size:0.8em">${m.ocupada ? m.cliente.substring(0,10) : 'LIVRE'}</div>
-                    <div style="color:var(--vermelho); font-weight:bold; font-size:0.8em">${m.ocupada ? 'R$' + m.total.toFixed(2) : ''}</div>
-                </div>
-            `).join('');
-        }
-
-        function gerenciarMesa(id) {
-            let m = mesas.find(x => x.id === id);
-            if (!m.ocupada) {
-                let n = prompt("Nome do Cliente:");
-                if (n) { m.ocupada = true; m.cliente = n; m.itens = []; }
-            } else {
-                exibirRecibo(m);
-                let acao = prompt("1: Adicionar Cerveja (R$12)\n2: Adicionar Dose (R$15)\n3: FINALIZAR PAGAMENTO\n4: Sair");
-                if (acao === "1") { m.total += 12; m.itens.push({n: "Cerveja 600ml", v: 12}); }
-                if (acao === "2") { m.total += 15; m.itens.push({n: "Dose Especial", v: 15}); }
-                if (acao === "3") { totalVendido += m.total; m.ocupada = false; m.cliente = ""; m.total = 0; m.itens = []; alert("Venda Finalizada!"); }
-                exibirRecibo(m);
-            }
-            salvar(); mostrarMesas();
-        }
-
-        function exibirRecibo(m) {
-            document.getElementById('cli-nome').innerText = m.cliente ? "CLIENTE: " + m.cliente : "Selecione uma mesa";
-            document.getElementById('recibo-lista').innerHTML = m.itens.map(i => `<div>${i.n.padEnd(20,'.')} R$ ${i.v.toFixed(2)}</div>`).join('');
-            document.getElementById('vlr-total').innerText = "R$ " + m.total.toFixed(2);
-        }
-
-        function mostrarEstoque() {
-            const area = document.getElementById('area-principal');
-            area.innerHTML = '<h2>Estoque Visual</h2>' + estoque.map(item => `
-                <div class="estoque-card">
-                    <div style="flex:1">
-                        <strong>${item.nome}</strong><br>
-                        <div class="barra-bg"><div class="barra-fill ${item.qtd < 10 ? 'baixo' : ''}" style="width:${Math.min(item.qtd, 100)}%"></div></div>
-                    </div>
-                    <div style="text-align:right; min-width:80px;"><strong>${item.qtd} un</strong></div>
-                </div>
-            `).join('');
-        }
-
-        function processarXML(input) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const xmlDoc = new DOMParser().parseFromString(e.target.result, "text/xml");
-                const itens = xmlDoc.getElementsByTagName("det");
-                for (let i = 0; i < itens.length; i++) {
-                    let nome = itens[i].getElementsByTagName("xProd")[0].textContent;
-                    let qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                    let index = estoque.findIndex(p => p.nome === nome);
-                    if (index > -1) estoque[index].qtd += qtd;
-                    else estoque.push({ nome: nome, qtd: qtd });
-                }
-                alert("XML Importado com Sucesso!");
-                salvar(); mostrarEstoque();
-            };
-            reader.readAsText(input.files[0]);
-        }
-
-        function zerarMesas() { if(confirm("Zerar todas as mesas?")) { mesas.forEach(m => { m.ocupada=false; m.total=0; m.itens=[]; }); salvar(); mostrarMesas(); } }
-
-        setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-        mostrarMesas();
-        salvar();
-    </script>
-</body>
-</html>
+    function clickMesa(id) {
+        let m = mesas.find(x =>
