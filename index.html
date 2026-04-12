@@ -2,40 +2,47 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 BOTECO - PDV ATIVO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>934 BOTECO - GESTÃO TOTAL</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; }
+        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --cinza-escuro: #111; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--preto); color: #fff; }
+
+        /* HEADER E NAV */
         header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
-        
         nav { background: #1a1a1a; display: flex; border-bottom: 1px solid #333; overflow-x: auto; }
         .nav-item { padding: 15px 20px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px; white-space: nowrap; }
-        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
+        .nav-item.active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
 
         .container { padding: 20px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* Estilo PDV (Vendas) */
+        /* PDV - VENDAS */
         .pdv-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
-        .grid-vendas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .card-produto-venda { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; transition: 0.2s; border: 3px solid transparent; }
-        .card-produto-venda:hover { transform: scale(1.05); border-color: var(--amarelo); }
+        .grid-vendas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .card-produto-venda { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card-produto-venda:hover { transform: translateY(-3px); background: #f0f0f0; }
         .card-produto-venda span { display: block; color: var(--azul); font-size: 18px; margin-top: 5px; }
-
-        /* Carrinho de Venda */
-        .resumo-venda { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
-        .total-venda { font-size: 32px; color: var(--amarelo); font-weight: 900; margin: 20px 0; border-top: 1px solid #333; padding-top: 10px; }
         
-        /* Tabelas e Cards de Clientes */
+        .resumo-venda { background: var(--cinza-escuro); padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; position: sticky; top: 20px; }
+        .total-venda { font-size: 32px; color: var(--amarelo); font-weight: 900; margin: 20px 0; border-top: 1px solid #333; padding-top: 10px; }
+
+        /* ESTOQUE - TABELA COLORIDA */
         .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.8fr; background: var(--azul); padding: 12px; border-radius: 8px 8px 0 0; font-weight: bold; text-align: center; font-size: 10px; }
         .grid-linha { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.8fr; background: #fff; color: #000; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 12px; }
-        .grid-linha div { padding: 12px; }
+        .grid-linha div { padding: 12px; border-right: 1px solid #eee; }
+
+        /* INPUTS E BOTÕES */
+        .card-input { background: var(--cinza-escuro); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; border: 1px solid #333; }
+        input, select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; }
+        button { background: var(--amarelo); color: #000; font-weight: bold; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+
+        /* CLIENTES */
         .card-cliente { background: #fff; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        
-        button { background: var(--amarelo); color: #000; font-weight: bold; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; text-transform: uppercase; }
-        select, input { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 10px; }
+
+        @media (max-width: 768px) { .pdv-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -46,58 +53,50 @@
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vender (Balcão)</div>
+    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Balcão (Venda)</div>
     <div class="nav-item" onclick="mudar('estoque', this)">📦 Estoque XML</div>
     <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
 </nav>
 
 <div class="container">
-    
     <div id="vendas" class="secao ativa">
         <div class="pdv-container">
-            <div id="gradeProdutos" class="grid-vendas">
-                </div>
-
+            <div id="gradeProdutos" class="grid-vendas"></div>
             <div class="resumo-venda">
-                <h3>Resumo do Pedido</h3>
-                <label style="font-size: 12px; color: #888;">Cliente:</label>
-                <select id="selectCliente">
-                    <option value="Avulso">Venda Avulsa (Dinheiro/Pix)</option>
-                </select>
-                
-                <div id="itensCarrinho" style="margin-top: 15px; font-size: 14px; max-height: 200px; overflow-y: auto;">
-                    </div>
-
+                <h3 style="margin-bottom:15px;">Novo Pedido</h3>
+                <select id="selectCliente" style="margin-bottom:15px;"></select>
+                <div id="itensCarrinho" style="max-height:250px; overflow-y:auto; font-size:14px; margin-bottom:15px;"></div>
                 <div class="total-venda">R$ <span id="valorTotal">0.00</span></div>
-                <button onclick="finalizarVenda()" style="background: var(--verde); color: #fff;">Finalizar Venda</button>
-                <button onclick="limparCarrinho()" style="background: #cc0000; color: #fff; margin-top: 10px; font-size: 10px; padding: 5px;">Cancelar</button>
+                <button onclick="finalizarVenda()" style="background: var(--verde); color: #fff; width:100%;">Finalizar Venda</button>
+                <button onclick="limparCarrinho()" style="background: #444; color: #fff; width:100%; margin-top:10px; font-size:10px;">Limpar Pedido</button>
             </div>
         </div>
     </div>
 
     <div id="estoque" class="secao">
-        <input type="file" id="xmlInput" accept=".xml" style="width: auto;">
-        <button onclick="lancarXML()" style="width: auto;">Importar XML</button>
-        <div class="grid-header" style="margin-top: 20px;">
+        <div class="card-input">
+            <input type="file" id="xmlInput" accept=".xml">
+            <button onclick="lancarXML()">Importar XML</button>
+        </div>
+        <div class="grid-header">
             <div>PRODUTO</div><div>QTD</div><div>CUSTO</div><div>VENDA</div><div>LUCRO</div><div>%</div>
         </div>
         <div id="listaProdutos"></div>
     </div>
 
     <div id="clientes" class="secao">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="nomeCliente" placeholder="Nome">
+        <div class="card-input">
+            <input type="text" id="nomeCliente" placeholder="Nome Completo">
             <input type="text" id="contatoCliente" placeholder="WhatsApp">
-            <button onclick="salvarCliente()" style="width: auto;">Cadastrar</button>
+            <button onclick="salvarCliente()">Cadastrar</button>
         </div>
         <div id="listaClientes"></div>
     </div>
-
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
@@ -107,123 +106,4 @@
         appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    let carrinho = [];
-    let produtosDados = {};
-
-    // --- RELÓGIO ---
-    setInterval(() => {
-        document.getElementById('relogio').innerText = new Date().toLocaleTimeString();
-    }, 1000);
-
-    // --- CARREGAR PRODUTOS PARA VENDA ---
-    onValue(ref(db, 'produtos'), (snapshot) => {
-        const grade = document.getElementById('gradeProdutos');
-        const listaEstoque = document.getElementById('listaProdutos');
-        grade.innerHTML = "";
-        listaEstoque.innerHTML = "";
-        produtosDados = snapshot.val() || {};
-
-        Object.entries(produtosDados).forEach(([id, p]) => {
-            // Grade do PDV
-            grade.innerHTML += `
-                <div class="card-produto-venda" onclick="adicionarAoCarrinho('${id}')">
-                    ${p.nome.substring(0, 20)}
-                    <span>R$ ${Number(p.venda).toFixed(2)}</span>
-                    <small style="color:#666; font-size:10px">Estoque: ${p.qtd}</small>
-                </div>`;
-            
-            // Tabela do Estoque
-            listaEstoque.innerHTML += `
-                <div class="grid-linha">
-                    <div style="text-align:left">${p.nome}</div>
-                    <div>${p.qtd}</div>
-                    <div style="background:#fff2cc">R$ ${Number(p.custo).toFixed(2)}</div>
-                    <div style="background:#d9e1f2">R$ ${Number(p.venda).toFixed(2)}</div>
-                    <div style="background:#fce4ec">R$ ${Number(p.lucro).toFixed(2)}</div>
-                    <div style="background:#e2efda">${p.margem}%</div>
-                </div>`;
-        });
-    });
-
-    // --- LÓGICA DO CARRINHO ---
-    window.adicionarAoCarrinho = (id) => {
-        const p = produtosDados[id];
-        if(p.qtd <= 0) return alert("Estoque zerado!");
-        
-        carrinho.push({ id, nome: p.nome, preco: p.venda });
-        atualizarResumo();
-    };
-
-    function atualizarResumo() {
-        const div = document.getElementById('itensCarrinho');
-        const totalSpan = document.getElementById('valorTotal');
-        div.innerHTML = "";
-        let total = 0;
-
-        carrinho.forEach((item, index) => {
-            total += Number(item.preco);
-            div.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>${item.nome}</span>
-                <b>R$ ${Number(item.preco).toFixed(2)}</b>
-            </div>`;
-        });
-        totalSpan.innerText = total.toFixed(2);
-    }
-
-    window.limparCarrinho = () => { carrinho = []; atualizarResumo(); };
-
-    window.finalizarVenda = () => {
-        if(carrinho.length === 0) return alert("Carrinho vazio!");
-        const cliente = document.getElementById('selectCliente').value;
-        const total = document.getElementById('valorTotal').innerText;
-
-        // 1. Salva a Venda
-        push(ref(db, 'vendas_gerais'), {
-            cliente,
-            total,
-            data: new Date().toLocaleString(),
-            itens: carrinho
-        });
-
-        // 2. Baixa no Estoque
-        carrinho.forEach(item => {
-            const novaQtd = produtosDados[item.id].qtd - 1;
-            update(ref(db, `produtos/${item.id}`), { qtd: novaQtd });
-        });
-
-        alert("Venda Finalizada com Sucesso!");
-        limparCarrinho();
-    };
-
-    // --- CLIENTES NO SELECT ---
-    onValue(ref(db, 'clientes'), (snapshot) => {
-        const select = document.getElementById('selectCliente');
-        const lista = document.getElementById('listaClientes');
-        lista.innerHTML = "";
-        select.innerHTML = '<option value="Avulso">Venda Avulsa (Dinheiro/Pix)</option>';
-        
-        if(snapshot.exists()){
-            Object.values(snapshot.val()).forEach(c => {
-                select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
-                lista.innerHTML += `
-                <div class="card-cliente">
-                    <span>👤 ${c.nome.toUpperCase()}</span>
-                    <span style="color:var(--verde)">📞 ${c.contato}</span>
-                </div>`;
-            });
-        }
-    });
-
-    // --- (Mantenha aqui as suas funções de salvarCliente e lancarXML anteriores) ---
-    window.mudar = (id, el) => {
-        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('ativa');
-        el.classList.add('active');
-    };
-</script>
-</body>
-</html>
+    const app
