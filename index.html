@@ -1,53 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Boteco 934 - PDV</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</head>
-<body>
-    <div class="card-topo">
-        <h1 class="titulo">Boteco 934</h1>
-        <div class="controles">
-            <select id="select-mesa"><option>Balcão</option><option>Mesa 01</option></select>
-            <input type="text" id="cliente-nome" placeholder="Nome do Cliente">
-            <button onclick="abrirModal('modal-financeiro')" class="btn-azul">📊 Finanças</button>
-            <button onclick="abrirModal('modal-nota')" class="btn-ciano">📑 Notas</button>
-            <button onclick="abrirModal('modal-produto')" class="btn-branco">➕ Novo Produto</button>
+<div id="modal-lancamento" class="modal" style="display:none;">
+    <div class="modal-content-largo">
+        <h3 id="titulo-mesa-ativa">Lançar para: [Nome]</h3>
+        
+        <div class="busca-rapida">
+            <input type="text" id="busca-produto" placeholder="Pesquisar produto..." onkeyup="filtrarProdutos()">
+        </div>
+
+        <div id="lista-produtos-lancamento" class="grid-produtos-pequeno">
+            </div>
+
+        <div class="resumo-mesa">
+            <h4>Itens na Mesa:</h4>
+            <ul id="itens-consumidos"></ul>
+            <hr>
+            <button onclick="fecharModalLancamento()" class="btn-fechar">Voltar</button>
+            <button onclick="finalizarMesa()" class="btn-sucesso">Fechar Conta / Receber</button>
         </div>
     </div>
-
-    <div id="grade-produtos" class="grade-venda"></div>
-
-    <div class="area-fechamento">
-        <h3>Consumo</h3>
-        <div id="lista-carrinho"></div>
-        <p class="total">Total: R$ <span id="valor-total">0,00</span></p>
-        <button onclick="abrirModal('modal-pagamento')" class="btn-fechar">Fechar Recibo</button>
-    </div>
-
-    <div id="modal-financeiro" class="modal-bg">
-        <div class="modal-caixa">
-            <h3>Financeiro</h3>
-            <p>Dinheiro: R$ <span id="f-dinheiro">0,00</span></p>
-            <p>PIX: R$ <span id="f-pix">0,00</span></p>
-            <p style="color:red">Pendura: R$ <span id="f-pendura">0,00</span></p>
-            <button onclick="fecharModal('modal-financeiro')">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modal-produto" class="modal-bg">
-        <div class="modal-caixa">
-            <h3>Novo Produto</h3>
-            <input type="text" id="p-nome" placeholder="Nome">
-            <input type="number" id="p-preco" placeholder="Preço">
-            <button onclick="salvarProduto()">Gravar</button>
-            <button onclick="fecharModal('modal-produto')">Sair</button>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-</body>
-</html>
+</div>
