@@ -1,53 +1,65 @@
-/* Visual Geral */
+/* Reset básico para tirar espaços vazios */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #121212; /* Fundo escuro estilo Dark Mode */
-    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a; /* Fundo grafite escuro */
+    color: #ffffff;
     padding: 20px;
 }
 
-/* Grade de Mesas */
-#grid-mesas {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
+h1 {
+    color: #ffcc00; /* Amarelo cerveja */
+    margin-bottom: 5px;
 }
 
-/* Estilo do Card da Mesa */
+/* Container das mesas */
+#grid-mesas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Estilo de cada Mesa */
 .card-mesa {
     padding: 20px;
     border-radius: 12px;
     text-align: center;
     cursor: pointer;
-    transition: 0.3s;
-    border: 2px solid transparent;
-}
-
-/* Cores dos Status */
-.status-livre {
-    background-color: #2e7d32; /* Verde */
-    border-color: #4caf50;
-}
-
-.status-ocupada {
-    background-color: #c62828; /* Vermelho */
-    border-color: #ef5350;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid rgba(255,255,255,0.1);
 }
 
 .card-mesa:hover {
-    transform: translateY(-5px);
-    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+/* Cor quando está LIVRE */
+.status-livre {
+    background-color: #2e7d32; /* Verde escuro */
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+}
+
+/* Cor quando está OCUPADA */
+.status-ocupada {
+    background-color: #c62828; /* Vermelho escuro */
+    box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
 }
 
 .mesa-header {
-    font-size: 0.9em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    opacity: 0.8;
+    font-weight: bold;
+    font-size: 0.8em;
+    margin-bottom: 8px;
+    opacity: 0.9;
 }
 
 .mesa-body strong {
-    font-size: 1.2em;
+    font-size: 1.1em;
     display: block;
-    margin-bottom: 5px;
+    margin-top: 5px;
 }
