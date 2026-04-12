@@ -1,7 +1,187 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta charset="UTF-8"><!DOCTYPE html>
+<html lang="pt-br">
+<head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco 934 - Gestão</title>
+    <style>
+        :root {
+            --primary: #ffcc00; /* Amarelo Boteco 934 */
+            --dark: #000000;
+            --glass: rgba(255, 255, 255, 0.05);
+            /* Cores Harmonizadas para a Tabela */
+            --bg-custo: #fff9e6; --text-custo: #856404;
+            --bg-venda: #eef2ff; --text-venda: #1e3a8a;
+            --bg-lucro: #fdf2f2; --text-lucro: #9b1c1c;
+            --bg-margem: #f0fdf4; --text-margem: #166534;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--dark); color: #fff; }
+
+        /* Banner Superior */
+        header { background: var(--primary); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; color: #000; }
+        .logo-box { display: flex; align-items: center; gap: 10px; }
+        .badge { background: #000; color: var(--primary); padding: 5px 10px; border-radius: 4px; font-weight: 900; }
+
+        /* Navegação */
+        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 1px solid #333; }
+        .nav-item { padding: 18px 25px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; transition: 0.3s; }
+        .nav-item:hover, .active { color: var(--primary); border-bottom: 3px solid var(--primary); background: rgba(255, 204, 0, 0.05); }
+
+        .container { padding: 30px; }
+        .secao { display: none; }
+        .ativa { display: block; }
+
+        /* Grid de Mesas (Abrem sem cliente) */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .mesa { background: var(--glass); border: 1px solid #333; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.3); }
+
+        /* Tabela Profissional */
+        .card { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; color: #000; border-radius: 10px; overflow: hidden; }
+        th { background: #2b579a; color: #fff; padding: 15px; text-align: left; font-size: 12px; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; }
+
+        /* Harmonização de Colunas */
+        .col-custo { background: var(--bg-custo); color: var(--text-custo); }
+        .col-venda { background: var(--bg-venda); color: var(--text-venda); }
+        .col-lucro { background: var(--bg-lucro); color: var(--text-lucro); }
+        .col-margem { background: var(--bg-margem); color: var(--text-margem); }
+
+        input, button { padding: 12px; border-radius: 8px; border: 1px solid #444; }
+        input { background: #2a2a2a; color: #fff; margin-right: 10px; }
+        button { background: var(--primary); color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-box">
+        <div class="badge">934</div>
+        <h1 style="letter-spacing: -1.5px;">BOTECO</h1>
+    </div>
+    <div style="font-weight: bold;">Petrolina-PE | 32°C</div>
+</header>
+
+<nav>
+    <div class="nav-item active" onclick="mudar('operacional', this)">Mesas/Operacional</div>
+    <div class="nav-item" onclick="mudar('estoque', this)">Estoque XML</div>
+    <div class="nav-item" onclick="mudar('clientes', this)">Clientes/Fiado</div>
+</nav>
+
+<div class="container">
+    <div id="operacional" class="secao ativa">
+        <div class="grid-mesas" id="gradeMesas"></div>
+    </div>
+
+    <div id="estoque" class="secao">
+        <div class="card">
+            <h3 style="margin-bottom:15px; color:var(--primary)">IMPORTAR NOTA FISCAL (XML)</h3>
+            <input type="file" id="xmlInput" accept=".xml">
+            <button onclick="processarXML()">LANÇAR NO FIREBASE</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>PRODUTO</th>
+                    <th>QTD</th>
+                    <th style="background: #ffecb3; color: #000">CUSTO UNIT.</th>
+                    <th style="background: #c5cae9; color: #000">VENDA UNIT.</th>
+                    <th style="background: #ffcdd2; color: #000">LUCRO</th>
+                    <th style="background: #c8e6c9; color: #000">MARGEM %</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Configuração oficial Boteco 934
+    const firebaseConfig = {
+        apiKey: "AIzaSy...", 
+        authDomain: "boteco934-afc3f.firebaseapp.com",
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+        projectId: "boteco934-afc3f",
+        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // 1. Geração de Mesas (Livres para uso imediato)
+    const grade = document.getElementById('gradeMesas');
+    for(let i=1; i<=15; i++) {
+        grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
+    }
+
+    // 2. Processamento de XML direto para o Firebase
+    window.processarXML = function() {
+        const file = document.getElementById('xmlInput').files[0];
+        if(!file) return alert("Selecione o arquivo XML!");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                
+                // Cálculo automático: Margem de 50% para harmonizar com seu sistema
+                const venda = custo * 2;
+                const lucro = venda - custo;
+
+                push(ref(db, 'produtos'), {
+                    nome, qtd, custo, venda, lucro, margem: 50
+                });
+            }
+            alert("Produtos lançados na nuvem com sucesso!");
+        };
+        reader.readAsText(file);
+    };
+
+    // 3. Atualização em Tempo Real (Leitura do Firebase)
+    onValue(ref(db, 'produtos'), (snapshot) => {
+        const corpo = document.getElementById('corpoTabela');
+        corpo.innerHTML = "";
+        const data = snapshot.val();
+        if(data) {
+            Object.values(data).forEach(p => {
+                corpo.innerHTML += `
+                    <tr>
+                        <td>${p.nome.toUpperCase()}</td>
+                        <td>${p.qtd}</td>
+                        <td class="col-custo">R$ ${p.custo.toFixed(2)}</td>
+                        <td class="col-venda">R$ ${p.venda.toFixed(2)}</td>
+                        <td class="col-lucro">R$ ${p.lucro.toFixed(2)}</td>
+                        <td class="col-margem">${p.margem}%</td>
+                    </tr>`;
+            });
+        }
+    });
+
+    window.mudar = (id, el) => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa');
+        el.classList.add('active');
+    };
+</script>
+</body>
+</html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - Gestão Profissional</title>
     <style>
