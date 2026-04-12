@@ -3,191 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - PDV & MARGEM</title>
+    <title>934 BOTECO - QUANTUM OS</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #0b0b0b; --cinza: #1a1a1a; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--preto); color: #fff; }
+        :root {
+            --quantum-gold: #ffcc00;
+            --quantum-blue: #00d4ff;
+            --glass-bg: rgba(17, 17, 17, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.12);
+            --black-hole: #050505;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         
-        header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; }
-        nav { background: var(--cinza); display: flex; border-bottom: 2px solid #333; overflow-x: auto; }
-        .nav-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
-        .nav-item.active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
-
-        .container { padding: 20px; }
-        .secao { display: none; }
-        .ativa { display: block; }
-
-        /* CALCULADORA IGUAL À FOTO */
-        .card-calc { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(15px); 
-            padding: 40px; 
-            border-radius: 25px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            max-width: 500px; 
-            margin: 20px auto;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        body { 
+            background: var(--black-hole); 
+            color: #fff; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
         }
-        .btn-calc { 
-            background: var(--amarelo); 
+
+        header { 
+            background: var(--quantum-gold); 
+            padding: 15px 30px; 
             color: #000; 
-            padding: 20px; 
-            border: none; 
-            width: 100%; 
-            font-weight: 900; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            font-size: 18px; 
-            text-transform: uppercase; 
-            margin-top: 20px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
         }
 
-        /* PDV E VITRINE */
-        .pdv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-        .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; min-height: 110px; display: flex; flex-direction: column; justify-content: center; }
-        .card-prod span { display: block; color: var(--azul); font-size: 1.2em; margin-top: 5px; }
+        nav { 
+            background: rgba(20, 20, 20, 0.9);
+            display: flex; 
+            justify-content: center;
+            border-bottom: 1px solid var(--border-glass);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-        /* CUPOM E BOTÕES */
-        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; min-height: 380px; }
-        .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-pgto button { padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; color: #fff; text-transform: uppercase; font-size: 12px; }
+        .nav-item { 
+            padding: 20px 25px; 
+            cursor: pointer; 
+            color: #666; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-        input, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-size: 16px; }
+        .nav-item.active { 
+            color: var(--quantum-gold); 
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            border-bottom: 3px solid var(--quantum-gold);
+        }
+
+        .container { padding: 40px 20px; max-width: 1200px; margin: auto; }
+        .secao { display: none; }
+        .ativa { display: block; animation: quantum-entry 0.6s ease-out; }
+
+        @keyframes quantum-entry {
+            from { opacity: 0; transform: scale(0.98) translateY(20px); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        /* --- CALCULADORA QUÂNTICA --- */
+        .card-quantum {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 50px;
+            border-radius: 35px;
+            border: 1px solid var(--border-glass);
+            max-width: 550px;
+            margin: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,255,255,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-quantum::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--quantum-gold));
+            animation: rotate-quantum 10s linear infinite;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        @keyframes rotate-quantum { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .card-quantum h2 {
+            color: var(--quantum-gold);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        label { display: block; margin-bottom: 10px; font-size: 14px; color: #aaa; font-weight: 600; text-transform: uppercase; }
+
+        input {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 18px;
+            width: 100%;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--quantum-gold);
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+            outline: none;
+        }
+
+        .btn-quantum {
+            background: linear-gradient(135deg, var(--quantum-gold), #e6b800);
+            color: #000;
+            padding: 22px;
+            border: none;
+            width: 100%;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 18px;
+            font-size: 18px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-quantum:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(255, 204, 0, 0.4); }
+
+        .res-quantum {
+            margin-top: 35px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 8px solid var(--quantum-gold);
+            padding: 30px;
+            border-radius: 20px;
+            display: none;
+        }
+
+        /* PDV E OUTROS */
+        .pdv-grid { display: grid; grid-template-columns: 1fr 400px; gap: 30px; }
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .prod-card {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .prod-card:hover { transform: translateY(-5px); }
+        .prod-card span { display: block; color: var(--quantum-blue); font-size: 1.3em; margin-top: 8px; }
+
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="font-weight: 900;">934 BOTECO</h1>
-    <div id="relogio" style="font-weight: 900; background: #000; padding: 5px 15px; border-radius: 20px; color: var(--amarelo);">00:00:00</div>
+    <h1 style="font-weight: 900; font-size: 32px;">934 BOTECO</h1>
+    <div id="relogio" style="font-weight: 900; font-size: 20px; letter-spacing: 2px;">00:00:00</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas</div>
-    <div class="nav-item" onclick="mudar('calculadora', this)">📊 Calculadora</div>
-    <div class="nav-item" onclick="mudar('produtos', this)">📦 Produtos</div>
+    <div class="nav-item active" onclick="navegar('vendas', this)">🛒 Terminal Vendas</div>
+    <div class="nav-item" onclick="navegar('calculadora', this)">⚡ Quantum Calc</div>
+    <div class="nav-item" onclick="navegar('produtos', this)">📦 Inventário</div>
 </nav>
 
 <div class="container">
     
-    <div id="vendas" class="secao ativa">
-        <input type="text" id="inputLeitor" placeholder="Passe o código de barras..." oninput="lerBarras(this.value)" autofocus style="border: 2px solid var(--amarelo);">
-        
-        <div class="pdv-layout">
-            <div>
-                <div style="display:flex; gap:10px; margin-bottom: 15px;">
-                    <select id="selMesa" style="flex:1"><option>Balcão</option><script>for(let i=1;i<=20;i++) document.write(`<option>Mesa ${i}</option>`)</script></select>
-                    <select id="selCliente" style="flex:2"></select>
-                </div>
-                <div id="gridProdutos" class="grid-produtos"></div>
-            </div>
-
-            <div>
-                <div id="reciboDigital" class="cupom">
-                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:10px; margin-bottom:10px;">
-                        <b>934 BOTECO - GESTÃO</b>
-                    </div>
-                    <div id="itensCupom"></div>
-                    <div style="border-top:1px dashed #000; margin-top:10px; padding-top:10px;">
-                        <b style="font-size:1.5em;">TOTAL: R$ <span id="totalTxt">0.00</span></b>
-                    </div>
-                </div>
-                <div class="btn-pgto">
-                    <button style="background:#32bcad" onclick="fechar('PIX')">PIX</button>
-                    <button style="background:#4caf50" onclick="fechar('DINHEIRO')">DINHEIRO</button>
-                    <button style="background:#2196f3" onclick="fechar('CARTÃO')">CARTÃO</button>
-                    <button style="background:#ff9800" onclick="fechar('PENDURA')">PENDURAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="calculadora" class="secao">
-        <div class="card-calc">
-            <h2 style="color:var(--amarelo); text-align:center; margin-bottom:30px; font-size: 26px;">Calculadora de Margem</h2>
-            <label>Custo Unitário (R$):</label>
-            <input type="number" id="c_custo" placeholder="0.00">
-            <label>Preço de Venda (R$):</label>
-            <input type="number" id="c_venda" placeholder="0.00">
-            <button class="btn-calc" onclick="calcularMargem()">ANALISAR MARGEM</button>
-            <div id="resCalc" style="margin-top:25px;"></div>
+        <div class="card-quantum">
+            <h2>Calculadora de Margem</h2>
+            
+            <label>Custo de Aquisição (R$):</label>
+            <input type="number" id="q_custo" placeholder="Ex: 5.60" step="0.01">
+            
+            <label>Valor de Saída (R$):</label>
+            <input type="number" id="q_venda" placeholder="Ex: 16.00" step="0.01">
+            
+            <button class="btn-quantum" onclick="processarQuantum()">EXECUTAR ANÁLISE</button>
+            
+            <div id="resQuantum" class="res-quantum">
+                <p style="color: #888; text-transform: uppercase; font-size: 12px; margin-bottom: 5px;">Lucro Líquido</p>
+                <h3 id="txtLucro" style="font-size: 28px; margin-bottom: 20px;">R$ 0,00</h3>
+                <p style="color: #888; text-transform: uppercase; font-size: 12px; margin-bottom: 5px;">Eficiência de Margem</p>
+                <h3 id="txtMargem" style="font-size: 48px; color: var(--quantum-gold); font-weight: 900;">0%</h3>
+            </div>
         </div>
     </div>
 
-    <div id="produtos" class="secao">
-        <div class="card-calc" style="max-width: 100%; text-align: left;">
-            <h3 style="color:var(--amarelo); margin-bottom:20px;">Cadastrar Produto</h3>
-            <input type="text" id="p_ean" placeholder="Código de Barras">
-            <input type="text" id="p_nome" placeholder="Nome do Produto">
-            <input type="number" id="p_venda" placeholder="Preço de Venda">
-            <button onclick="salvarProd()" style="background:var(--verde); color:#fff; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold;">SALVAR</button>
+    <div id="vendas" class="secao ativa">
+        <div class="pdv-grid">
+            <div class="vitrine" id="vitrineProds">
+                </div>
+            <div id="pdv-checkout">
+                <div style="background:#fff; color:#000; padding:20px; border-radius:10px; min-height:400px;">
+                    <h3 style="border-bottom:2px solid #eee; padding-bottom:10px;">CUPOM FISCAL</h3>
+                    <div id="listaItens" style="margin: 20px 0;"></div>
+                    <h2 style="font-size: 35px;">TOTAL: R$ <span id="totalVenda">0,00</span></h2>
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = { apiKey: "AIzaSy...", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let carrinho = [], produtosDados = {};
 
+    // RELÓGIO ATÔMICO
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    onValue(ref(db, 'produtos'), (s) => {
-        const g = document.getElementById('gridProdutos'); g.innerHTML = "";
-        produtosDados = s.val() || {};
-        Object.entries(produtosDados).forEach(([id, p]) => {
-            g.innerHTML += `<div class="card-prod" onclick="addCar('${id}')">${p.nome}<span>R$ ${Number(p.venda).toFixed(2)}</span></div>`;
-        });
-    });
-
-    window.lerBarras = (valor) => {
-        Object.entries(produtosDados).forEach(([id, p]) => {
-            if(p.ean === valor) { addCar(id); document.getElementById('inputLeitor').value = ""; }
-        });
+    // PROCESSAMENTO DA CALCULADORA
+    window.processarQuantum = () => {
+        const custo = parseFloat(document.getElementById('q_custo').value);
+        const venda = parseFloat(document.getElementById('q_venda').value);
+        
+        if(custo > 0 && venda > 0) {
+            const lucro = venda - custo;
+            const margem = (lucro / venda) * 100;
+            
+            const box = document.getElementById('resQuantum');
+            box.style.display = 'block';
+            
+            document.getElementById('txtLucro').innerText = `R$ ${lucro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('txtMargem').innerText = `${margem.toFixed(1)}%`;
+            
+            // Efeito de pulso no resultado
+            box.style.animation = 'none';
+            setTimeout(() => box.style.animation = 'quantum-entry 0.4s ease-out', 10);
+        }
     };
 
-    window.addCar = (id) => {
-        const p = produtosDados[id];
-        carrinho.push({ nome: p.nome, preco: p.venda });
-        const d = document.getElementById('itensCupom'); d.innerHTML = ""; let t = 0;
-        carrinho.forEach(i => { d.innerHTML += `<div style="display:flex; justify-content:space-between"><span>${i.nome}</span><b>R$ ${Number(i.preco).toFixed(2)}</b></div>`; t += Number(i.preco); });
-        document.getElementById('totalTxt').innerText = t.toFixed(2);
-    };
-
-    window.calcularMargem = () => {
-        const c = parseFloat(document.getElementById('c_custo').value);
-        const v = parseFloat(document.getElementById('c_venda').value);
-        if(!c || !v) return;
-        const lucro = v - c; const margem = (lucro / v) * 100;
-        document.getElementById('resCalc').innerHTML = `<div style="background:rgba(255,255,255,0.1); padding:20px; border-radius:15px; border-left:8px solid var(--amarelo);">
-            <p>Lucro: <b>R$ ${lucro.toFixed(2)}</b></p>
-            <p style="font-size: 22px; color:var(--amarelo)">Margem: <b>${margem.toFixed(1)}%</b></p>
-        </div>`;
-    };
-
-    window.salvarProd = () => {
-        const ean = document.getElementById('p_ean').value;
-        const nome = document.getElementById('p_nome').value;
-        const venda = document.getElementById('p_venda').value;
-        if(nome && venda) { push(ref(db, 'produtos'), { ean, nome, venda: parseFloat(venda) }); alert("Salvo!"); }
-    };
-
-    window.mudar = (id, el) => {
+    // NAVEGAÇÃO
+    window.navegar = (id, el) => {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('ativa'); el.classList.add('active');
+        document.getElementById(id).classList.add('ativa');
+        el.classList.add('active');
     };
 
-    onValue(ref(db, 'clientes'), (s) => {
-        const sel = document.getElementById('selCliente'); sel.innerHTML = '<option>CLIENTE AVULSO</option>';
-        if(s.exists()) Object.values(s.val()).forEach(c => { sel.innerHTML += `<option>${c.nome}</option>`; });
+    // CARREGAR VITRINE
+    onValue(ref(db, 'produtos'), (s) => {
+        const v = document.getElementById('vitrineProds');
+        v.innerHTML = "";
+        const dados = s.val() || {};
+        Object.values(dados).forEach(p => {
+            v.innerHTML += `<div class="prod-card">${p.nome}<span>R$ ${p.venda.toFixed(2)}</span></div>`;
+        });
     });
 </script>
+
 </body>
 </html>
