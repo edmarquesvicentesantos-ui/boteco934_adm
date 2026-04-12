@@ -1,20 +1,26 @@
-<div id="modal-lancamento" class="modal" style="display:none;">
-    <div class="modal-content-largo">
-        <h3 id="titulo-mesa-ativa">Lançar para: [Nome]</h3>
-        
-        <div class="busca-rapida">
-            <input type="text" id="busca-produto" placeholder="Pesquisar produto..." onkeyup="filtrarProdutos()">
-        </div>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco 934 - PDV</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
 
-        <div id="lista-produtos-lancamento" class="grid-produtos-pequeno">
-            </div>
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h1>🍻 Boteco 934</h1>
+        <p>Controle de Mesas e Distribuição</p>
+    </header>
 
-        <div class="resumo-mesa">
-            <h4>Itens na Mesa:</h4>
-            <ul id="itens-consumidos"></ul>
-            <hr>
-            <button onclick="fecharModalLancamento()" class="btn-fechar">Voltar</button>
-            <button onclick="finalizarMesa()" class="btn-sucesso">Fechar Conta / Receber</button>
-        </div>
-    </div>
-</div>
+    <main>
+        <div id="grid-mesas"></div>
+    </main>
+
+    <footer style="margin-top: 50px; text-align: center; font-size: 0.8em; opacity: 0.6;">
+        <p>Sistema Boteco 934 Adm - Operacional</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
