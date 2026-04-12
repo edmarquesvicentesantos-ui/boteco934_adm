@@ -3,93 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV Oficial</title>
+    <title>Boteco 934 - PDV Pro</title>
     <style>
-        /* DESIGN MODERNO E PROFISSIONAL */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0d0d0d; color: white; padding: 15px; }
-        
-        /* ESPAÇO PARA SUA LOGO */
-        .header-container { 
-            text-align: center; 
-            padding: 20px; 
-            border-bottom: 2px solid #ffcc00; 
-            margin-bottom: 25px;
-            background: #1a1a1a;
-            border-radius: 0 0 20px 20px;
-        }
-        .logo-placeholder {
-            width: 80px; height: 80px;
-            background-color: #333;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 10px;
-            border: 2px solid #ffcc00;
-            font-size: 0.7em; color: #888;
-        }
-        h1 { color: #ffcc00; font-size: 1.5em; letter-spacing: 1px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0d0d0d; color: white; height: 100vh; display: flex; overflow: hidden; }
 
-        /* GRADE DE MESAS - FOCO EM CLAREZA */
-        #grid-mesas { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-            gap: 12px; 
-        }
-        .card-mesa { 
-            padding: 18px; border-radius: 15px; cursor: pointer; 
-            transition: 0.2s; position: relative; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .status-livre { background: linear-gradient(145deg, #1b5e20, #2e7d32); }
-        .status-ocupada { background: linear-gradient(145deg, #b71c1c, #c62828); }
-        
-        .mesa-header { font-size: 0.75em; opacity: 0.8; font-weight: bold; }
-        .mesa-body { margin-top: 8px; font-size: 1.1em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mesa-valor { color: #ffcc00; margin-top: 5px; font-size: 1em; }
+        /* BARRA LATERAL ESQUERDA (BOTÕES) */
+        .sidebar-left { width: 15%; background: #1a1a1a; border-right: 2px solid #ffcc00; display: flex; flex-direction: column; padding: 15px; gap: 10px; }
+        .btn-side { background: #333; color: #ffcc00; border: 1px solid #444; padding: 15px 5px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
+        .btn-side:hover { background: #ffcc00; color: black; }
 
-        .btn-reset { 
-            margin-top: 50px; background: transparent; border: 1px solid #333; 
-            color: #555; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.8em;
+        /* CENTRO (MESAS E LOGO) */
+        .main-content { width: 55%; padding: 20px; overflow-y: auto; position: relative; }
+        .bg-logo-suave { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            opacity: 0.05; width: 300px; filter: grayscale(1); z-index: -1;
         }
+        #grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+        .card-mesa { padding: 15px; border-radius: 10px; cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .status-livre { background: #2e7d32; }
+        .status-ocupada { background: #c62828; }
+
+        /* LADO DIREITO (RECIBO) */
+        .sidebar-right { width: 30%; background: #f9f9f9; color: #333; padding: 15px; display: flex; flex-direction: column; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+        .recibo-header { border-bottom: 2px dashed #ccc; padding-bottom: 10px; text-align: center; margin-bottom: 10px; }
+        .recibo-corpo { flex-grow: 1; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-y: auto; }
+        .recibo-footer { border-top: 2px dashed #ccc; padding-top: 10px; font-weight: bold; font-size: 1.2em; text-align: right; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div class="logo-placeholder">SUA LOGO</div>
-        <h1>BOTECO 934</h1>
-        <p style="font-size: 0.8em; opacity: 0.6;">SISTEMA DE GESTÃO E DISTRIBUIÇÃO</p>
-    </div>
+    <aside class="sidebar-left">
+        <div style="color: #ffcc00; font-weight: bold; margin-bottom: 20px; text-align: center;">MENU</div>
+        <button class="btn-side" onclick="renderizar()">🔄 Atualizar</button>
+        <button class="btn-side" onclick="zerarSistema()">🧹 Zerar Dia</button>
+        <button class="btn-side" onclick="alert('Módulo Boticário em breve!')">💄 Boticário</button>
+        <button class="btn-side" onclick="alert('Relatórios em breve!')">📊 Vendas</button>
+    </aside>
 
-    <div id="grid-mesas"></div>
+    <main class="main-content">
+        <div class="bg-logo-suave">LOGO</div>
+        <h2 style="color: #ffcc00; margin-bottom: 20px;">Painel de Mesas</h2>
+        <div id="grid-mesas"></div>
+    </main>
 
-    <button class="btn-reset" onclick="zerarSistema()">Reiniciar dia (Zerar Tudo)</button>
+    <aside class="sidebar-right">
+        <div class="recibo-header">
+            <h3>BOTECO 934</h3>
+            <p>Distribuidora & Bar</p>
+            <p id="recibo-data"></p>
+        </div>
+        <div class="recibo-corpo" id="detalhes-recibo">
+            <p style="text-align: center; color: #999;">Selecione uma mesa ocupada para ver o recibo</p>
+        </div>
+        <div class="recibo-footer">
+            Total: <span id="recibo-total">R$ 0,00</span>
+        </div>
+    </aside>
 
     <script>
-        // LISTA DE PRODUTOS ESTRATÉGICA
         const produtos = [
             { id: 1, nome: "Cerveja 600ml Gelada", preco: 12.00 },
             { id: 2, nome: "Cerveja 600ml Grade", preco: 9.50 },
-            { id: 3, nome: "Whisky Dose", preco: 12.00 },
-            { id: 4, nome: "Whisky Garrafa", preco: 110.00 },
-            { id: 5, nome: "Cerveja Lata", preco: 5.50 },
-            { id: 6, nome: "Refrigerante", preco: 6.00 },
-            { id: 7, nome: "Gelo Pacote", preco: 15.00 },
-            { id: 8, nome: "Cachaça Dose", preco: 3.00 }
+            { id: 3, nome: "Dose Whisky", preco: 12.00 },
+            { id: 4, nome: "Refrigerante", preco: 6.00 },
+            { id: 5, nome: "Gelo Pacote", preco: 15.00 }
         ];
 
-        let mesas = JSON.parse(localStorage.getItem('boteco_934_final')) || Array.from({ length: 12 }, (_, i) => ({
-            id: i + 1, ocupada: false, cliente: "", total: 0
+        let mesas = JSON.parse(localStorage.getItem('boteco_v3')) || Array.from({ length: 15 }, (_, i) => ({
+            id: i + 1, ocupada: false, cliente: "", total: 0, itens: []
         }));
 
-        function salvar() { localStorage.setItem('boteco_934_final', JSON.stringify(mesas)); }
+        function salvar() { localStorage.setItem('boteco_v3', JSON.stringify(mesas)); }
 
         function renderizar() {
+            document.getElementById('recibo-data').innerText = new Date().toLocaleDateString();
             const grid = document.getElementById('grid-mesas');
             grid.innerHTML = mesas.map(m => `
                 <div class="card-mesa ${m.ocupada ? 'status-ocupada' : 'status-livre'}" onclick="gerenciar(${m.id})">
                     <div class="mesa-header">MESA ${m.id}</div>
                     <div class="mesa-body">${m.ocupada ? m.cliente : 'LIVRE'}</div>
-                    <div class="mesa-valor">${m.ocupada ? 'R$ ' + m.total.toFixed(2) : '---'}</div>
+                    <div class="mesa-valor">${m.ocupada ? 'R$ ' + m.total.toFixed(2) : ''}</div>
                 </div>
             `).join('');
         }
@@ -98,26 +92,37 @@
             let mesa = mesas.find(m => m.id === id);
             if (!mesa.ocupada) {
                 let n = prompt("Nome do Cliente:");
-                if (n) { mesa.ocupada = true; mesa.cliente = n; }
+                if (n) { mesa.ocupada = true; mesa.cliente = n; mesa.itens = []; }
             } else {
-                let op = prompt("1: + Adicionar | 2: PAGO | 3: PENDURA | 4: Sair");
+                atualizarRecibo(mesa);
+                let op = prompt("1: Adicionar Item | 2: PAGO | 3: PENDURA | 4: Sair");
                 if (op === "1") {
-                    let lista = produtos.map(p => `${p.id}: ${p.nome} (R$${p.preco})`).join('\n');
-                    let cod = prompt("Código:\n" + lista);
+                    let lista = produtos.map(p => `${p.id}: ${p.nome}`).join('\n');
+                    let cod = prompt("CÓDIGO:\n" + lista);
                     let p = produtos.find(item => item.id == cod);
-                    if (p) mesa.total += p.preco;
+                    if (p) {
+                        mesa.total += p.preco;
+                        mesa.itens.push({ nome: p.nome, preco: p.preco });
+                        atualizarRecibo(mesa);
+                    }
                 } else if (op === "2" || op === "3") {
-                    let msg = op === "2" ? "PAGO!" : "ENVIADO AO PENDURA!";
-                    alert(`Total: R$ ${mesa.total.toFixed(2)}\nStatus: ${msg}`);
-                    mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0;
+                    mesa.ocupada = false; mesa.cliente = ""; mesa.total = 0; mesa.itens = [];
+                    document.getElementById('detalhes-recibo').innerHTML = "<p>Mesa Finalizada!</p>";
                 }
             }
             salvar(); renderizar();
         }
 
+        function atualizarRecibo(mesa) {
+            const corpo = document.getElementById('detalhes-recibo');
+            corpo.innerHTML = `<strong>CLIENTE: ${mesa.cliente}</strong><br><br>` + 
+                mesa.itens.map(i => `<div>${i.nome.padEnd(20, '.')} R$ ${i.preco.toFixed(2)}</div>`).join('');
+            document.getElementById('recibo-total').innerText = "R$ " + mesa.total.toFixed(2);
+        }
+
         function zerarSistema() {
-            if (confirm("Limpar todas as mesas para amanhã?")) {
-                mesas.forEach(m => { m.ocupada = false; m.cliente = ""; m.total = 0; });
+            if (confirm("Limpar tudo?")) {
+                mesas.forEach(m => { m.ocupada = false; m.cliente = ""; m.total = 0; m.itens = []; });
                 salvar(); renderizar();
             }
         }
