@@ -4,99 +4,83 @@
     <meta charset="UTF-8">
     <title>Boteco 934 - Gestão Profissional</title>
     <style>
-        :root {
-            --primary: #ffcc00;
-            --dark-bg: #000;
-            --card-gray: #1a1a1a;
-            /* Cores Harmonizadas da Tabela */
-            --col-prod: #3b5998;
-            --col-custo: #fff2cc;
-            --col-venda: #d9e1f2;
-            --col-lucro: #fce4ec;
-            --col-margem: #e2efda;
+        :root { --amarelo: #ffcc00; --azul-header: #2b579a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000; color: #fff; }
+
+        /* Estilo da Tabela conforme sua última versão */
+        .barra-azul { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; 
+            background: var(--azul-header); 
+            padding: 15px; 
+            border-radius: 10px; 
+            font-size: 12px; 
+            font-weight: bold;
+            text-align: center;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--dark-bg); color: #fff; }
+        .linha-dados { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; 
+            margin-top: 5px; 
+            color: #000; 
+            font-weight: bold; 
+            text-align: center; 
+        }
 
-        /* Cabeçalho Profissional */
-        header { background: var(--primary); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; }
-        .badge { background: #000; color: var(--primary); padding: 5px 12px; border-radius: 4px; font-weight: 900; }
-
-        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 2px solid #333; }
-        .nav-item { padding: 18px 25px; cursor: pointer; color: #888; font-weight: bold; font-size: 11px; text-transform: uppercase; }
-        .nav-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-
-        .container { padding: 30px; }
-        .secao { display: none; }
-        .ativa { display: block; }
-
-        /* Card de Importação */
-        .card-import { background: var(--card-gray); padding: 30px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; }
-        .btn-lancar { background: var(--primary); color: #000; border: none; padding: 15px 30px; font-weight: bold; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
-
-        /* Barra de Tabela Azul */
-        .header-tabela { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; background: #2b579a; border-radius: 10px; padding: 15px; text-align: center; font-size: 12px; font-weight: bold; }
-
-        /* Linhas de Dados com Cores Harmonizadas */
-        .linha-produto { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; margin-top: 5px; border-radius: 8px; overflow: hidden; color: #000; font-weight: bold; text-align: center; }
-        .c-prod { background: #3b5998; color: #fff; padding: 12px; }
+        /* Cores Harmonizadas */
+        .c-prod { background: #3b5998; color: #fff; padding: 12px; border-radius: 5px 0 0 5px; }
         .c-qtd { background: #4a7ebb; color: #fff; padding: 12px; }
-        .c-custo { background: var(--col-custo); padding: 12px; }
-        .c-venda { background: var(--col-venda); padding: 12px; }
-        .c-lucro { background: var(--col-lucro); padding: 12px; }
-        .c-margem { background: var(--col-margem); padding: 12px; }
+        .c-custo { background: #fff2cc; padding: 12px; }
+        .c-venda { background: #d9e1f2; padding: 12px; }
+        .c-lucro { background: #fce4ec; padding: 12px; }
+        .c-margem { background: #e2efda; padding: 12px; border-radius: 0 5px 5px 0; }
 
-        /* Mesas Independentes */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .mesa { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 35px 10px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .mesa.ocupada { background: #d32f2f; border-color: #ff5252; box-shadow: 0 0 15px rgba(211, 47, 47, 0.4); }
+        header { background: var(--amarelo); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; }
+        nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 2px solid #333; }
+        .nav-item { padding: 15px 20px; cursor: pointer; color: #888; font-size: 12px; font-weight: bold; }
+        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
+        .secao { display: none; padding: 20px; }
+        .ativa { display: block; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="display:flex; align-items:center; gap:15px;">
-        <div class="badge">934</div>
-        <h1 style="letter-spacing:-1.5px;">BOTECO</h1>
-    </div>
-    <div style="font-weight: bold;">Petrolina-PE | 32°C</div>
+    <h1>934 BOTECO</h1>
+    <div>Petrolina-PE | 32°C</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="tela('mesas', this)">Mesas/Operacional</div>
-    <div class="nav-item" onclick="tela('estoque', this)">Estoque XML</div>
+    <div class="nav-item active" onclick="mudar('estoque', this)">ESTOQUE XML</div>
+    <div class="nav-item" onclick="mudar('clientes', this)">CLIENTES/FIADO</div>
 </nav>
 
-<div class="container">
-    <div id="mesas" class="secao ativa">
-        <div class="grid-mesas" id="gradeMesas"></div>
+<div id="estoque" class="secao ativa">
+    <div style="background:#1a1a1a; padding:20px; border-radius:10px; margin-bottom:20px;">
+        <input type="file" id="xmlInput" accept=".xml">
+        <button onclick="lancarNoFirebase()" style="background:var(--amarelo); padding:10px 20px; border:none; font-weight:bold; cursor:pointer;">LANÇAR NO FIREBASE</button>
     </div>
 
-    <div id="estoque" class="secao">
-        <div class="card-import">
-            <h3 style="color:var(--primary); margin-bottom:20px; text-transform: uppercase;">Importar Nota Fiscal (XML)</h3>
-            <input type="file" id="xmlInput" accept=".xml" style="color:#fff; margin-right:15px;">
-            <button class="btn-lancar" onclick="importarXML()">Lançar no Firebase</button>
-        </div>
+    <div class="barra-azul">
+        <div>PRODUTO</div><div>QTD</div><div>CUSTO UNIT.</div><div>VENDA UNIT.</div><div>LUCRO</div><div>MARGEM %</div>
+    </div>
+    <div id="listaProdutos"></div>
+</div>
 
-        <div class="header-tabela">
-            <div>PRODUTO</div>
-            <div>QTD</div>
-            <div>CUSTO UNIT.</div>
-            <div>VENDA UNIT.</div>
-            <div>LUCRO</div>
-            <div>MARGEM %</div>
-        </div>
-        <div id="corpoTabela"></div>
+<div id="clientes" class="secao">
+    <h2 style="color:var(--amarelo); margin-bottom:15px;">CLIENTES CADASTRADOS</h2>
+    <div id="listaClientes" style="background:#fff; color:#000; border-radius:10px; padding:10px;">
+        Carregando clientes do Firebase...
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Suas credenciais oficiais do Boteco 934
+    // Suas credenciais oficiais
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -108,50 +92,56 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Gerar mesas (Abrem sem cliente)
-    const grade = document.getElementById('gradeMesas');
-    for(let i=1; i<=15; i++) {
-        grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
-    }
+    // 1. RECUPERAR CLIENTES (Garante que eles voltem a aparecer)
+    onValue(ref(db, 'clientes'), (snapshot) => {
+        const div = document.getElementById('listaClientes');
+        div.innerHTML = "";
+        const dados = snapshot.val();
+        if(dados) {
+            Object.values(dados).forEach(c => {
+                div.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">👤 ${c.nome || 'Cliente sem nome'}</div>`;
+            });
+        } else { div.innerHTML = "Nenhum cliente encontrado na pasta 'clientes'."; }
+    });
 
-    // Processamento do XML direto para o Firebase
-    window.importarXML = function() {
+    // 2. LANÇAR XML SEM ERRO DE "NOTA JÁ IMPORTADA"
+    window.lancarNoFirebase = function() {
         const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Escolha um arquivo XML primeiro!");
+        if(!file) return alert("Selecione o XML!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const itens = xml.getElementsByTagName("det");
+            const produtos = xml.getElementsByTagName("det");
 
-            for(let i=0; i<itens.length; i++) {
-                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
-                const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+            for(let i=0; i<produtos.length; i++) {
+                const nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
+                const custo = parseFloat(produtos[i].getElementsByTagName("vUnCom")[0].textContent);
                 
-                // Cálculo de venda sugerida (Ex: 50% de lucro)
-                const venda = custo * 1.5;
-                const lucro = venda - custo;
-
-                // USANDO PUSH PARA EVITAR O ERRO "NOTA JÁ IMPORTADA"
+                // O segredo está no PUSH: ele gera um ID novo toda vez, evitando o erro de nota repetida
                 push(ref(db, 'produtos'), {
-                    nome, qtd, custo, venda, lucro, margem: 50
+                    nome: nome,
+                    qtd: 1,
+                    custo: custo,
+                    venda: custo * 1.5, // Exemplo de margem
+                    lucro: custo * 0.5,
+                    margem: 50
                 });
             }
-            alert("Produtos lançados com sucesso no Firebase!");
+            alert("Lançado com sucesso!");
         };
         reader.readAsText(file);
     };
 
-    // Sincronização em Tempo Real com a Tabela Colorida
+    // 3. MOSTRAR PRODUTOS NA TABELA COLORIDA
     onValue(ref(db, 'produtos'), (snapshot) => {
-        const corpo = document.getElementById('corpoTabela');
-        corpo.innerHTML = "";
+        const lista = document.getElementById('listaProdutos');
+        lista.innerHTML = "";
         const data = snapshot.val();
         if(data) {
             Object.values(data).forEach(p => {
-                corpo.innerHTML += `
-                    <div class="linha-produto">
+                lista.innerHTML += `
+                    <div class="linha-dados">
                         <div class="c-prod">${p.nome}</div>
                         <div class="c-qtd">${p.qtd}</div>
                         <div class="c-custo">R$ ${p.custo.toFixed(2)}</div>
@@ -163,7 +153,7 @@
         }
     });
 
-    window.tela = (id, el) => {
+    window.mudar = (id, el) => {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
