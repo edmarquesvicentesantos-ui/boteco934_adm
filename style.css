@@ -1,89 +1,54 @@
-<style>
-    /* AJUSTE PARA O ESTILO PORTAL UOL */
-    .header-uol {
-        background: #fff;
-        padding: 15px 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ddd;
-    }
-    .logo-container {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    .badge-30 {
-        background: linear-gradient(45deg, #ffcc00, #ff6600);
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: 900;
-        font-size: 1.2em;
-    }
-    .brand-name {
-        font-size: 2.2em;
-        font-weight: 900;
-        color: #000;
-        letter-spacing: -2px;
-    }
-    .info-cotacao {
-        display: flex;
-        gap: 20px;
-        font-size: 0.85em;
-        color: #444;
-        align-items: center;
-    }
-    .cotacao-item b { color: #d32f2f; } /* Cor para as setas/valores */
+/* Fundo do Cartão com efeito de vidro */
+.card-calc {
+    background: #111111;
+    padding: 40px;
+    border-radius: 25px;
+    max-width: 550px;
+    margin: 40px auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
 
-    .clima-uol {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.85em;
-        color: #666;
-    }
+/* Título Amarelo */
+.card-calc h2 {
+    color: #ffcc00;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 900;
+}
 
-    /* BARRA DE MENU (CINZA IGUAL AO UOL) */
-    .nav-uol {
-        background: #fff;
-        border-bottom: 2px solid #eee;
-        display: flex;
-        padding: 0 25px;
-        overflow-x: auto;
-    }
-    .nav-uol .nav-item {
-        padding: 10px 15px;
-        color: #333;
-        font-weight: bold;
-        font-size: 0.75em;
-        text-transform: uppercase;
-        cursor: pointer;
-        white-space: nowrap;
-        border-bottom: 3px solid transparent;
-    }
-    .nav-uol .nav-item:hover {
-        color: #ffcc00;
-        border-bottom: 3px solid #ffcc00;
-    }
-
-    /* SUBMENU ESTILO DROPDOWN */
-    .submenu {
-        display: none;
-        position: absolute;
-        background: #fff;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        z-index: 1000;
-        margin-top: 10px;
-    }
-
-/* Estilo para o alerta de aumento */
-.alerta-preco {
-    background: #440000;
-    color: #ffcccc;
-    padding: 15px;
-    border-radius: 8px;
+/* Campos de entrada escuros e arredondados */
+.card-calc input {
+    background: #1c1c1c;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    width: 100%;
     margin-bottom: 20px;
-    border-left: 5px solid var(--vermelho);
-    display: none; /* Inicia escondido */
+    font-size: 18px;
+}
+
+/* Botão Amarelo de Análise */
+.btn-calc {
+    background: #ffcc00;
+    color: #000;
+    padding: 22px;
+    border: none;
+    width: 100%;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 12px;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+/* Resultado com a borda lateral amarela */
+.res-container {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 15px;
+    border-left: 6px solid #ffcc00;
+    margin-top: 25px;
+    text-align: left;
 }
