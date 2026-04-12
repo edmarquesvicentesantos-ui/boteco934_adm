@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>934 - GESTÃO E ESTOQUE</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px #ccc; }
+        input { padding: 10px; margin: 5px 0; width: 100%; }
+        button { padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>📊 Gestão Boteco 934</h1>
+    
+    <div class="card">
+        <h3>📦 Cadastrar Mercadoria (Entrada)</h3>
+        <input type="text" id="p_nome" placeholder="Nome do Produto">
+        <input type="number" id="p_custo" placeholder="Custo Total">
+        <input type="number" id="p_qtd" placeholder="Quantidade de itens no fardo" value="1">
+        <input type="number" id="p_venda" placeholder="Preço de Venda Unitário">
+        <button onclick="salvarEstoque()">Salvar no Estoque</button>
+    </div>
+
+    <div class="card">
+        <h3>👥 Clientes</h3>
+        <input type="text" id="c_nome" placeholder="Nome do Cliente">
+        <input type="text" id="c_fone" placeholder="WhatsApp">
+        <button onclick="salvarCliente()">Salvar Cliente</button>
+    </div>
+
+    <div class="card">
+        <h3>Estoque Atual</h3>
+        <table id="tabEstoque">
+            <thead><tr><th>Nome</th><th>Custo Un.</th><th>Venda Un.</th><th>Ação</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
+        let clientes = JSON.parse(localStorage.getItem('boteco_cli')) || [];
+
+        function salvarEstoque() {
+            const nome = document.getElementById('p_nome').value;
+            const custoTotal = parseFloat(document.getElementById('p_custo').value);
+            const qtd = parseInt(document.getElementById('p_qtd').value) || 1;
+            const venda = parseFloat(document.getElementById('p_venda').value);
+            
+            estoque.push({ nome, custo: custoTotal/qtd, venda });
+            localStorage.setItem('boteco_est', JSON.stringify(estoque));
+            location.reload();
+        }
+
+        function salvarCliente() {
+            const nome = document.getElementById('c_nome').value;
+            const fone = document.getElementById('c_fone').value;
+            clientes.push({ nome, fone });
+            localStorage.setItem('boteco_cli', JSON.stringify(clientes));
+            alert("Cliente salvo!");
+        }
+
+        function render() {
+            const tbody = document.querySelector('#tabEstoque tbody');
+            tbody.innerHTML = estoque.map((p, i) => `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.custo.toFixed(2)}</td>
+                    <td>R$ ${p.venda.toFixed(2)}</td>
+                    <td onclick="remover(${i})">🗑️</td>
+                </tr>
+            `).join('');
+        }
+
+        function remover(i) {
+            estoque.splice(i, 1);
+            localStorage.setItem('boteco_est', JSON.stringify(estoque));
+            location.reload();
+        }
+        render();
+    </script>
+</body>
+</html>
