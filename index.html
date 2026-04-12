@@ -2,75 +2,65 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão Completa</title>
+    <title>934 BOTECO - SISTEMA ATUALIZADO</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul-header: #2b579a; --preto: #000; --cinza: #1a1a1a; }
+        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--preto); color: #fff; }
-
-        header { background: var(--amarelo); padding: 20px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
-        header h1 { font-size: 28px; font-weight: 900; }
-
-        nav { background: var(--cinza); display: flex; padding: 0 20px; border-bottom: 1px solid #444; }
-        .nav-item { padding: 15px 25px; cursor: pointer; color: #888; font-size: 13px; font-weight: bold; text-transform: uppercase; }
-        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); background: rgba(255,204,0,0.05); }
-
-        .container { padding: 25px; }
+        header { background: var(--amarelo); padding: 15px; color: #000; display: flex; justify-content: space-between; align-items: center; }
+        nav { background: #1a1a1a; display: flex; border-bottom: 1px solid #333; }
+        .nav-item { padding: 15px 20px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 11px; }
+        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
+        .container { padding: 20px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* Cards de Input */
-        .card-gestao { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
-        input { padding: 12px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; flex: 1; min-width: 200px; }
-        button { background: var(--amarelo); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; }
+        /* Estilo Inputs */
+        .card-input { background: #111; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; border: 1px solid #333; }
+        input { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; flex: 1; }
+        button { background: var(--amarelo); color: #000; font-weight: bold; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; }
 
-        /* Tabela de Produtos */
-        .header-tabela { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; background: var(--azul-header); padding: 15px; border-radius: 10px 10px 0 0; font-size: 12px; font-weight: bold; text-align: center; }
-        .linha-produto { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; background: #fff; color: #000; font-weight: bold; text-align: center; border-bottom: 1px solid #eee; }
-        .linha-produto div { padding: 12px; }
-
-        /* Cores Harmonizadas */
-        .c-custo { background: #fff2cc; }
-        .c-venda { background: #d9e1f2; }
-        .c-lucro { background: #fce4ec; }
-        .c-margem { background: #e2efda; }
-
-        /* Lista de Clientes */
-        .cliente-item { background: #fff; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .contato-badge { background: #eee; padding: 5px 10px; border-radius: 4px; color: #333; font-size: 13px; }
+        /* Tabela Profissional */
+        .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.8fr; background: var(--azul); padding: 12px; border-radius: 8px 8px 0 0; font-weight: bold; text-align: center; font-size: 10px; }
+        .grid-linha { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.8fr; background: #fff; color: #000; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 12px; }
+        .grid-linha div { padding: 12px; border-left: 1px solid #eee; }
+        
+        /* Lista Clientes */
+        .card-cliente { background: #fff; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .btn-whats { background: #25d366; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>934 BOTECO</h1>
-    <div style="font-weight: bold;">SISTEMA COMPLETO</div>
+    <span style="font-weight: 900; font-size: 12px;">PETROLINA-PE | 32°C</span>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('estoque', this)">Estoque XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">Clientes / Contatos</div>
+    <div class="nav-item active" onclick="mudar('estoque', this)">ESTOQUE XML</div>
+    <div class="nav-item" onclick="mudar('clientes', this)">CLIENTES / CONTATOS</div>
 </nav>
 
 <div class="container">
     <div id="estoque" class="secao ativa">
-        <div class="card-gestao">
+        <div class="card-input">
             <input type="file" id="xmlInput" accept=".xml">
-            <button onclick="lancarXML()">Lançar no Firebase</button>
+            <button onclick="lancarXML()">LANÇAR XML</button>
         </div>
-        <div class="header-tabela">
+        <div class="grid-header">
             <div>PRODUTO</div><div>QTD</div><div>CUSTO</div><div>VENDA</div><div>LUCRO</div><div>%</div>
         </div>
-        <div id="listaProdutos" style="border-radius: 0 0 10px 10px; overflow: hidden;"></div>
+        <div id="listaProdutos"></div>
     </div>
 
     <div id="clientes" class="secao">
-        <div class="card-gestao">
+        <div class="card-input">
             <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
-            <input type="text" id="contatoCliente" placeholder="WhatsApp / Telefone">
-            <button onclick="salvarCliente()">Cadastrar</button>
+            <input type="text" id="contatoCliente" placeholder="WhatsApp (DDD + Número)">
+            <button onclick="salvarCliente()">CADASTRAR</button>
         </div>
-        <h2 style="color: var(--amarelo); margin-bottom: 15px; font-size: 16px;">CLIENTES CADASTRADOS</h2>
+        <h3 style="color: var(--amarelo); margin-bottom: 15px; font-size: 14px;">CLIENTES ATIVOS</h3>
         <div id="listaClientes"></div>
     </div>
 </div>
@@ -79,7 +69,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Suas credenciais oficiais
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -91,52 +80,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // --- LOGICA DE ESTOQUE (XML) ---
-    window.lancarXML = function() {
-        const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Selecione o XML!");
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const itens = xml.getElementsByTagName("det");
-            for(let i=0; i<itens.length; i++) {
-                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
-                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-                push(ref(db, 'produtos'), {
-                    nome, qtd: 1, custo, venda: custo * 1.5, lucro: custo * 0.5, margem: 50
-                });
-            }
-            alert("Produtos lançados!");
-        };
-        reader.readAsText(file);
-    };
-
-    onValue(ref(db, 'produtos'), (snapshot) => {
-        const div = document.getElementById('listaProdutos');
-        div.innerHTML = "";
-        const dados = snapshot.val();
-        if(dados) {
-            Object.values(dados).forEach(p => {
-                div.innerHTML += `
-                <div class="linha-produto">
-                    <div style="text-align:left">${p.nome}</div>
-                    <div>${p.qtd}</div>
-                    <div class="c-custo">R$ ${p.custo.toFixed(2)}</div>
-                    <div class="c-venda">R$ ${p.venda.toFixed(2)}</div>
-                    <div class="c-lucro">R$ ${p.lucro.toFixed(2)}</div>
-                    <div class="c-margem">${p.margem}%</div>
-                </div>`;
-            });
-        }
-    });
-
-    // --- LOGICA DE CLIENTES ---
+    // --- FUNÇÕES DE CLIENTES (CORRIGE UNDEFINED) ---
     window.salvarCliente = function() {
         const nome = document.getElementById('nomeCliente').value;
         const contato = document.getElementById('contatoCliente').value;
-        if(!nome || !contato) return alert("Preencha Nome e Contato!");
+        if(!nome || !contato) return alert("Preencha todos os campos!");
         push(ref(db, 'clientes'), { nome, contato }).then(() => {
-            alert("Cliente cadastrado!");
             document.getElementById('nomeCliente').value = "";
             document.getElementById('contatoCliente').value = "";
         });
@@ -148,10 +97,55 @@
         const dados = snapshot.val();
         if(dados) {
             Object.values(dados).forEach(c => {
+                const fone = c.contato || "---";
                 div.innerHTML += `
-                <div class="cliente-item">
+                <div class="card-cliente">
                     <span>👤 ${c.nome.toUpperCase()}</span>
-                    <span class="contato-badge">📞 ${c.contato}</span>
+                    <a href="https://wa.me/55${fone}" target="_blank" class="btn-whats">📞 ${fone}</a>
+                </div>`;
+            });
+        }
+    });
+
+    // --- FUNÇÕES DE ESTOQUE (CORRIGE toFixed) ---
+    window.lancarXML = function() {
+        const file = document.getElementById('xmlInput').files[0];
+        if(!file) return alert("Selecione o arquivo!");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent) || 0;
+                push(ref(db, 'produtos'), { 
+                    nome, qtd: 1, custo, venda: custo * 1.5, lucro: custo * 0.5, margem: 50 
+                });
+            }
+            alert("Produtos Importados!");
+        };
+        reader.readAsText(file);
+    };
+
+    onValue(ref(db, 'produtos'), (snapshot) => {
+        const div = document.getElementById('listaProdutos');
+        div.innerHTML = "";
+        const dados = snapshot.val();
+        if(dados) {
+            Object.values(dados).forEach(p => {
+                // Proteção contra erro de valor vazio
+                const nCusto = Number(p.custo || 0).toFixed(2);
+                const nVenda = Number(p.venda || 0).toFixed(2);
+                const nLucro = Number(p.lucro || 0).toFixed(2);
+                
+                div.innerHTML += `
+                <div class="grid-linha">
+                    <div style="text-align:left">${p.nome}</div>
+                    <div>${p.qtd}</div>
+                    <div style="background:#fff2cc">R$ ${nCusto}</div>
+                    <div style="background:#d9e1f2">R$ ${nVenda}</div>
+                    <div style="background:#fce4ec">R$ ${nLucro}</div>
+                    <div style="background:#e2efda">${p.margem || 0}%</div>
                 </div>`;
             });
         }
