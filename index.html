@@ -2,117 +2,163 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 - PDV</title>
+    <title>934 - PDV OPERACIONAL</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --gray: #161616; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 12px; }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #121212; --glass: rgba(255,255,255,0.05); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
         body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Cabeçalho Profissional */
-        header { background: #000; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-placeholder { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--gold); background: #222; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
-        .brand-name { font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+        /* Cabeçalho */
+        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
+        .logo-box { display: flex; align-items: center; gap: 10px; }
+        .logo-circulo { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--gold); }
+        
+        /* Menu de Navegação */
+        nav { display: flex; background: #111; border-bottom: 1px solid #222; }
+        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: #777; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: var(--glass); }
 
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-        .pdv-area { flex: 1; padding: 10px; overflow-y: auto; }
+        .container-principal { display: flex; flex: 1; overflow: hidden; }
+        .tela { display: none; flex: 1; padding: 15px; overflow-y: auto; }
+        .tela.ativa { display: block; }
+
+        /* Estilo das Mesas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .mesa-item { background: var(--gray); padding: 15px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #282828; }
+        .mesa-item.ocupada { background: #400; border-color: #f33; }
+        .mesa-item.selecionada { border-color: var(--gold); background: #222; }
+
+        /* Estilo Mercadorias e Busca */
+        .busca-bar { margin-bottom: 15px; }
+        .input-barcode { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: var(--gold); border-radius: 6px; font-size: 15px; font-weight: bold; }
+        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+        .btn-prod { background: #fff; color: #000; padding: 15px 5px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; border: none; box-shadow: 0 3px 0 #bbb; }
         
-        /* 15 Mesas em Grid Compacto */
-        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
-        .mesa { background: var(--gray); padding: 8px; border-radius: 4px; text-align: center; cursor: pointer; border: 1px solid #333; }
-        .mesa.ocupada { background: #400; border-color: #f44; }
-        .mesa.selecionada { border-color: var(--gold); background: #222; }
-        
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; border-top: 1px solid #333; padding-top: 10px; }
-        .prod-btn { background: #fff; color: #000; padding: 10px 5px; border-radius: 4px; text-align: center; cursor: pointer; font-weight: bold; }
-        
-        .caixa-lateral { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; }
-        .itens-lista { flex: 1; overflow-y: auto; border-top: 1px solid #eee; padding-top: 5px; }
-        .btn-whats { background: #25d366; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; }
+        /* Cupom Lateral */
+        .caixa-cupom { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+        .lista-consumo { flex: 1; overflow-y: auto; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
+        .linha { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500; }
+        .btn-whats { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-area">
-        <div class="logo-placeholder">934</div> <div class="brand-name">BOTECO 934</div>
+    <div class="logo-box">
+        <div class="logo-circulo">934</div>
+        <div style="font-weight: bold; font-size: 15px;">BOTECO 934</div>
     </div>
     <div id="relogio" style="color: var(--gold); font-weight: bold;">00:00</div>
 </header>
 
-<div class="main-container">
-    <div class="pdv-area">
+<nav>
+    <button class="nav-btn active" onclick="mudarTela('aba-mesas', this)">🪑 Mesas / Balcão</button>
+    <button class="nav-btn" onclick="mudarTela('aba-vendas', this)">🍺 Mercadorias</button>
+</nav>
+
+<div class="container-principal">
+    <div id="aba-mesas" class="tela ativa">
         <div class="grid-mesas" id="gridMesas"></div>
-        <div id="vitrine" class="vitrine"></div>
     </div>
 
-    <div class="caixa-lateral">
-        <h2 id="infoMesa" style="font-size: 14px; margin-bottom: 5px;">Mesa --</h2>
-        <div id="consumo" class="itens-lista"></div>
-        <div style="padding: 10px 0; border-top: 2px solid #000; font-weight: bold; display: flex; justify-content: space-between;">
-            <span>TOTAL:</span>
-            <span>R$ <span id="total">0,00</span></span>
+    <div id="aba-vendas" class="tela">
+        <div class="busca-bar">
+            <input type="text" id="barcode" class="input-barcode" placeholder="[ BARCODE ] ou digite o nome..." oninput="filtrarProdutos()">
         </div>
-        <button class="btn-whats" onclick="fechar()">FECHAR CONTA</button>
+        <div id="vitrine" class="grid-produtos"></div>
+    </div>
+
+    <div class="caixa-cupom">
+        <h3 id="labelMesa" style="font-size: 15px; color: #555;">Mesa --</h3>
+        <div id="lista" class="lista-consumo"></div>
+        <div style="border-top: 2px solid #000; padding-top: 10px; font-weight: 900; display: flex; justify-content: space-between; font-size: 16px;">
+            <span>TOTAL:</span>
+            <span>R$ <span id="totalTxt">0,00</span></span>
+        </div>
+        <button class="btn-whats" onclick="fecharConta()">FINALIZAR VENDA</button>
     </div>
 </div>
 
 <script>
     let mSel = null;
-    let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
+    let mesas = JSON.parse(localStorage.getItem('m_934')) || {};
     let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
+
+    // Organiza o estoque em ordem alfabética na inicialização
+    estoque.sort((a, b) => a.nome.localeCompare(b.nome));
 
     function init() {
         const grid = document.getElementById('gridMesas');
-        for(let i=1; i<=15; i++) { // Agora com 15 mesas
-            if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
-            grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})">M${i}</div>`;
+        for(let i=1; i<=15; i++) {
+            if(!mesas[i]) mesas[i] = { ativa: false, itens: [], total: 0 };
+            grid.innerHTML += `<div class="mesa-item ${mesas[i].ativa?'ocupada':''}" id="m${i}" onclick="selecionarMesa(${i})"><b>M${i}</b></div>`;
         }
-        renderVitrine();
+        renderProdutos(estoque);
     }
 
-    function renderVitrine() {
-        document.getElementById('vitrine').innerHTML = estoque.map(p => 
-            `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br><span style="font-size:10px; color:#555;">R$ ${p.venda.toFixed(2)}</span></div>`
+    function mudarTela(id, btn) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa');
+        btn.classList.add('active');
+        if(id === 'aba-vendas') document.getElementById('barcode').focus();
+    }
+
+    function renderProdutos(lista) {
+        document.getElementById('vitrine').innerHTML = lista.map(p => 
+            `<button class="btn-prod" onclick="lancar('${p.nome}', ${p.venda})">${p.nome}<br><span style="font-size:10px; color:#666;">R$ ${p.venda.toFixed(2)}</span></button>`
         ).join('');
     }
 
-    function sel(n) {
+    function filtrarProdutos() {
+        const termo = document.getElementById('barcode').value.toLowerCase();
+        const filtrados = estoque.filter(p => p.nome.toLowerCase().includes(termo));
+        renderProdutos(filtrados);
+    }
+
+    function selecionarMesa(n) {
         mSel = n;
-        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+        document.querySelectorAll('.mesa-item').forEach(m => m.classList.remove('selecionada'));
         document.getElementById(`m${n}`).classList.add('selecionada');
-        document.getElementById('infoMesa').innerText = "Mesa " + n;
-        if(!mesas[n].ocupada) {
-            if(confirm("Abrir mesa " + n + "?")) {
-                mesas[n].ocupada = true;
+        document.getElementById('labelMesa').innerText = "CONTA MESA " + n;
+        
+        if(!mesas[n].ativa) {
+            if(confirm("Abrir Mesa " + n + "?")) {
+                mesas[n].ativa = true;
                 document.getElementById(`m${n}`).classList.add('ocupada');
-                salvar();
+                save();
             }
         }
-        atualizar();
+        atualizarCupom();
     }
 
-    function add(n, v) {
-        if(!mSel || !mesas[mSel].ocupada) return alert("Abra a mesa!");
-        mesas[mSel].itens.push({ n, v });
-        mesas[mSel].total += v;
-        salvar();
-        atualizar();
+    function lancar(nome, valor) {
+        if(!mSel || !mesas[mSel].ativa) {
+            alert("Selecione e abra uma MESA primeiro!");
+            mudarTela('aba-mesas', document.querySelector('.nav-btn'));
+            return;
+        }
+        mesas[mSel].itens.push({ nome, valor });
+        mesas[mSel].total += valor;
+        save();
+        atualizarCupom();
+        document.getElementById('barcode').value = ''; // Limpa busca após lançar
     }
 
-    function atualizar() {
+    function atualizarCupom() {
         if(!mSel) return;
-        document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>${i.n}</span><span>${i.v.toFixed(2)}</span></div>`).join('');
-        document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
+        document.getElementById('lista').innerHTML = mesas[mSel].itens.map(i => `<div class="linha"><span>${i.nome}</span><span>${i.valor.toFixed(2)}</span></div>`).join('');
+        document.getElementById('totalTxt').innerText = mesas[mSel].total.toFixed(2);
     }
 
-    function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
+    function save() { localStorage.setItem('m_934', JSON.stringify(mesas)); }
 
-    function fechar() {
-        if(!mSel || mesas[mSel].total == 0) return;
-        window.open(`https://wa.me/?text=*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`);
-        mesas[mSel] = { ocupada: false, itens: [], total: 0 };
-        salvar();
+    function fecharConta() {
+        if(!mSel || !mesas[mSel].ativa) return;
+        const msg = `*BOTECO 934*%0AMesa: ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
+        window.open(`https://wa.me/?text=${msg}`);
+        mesas[mSel] = { ativa: false, itens: [], total: 0 };
+        save();
         location.reload();
     }
 
