@@ -144,6 +144,59 @@
         document.getElementById(id).classList.add('ativa');
         el.classList.add('active');
     };
+// 1. Função para Abrir a Mesa (Sai da tela de nome e vai para o consumo)
+function abrirMesa() {
+    const nome = document.getElementById('nomeCliente').value;
+    if(!nome) {
+        alert("Edmarques, precisa colocar o nome do cliente antes!");
+        return;
+    }
+    
+    // Salva os dados na mesa selecionada
+    dadosMesas[mesaSelecionada].ocupada = true;
+    dadosMesas[mesaSelecionada].cliente = nome;
+    
+    // Atualiza o visual da mesa na grade
+    const mEl = document.getElementById(`m${mesaSelecionada}`);
+    mEl.classList.add('ocupada');
+    mEl.innerHTML = `<b>Mesa ${mesaSelecionada}</b><br><small>${nome}</small>`;
+    
+    // MUDA A TELA: Esconde o formulário de nome e mostra a área de consumo
+    document.getElementById('areaAbertura').style.display = 'none';
+    document.getElementById('areaConsumo').style.display = 'block';
+    
+    // Atualiza os nomes na tela de consumo
+    document.getElementById('tituloMesa').innerText = `Atendendo Mesa ${mesaSelecionada}`;
+    document.getElementById('clienteAtual').innerText = `Cliente: ${nome}`;
+}
+
+// 2. Função para Preparar o Fechamento (Abre o Modal de Pagamento)
+function prepararFechamento() {
+    const total = document.getElementById('totalVenda').innerText;
+    document.getElementById('valorModal').innerText = `R$ ${total}`;
+    document.getElementById('modalPagamento').style.display = 'block';
+}
+
+// 3. Função para Finalizar e Limpar a Mesa
+function confirmarVenda() {
+    const meio = document.getElementById('meioPagamento').value;
+    const cliente = dadosMesas[mesaSelecionada].cliente;
+    const total = document.getElementById('totalVenda').innerText;
+
+    alert(`Venda Finalizada!\nCliente: ${cliente}\nTotal: R$ ${total}\nForma: ${meio}`);
+
+    // Limpa a mesa para o próximo cliente
+    dadosMesas[mesaSelecionada] = { ocupada: false, cliente: '', total: 0 };
+    const mEl = document.getElementById(`m${mesaSelecionada}`);
+    mEl.classList.remove('ocupada');
+    mEl.innerHTML = `Mesa ${mesaSelecionada}<br><small>Livre</small>`;
+
+    // Volta para a tela inicial de mesas
+    document.getElementById('modalPagamento').style.display = 'none';
+    document.getElementById('areaConsumo').style.display = 'none';
+    document.getElementById('areaAbertura').style.display = 'block';
+    document.getElementById('nomeCliente').value = '';
+}
 </script>
 </body>
 </html>
