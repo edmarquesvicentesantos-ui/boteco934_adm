@@ -2,77 +2,82 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão Profissional</title>
+    <title>Boteco 934 - Gestão Total</title>
     <style>
-        :root { --amarelo: #ffcc00; --azul-header: #2b579a; }
+        :root { --amarelo: #ffcc00; --azul-header: #2b579a; --preto: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #000; color: #fff; }
+        body { background: var(--preto); color: #fff; }
 
-        /* Estilo da Tabela conforme sua última versão */
-        .barra-azul { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; 
-            background: var(--azul-header); 
-            padding: 15px; 
-            border-radius: 10px; 
-            font-size: 12px; 
-            font-weight: bold;
-            text-align: center;
-        }
+        header { background: var(--amarelo); padding: 20px 40px; color: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #333; }
+        header h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
 
-        .linha-dados { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; 
-            margin-top: 5px; 
-            color: #000; 
-            font-weight: bold; 
-            text-align: center; 
-        }
-
-        /* Cores Harmonizadas */
-        .c-prod { background: #3b5998; color: #fff; padding: 12px; border-radius: 5px 0 0 5px; }
-        .c-qtd { background: #4a7ebb; color: #fff; padding: 12px; }
-        .c-custo { background: #fff2cc; padding: 12px; }
-        .c-venda { background: #d9e1f2; padding: 12px; }
-        .c-lucro { background: #fce4ec; padding: 12px; }
-        .c-margem { background: #e2efda; padding: 12px; border-radius: 0 5px 5px 0; }
-
-        header { background: var(--amarelo); padding: 15px 40px; color: #000; display: flex; justify-content: space-between; }
         nav { background: #1a1a1a; display: flex; padding: 0 40px; border-bottom: 2px solid #333; }
-        .nav-item { padding: 15px 20px; cursor: pointer; color: #888; font-size: 12px; font-weight: bold; }
-        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
-        .secao { display: none; padding: 20px; }
+        .nav-item { padding: 15px 25px; cursor: pointer; color: #888; font-size: 13px; font-weight: bold; text-transform: uppercase; }
+        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); background: rgba(255,204,0,0.05); }
+
+        .container { padding: 30px; }
+        .secao { display: none; }
         .ativa { display: block; }
+
+        /* Card de Gestão */
+        .card-gestao { background: #111; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; display: flex; gap: 10px; align-items: center; }
+        input { padding: 12px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; flex: 1; }
+        button { background: var(--amarelo); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; transition: 0.3s; }
+        button:hover { transform: scale(1.02); background: #e6b800; }
+
+        /* Tabela Azul Profissional */
+        .header-tabela { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; background: var(--azul-header); padding: 15px; border-radius: 10px 10px 0 0; font-size: 13px; font-weight: bold; text-align: center; }
+        .lista-container { background: #fff; border-radius: 0 0 10px 10px; overflow: hidden; }
+        .linha-produto { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1fr 1.2fr; border-bottom: 1px solid #eee; color: #000; font-weight: bold; text-align: center; font-size: 14px; }
+        .linha-produto div { padding: 15px; border-right: 1px solid #f0f0f0; }
+
+        /* Cores das Colunas */
+        .c-prod { text-align: left !important; background: #f8f9fa; }
+        .c-custo { background: #fff2cc; }
+        .c-venda { background: #d9e1f2; }
+        .c-lucro { background: #fce4ec; }
+        .c-margem { background: #e2efda; border-right: none !important; }
+
+        /* Lista de Clientes */
+        .cliente-item { background: #fff; color: #000; padding: 18px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <header>
     <h1>934 BOTECO</h1>
-    <div>Petrolina-PE | 32°C</div>
+    <div style="font-weight: bold; font-size: 14px;">PETROLINA-PE | GESTÃO CLOUD</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('estoque', this)">ESTOQUE XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">CLIENTES/FIADO</div>
+    <div class="nav-item active" onclick="mudar('estoque', this)">Estoque XML</div>
+    <div class="nav-item" onclick="mudar('clientes', this)">Clientes / Fiado</div>
 </nav>
 
-<div id="estoque" class="secao ativa">
-    <div style="background:#1a1a1a; padding:20px; border-radius:10px; margin-bottom:20px;">
-        <input type="file" id="xmlInput" accept=".xml">
-        <button onclick="lancarNoFirebase()" style="background:var(--amarelo); padding:10px 20px; border:none; font-weight:bold; cursor:pointer;">LANÇAR NO FIREBASE</button>
+<div class="container">
+    <div id="estoque" class="secao ativa">
+        <div class="card-gestao">
+            <input type="file" id="xmlInput" accept=".xml">
+            <button onclick="lancarXML()">Lançar no Firebase</button>
+        </div>
+
+        <div class="header-tabela">
+            <div>PRODUTO</div><div>QTD</div><div>CUSTO UNIT.</div><div>VENDA UNIT.</div><div>LUCRO</div><div>MARGEM %</div>
+        </div>
+        <div id="listaProdutos" class="lista-container">
+            <div style="padding: 20px; color: #666; text-align: center;">Carregando produtos...</div>
+        </div>
     </div>
 
-    <div class="barra-azul">
-        <div>PRODUTO</div><div>QTD</div><div>CUSTO UNIT.</div><div>VENDA UNIT.</div><div>LUCRO</div><div>MARGEM %</div>
-    </div>
-    <div id="listaProdutos"></div>
-</div>
-
-<div id="clientes" class="secao">
-    <h2 style="color:var(--amarelo); margin-bottom:15px;">CLIENTES CADASTRADOS</h2>
-    <div id="listaClientes" style="background:#fff; color:#000; border-radius:10px; padding:10px;">
-        Carregando clientes do Firebase...
+    <div id="clientes" class="secao">
+        <div class="card-gestao">
+            <input type="text" id="nomeCliente" placeholder="Nome Completo do Cliente">
+            <button onclick="salvarCliente()">Cadastrar Cliente</button>
+        </div>
+        <h2 style="color:var(--amarelo); margin-bottom:20px; text-transform: uppercase; font-size: 16px;">Clientes Cadastrados</h2>
+        <div id="listaClientes">
+             <div style="padding: 20px; color: #888;">Nenhum cliente cadastrado.</div>
+        </div>
     </div>
 </div>
 
@@ -80,7 +85,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Suas credenciais oficiais
+    // Configuração do Projeto Boteco934
     const firebaseConfig = {
         apiKey: "AIzaSy...", 
         authDomain: "boteco934-afc3f.firebaseapp.com",
@@ -92,64 +97,78 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 1. RECUPERAR CLIENTES (Garante que eles voltem a aparecer)
+    // --- FUNÇÕES DE CLIENTE ---
+    window.salvarCliente = function() {
+        const nome = document.getElementById('nomeCliente').value;
+        if(!nome) return alert("Por favor, digite o nome do cliente.");
+        
+        push(ref(db, 'clientes'), { nome: nome })
+        .then(() => {
+            alert("✅ Cliente salvo com sucesso!");
+            document.getElementById('nomeCliente').value = "";
+        });
+    };
+
     onValue(ref(db, 'clientes'), (snapshot) => {
         const div = document.getElementById('listaClientes');
         div.innerHTML = "";
         const dados = snapshot.val();
         if(dados) {
-            Object.values(dados).forEach(c => {
-                div.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">👤 ${c.nome || 'Cliente sem nome'}</div>`;
+            Object.values(dados).forEach((c) => {
+                div.innerHTML += `<div class="cliente-item">👤 ${c.nome.toUpperCase()}</div>`;
             });
-        } else { div.innerHTML = "Nenhum cliente encontrado na pasta 'clientes'."; }
+        } else {
+            div.innerHTML = `<div style="padding: 20px; color: #888;">Nenhum cliente na base de dados.</div>`;
+        }
     });
 
-    // 2. LANÇAR XML SEM ERRO DE "NOTA JÁ IMPORTADA"
-    window.lancarNoFirebase = function() {
+    // --- FUNÇÕES DE ESTOQUE (XML) ---
+    window.lancarXML = function() {
         const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Selecione o XML!");
+        if(!file) return alert("Selecione o arquivo XML da nota!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const produtos = xml.getElementsByTagName("det");
+            const itens = xml.getElementsByTagName("det");
 
-            for(let i=0; i<produtos.length; i++) {
-                const nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
-                const custo = parseFloat(produtos[i].getElementsByTagName("vUnCom")[0].textContent);
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
                 
-                // O segredo está no PUSH: ele gera um ID novo toda vez, evitando o erro de nota repetida
+                // Grava com PUSH para evitar erros de ID duplicado
                 push(ref(db, 'produtos'), {
-                    nome: nome,
-                    qtd: 1,
-                    custo: custo,
-                    venda: custo * 1.5, // Exemplo de margem
-                    lucro: custo * 0.5,
+                    nome, 
+                    qtd: 1, 
+                    custo, 
+                    venda: custo * 1.5, 
+                    lucro: custo * 0.5, 
                     margem: 50
                 });
             }
-            alert("Lançado com sucesso!");
+            alert("🚀 Estoque atualizado no Firebase!");
         };
         reader.readAsText(file);
     };
 
-    // 3. MOSTRAR PRODUTOS NA TABELA COLORIDA
     onValue(ref(db, 'produtos'), (snapshot) => {
-        const lista = document.getElementById('listaProdutos');
-        lista.innerHTML = "";
-        const data = snapshot.val();
-        if(data) {
-            Object.values(data).forEach(p => {
-                lista.innerHTML += `
-                    <div class="linha-dados">
+        const div = document.getElementById('listaProdutos');
+        div.innerHTML = "";
+        const dados = snapshot.val();
+        if(dados) {
+            Object.values(dados).forEach((p) => {
+                div.innerHTML += `
+                    <div class="linha-produto">
                         <div class="c-prod">${p.nome}</div>
-                        <div class="c-qtd">${p.qtd}</div>
+                        <div>${p.qtd}</div>
                         <div class="c-custo">R$ ${p.custo.toFixed(2)}</div>
                         <div class="c-venda">R$ ${p.venda.toFixed(2)}</div>
                         <div class="c-lucro">R$ ${p.lucro.toFixed(2)}</div>
                         <div class="c-margem">${p.margem}%</div>
                     </div>`;
             });
+        } else {
+            div.innerHTML = `<div style="padding: 20px; color: #666; text-align: center;">Nenhum produto no estoque.</div>`;
         }
     });
 
