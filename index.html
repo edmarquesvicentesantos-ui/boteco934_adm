@@ -2,88 +2,110 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 - CAIXA PDV</title>
+    <title>934 - PDV</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #0b0b0b; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
-        /* Lado Esquerdo: Mesas e Produtos */
-        .painel-venda { flex: 1; padding: 20px; overflow-y: auto; border-right: 1px solid #333; }
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 30px; }
-        .mesa { background: #222; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        :root { --gold: #ffcc00; --bg: #0b0b0b; --gray: #1a1a1a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; } /* Fonte reduzida */
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; }
+        
+        /* Área das Mesas e Mercadorias */
+        .pdv-main { flex: 1; padding: 15px; overflow-y: auto; }
+        .grid-mesas { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 20px; }
+        .mesa { background: var(--gray); padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
+        .mesa b { font-size: 14px; }
         .mesa.ocupada { background: #4a0000; border-color: #ff4444; }
-        .mesa.selecionada { border-color: var(--gold); }
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-        .prod-btn { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; }
-        /* Lado Direito: Cupom */
-        .cupom { width: 350px; background: #fff; color: #000; padding: 20px; display: flex; flex-direction: column; }
-        .btn-fechar { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-top: auto; border-radius: 5px; }
+        .mesa.selecionada { border-color: var(--gold); background: #333; }
+        
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; border-top: 1px solid #333; padding-top: 15px; }
+        .prod-btn { background: #fff; color: #000; padding: 12px 8px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; line-height: 1.2; }
+        
+        /* Lateral do Caixa */
+        .caixa-lateral { width: 300px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; box-shadow: -2px 0 10px rgba(0,0,0,0.5); }
+        .itens-lista { flex: 1; margin-top: 10px; border-top: 1px solid #eee; overflow-y: auto; padding-top: 5px; }
+        .item-linha { display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; padding-bottom: 2px; }
+        .total-container { border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
+        .btn-whats { background: #25d366; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="painel-venda">
-        <h2 style="color:var(--gold)">MESAS</h2>
+    <div class="pdv-main">
+        <h3 style="color:var(--gold); margin-bottom:10px;">MESAS</h3>
         <div id="gridMesas" class="grid-mesas"></div>
-        <h2 style="color:var(--gold)">BEBIDAS / MERCADORIAS</h2>
-        <div id="vitrineVendas" class="vitrine"></div>
+        
+        <h3 style="color:var(--gold); margin-bottom:10px; margin-top:10px;">MERCADORIAS</h3>
+        <div id="vitrine" class="vitrine"></div>
     </div>
-    <div class="cupom">
-        <h3 id="hMesa">Selecione uma mesa</h3>
-        <div id="listaItens" style="flex: 1; border-top: 1px solid #ddd; padding-top: 10px;"></div>
-        <hr>
-        <h2>TOTAL: R$ <span id="totalVenda">0,00</span></h2>
-        <button class="btn-fechar" onclick="finalizar()">FECHAR CONTA (WHATSAPP)</button>
+
+    <div class="caixa-lateral">
+        <h2 id="infoMesa" style="font-size: 16px;">Selecione uma mesa</h2>
+        <div id="consumo" class="itens-lista"></div>
+        <div class="total-container">
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span>TOTAL:</span>
+                <span>R$ <span id="total">0,00</span></span>
+            </div>
+        </div>
+        <button class="btn-whats" onclick="fechar()">FECHAR CONTA</button>
     </div>
 
     <script>
         let mSel = null;
-        let mesas = JSON.parse(localStorage.getItem('mesas_934')) || {};
+        let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
         let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
 
         function init() {
             const grid = document.getElementById('gridMesas');
-            for(let i=1; i<=20; i++) {
+            // Criando 12 mesas inicialmente (fácil mudar para 15 no futuro)
+            for(let i=1; i<=12; i++) {
                 if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
-                grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="selMesa(${i})">M${i}</div>`;
+                grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})"><b>M${i}</b></div>`;
             }
             renderVitrine();
         }
 
-        function selMesa(n) {
+        function renderVitrine() {
+            document.getElementById('vitrine').innerHTML = estoque.map(p => 
+                `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br><span style="color:#666; font-size:11px;">R$ ${p.venda.toFixed(2)}</span></div>`
+            ).join('');
+        }
+
+        function sel(n) {
             mSel = n;
             document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
             document.getElementById(`m${n}`).classList.add('selecionada');
-            document.getElementById('hMesa').innerText = "Mesa " + n;
-            if(!mesas[n].ocupada) { 
-                if(confirm("Abrir mesa " + n + "?")) { mesas[n].ocupada = true; document.getElementById(`m${n}`).classList.add('ocupada'); }
+            document.getElementById('infoMesa').innerText = "Mesa " + n;
+            if(!mesas[n].ocupada) {
+                if(confirm("Abrir mesa " + n + "?")) {
+                    mesas[n].ocupada = true;
+                    document.getElementById(`m${n}`).classList.add('ocupada');
+                    salvar();
+                }
             }
-            atualizarLista();
-        }
-
-        function renderVitrine() {
-            const v = document.getElementById('vitrineVendas');
-            v.innerHTML = estoque.map(p => `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br>R$ ${p.venda.toFixed(2)}</div>`).join('');
+            atualizar();
         }
 
         function add(n, v) {
-            if(!mSel) return alert("Selecione a mesa!");
+            if(!mSel || !mesas[mSel].ocupada) return alert("Selecione uma mesa aberta!");
             mesas[mSel].itens.push({ n, v });
             mesas[mSel].total += v;
-            atualizarLista();
-            localStorage.setItem('mesas_934', JSON.stringify(mesas));
+            salvar();
+            atualizar();
         }
 
-        function atualizarLista() {
+        function atualizar() {
             if(!mSel) return;
-            document.getElementById('listaItens').innerHTML = mesas[mSel].itens.map(i => `<div>${i.n} - R$ ${i.v.toFixed(2)}</div>`).join('');
-            document.getElementById('totalVenda').innerText = mesas[mSel].total.toFixed(2);
+            document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div class="item-linha"><span>${i.n}</span><span>${i.v.toFixed(2)}</span></div>`).join('');
+            document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
         }
 
-        function finalizar() {
-            const msg = `*BOTECO 934*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
-            window.open(`https://wa.me/?text=${msg}`);
+        function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
+
+        function fechar() {
+            if(!mSel || mesas[mSel].total == 0) return;
+            const texto = `*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
+            window.open(`https://wa.me/?text=${texto}`);
             mesas[mSel] = { ocupada: false, itens: [], total: 0 };
-            document.getElementById(`m${mSel}`).classList.remove('ocupada');
-            localStorage.setItem('mesas_934', JSON.stringify(mesas));
+            salvar();
             location.reload();
         }
         init();
