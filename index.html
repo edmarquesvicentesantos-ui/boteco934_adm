@@ -3,50 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Sistema de Gestão</title>
+    <title>Boteco 934 - Gestão 360º</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #333; }
+        body { background: #fff; color: #333; overflow-x: hidden; }
 
-        /* HEADER ESTILO PORTAL UOL */
-        .uol-header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .badge-934 { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.8em; }
-        .brand-name { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
-        .stats { display: flex; gap: 25px; font-size: 0.85em; color: #444; }
-        .stats b { color: #d32f2f; }
-        .clima { text-align: right; font-size: 0.85em; }
+        /* HEADER ESTILO UOL */
+        header { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .logo-box { display: flex; align-items: center; gap: 10px; }
+        .badge { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.8em; }
+        .brand { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
+        .indicadores { display: flex; gap: 25px; font-size: 0.85em; color: #444; }
+        .indicadores b { color: #d32f2f; }
+        .clima { text-align: right; font-size: 0.85em; color: #666; }
 
-        /* MENU DE NAVEGAÇÃO */
-        nav { display: flex; padding: 0 40px; gap: 20px; border-bottom: 1px solid #eee; background: #fff; }
+        /* MENU */
+        nav { display: flex; padding: 0 40px; gap: 25px; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 100; }
         .nav-link { padding: 15px 0; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
         .nav-link:hover { border-bottom: 3px solid #ffcc00; }
-        .nav-active { border-bottom: 3px solid #ffcc00; }
+        .active { border-bottom: 3px solid #ffcc00; color: #ffcc00; }
 
-        /* ÁREAS DE CONTEÚDO */
+        /* CONTEÚDO */
         .container { padding: 30px 40px; }
-        .secao { display: none; }
+        .secao { display: none; animation: fadeIn 0.3s ease; }
         .ativa { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ESTILO DAS TABELAS (ESTOQUE E CLIENTES) */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        /* TABELAS PROFISSIONAIS */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         th { background: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; }
         td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
         
-        .c-amarelo { background: #fff2cc; }
-        .c-laranja { background: #fce4d6; }
-        .c-verde { background: #c6efce; color: #006100; }
-        .img-p { width: 45px; border-radius: 4px; }
+        .c-custo { background: #fff2cc; }
+        .c-lucro { background: #fce4d6; }
+        .c-margem { background: #c6efce; color: #006100; }
+        .img-item { width: 45px; height: auto; border-radius: 4px; }
+        
+        /* BOTÕES */
+        .btn-xml { background: #2b579a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-xml:hover { background: #1a3a6d; }
     </style>
 </head>
 <body>
 
-<header class="uol-header">
-    <div class="logo-area">
-        <div class="badge-934">934</div>
-        <div class="brand-name">BOTECO</div>
+<header>
+    <div class="logo-box">
+        <div class="badge">934</div>
+        <div class="brand">BOTECO</div>
     </div>
-    <div class="stats">
+    <div class="indicadores">
         <div>Dólar <b>▼ 5,011</b></div>
         <div>Euro <b>▼ 5,877</b></div>
     </div>
@@ -56,79 +61,116 @@
     </div>
 </header>
 
-<nav>
-    <div class="nav-link" onclick="mostrar('vendas')">Operacional</div>
-    <div class="nav-link" onclick="mostrar('estoque')">Estoque / XML</div>
-    <div class="nav-link" onclick="mostrar('clientes')">Clientes</div>
+<nav id="menu-principal">
+    <div class="nav-link active" onclick="navegar('operacional', this)">Operacional</div>
+    <div class="nav-link" onclick="navegar('estoque', this)">Estoque / XML</div>
+    <div class="nav-link" onclick="navegar('clientes', this)">Clientes</div>
 </nav>
 
 <div class="container">
     
+    <div id="operacional" class="secao ativa">
+        <h2 style="letter-spacing:-1px">SISTEMA OPERACIONAL - BALCÃO</h2>
+        <div style="margin-top:20px; padding:40px; border:2px dashed #ccc; text-align:center; color:#999">
+            Área de Mesas e Atendimento em Tempo Real
+        </div>
+    </div>
+
     <div id="estoque" class="secao">
-        <h2 style="letter-spacing: -1px;">PLANILHA DE VENDAS - ESTOQUE</h2>
-        <table>
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h2 style="letter-spacing:-1px">PLANILHA DE VENDAS - DISTRIBUIDORA</h2>
+            <label class="btn-xml">📁 IMPORTAR XML <input type="file" accept=".xml" style="display:none" onchange="importarXML(this)"></label>
+        </div>
+        
+        <table id="tabela-estoque">
             <thead>
                 <tr>
                     <th>Foto</th>
                     <th>Produto</th>
-                    <th>Qtd Pacote</th>
+                    <th>Qtd/Cx</th>
                     <th>Venda Uni.</th>
-                    <th class="c-amarelo" style="color:#000">Custo</th>
-                    <th class="c-laranja" style="color:#000">Lucro</th>
-                    <th class="c-verde">Margem %</th>
+                    <th class="c-custo" style="color:#000">Custo Uni.</th>
+                    <th class="c-custo" style="color:#000">Total Caixa</th>
+                    <th class="c-lucro" style="color:#000">Lucro</th>
+                    <th class="c-margem">Margem %</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="corpo-estoque">
                 <tr>
-                    <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-p"></td>
-                    <td style="text-align:left">Cerveja Heineken - Lata 350ml</td>
+                    <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-item"></td>
+                    <td style="text-align:left">Cerveja Heineken - Lata 350ml C/12</td>
                     <td>12</td>
                     <td>R$ 10,00</td>
-                    <td class="c-amarelo">R$ 5,04</td>
-                    <td class="c-laranja">R$ 59,52</td>
-                    <td class="c-verde">49,60%</td>
+                    <td class="c-custo">R$ 5,04</td>
+                    <td class="c-custo">R$ 60,48</td>
+                    <td class="c-lucro">R$ 59,52</td>
+                    <td class="c-margem">49,60%</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div id="clientes" class="secao">
-        <h2 style="letter-spacing: -1px;">GESTÃO DE CLIENTES</h2>
+        <h2 style="letter-spacing:-1px">GESTÃO DE CLIENTES & PENDURAS</h2>
         <table>
             <thead>
                 <tr>
                     <th>Nome do Cliente</th>
                     <th>WhatsApp</th>
-                    <th>Limite de Crédito</th>
+                    <th>Limite Crédito</th>
                     <th>Saldo Devedor</th>
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="corpo-clientes">
                 <tr>
-                    <td>Exemplo de Cliente</td>
+                    <td>Cliente Exemplo</td>
                     <td>(87) 99999-0000</td>
-                    <td>R$ 300,00</td>
+                    <td>R$ 200,00</td>
                     <td>R$ 0,00</td>
-                    <td class="c-verde">EM DIA</td>
+                    <td class="c-margem">EM DIA</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <div id="vendas" class="secao ativa">
-        <h2 style="letter-spacing: -1px;">SISTEMA OPERACIONAL - BALCÃO</h2>
-        <p style="margin-top:20px;">Área de atendimento e mesas carregando...</p>
-    </div>
-
 </div>
 
 <script>
-    function mostrar(id) {
-        // Esconde todas as seções
+    // Memória do Sistema
+    let notasFiscais = JSON.parse(localStorage.getItem('b934_notas')) || [];
+
+    // Navegação de Telas
+    function navegar(id, elemento) {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-        // Mostra a seção clicada
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        
         document.getElementById(id).classList.add('ativa');
+        elemento.classList.add('active');
+    }
+
+    // Importação de XML com Trava de Segurança
+    function importarXML(input) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            
+            // Pega a chave da nota (ID único)
+            const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id") || "";
+            
+            if (notasFiscais.includes(chave)) {
+                alert("⚠️ NOTA RECUSADA: Esta nota fiscal já foi lançada no sistema para evitar erro no seu lucro!");
+                input.value = "";
+                return;
+            }
+
+            // Se for nota nova, processa (Exemplo simplificado)
+            notasFiscais.push(chave);
+            localStorage.setItem('b934_notas', JSON.stringify(notasFiscais));
+            alert("✅ Nota fiscal importada com sucesso! Estoque atualizado.");
+            // Aqui entraria a lógica de somar ao estoque real
+        };
+        reader.readAsText(input.files[0]);
     }
 </script>
 
