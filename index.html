@@ -2,33 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão 360</title>
+    <title>Boteco 934 - Reset e Gestão</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #f0f2f5; }
-        header { background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffcc00; }
-        .badge { background: #ffcc00; color: #000; padding: 8px 15px; border-radius: 5px; font-weight: 900; font-size: 1.5em; }
-        nav { background: #fff; display: flex; padding: 0 40px; gap: 20px; border-bottom: 1px solid #ddd; }
-        .nav-link { padding: 15px 5px; font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; color: #555; }
-        .active { border-bottom: 3px solid #ffcc00; color: #000; }
-        
+        body { background: #f0f2f5; color: #333; }
+        header { background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #ffcc00; }
+        .badge { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.5em; }
+        nav { background: #222; display: flex; padding: 0 40px; gap: 20px; }
+        .nav-link { padding: 15px 10px; color: #fff; font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
+        .active { border-bottom: 3px solid #ffcc00; color: #ffcc00; }
         .container { padding: 20px 40px; }
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* ESTILO DAS MESAS */
+        /* MESAS */
         .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; }
-        .mesa { background: #fff; border: 2px solid #2b579a; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.2em; }
-        .mesa.ocupada { background: #d32f2f; color: #fff; border-color: #b71c1c; }
-        .mesa:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .mesa { background: #fff; border: 2px solid #2b579a; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 900; font-size: 1.3em; transition: 0.2s; }
+        .mesa.ocupada { background: #e74c3c; color: #fff; border-color: #c0392b; }
 
-        /* TABELAS */
-        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        /* TABELA ESTILO PLANILHA */
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #2b579a; color: white; padding: 12px; text-align: left; font-size: 13px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; }
+        th { background: #2b579a; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border: 1px solid #ddd; font-weight: bold; }
         .c-custo { background: #fff2cc; }
-        button { padding: 10px 20px; background: #2b579a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-azul { background: #2b579a; }
+        .btn-vermelho { background: #d32f2f; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -38,100 +39,65 @@
         <div class="badge">934</div>
         <h1 style="letter-spacing:-2px;">BOTECO</h1>
     </div>
-    <div style="text-align:right; font-size:0.9em;">
-        <strong>Petrolina-PE</strong><br>
-        <span style="color:orange">32°C</span> | Dólar: <b>R$ 5,01</b>
-    </div>
+    <div style="text-align:right;"><strong>Petrolina-PE</strong></div>
 </header>
 
 <nav>
-    <div class="nav-link active" onclick="irPara('operacional', this)">Operacional (Mesas)</div>
-    <div class="nav-link" onclick="irPara('estoque', this)">Estoque / XML</div>
-    <div class="nav-link" onclick="irPara('clientes', this)">Clientes</div>
+    <div class="nav-link active" onclick="mudar('operacional', this)">Operacional (Mesas)</div>
+    <div class="nav-link" onclick="mudar('estoque', this)">Estoque / XML</div>
 </nav>
 
 <div class="container">
-    
     <div id="operacional" class="secao ativa">
-        <h2 style="letter-spacing:-1px">ATENDIMENTO DE MESAS</h2>
+        <h2>SISTEMA DE MESAS</h2>
         <div class="grid-mesas" id="gradeMesas"></div>
     </div>
 
     <div id="estoque" class="secao">
         <div class="card">
-            <h3>IMPORTAR PRODUTOS (XML)</h3>
-            <input type="file" id="inputXML" accept=".xml" style="margin-top:10px;">
-            <button onclick="processarXML()">ATUALIZAR ESTOQUE</button>
+            <h3>IMPORTAR XML</h3>
+            <input type="file" id="xmlInput" accept=".xml">
+            <button class="btn btn-azul" onclick="lerXML()">ATUALIZAR ESTOQUE</button>
+            <button class="btn btn-vermelho" onclick="resetarSistema()">LIMPAR TUDO (RESET)</button>
         </div>
         <div class="card">
-            <h3>PRODUTOS EM ESTOQUE</h3>
+            <h3>PRODUTOS LANÇADOS</h3>
             <table>
                 <thead>
                     <tr>
                         <th>PRODUTO</th>
-                        <th>QTD</th>
+                        <th>ESTOQUE</th>
                         <th class="c-custo">CUSTO UNIT.</th>
-                        <th>VENDA UNIT.</th>
-                        <th>LUCRO UNIT.</th>
+                        <th>SUGESTÃO VENDA</th>
                     </tr>
                 </thead>
-                <tbody id="listaProdutos"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="clientes" class="secao">
-        <div class="card">
-            <h3>CLIENTES CADASTRADOS</h3>
-            <table id="tabelaClientes">
-                <thead>
-                    <tr>
-                        <th>NOME</th>
-                        <th>WHATSAPP</th>
-                        <th>LIMITE</th>
-                        <th>PENDÊNCIA</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoClientes"></tbody>
+                <tbody id="corpoEstoque"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    // Carrega do "HD" do navegador
-    let estoque = JSON.parse(localStorage.getItem('b934_estoque')) || {};
-    let clientes = JSON.parse(localStorage.getItem('b934_clientes')) || [];
-    let notas = JSON.parse(localStorage.getItem('b934_notas')) || [];
+    let db = JSON.parse(localStorage.getItem('b934_data')) || { estoque: {}, notas: [] };
 
-    function irPara(id, btn) {
+    function mudar(id, btn) {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
         btn.classList.add('active');
-        atualizarTudo();
+        atualizarTela();
     }
 
-    // Desenha as mesas na tela
-    function renderMesas() {
-        const grade = document.getElementById('gradeMesas');
-        grade.innerHTML = "";
-        for (let i = 1; i <= 15; i++) {
-            grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
-        }
-    }
-
-    // Processa o XML e salva
-    function processarXML() {
-        const file = document.getElementById('inputXML').files[0];
-        if(!file) return alert("Selecione o XML!");
+    function lerXML() {
+        const file = document.getElementById('xmlInput').files[0];
+        if(!file) return alert("Selecione o arquivo!");
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
             const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id") || "";
 
-            if(notas.includes(chave)) return alert("⚠️ Nota já importada!");
+            if(db.notas.includes(chave)) return alert("⚠️ Nota já importada!");
 
             const itens = xml.getElementsByTagName("det");
             for(let i = 0; i < itens.length; i++) {
@@ -139,56 +105,51 @@
                 const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
                 const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
 
-                if(estoque[nome]) {
-                    estoque[nome].qtd += qtd;
-                    estoque[nome].custo = custo;
+                if(db.estoque[nome]) {
+                    db.estoque[nome].qtd += qtd;
                 } else {
-                    estoque[nome] = { qtd: qtd, custo: custo, venda: custo * 1.6 };
+                    db.estoque[nome] = { qtd: qtd, custo: custo };
                 }
             }
 
-            notas.push(chave);
-            localStorage.setItem('b934_estoque', JSON.stringify(estoque));
-            localStorage.setItem('b934_notas', JSON.stringify(notas));
-            alert("✅ Estoque atualizado!");
-            atualizarTudo();
+            db.notas.push(chave);
+            localStorage.setItem('b934_data', JSON.stringify(db));
+            alert("✅ Sucesso!");
+            atualizarTela();
         };
         reader.readAsText(file);
     }
 
-    // Atualiza as tabelas com os dados salvos
-    function atualizarTudo() {
-        // Renderiza Produtos
-        const listaP = document.getElementById('listaProdutos');
-        listaP.innerHTML = "";
-        for(let p in estoque) {
-            let lucro = estoque[p].venda - estoque[p].custo;
-            listaP.innerHTML += `
-                <tr>
-                    <td>${p}</td>
-                    <td>${estoque[p].qtd}</td>
-                    <td class="c-custo">R$ ${estoque[p].custo.toFixed(2)}</td>
-                    <td>R$ ${estoque[p].venda.toFixed(2)}</td>
-                    <td style="color:green">R$ ${lucro.toFixed(2)}</td>
-                </tr>`;
+    function atualizarTela() {
+        // Renderiza Mesas
+        const grade = document.getElementById('gradeMesas');
+        if(grade.innerHTML === "") {
+            for (let i = 1; i <= 15; i++) {
+                grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
+            }
         }
 
-        // Renderiza Clientes
-        const listaC = document.getElementById('corpoClientes');
-        listaC.innerHTML = clientes.map(c => `
-            <tr>
-                <td>${c.nome}</td>
-                <td>${c.zap}</td>
-                <td>R$ ${c.limite.toFixed(2)}</td>
-                <td style="color:${c.saldo > 0 ? 'red' : 'green'}">R$ ${c.saldo.toFixed(2)}</td>
-            </tr>`).join('');
+        // Renderiza Tabela
+        const tabela = document.getElementById('corpoEstoque');
+        tabela.innerHTML = "";
+        for(let p in db.estoque) {
+            tabela.innerHTML += `<tr>
+                <td>${p}</td>
+                <td>${db.estoque[p].qtd}</td>
+                <td class="c-custo">R$ ${db.estoque[p].custo.toFixed(2)}</td>
+                <td>R$ ${(db.estoque[p].custo * 1.5).toFixed(2)}</td>
+            </tr>`;
+        }
     }
 
-    // Inicia o sistema
-    window.onload = function() {
-        renderMesas();
-        atualizarTudo();
-    };
+    function resetarSistema() {
+        if(confirm("Deseja apagar TUDO e começar do zero?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    window.onload = atualizarTela;
 </script>
 </body>
 </html>
