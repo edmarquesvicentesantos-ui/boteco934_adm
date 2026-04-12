@@ -1,85 +1,188 @@
-<style>
-    @media print {
-        body * { visibility: hidden; }
-        #reciboDigital, #reciboDigital * { visibility: visible; }
-        #reciboDigital { position: absolute; left: 0; top: 0; width: 100%; font-size: 14px; color: #000; }
-        button, input, select { display: none !important; }
-    }
-</style>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>934 BOTECO - PDV FINAL</title>
+    <style>
+        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #000; --verde: #25d366; --vermelho: #ff4444; --cinza: #1a1a1a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--preto); color: #fff; }
+        
+        header { background: var(--amarelo); padding: 10px 20px; color: #000; display: flex; justify-content: space-between; align-items: center; }
+        nav { background: var(--cinza); display: flex; overflow-x: auto; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #333; }
+        .nav-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 10px; white-space: nowrap; }
+        .nav-item.active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); }
+
+        .container { padding: 15px; }
+        .secao { display: none; }
+        .ativa { display: block; }
+
+        .pdv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 15px; }
+        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+        .card-prod { background: #fff; color: #000; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; }
+        .card-prod span { display: block; color: var(--azul); font-size: 1.1em; }
+
+        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; }
+        .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .btn-pgto button { padding: 10px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 10px; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #reciboDigital, #reciboDigital * { visibility: visible; }
+            #reciboDigital { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+
+        input, select { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; width: 100%; margin-bottom: 8px; }
+        button.principal { background: var(--verde); color: #fff; padding: 15px; border: none; border-radius: 5px; width: 100%; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>934 BOTECO</h1>
+    <div id="relogio">00:00:00</div>
+</header>
+
+<nav>
+    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas / Mesas</div>
+    <div class="nav-item" onclick="mudar('financeiro', this)">💰 Financeiro</div>
+    <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
+</nav>
+
+<div class="container">
+    <div id="vendas" class="secao ativa">
+        <div class="pdv-layout">
+            <div>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="selMesa"><option value="Balcão">Balcão</option><script>for(let i=1;i<=20;i++) document.write(`<option value="Mesa ${i}">Mesa ${i}</option>`)</script></select>
+                    <select id="selCliente"></select>
+                </div>
+                <div id="gridProdutos" class="grid-produtos"></div>
+            </div>
+
+            <div>
+                <div id="reciboDigital" class="cupom">
+                    <div style="text-align:center; border-bottom:1px dashed #000; margin-bottom:10px;">
+                        <b>934 BOTECO - PETROLINA</b><br>WhatsApp: (87) 9...<br>----------------------------
+                    </div>
+                    <div id="itensCupom">Aguardando pedido...</div>
+                    <div style="border-top:1px dashed #000; margin-top:10px; padding-top:5px;">
+                        <b>TOTAL: R$ <span id="totalTxt">0.00</span></b>
+                    </div>
+                </div>
+                
+                <div class="btn-pgto">
+                    <button style="background:#32bcad; color:#fff" onclick="fechar('PIX')">PIX</button>
+                    <button style="background:#4caf50; color:#fff" onclick="fechar('DINHEIRO')">DINHEIRO</button>
+                    <button style="background:#2196f3; color:#fff" onclick="fechar('CARTÃO')">CARTÃO</button>
+                    <button style="background:#ff9800; color:#fff" onclick="fechar('PENDURA')">PENDURAR (4 DIAS)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="financeiro" class="secao">
+        <h3>Resumo do Dia</h3>
+        <div id="resumoValores" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0;"></div>
+        <div id="listaHistorico"></div>
+    </div>
+
+    <div id="clientes" class="secao">
+        <input type="text" id="nCli" placeholder="Nome"><input type="text" id="tCli" placeholder="Zap (Ex: 87988...)"><button class="principal" onclick="addCli()">Salvar</button>
+        <div id="listaCliView" style="margin-top:20px;"></div>
+    </div>
+</div>
 
 <script type="module">
-    // ... (mantenha seu import e config do Firebase)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    window.finalizar = (metodo) => {
+    const firebaseConfig = { 
+        apiKey: "AIzaSy...", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    let carrinho = [], produtos = {}, clientes = {};
+
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+    // CARREGAR DADOS
+    onValue(ref(db, 'produtos'), (s) => {
+        const g = document.getElementById('gridProdutos'); g.innerHTML = "";
+        produtos = s.val() || {};
+        Object.entries(produtos).forEach(([id, p]) => {
+            g.innerHTML += `<div class="card-prod" onclick="addCar('${id}')">${p.nome.substring(0,15)}<span>R$ ${Number(p.venda).toFixed(2)}</span></div>`;
+        });
+    });
+
+    onValue(ref(db, 'clientes'), (s) => {
+        const sel = document.getElementById('selCliente'); 
+        sel.innerHTML = '<option value="Avulso">CLIENTE AVULSO</option>';
+        clientes = s.val() || {};
+        Object.values(clientes).forEach(c => { sel.innerHTML += `<option value="${c.nome}">${c.nome}</option>`; });
+    });
+
+    window.addCar = (id) => {
+        carrinho.push({ id, nome: produtos[id].nome, preco: produtos[id].venda });
+        const d = document.getElementById('itensCupom'); d.innerHTML = ""; let t = 0;
+        carrinho.forEach(i => { d.innerHTML += `<div>${i.nome} - R$ ${Number(i.preco).toFixed(2)}</div>`; t += Number(i.preco); });
+        document.getElementById('totalTxt').innerText = t.toFixed(2);
+    };
+
+    window.fechar = (metodo) => {
         if(!carrinho.length) return;
-        
-        const mesa = document.getElementById('selMesa').value;
-        const clienteNome = document.getElementById('selCliente').value;
         const total = parseFloat(document.getElementById('totalTxt').innerText);
-        const dataAtual = new Date();
-        
-        // Regra dos 4 dias para o Pendura
-        const dataVencimento = new Date();
-        dataVencimento.setDate(dataAtual.getDate() + 4);
+        const cliNome = document.getElementById('selCliente').value;
+        const venc = new Date(); venc.setDate(venc.getDate() + 4);
 
         const venda = {
-            mesa,
-            cliente: clienteNome,
+            cliente: cliNome,
             total,
             metodo,
-            data: dataAtual.toLocaleDateString(),
-            vencimento: metodo === 'PENDURA' ? dataVencimento.toLocaleDateString() : 'Pago',
-            hora: dataAtual.toLocaleTimeString()
+            data: new Date().toLocaleDateString(),
+            hora: new Date().toLocaleTimeString(),
+            vencimento: metodo === 'PENDURA' ? venc.toLocaleDateString() : 'Pago'
         };
 
-        push(ref(db, 'vendas_financeiro'), venda).then(() => {
-            // Baixa no estoque
-            carrinho.forEach(i => {
-                update(ref(db, `produtos/${i.id}`), { qtd: produtosDados[i.id].qtd - 1 });
-            });
-
-            // Se for pendura, já prepara o Zap
+        push(ref(db, 'vendas_fin'), venda).then(() => {
             if(metodo === 'PENDURA') {
-                enviarZapPendura(clienteNome, total, dataVencimento.toLocaleDateString());
+                const msg = `Boteco 934: Conta de R$ ${total.toFixed(2)} pendurada. Vence em ${venc.toLocaleDateString()}.`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             }
-
-            alert(`Venda registrada como ${metodo}!`);
-            imprimirRecibo(); // Chama a impressão automática
-            carrinho = []; 
-            attCar();
+            window.print();
+            carrinho = []; document.getElementById('itensCupom').innerHTML = "Aguardando..."; document.getElementById('totalTxt').innerText="0.00";
+            alert("Venda Finalizada!");
         });
     };
 
-    window.imprimirRecibo = () => {
-        window.print(); // Abre a tela de impressão configurada pelo CSS @media print
-    };
-
-    function enviarZapPendura(nome, valor, dataVenc) {
-        // Busca o contato do cliente nos dados carregados
-        // Nota: Assumindo que você tem os dados dos clientes em uma variável global 'clientesDados'
-        const msg = `Olá ${nome}! Passando para registrar sua conta de hoje no *Boteco 934*.\n\n*Total:* R$ ${valor.toFixed(2)}\n*Vencimento:* ${dataVenc}\n\nAté a próxima! 🍻`;
-        const linkZap = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-        
-        // Abre em uma nova aba para não travar o PDV
-        window.open(linkZap, '_blank');
-    }
-
-    // --- ATUALIZAÇÃO DO FINANCEIRO PARA MOSTRAR VENCIMENTOS ---
-    onValue(ref(db, 'vendas_financeiro'), (s) => {
-        const hist = document.getElementById('listaVendasDia');
-        hist.innerHTML = "<h4>Movimentação de Hoje</h4>";
-        
+    onValue(ref(db, 'vendas_fin'), (s) => {
+        const h = document.getElementById('listaHistorico'); h.innerHTML = "";
+        const res = document.getElementById('resumoValores');
+        let total = 0, pix = 0, pend = 0;
         if(s.exists()){
             Object.values(s.val()).reverse().forEach(v => {
-                const corStatus = v.metodo === 'PENDURA' ? 'color:var(--vermelho)' : 'color:var(--verde)';
-                hist.innerHTML += `
-                    <div class="card-fin">
-                        <b>${v.hora} - ${v.mesa}</b> | ${v.cliente}<br>
-                        Pagamento: <span style="${corStatus}">${v.metodo}</span><br>
-                        Total: <b>R$ ${v.total.toFixed(2)}</b><br>
-                        ${v.metodo === 'PENDURA' ? `<small>⏳ Vence em: ${v.vencimento}</small>` : ''}
+                if(v.data === new Date().toLocaleDateString()){
+                    total += v.total;
+                    if(v.metodo === 'PIX') pix += v.total;
+                    if(v.metodo === 'PENDURA') pend += v.total;
+                    h.innerHTML += `<div style="background:#111; padding:10px; margin-bottom:5px; border-left:4px solid var(--amarelo)">
+                        ${v.hora} - ${v.cliente} - R$ ${v.total.toFixed(2)} (${v.metodo})
                     </div>`;
+                }
             });
         }
+        res.innerHTML = `<div style="background:var(--verde); padding:10px; border-radius:5px;">TOTAL: R$ ${total.toFixed(2)}</div>
+                         <div style="background:var(--vermelho); padding:10px; border-radius:5px;">PENDURA: R$ ${pend.toFixed(2)}</div>`;
     });
+
+    window.mudar = (id, el) => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa'); el.classList.add('active');
+    };
 </script>
+</body>
+</html>
