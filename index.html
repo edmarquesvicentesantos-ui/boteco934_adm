@@ -18,23 +18,24 @@
         .secao { display: none; }
         .ativa { display: block; }
 
-        /* PDV - VITRINE */
+        /* PDV VITRINE */
         .pdv-layout { display: grid; grid-template-columns: 1fr 380px; gap: 15px; }
         .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-        .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; height: 110px; display: flex; flex-direction: column; justify-content: center; }
+        .card-prod { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; height: 110px; display: flex; flex-direction: column; justify-content: center; transition: 0.2s; }
+        .card-prod:hover { transform: scale(1.02); background: #f0f0f0; }
         .card-prod span { display: block; color: var(--azul); font-size: 1.2em; margin-top: 5px; }
 
-        /* CUPOM E CALCULADORA */
-        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; min-height: 300px; }
-        .card-calc { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
-        .res-box { background: #222; padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 5px solid var(--amarelo); }
-
+        /* CUPOM E CALC */
+        .cupom { background: #fff; color: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; min-height: 350px; }
+        .card-ferramenta { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; max-width: 500px; margin: 0 auto; }
+        
         .btn-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .btn-pgto button { padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; color: #fff; text-transform: uppercase; }
+        .btn-pgto button { padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; color: #fff; text-transform: uppercase; font-size: 11px; }
         
         input, select { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 10px; }
         
         @media print { body * { visibility: hidden; } #reciboDigital, #reciboDigital * { visibility: visible; } #reciboDigital { position: absolute; left: 0; top: 0; width: 100%; } }
+        @media (max-width: 800px) { .pdv-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -46,7 +47,7 @@
 
 <nav>
     <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas / Mesas</div>
-    <div class="nav-item" onclick="mudar('calculadora', this)">🧮 Calculadora de Lucro</div>
+    <div class="nav-item" id="btnCalc" onclick="mudar('calculadora', this)">🧮 Calculadora de Lucro</div>
     <div class="nav-item" onclick="mudar('financeiro', this)">💰 Financeiro</div>
     <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
 </nav>
@@ -77,21 +78,22 @@
                 <div class="btn-pgto">
                     <button style="background:#32bcad" onclick="fechar('PIX')">PIX</button>
                     <button style="background:#4caf50" onclick="fechar('DINHEIRO')">DINHEIRO</button>
-                    <button style="background:#2196f3" onclick="fechar('DÉBITO')">DÉBITO</button>
-                    <button style="background:#2b579a" onclick="fechar('CRÉDITO')">CRÉDITO</button>
-                    <button style="background:#ff9800; grid-column: span 2;" onclick="fechar('PENDURA')">PENDURAR (4 DIAS)</button>
+                    <button style="background:#2196f3" onclick="fechar('CARTÃO')">CARTÃO</button>
+                    <button style="background:#ff9800" onclick="fechar('PENDURA')">PENDURAR (4 DIAS)</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="calculadora" class="secao">
-        <div class="card-calc">
-            <h3 style="color:var(--amarelo); margin-bottom:15px;">Analisar Lucro (Cervejas/Doses)</h3>
-            <input type="number" id="calc_custo" placeholder="Custo da Unidade (R$)">
-            <input type="number" id="calc_praticado" placeholder="Preço que você cobra hoje (R$)">
-            <button onclick="analisar()" style="background:var(--amarelo); color:#000; padding:12px; border:none; width:100%; font-weight:bold;">ANALISAR MARGEM</button>
-            <div id="resCalc"></div>
+        <div class="card-ferramenta">
+            <h2 style="color:var(--amarelo); margin-bottom:20px; text-align:center;">Calculadora de Margem</h2>
+            <label>Custo Unitário (R$):</label>
+            <input type="number" id="c_custo" placeholder="Ex: 5.50">
+            <label>Preço de Venda Atual (R$):</label>
+            <input type="number" id="c_venda" placeholder="Ex: 12.00">
+            <button onclick="calcularMargem()" style="background:var(--amarelo); color:#000; padding:15px; border:none; width:100%; font-weight:bold; cursor:pointer; border-radius:6px; margin-top:10px;">ANALISAR AGORA</button>
+            <div id="resCalculadora" style="margin-top:20px;"></div>
         </div>
     </div>
 
@@ -101,9 +103,11 @@
     </div>
 
     <div id="clientes" class="secao">
-        <input type="text" id="nCli" placeholder="Nome do Cliente">
-        <input type="text" id="tCli" placeholder="WhatsApp">
-        <button onclick="addCli()" style="background:var(--verde); color:#fff; padding:12px; border:none; width:100%; font-weight:bold;">SALVAR CLIENTE</button>
+        <div class="card-ferramenta" style="max-width: 100%;">
+            <input type="text" id="nCli" placeholder="Nome do Cliente">
+            <input type="text" id="tCli" placeholder="WhatsApp">
+            <button onclick="addCli()" style="background:var(--verde); color:#fff; padding:12px; border:none; width:100%; font-weight:bold; border-radius:6px;">CADASTRAR</button>
+        </div>
         <div id="listaCliView" style="margin-top:20px;"></div>
     </div>
 </div>
@@ -123,21 +127,21 @@
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // --- CARREGAR PRODUTOS (COM TRAVA DE REPETIÇÃO) ---
+    // VITRINE SEM REPETIÇÕES
     onValue(ref(db, 'produtos'), (s) => {
         const g = document.getElementById('gridProdutos'); g.innerHTML = "";
         produtosDados = s.val() || {};
+        const nomesVistos = new Set();
         
-        // Filtro para não repetir nomes
-        const nomesUnicos = [];
         Object.entries(produtosDados)
             .sort((a,b) => a[1].nome.localeCompare(b[1].nome))
             .forEach(([id, p]) => {
-                if(!nomesUnicos.includes(p.nome)) {
-                    nomesUnicos.push(p.nome);
+                const nomeLimpo = p.nome.trim().toUpperCase();
+                if(!nomesVistos.has(nomeLimpo)) {
+                    nomesVistos.add(nomeLimpo);
                     g.innerHTML += `
                         <div class="card-prod" onclick="addCar('${id}')">
-                            ${p.nome.substring(0,18)}
+                            ${p.nome.substring(0,20)}
                             <span>R$ ${Number(p.venda).toFixed(2)}</span>
                         </div>`;
                 }
@@ -154,17 +158,19 @@
         document.getElementById('totalTxt').innerText = t.toFixed(2);
     };
 
-    window.analisar = () => {
-        const custo = parseFloat(document.getElementById('calc_custo').value);
-        const preco = parseFloat(document.getElementById('calc_praticado').value);
-        if(!custo || !preco) return;
-        const lucro = preco - custo;
-        const margem = (lucro / preco) * 100;
-        document.getElementById('resCalc').innerHTML = `
-            <div class="res-box">
-                Lucro por Unidade: <b>R$ ${lucro.toFixed(2)}</b><br>
-                Margem de Lucro: <b>${margem.toFixed(1)}%</b><br>
-                <small>${margem < 40 ? '⚠️ Margem baixa para boteco' : '✅ Margem saudável'}</small>
+    window.calcularMargem = () => {
+        const c = parseFloat(document.getElementById('c_custo').value);
+        const v = parseFloat(document.getElementById('c_venda').value);
+        if(!c || !v) return;
+        const lucro = v - c;
+        const margem = (lucro / v) * 100;
+        document.getElementById('resCalculadora').innerHTML = `
+            <div style="background:#222; padding:15px; border-radius:8px; border-left:5px solid var(--amarelo);">
+                <p>Lucro Real: <b>R$ ${lucro.toFixed(2)}</b></p>
+                <p>Margem: <b>${margem.toFixed(1)}%</b></p>
+                <p style="margin-top:10px; font-size:12px; color:${margem < 35 ? 'var(--vermelho)' : 'var(--verde)'}">
+                    ${margem < 35 ? '⚠️ Margem apertada!' : '✅ Ótima margem para revenda!'}
+                </p>
             </div>`;
     };
 
@@ -180,7 +186,7 @@
 
         push(ref(db, 'vendas_fin'), venda).then(() => {
             if(metodo === 'PENDURA') {
-                const msg = `Boteco 934: Conta de R$ ${total.toFixed(2)} registrada. Vencimento: ${venc.toLocaleDateString()}.`;
+                const msg = `Boteco 934: Olá! Sua conta de hoje deu R$ ${total.toFixed(2)}. O vencimento é em ${venc.toLocaleDateString()}.`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             }
             window.print();
@@ -195,7 +201,7 @@
 
     window.addCli = () => {
         const n = document.getElementById('nCli').value, t = document.getElementById('tCli').value;
-        if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(()=> { alert("Cliente salvo!"); document.getElementById('nCli').value=""; });
+        if(n && t) push(ref(db, 'clientes'), { nome: n, contato: t }).then(()=> { alert("Cadastrado!"); document.getElementById('nCli').value=""; });
     };
 
     window.mudar = (id, el) => {
