@@ -2,159 +2,124 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Estoque Boteco 934</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco 934 - Oficial</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        /* Estilo da Tabela igual à imagem */
-        .tabela-estoque { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .tabela-estoque th { background-color: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; font-size: 14px; }
-        .tabela-estoque td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #fff; }
+
+        /* CABEÇALHO BRANCO (ESTILO UOL) */
+        .topo-uol {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px;
+            border-bottom: 1px solid #eee;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .badge-934 { 
+            background: #ffcc00; color: #000; padding: 10px; 
+            border-radius: 5px; font-weight: 900; font-size: 1.8em; 
+        }
+        .nome-marca { font-size: 2.2em; font-weight: 900; letter-spacing: -2px; }
+
+        .indicadores { display: flex; gap: 30px; font-size: 0.85em; color: #444; }
+        .indicadores b { color: #d32f2f; }
+
+        .clima { text-align: right; font-size: 0.85em; line-height: 1.2; }
+
+        /* BARRA DE MENU CINZA/BRANCA */
+        nav {
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            padding: 0 40px;
+            gap: 20px;
+            background: #fff;
+        }
+        .nav-link {
+            padding: 15px 0;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+        }
+        .nav-link:hover { border-bottom: 3px solid #ffcc00; }
+
+        /* TABELA DE ESTOQUE */
+        .container { padding: 20px 40px; }
+        .tabela-vendas { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        .tabela-vendas th { background: #2b579a; color: white; padding: 12px; border: 1px solid #ccc; text-transform: uppercase; }
+        .tabela-vendas td { padding: 10px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
         
-        /* Cores das colunas de cálculo */
-        .col-custo { background-color: #fff2cc; }
-        .col-lucro { background-color: #fce4d6; }
-        .col-margem { background-color: #c6efce; color: #006100; }
-        
-        .img-produto { width: 50px; height: auto; border-radius: 5px; }
+        .c-custo { background: #fff2cc; }
+        .c-lucro { background: #fce4d6; }
+        .c-margem { background: #c6efce; color: #006100; }
     </style>
 </head>
 <body>
 
-    <h2 style="padding: 20px; color: #333;">PLANILHA DE VENDAS - DISTRIBUIDORA</h2>
+<header class="topo-uol">
+    <div class="logo-area">
+        <div class="badge-934">934</div>
+        <div class="nome-marca">BOTECO</div>
+    </div>
+    
+    <div class="indicadores">
+        <div>Dólar <b>▼ 5,011</b></div>
+        <div>Euro <b>▼ 5,877</b></div>
+    </div>
 
-    <table class="tabela-estoque">
+    <div class="clima">
+        <strong>Petrolina</strong><br>
+        <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
+    </div>
+</header>
+
+<nav>
+    <a class="nav-link">Produtos</a>
+    <a class="nav-link">Flash</a>
+    <a class="nav-link">Economia</a>
+    <a class="nav-link">Copa 2026</a>
+    <a class="nav-link">Guia de Compras</a>
+</nav>
+
+<div class="container">
+    <h2 style="margin-top: 20px; letter-spacing: -1px; color: #333;">PLANILHA DE VENDAS - DISTRIBUIDORA</h2>
+    
+    <table class="tabela-vendas">
         <thead>
             <tr>
                 <th>Foto</th>
                 <th>Código de Barra</th>
                 <th>Produto</th>
-                <th>Quat. pacote</th>
-                <th>Venda uni.</th>
+                <th>Quat. Pacote</th>
+                <th>Venda Uni.</th>
                 <th>Total Vend.</th>
-                <th>Custo</th>
-                <th>Total da Caixa</th>
-                <th>Lucro</th>
-                <th>Margem %</th>
+                <th style="background:#ffd966; color:#000">Custo</th>
+                <th style="background:#ffd966; color:#000">Total Caixa</th>
+                <th style="background:#f4b084; color:#000">Lucro</th>
+                <th style="background:#a9d08e; color:#000">Margem %</th>
             </tr>
         </thead>
-        <tbody id="lista-produtos">
+        <tbody>
             <tr>
-                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" class="img-produto"></td>
+                <td><img src="https://trimais.vteximg.com.br/arquivos/ids/1010344/cerveja-heineken-lata-350ml.jpg" width="40"></td>
                 <td>789456123858</td>
-                <td style="text-align: left;">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
+                <td style="text-align:left">Cerveja Heineken - Lata 350ml C/12 Descartável</td>
                 <td>12</td>
                 <td>R$ 10,00</td>
                 <td>R$ 120,00</td>
-                <td class="col-custo">R$ 5,04</td>
-                <td class="col-custo">R$ 60,48</td>
-                <td class="col-lucro">R$ 59,52</td>
-                <td class="col-margem">49,60%</td>
-            </tr>
-    .nav-item:hover .submenu { display: block; }
-</style>
-
-<header class="header-uol">
-    <div class="logo-container">
-        <div class="badge-30">934</div>
-        <div class="brand-name">BOTECO</div>
-    </div>
-    
-    <div class="info-cotacao">
-        <div class="cotacao-item">Dólar <b>▼ 5,011</b></div>
-        <div class="cotacao-item">Euro <b>▼ 5,877</b></div>
-    </div>
-
-    <div class="clima-uol">
-        <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" width="20">
-        <div>
-            <b>Petrolina</b><br>
-            <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
-        </div>
-    </div>
-</header>
-
-<nav class="nav-uol">
-    <div class="nav-item">OPERACIONAL
-        <div class="submenu">
-            <button onclick="setVisao('mesas')">Mesas</button>
-            <button onclick="zerarMesas()">Limpar Tudo</button>
-        </div>
-    </div>
-    <div class="nav-item" onclick="setVisao('estoque')">ESTOQUE / XML</div>
-    <div class="nav-item">FINANCEIRO</div>
-    <div class="nav-item">CARROS</div>
-    <div class="nav-item">ECONOMIA</div>
-    <div class="nav-item">GUIA DE COMPRAS</div>
-</nav>
-
-<script>
-    // Agora guardamos as chaves das notas para não repetir
-    let notasProcessadas = JSON.parse(localStorage.getItem('b934_notas_chaves')) || [];
-
-    function lerXML(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-            
-            // 1. PEGA A CHAVE DE ACESSO DA NOTA (Tag infNFe id)
-            const infNFe = xmlDoc.getElementsByTagName("infNFe")[0];
-            const chaveAcesso = infNFe ? infNFe.getAttribute("Id").replace("NFe", "") : null;
-
-            if (!chaveAcesso) {
-                alert("Erro: Não foi possível encontrar a chave de acesso desta nota.");
-                return;
-            }
-
-            // 2. TRAVA DE SEGURANÇA: VERIFICA SE A NOTA JÁ FOI SUBIDA
-            if (notasProcessadas.includes(chaveAcesso)) {
-                alert("⚠️ ATENÇÃO: Esta nota fiscal (Final: " + chaveAcesso.slice(-4) + ") já foi importada anteriormente! Operação cancelada para evitar duplicidade.");
-                input.value = ""; // Limpa o seletor de arquivo
-                return;
-            }
-
-            // 3. SE FOR NOVA, PROCESSA OS PRODUTOS
-            const itensNota = xmlDoc.getElementsByTagName("det");
-            let resumo = "Nota Validada! Importando produtos:\n";
-
-            for (let i = 0; i < itensNota.length; i++) {
-                let nome = itensNota[i].getElementsByTagName("xProd")[0].textContent;
-                let qtd = parseFloat(itensNota[i].getElementsByTagName("qCom")[0].textContent);
-                
-                // Lógica de atualização de estoque (conforme já fizemos)
-                estoquePro[nome] = (estoquePro[nome] || 0) + qtd;
-                resumo += `- ${nome}: +${qtd} un\n`;
-            }
-
-            // 4. SALVA A CHAVE NO HISTÓRICO PARA A PRÓXIMA VEZ
-            notasProcessadas.push(chaveAcesso);
-            localStorage.setItem('b934_notas_chaves', JSON.stringify(notasProcessadas));
-            
-            alert(resumo);
-            salvar(); // Salva o estoque atualizado
-            renderizarPlanilha();
-        };
-        reader.readAsText(file);
-    }
-</script>
-
-            <tr>
-                <td><img src="https://choppmaia.com.br/wp-content/uploads/2021/05/Heineken-600ml.png" class="img-prod"></td>
-                <td>789456123658</td>
-                <td style="text-align: left;">Cerveja Heineken - Garrafa 600ml C/24 Retornável</td>
-                <td>24</td>
-                <td>R$ 16,00</td>
-                <td>R$ 384,00</td>
-                <td class="col-custo">R$ 9,58</td>
-                <td class="col-custo">R$ 229,92</td>
-                <td class="col-lucro">R$ 154,08</td>
-                <td class="col-margem">40,13%</td>
+                <td class="c-custo">R$ 5,04</td>
+                <td class="c-custo">R$ 60,48</td>
+                <td class="c-lucro">R$ 59,52</td>
+                <td class="c-margem">49,60%</td>
             </tr>
         </tbody>
     </table>
+</div>
 
 </body>
 </html>
