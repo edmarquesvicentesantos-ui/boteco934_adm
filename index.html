@@ -106,4 +106,151 @@
         appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
     };
 
-    const app
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let carrinho = [];
+    let produtosDados = {};
+
+    // --- RELÓGIO ---
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+    // --- PRODUTOS (ESTOQUE E PDV EM ORDEM ALFABÉTICA) ---
+    onValue(ref(db, 'produtos'), (snapshot) => {
+        const grade = document.getElementById('gradeProdutos');
+        const listaEstoque = document.getElementById('listaProdutos');
+        grade.innerHTML = ""; listaEstoque.innerHTML = "";
+        produtosDados = snapshot.val() || {};
+
+        const ordenados = Object.entries(produtosDados).sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+
+        ordenados.forEach(([id, p]) => {
+            const custo = Number(p.custo || 0).toFixed(2);
+            const venda = Number(p.venda || 0).toFixed(2);
+            const lucro = Number(p.lucro || 0).toFixed(2);
+
+            grade.innerHTML += `
+                <div class="card-produto-venda" onclick="adicionarAoCarrinho('${id}')">
+                    ${p.nome.substring(0, 20)}
+                    <span>R$ ${venda}</span>
+                    <small style="color:#666; font-size:10px">Qtd: ${p.qtd}</small>
+                </div>`;
+            
+            listaEstoque.innerHTML += `
+                <div class="grid-linha">
+                    <div style="text-align:left">${p.nome}</div>
+                    <div>${p.qtd}</div>
+                    <div style="background:#fff2cc">R$ ${custo}</div>
+                    <div style="background:#d9e1f2">R$ ${venda}</div>
+                    <div style="background:#fce4ec">R$ ${lucro}</div>
+                    <div style="background:#e2efda">${p.margem || 0}%</div>
+                </div>`;
+        });
+    });
+
+    // --- LÓGICA DO CARRINHO (AGRUPADO) ---
+    window.adicionarAoCarrinho = (id) => {
+        const p = produtosDados[id];
+        if(p.qtd <= 0) return alert("Estoque insuficiente!");
+        carrinho.push({ id, nome: p.nome, preco: p.venda });
+        atualizarResumo();
+    };
+
+    function atualizarResumo() {
+        const div = document.getElementById('itensCarrinho');
+        const totalSpan = document.getElementById('valorTotal');
+        div.innerHTML = "";
+        let total = 0;
+        const agrupado = {};
+
+        carrinho.forEach(item => {
+            if(agrupado[item.nome]) { agrupado[item.nome].q++; agrupado[item.nome].v += Number(item.preco); }
+            else { agrupado[item.nome] = { q: 1, v: Number(item.preco) }; }
+            total += Number(item.preco);
+        });
+
+        for(let n in agrupado) {
+            div.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span><b>${agrupado[n].q}x</b> ${n.substring(0, 20)}</span>
+                <b>R$ ${agrupado[n].v.toFixed(2)}</b>
+            </div>`;
+        }
+        totalSpan.innerText = total.toFixed(2);
+    }
+
+    window.finalizarVenda = () => {
+        if(carrinho.length === 0) return alert("Carrinho vazio!");
+        const cliente = document.getElementById('selectCliente').value;
+        
+        push(ref(db, 'vendas_gerais'), {
+            cliente, total: document.getElementById('valorTotal').innerText,
+            data: new Date().toLocaleString(), itens: carrinho
+        });
+
+        carrinho.forEach(item => {
+            const novaQtd = produtosDados[item.id].qtd - 1;
+            update(ref(db, `produtos/${item.id}`), { qtd: novaQtd });
+        });
+
+        alert("Venda realizada!");
+        limparCarrinho();
+    };
+
+    window.limparCarrinho = () => { carrinho = []; atualizarResumo(); };
+
+    // --- CLIENTES (ORDEM ALFABÉTICA) ---
+    onValue(ref(db, 'clientes'), (snapshot) => {
+        const select = document.getElementById('selectCliente');
+        const lista = document.getElementById('listaClientes');
+        select.innerHTML = '<option value="Avulso">Venda Avulsa</option>';
+        lista.innerHTML = "";
+        
+        if(snapshot.exists()) {
+            const ordenados = Object.values(snapshot.val()).sort((a,b) => a.nome.localeCompare(b.nome));
+            ordenados.forEach(c => {
+                select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                lista.innerHTML += `
+                <div class="card-cliente">
+                    <span>👤 ${c.nome.toUpperCase()}</span>
+                    <a href="https://wa.me/55${c.contato}" target="_blank" style="background:var(--verde); color:#fff; padding:5px; border-radius:4px; text-decoration:none; font-size:12px;">📞 ${c.contato}</a>
+                </div>`;
+            });
+        }
+    });
+
+    window.salvarCliente = () => {
+        const nome = document.getElementById('nomeCliente').value;
+        const contato = document.getElementById('contatoCliente').value;
+        if(nome && contato) {
+            push(ref(db, 'clientes'), { nome, contato }).then(() => {
+                document.getElementById('nomeCliente').value = "";
+                document.getElementById('contatoCliente').value = "";
+            });
+        }
+    };
+
+    window.lancarXML = () => {
+        const file = document.getElementById('xmlInput').files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent) || 0;
+                push(ref(db, 'produtos'), { nome, qtd: 10, custo, venda: custo * 1.5, lucro: custo * 0.5, margem: 50 });
+            }
+            alert("XML importado!");
+        };
+        reader.readAsText(file);
+    };
+
+    window.mudar = (id, el) => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa'); el.classList.add('active');
+    };
+</script>
+</body>
+</html>
