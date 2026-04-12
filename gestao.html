@@ -2,25 +2,29 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 - GESTÃO E PRECIFICAÇÃO</title>
+    <title>934 - GESTÃO E ESTRATÉGIA</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --gray: #111; }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #111; --destilado: #ff4500; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
         body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 15px; }
         
-        /* Cabeçalho com espaço para Logo */
         header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .logo-box { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); background: #000; }
+        .logo-box { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gold); }
         
         .card { background: var(--gray); padding: 15px; border-radius: 8px; border: 1px solid #222; margin-bottom: 15px; }
-        input { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 5px 0; border-radius: 4px; outline: none; }
-        input:focus { border-color: var(--gold); }
-        button { width: 100%; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; border: none; transition: 0.2s; }
+        label { font-size: 11px; color: #888; text-transform: uppercase; display: block; margin-top: 10px; }
         
-        /* Estilo da Calculadora Robusta */
-        .calc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .res-box { background: #000; padding: 15px; border-radius: 6px; border: 1px solid #25d366; text-align: center; }
-        label { font-size: 11px; color: #888; text-transform: uppercase; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin-top: 5px; border-radius: 4px; outline: none; }
+        input:focus, select:focus { border-color: var(--gold); }
+        
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .res-destaque { background: #000; padding: 20px; border-radius: 8px; border: 2px solid #333; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        
+        .btn-acao { width: 100%; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; border: none; margin-top: 15px; text-transform: uppercase; }
+        .btn-copy { background: #fff; color: #000; }
+        .btn-save { background: var(--gold); color: #000; }
+        
+        .badge { padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -28,80 +32,115 @@
 <header>
     <div class="logo-box">934</div>
     <div>
-        <h1 style="font-size: 16px; letter-spacing: 1px;">BOTECO 934</h1>
-        <p style="font-size: 11px; color: var(--gold);">PAINEL DE ESTRATÉGIA E GESTÃO</p>
+        <h1 style="font-size: 16px;">BOTECO 934</h1>
+        <p style="font-size: 11px; color: var(--gold);">ESTRATÉGIA DE MIX INTELIGENTE</p>
     </div>
 </header>
 
-<div class="card" style="border-left: 4px solid var(--gold);">
-    <h2 style="color: var(--gold); margin-bottom: 10px;">📊 Calculadora de Precificação</h2>
-    <div class="calc-container">
+<div class="card" style="border-top: 4px solid var(--gold);">
+    <h2 style="color: var(--gold); margin-bottom: 15px;">📊 Precificação de Produtos</h2>
+    
+    <div class="calc-grid">
         <div>
-            <label>Custo do Fardo/Caixa</label>
-            <input type="number" id="c_fardo" placeholder="0,00" oninput="rodarCalculo()">
-            <label>Unidades no Fardo</label>
-            <input type="number" id="c_qtd" placeholder="Ex: 12" oninput="rodarCalculo()">
-            <label>Margem de Lucro (%)</label>
-            <input type="number" id="c_margem" value="30" oninput="rodarCalculo()">
+            <label>Tipo de Mercadoria</label>
+            <select id="tipo_prod" onchange="ajustarMargemPadrao()">
+                <option value="30">Cervejas / Bebidas Leves (Margem 30%)</option>
+                <option value="70">Destilados / Doses (Margem 70%)</option>
+                <option value="50">Petiscos / Outros (Margem 50%)</option>
+            </select>
+
+            <label>Custo do Fardo ou Garrafa (R$)</label>
+            <input type="number" id="c_custo" placeholder="0.00" oninput="calcularTudo()">
+
+            <label>Unidades (Fardo) ou Doses (Garrafa)</label>
+            <input type="number" id="c_unidades" value="1" oninput="calcularTudo()">
+
+            <label>Margem Desejada (%)</label>
+            <input type="number" id="c_margem" value="30" oninput="calcularTudo()">
         </div>
-        <div class="res-box">
-            <label>Preço de Venda Sugerido</label>
-            <div id="venda_sugerida" style="font-size: 24px; font-weight: 900; color: var(--gold); margin: 10px 0;">R$ 0,00</div>
-            <label>Custo Unitário: <span id="custo_un" style="color:#fff;">R$ 0,00</span></label><br>
-            <label>Lucro/Unidade: <span id="lucro_un" style="color:#25d366;">R$ 0,00</span></label>
+
+        <div class="res-destaque" id="box_resultado">
+            <label>Preço Sugerido p/ Venda</label>
+            <div id="venda_final" style="font-size: 28px; font-weight: 900; color: var(--gold); margin: 10px 0;">R$ 0,00</div>
+            
+            <div style="text-align: left; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;">
+                <p>Custo Un/Dose: <span id="res_unitario" style="color: #fff; float: right;">R$ 0,00</span></p>
+                <p>Lucro Estimado: <span id="res_lucro" style="color: #25d366; float: right;">R$ 0,00</span></p>
+            </div>
         </div>
     </div>
-    <button onclick="copiarParaCadastro()" style="margin-top: 10px; background: #fff; color: #000;">
-        USAR ESTES VALORES NO CADASTRO ↓
-    </button>
+
+    <button class="btn-acao btn-copy" onclick="copiarParaCadastro()">Copiar para Cadastro ↓</button>
 </div>
 
 <div class="card">
-    <h2 style="margin-bottom: 10px;">📦 Cadastro de Mercadoria</h2>
-    <input type="text" id="nome" placeholder="Nome do Produto (Ex: Heineken 600ml)">
-    <div style="display: flex; gap: 5px;">
-        <input type="number" id="custo" placeholder="Custo Fardo">
-        <input type="number" id="qtd" placeholder="Qtd">
-        <input type="number" id="venda" placeholder="Preço Venda">
+    <h2 style="margin-bottom: 10px;">📦 Finalizar Cadastro</h2>
+    <label>Nome do Produto / Destilado</label>
+    <input type="text" id="nome_final" placeholder="Ex: Black Label 1L ou Dose de Pitu">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+            <label>Custo Unitário (R$)</label>
+            <input type="number" id="form_custo" step="0.01">
+        </div>
+        <div>
+            <label>Preço de Venda (R$)</label>
+            <input type="number" id="form_venda" step="0.01">
+        </div>
     </div>
-    <button onclick="salvarProduto()" style="background: var(--gold); color: #000; margin-top: 10px;">SALVAR NO SISTEMA</button>
+    <button class="btn-acao btn-save" onclick="salvarNoEstoque()">Salvar no Sistema 934</button>
 </div>
 
 <script>
-    function rodarCalculo() {
-        const fardo = parseFloat(document.getElementById('c_fardo').value) || 0;
-        const unidades = parseInt(document.getElementById('c_qtd').value) || 1;
+    function ajustarMargemPadrao() {
+        const margem = document.getElementById('tipo_prod').value;
+        document.getElementById('c_margem').value = margem;
+        
+        // Estilo visual se for destilado
+        const box = document.getElementById('box_resultado');
+        if(margem == "70") {
+            box.style.borderColor = "var(--destilado)";
+        } else {
+            box.style.borderColor = "#333";
+        }
+        calcularTudo();
+    }
+
+    function calcularTudo() {
+        const custoTotal = parseFloat(document.getElementById('c_custo').value) || 0;
+        const unidades = parseFloat(document.getElementById('c_unidades').value) || 1;
         const margem = parseFloat(document.getElementById('c_margem').value) || 0;
 
-        const unitario = fardo / unidades;
-        const sugerido = unitario * (1 + (margem / 100));
-        const lucro = sugerido - unitario;
+        const unitario = custoTotal / unidades;
+        const venda = unitario * (1 + (margem / 100));
+        const lucro = venda - unitario;
 
-        document.getElementById('custo_un').innerText = `R$ ${unitario.toFixed(2)}`;
-        document.getElementById('venda_sugerida').innerText = `R$ ${sugerido.toFixed(2)}`;
-        document.getElementById('lucro_un').innerText = `R$ ${lucro.toFixed(2)}`;
+        document.getElementById('res_unitario').innerText = `R$ ${unitario.toFixed(2)}`;
+        document.getElementById('venda_final').innerText = `R$ ${venda.toFixed(2)}`;
+        document.getElementById('res_lucro').innerText = `R$ ${lucro.toFixed(2)}`;
     }
 
     function copiarParaCadastro() {
-        const preco = document.getElementById('venda_sugerida').innerText.replace('R$ ', '');
-        document.getElementById('venda').value = preco;
-        document.getElementById('custo').value = document.getElementById('c_fardo').value;
-        document.getElementById('qtd').value = document.getElementById('c_qtd').value;
+        const preco = document.getElementById('venda_final').innerText.replace('R$ ', '');
+        const custo = document.getElementById('res_unitario').innerText.replace('R$ ', '');
+        
+        document.getElementById('form_venda').value = preco;
+        document.getElementById('form_custo').value = custo;
+        document.getElementById('nome_final').focus();
     }
 
-    function salvarProduto() {
-        const nome = document.getElementById('nome').value;
-        const custo = parseFloat(document.getElementById('custo').value) || 0;
-        const qtd = parseInt(document.getElementById('qtd').value) || 1;
-        const venda = parseFloat(document.getElementById('venda').value) || 0;
+    function salvarNoEstoque() {
+        const nome = document.getElementById('nome_final').value;
+        const custo = parseFloat(document.getElementById('form_custo').value) || 0;
+        const venda = parseFloat(document.getElementById('form_venda').value) || 0;
 
-        if(!nome || !venda) return alert("Preencha o nome e o preço de venda!");
+        if(!nome || !venda) return alert("Preencha os dados do produto!");
 
         let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
-        estoque.push({ nome, custo: custo/qtd, venda });
+        estoque.push({ nome, custo, venda });
         localStorage.setItem('boteco_est', JSON.stringify(estoque));
-        
-        alert("Produto salvo com sucesso!");
+
+        alert("Produto cadastrado com sucesso!");
         location.reload();
     }
 </script>
