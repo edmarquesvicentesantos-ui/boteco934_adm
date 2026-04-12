@@ -4,96 +4,96 @@
     <meta charset="UTF-8">
     <title>934 - PDV OPERACIONAL</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --gray: #121212; --glass: rgba(255,255,255,0.05); }
+        :root { --gold: #ffcc00; --bg: #050505; --gray: #121212; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
         body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* Cabeçalho */
-        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
+        header { background: #000; padding: 8px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
         .logo-box { display: flex; align-items: center; gap: 10px; }
-        .logo-circulo { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--gold); }
+        .logo-circ { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--gold); }
         
-        /* Menu de Navegação */
+        /* Menu de Navegação Superior */
         nav { display: flex; background: #111; border-bottom: 1px solid #222; }
-        .nav-btn { flex: 1; padding: 15px; border: none; background: none; color: #777; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: var(--glass); }
+        .nav-btn { flex: 1; padding: 12px; border: none; background: none; color: #666; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(255,204,0,0.05); }
 
         .container-principal { display: flex; flex: 1; overflow: hidden; }
-        .tela { display: none; flex: 1; padding: 15px; overflow-y: auto; }
+        .tela { display: none; flex: 1; padding: 12px; overflow-y: auto; }
         .tela.ativa { display: block; }
 
-        /* Estilo das Mesas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .mesa-item { background: var(--gray); padding: 15px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #282828; }
-        .mesa-item.ocupada { background: #400; border-color: #f33; }
-        .mesa-item.selecionada { border-color: var(--gold); background: #222; }
+        /* Mesas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .mesa-card { background: var(--gray); padding: 15px 5px; border-radius: 4px; text-align: center; cursor: pointer; border: 1px solid #222; }
+        .mesa-card.ocupada { background: #3d0000; border-color: #f33; }
+        .mesa-card.selecionada { border-color: var(--gold); background: #222; }
 
-        /* Estilo Mercadorias e Busca */
-        .busca-bar { margin-bottom: 15px; }
-        .input-barcode { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: var(--gold); border-radius: 6px; font-size: 15px; font-weight: bold; }
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-        .btn-prod { background: #fff; color: #000; padding: 15px 5px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; border: none; box-shadow: 0 3px 0 #bbb; }
+        /* Mercadorias e Busca */
+        .busca-container { position: sticky; top: 0; background: var(--bg); padding-bottom: 10px; z-index: 10; }
+        .barcode-input { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: var(--gold); border-radius: 4px; font-size: 14px; text-align: center; }
+        .grid-vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
+        .prod-item { background: #fff; color: #000; padding: 12px 4px; border-radius: 4px; text-align: center; cursor: pointer; font-weight: bold; border: none; min-height: 55px; }
         
-        /* Cupom Lateral */
-        .caixa-cupom { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
-        .lista-consumo { flex: 1; overflow-y: auto; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
-        .linha { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500; }
-        .btn-whats { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 10px; font-size: 14px; }
+        /* Lateral do Cupom (Papel) */
+        .caixa-cupom { width: 260px; background: #fff; color: #000; padding: 12px; display: flex; flex-direction: column; box-shadow: -4px 0 10px rgba(0,0,0,0.3); }
+        .lista-itens { flex: 1; overflow-y: auto; border-top: 1px solid #ddd; margin-top: 8px; padding-top: 8px; }
+        .linha-compra { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; font-weight: 500; }
+        .btn-whats { background: #25d366; color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo-box">
-        <div class="logo-circulo">934</div>
-        <div style="font-weight: bold; font-size: 15px;">BOTECO 934</div>
+        <div class="logo-circ">934</div>
+        <div style="font-weight: bold; font-size: 14px; letter-spacing: 1px;">BOTECO 934</div>
     </div>
-    <div id="relogio" style="color: var(--gold); font-weight: bold;">00:00</div>
+    <div id="relogio" style="color: var(--gold); font-family: monospace;">00:00</div>
 </header>
 
 <nav>
-    <button class="nav-btn active" onclick="mudarTela('aba-mesas', this)">🪑 Mesas / Balcão</button>
-    <button class="nav-btn" onclick="mudarTela('aba-vendas', this)">🍺 Mercadorias</button>
+    <button class="nav-btn active" onclick="mudarTela('mesas', this)">🪑 Mesas</button>
+    <button class="nav-btn" id="btnMercadoria" onclick="mudarTela('vendas', this)">🍺 Mercadorias</button>
 </nav>
 
 <div class="container-principal">
-    <div id="aba-mesas" class="tela ativa">
+    <div id="mesas" class="tela ativa">
         <div class="grid-mesas" id="gridMesas"></div>
     </div>
 
-    <div id="aba-vendas" class="tela">
-        <div class="busca-bar">
-            <input type="text" id="barcode" class="input-barcode" placeholder="[ BARCODE ] ou digite o nome..." oninput="filtrarProdutos()">
+    <div id="vendas" class="tela">
+        <div class="busca-container">
+            <input type="text" id="leitor" class="barcode-input" placeholder="[ BIPAR CÓDIGO OU DIGITAR ]" oninput="filtrar()">
         </div>
-        <div id="vitrine" class="grid-produtos"></div>
+        <div id="vitrine" class="grid-vitrine"></div>
     </div>
 
     <div class="caixa-cupom">
-        <h3 id="labelMesa" style="font-size: 15px; color: #555;">Mesa --</h3>
-        <div id="lista" class="lista-consumo"></div>
-        <div style="border-top: 2px solid #000; padding-top: 10px; font-weight: 900; display: flex; justify-content: space-between; font-size: 16px;">
+        <b id="mesaLabel" style="font-size: 13px; color: #666;">Mesa --</b>
+        <div id="itensConsumo" class="lista-itens"></div>
+        <div style="border-top: 2px solid #000; padding-top: 8px; font-weight: 900; display: flex; justify-content: space-between; font-size: 15px;">
             <span>TOTAL:</span>
-            <span>R$ <span id="totalTxt">0,00</span></span>
+            <span>R$ <span id="txtTotal">0,00</span></span>
         </div>
-        <button class="btn-whats" onclick="fecharConta()">FINALIZAR VENDA</button>
+        <button class="btn-whats" onclick="finalizar()">FECHAR CONTA</button>
     </div>
 </div>
 
 <script>
     let mSel = null;
-    let mesas = JSON.parse(localStorage.getItem('m_934')) || {};
+    let mesas = JSON.parse(localStorage.getItem('m_data')) || {};
     let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
 
-    // Organiza o estoque em ordem alfabética na inicialização
+    // Organização Alfabética
     estoque.sort((a, b) => a.nome.localeCompare(b.nome));
 
     function init() {
         const grid = document.getElementById('gridMesas');
         for(let i=1; i<=15; i++) {
             if(!mesas[i]) mesas[i] = { ativa: false, itens: [], total: 0 };
-            grid.innerHTML += `<div class="mesa-item ${mesas[i].ativa?'ocupada':''}" id="m${i}" onclick="selecionarMesa(${i})"><b>M${i}</b></div>`;
+            grid.innerHTML += `<div class="mesa-card ${mesas[i].ativa?'ocupada':''}" id="m${i}" onclick="selMesa(${i})"><b>M${i}</b></div>`;
         }
-        renderProdutos(estoque);
+        renderVitrine(estoque);
     }
 
     function mudarTela(id, btn) {
@@ -101,26 +101,26 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
         btn.classList.add('active');
-        if(id === 'aba-vendas') document.getElementById('barcode').focus();
+        if(id === 'vendas') document.getElementById('leitor').focus();
     }
 
-    function renderProdutos(lista) {
+    function renderVitrine(lista) {
         document.getElementById('vitrine').innerHTML = lista.map(p => 
-            `<button class="btn-prod" onclick="lancar('${p.nome}', ${p.venda})">${p.nome}<br><span style="font-size:10px; color:#666;">R$ ${p.venda.toFixed(2)}</span></button>`
+            `<button class="prod-item" onclick="lancar('${p.nome}', ${p.venda})">${p.nome}<br><small style="color:#777; font-size:10px;">R$ ${p.venda.toFixed(2)}</small></button>`
         ).join('');
     }
 
-    function filtrarProdutos() {
-        const termo = document.getElementById('barcode').value.toLowerCase();
-        const filtrados = estoque.filter(p => p.nome.toLowerCase().includes(termo));
-        renderProdutos(filtrados);
+    function filtrar() {
+        const t = document.getElementById('leitor').value.toLowerCase();
+        const f = estoque.filter(p => p.nome.toLowerCase().includes(t));
+        renderVitrine(f);
     }
 
-    function selecionarMesa(n) {
+    function selMesa(n) {
         mSel = n;
-        document.querySelectorAll('.mesa-item').forEach(m => m.classList.remove('selecionada'));
+        document.querySelectorAll('.mesa-card').forEach(m => m.classList.remove('selecionada'));
         document.getElementById(`m${n}`).classList.add('selecionada');
-        document.getElementById('labelMesa').innerText = "CONTA MESA " + n;
+        document.getElementById('mesaLabel').innerText = "CONTA MESA " + n;
         
         if(!mesas[n].ativa) {
             if(confirm("Abrir Mesa " + n + "?")) {
@@ -132,38 +132,25 @@
         atualizarCupom();
     }
 
-    function lancar(nome, valor) {
+    function lancar(n, v) {
         if(!mSel || !mesas[mSel].ativa) {
-            alert("Selecione e abra uma MESA primeiro!");
-            mudarTela('aba-mesas', document.querySelector('.nav-btn'));
+            alert("Abra uma mesa primeiro!");
+            mudarTela('mesas', document.querySelector('.nav-btn'));
             return;
         }
-        mesas[mSel].itens.push({ nome, valor });
-        mesas[mSel].total += valor;
+        mesas[mSel].itens.push({ n, v });
+        mesas[mSel].total += v;
         save();
         atualizarCupom();
-        document.getElementById('barcode').value = ''; // Limpa busca após lançar
+        document.getElementById('leitor').value = ''; // Limpa busca
     }
 
     function atualizarCupom() {
         if(!mSel) return;
-        document.getElementById('lista').innerHTML = mesas[mSel].itens.map(i => `<div class="linha"><span>${i.nome}</span><span>${i.valor.toFixed(2)}</span></div>`).join('');
-        document.getElementById('totalTxt').innerText = mesas[mSel].total.toFixed(2);
+        document.getElementById('itensConsumo').innerHTML = mesas[mSel].itens.map(i => `<div class="linha-compra"><span>${i.n}</span><span>${i.v.toFixed(2)}</span></div>`).join('');
+        document.getElementById('txtTotal').innerText = mesas[mSel].total.toFixed(2);
     }
 
-    function save() { localStorage.setItem('m_934', JSON.stringify(mesas)); }
+    function save() { localStorage.setItem('m_data', JSON.stringify(mesas)); }
 
-    function fecharConta() {
-        if(!mSel || !mesas[mSel].ativa) return;
-        const msg = `*BOTECO 934*%0AMesa: ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
-        window.open(`https://wa.me/?text=${msg}`);
-        mesas[mSel] = { ativa: false, itens: [], total: 0 };
-        save();
-        location.reload();
-    }
-
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }, 1000);
-    init();
-</script>
-</body>
-</html>
+    function finalizar
