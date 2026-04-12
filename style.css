@@ -1,65 +1,114 @@
-/* Reset básico para tirar espaços vazios */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<style>
+    /* AJUSTE PARA O ESTILO PORTAL UOL */
+    .header-uol {
+        background: #fff;
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+    }
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .badge-30 {
+        background: linear-gradient(45deg, #ffcc00, #ff6600);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: 900;
+        font-size: 1.2em;
+    }
+    .brand-name {
+        font-size: 2.2em;
+        font-weight: 900;
+        color: #000;
+        letter-spacing: -2px;
+    }
+    .info-cotacao {
+        display: flex;
+        gap: 20px;
+        font-size: 0.85em;
+        color: #444;
+        align-items: center;
+    }
+    .cotacao-item b { color: #d32f2f; } /* Cor para as setas/valores */
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1a1a1a; /* Fundo grafite escuro */
-    color: #ffffff;
-    padding: 20px;
-}
+    .clima-uol {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85em;
+        color: #666;
+    }
 
-h1 {
-    color: #ffcc00; /* Amarelo cerveja */
-    margin-bottom: 5px;
-}
+    /* BARRA DE MENU (CINZA IGUAL AO UOL) */
+    .nav-uol {
+        background: #fff;
+        border-bottom: 2px solid #eee;
+        display: flex;
+        padding: 0 25px;
+        overflow-x: auto;
+    }
+    .nav-uol .nav-item {
+        padding: 10px 15px;
+        color: #333;
+        font-weight: bold;
+        font-size: 0.75em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+        border-bottom: 3px solid transparent;
+    }
+    .nav-uol .nav-item:hover {
+        color: #ffcc00;
+        border-bottom: 3px solid #ffcc00;
+    }
 
-/* Container das mesas */
-#grid-mesas {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
+    /* SUBMENU ESTILO DROPDOWN */
+    .submenu {
+        display: none;
+        position: absolute;
+        background: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        z-index: 1000;
+        margin-top: 10px;
+    }
+    .nav-item:hover .submenu { display: block; }
+</style>
 
-/* Estilo de cada Mesa */
-.card-mesa {
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid rgba(255,255,255,0.1);
-}
+<header class="header-uol">
+    <div class="logo-container">
+        <div class="badge-30">934</div>
+        <div class="brand-name">BOTECO</div>
+    </div>
+    
+    <div class="info-cotacao">
+        <div class="cotacao-item">Dólar <b>▼ 5,011</b></div>
+        <div class="cotacao-item">Euro <b>▼ 5,877</b></div>
+    </div>
 
-.card-mesa:hover {
-    transform: scale(1.05);
-}
+    <div class="clima-uol">
+        <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" width="20">
+        <div>
+            <b>Petrolina</b><br>
+            <span style="color:#ff6600">32°C</span> <span style="color:#0066ff">24°C</span>
+        </div>
+    </div>
+</header>
 
-/* Cor quando está LIVRE */
-.status-livre {
-    background-color: #2e7d32; /* Verde escuro */
-    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
-}
-
-/* Cor quando está OCUPADA */
-.status-ocupada {
-    background-color: #c62828; /* Vermelho escuro */
-    box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
-}
-
-.mesa-header {
-    font-weight: bold;
-    font-size: 0.8em;
-    margin-bottom: 8px;
-    opacity: 0.9;
-}
-
-.mesa-body strong {
-    font-size: 1.1em;
-    display: block;
-    margin-top: 5px;
-}
+<nav class="nav-uol">
+    <div class="nav-item">OPERACIONAL
+        <div class="submenu">
+            <button onclick="setVisao('mesas')">Mesas</button>
+            <button onclick="zerarMesas()">Limpar Tudo</button>
+        </div>
+    </div>
+    <div class="nav-item" onclick="setVisao('estoque')">ESTOQUE / XML</div>
+    <div class="nav-item">FINANCEIRO</div>
+    <div class="nav-item">CARROS</div>
+    <div class="nav-item">ECONOMIA</div>
+    <div class="nav-item">GUIA DE COMPRAS</div>
+</nav>
