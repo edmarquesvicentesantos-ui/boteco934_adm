@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - SISTEMA INTEGRADO</title>
+    <title>934 BOTECO - SISTEMA TOTAL</title>
     <style>
-        :root { --gold: #ffcc00; --blue: #00d4ff; --bg: #050505; --glass: rgba(20, 20, 20, 0.95); --border: rgba(255, 255, 255, 0.1); }
+        :root { --gold: #ffcc00; --blue: #00d4ff; --bg: #050505; --glass: rgba(20, 20, 20, 0.98); --border: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: #fff; min-height: 100vh; }
-
-        header { background: var(--gold); padding: 12px 25px; color: #000; display: flex; justify-content: space-between; align-items: center; font-weight: 900; }
+        header { background: var(--gold); padding: 15px; color: #000; font-weight: 900; display: flex; justify-content: space-between; }
         
         nav { background: #111; display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; sticky; top: 0; z-index: 100; }
         .nav-item { padding: 18px; cursor: pointer; color: #666; font-weight: bold; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
@@ -18,119 +17,131 @@
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .secao { display: none; }
         .ativa { display: block; animation: fadeIn 0.3s ease; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CARDS E LISTAS */
         .card-vidro { background: var(--glass); padding: 25px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .grid-pdv { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         
-        /* MESAS E PRODUTOS */
-        .grid-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-        .item-box { background: #fff; color: #000; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; font-weight: bold; }
-        .item-box span { display: block; color: var(--blue); font-size: 0.9em; }
-        .mesa-ativa { background: var(--gold) !important; }
+        label { display: block; margin-bottom: 5px; color: #888; font-size: 11px; text-transform: uppercase; font-weight: bold; }
+        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 12px; width: 100%; font-size: 16px; }
+        
+        .res-painel { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border-left: 8px solid var(--gold); display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .res-item p { font-size: 11px; color: #666; }
+        .res-item h3 { font-size: 20px; font-weight: 900; }
+        .destaque { color: var(--gold); font-size: 28px !important; }
 
-        /* TABELAS */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: var(--gold); font-size: 12px; padding: 10px; border-bottom: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 1px solid #333; font-size: 12px; }
         td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
-        .btn-whats { background: #25d366; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 12px; }
-
-        /* INPUTS */
-        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn-acao { background: #25d366; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 12px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>934 BOTECO</div>
+    <div>934 BOTECO - GESTÃO</div>
     <div id="relogio">00:00:00</div>
 </header>
 
 <nav>
-    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas / Mesas</div>
-    <div class="nav-item" onclick="mudar('precificacao', this)">📊 Precificação</div>
+    <div class="nav-item active" onclick="mudar('vendas', this)">🛒 Vendas</div>
+    <div class="nav-item" onclick="mudar('precificacao', this)">📊 Garrafa/Fardo</div>
+    <div class="nav-item" onclick="mudar('doses', this)">🥃 Dose/Litro</div>
     <div class="nav-item" onclick="mudar('clientes', this)">👥 Clientes</div>
-    <div class="nav-item" onclick="mudar('estoque', this)">📦 Estoque</div>
 </nav>
 
 <div class="container">
     
-    <div id="vendas" class="secao ativa">
-        <div class="grid-pdv">
-            <div>
-                <h3 style="margin-bottom:15px; color:var(--gold)">Painel de Mesas</h3>
-                <div class="grid-itens" id="gridMesas">
-                    </div>
-                <h3 style="margin:20px 0 15px; color:var(--gold)">Produtos</h3>
-                <div class="grid-itens" id="vitrineVendas">
-                    <div class="item-box">Heineken 600ml<span>R$ 16,00</span></div>
-                    <div class="item-box">Combo Whisky<span>R$ 150,00</span></div>
+    <div id="doses" class="secao">
+        <div class="card-vidro">
+            <h2 style="color:var(--gold); margin-bottom:20px;">🥃 Custo por Dose (Destilados)</h2>
+            <div class="grid-inputs">
+                <div>
+                    <label>Custo da Garrafa (R$)</label>
+                    <input type="number" id="ds_custo" placeholder="Ex: 100.00" oninput="calcDose()">
+                </div>
+                <div>
+                    <label>ML da Garrafa</label>
+                    <select id="ds_ml_garrafa" onchange="calcDose()">
+                        <option value="1000">1000ml (1 Litro)</option>
+                        <option value="750">750ml</option>
+                        <option value="700">700ml</option>
+                    </select>
+                </div>
+                <div>
+                    <label>ML da Dose (Medida)</label>
+                    <input type="number" id="ds_ml_dose" value="50" oninput="calcDose()">
+                </div>
+                <div>
+                    <label>Preço da Dose (Venda)</label>
+                    <input type="number" id="ds_venda" placeholder="Ex: 15.00" oninput="calcDose()">
                 </div>
             </div>
-            <div class="card-vidro" style="background:#fff; color:#000;">
-                <h3 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Comanda / Cupom</h3>
-                <div id="carrinho" style="min-height:300px; margin-top:15px;">
-                    <p style="color:#888; font-size:12px;">Selecione uma mesa ou produto...</p>
+
+            <div class="res-painel" style="border-left-color: var(--blue);">
+                <div class="res-item">
+                    <p>Doses por Garrafa</p>
+                    <h3 id="out_ds_qtd">0 doses</h3>
                 </div>
-                <h2 style="font-size:32px; border-top:2px solid #000; padding-top:10px;">Total: R$ 0,00</h2>
+                <div class="res-item">
+                    <p>Custo por Dose</p>
+                    <h3 id="out_ds_custo_un">R$ 0,00</h3>
+                </div>
+                <div class="res-item">
+                    <p>Lucro por Dose</p>
+                    <h3 id="out_ds_lucro">R$ 0,00</h3>
+                </div>
+                <div class="res-item">
+                    <p>Margem Real %</p>
+                    <h3 id="out_ds_margem" class="destaque">0%</h3>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="precificacao" class="secao">
-        <div class="card-vidro" style="max-width: 600px; margin: auto;">
-            <h2 style="color: var(--gold); text-align: center; margin-bottom: 20px;">ENGENHARIA DE CUSTO</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div><label>Custo Fardo/Caixa</label><input type="number" id="inp_a" oninput="calc()"></div>
-                <div><label>Qtd Embalagem</label><input type="number" id="inp_b" oninput="calc()"></div>
-                <div><label>% Despesas</label><input type="number" id="inp_d" oninput="calc()"></div>
-                <div><label>Margem Desejada %</label><input type="number" id="inp_m" oninput="calc()"></div>
-                <div style="grid-column: span 2;"><label>Preço Venda Atual</label><input type="number" id="inp_f" oninput="calc()"></div>
+        <div class="card-vidro">
+            <h2 style="color:var(--gold); margin-bottom:20px;">📦 Precificação (Fardo / Caixa)</h2>
+            <div class="grid-inputs">
+                <div><label>Custo Fardo/Caixa</label><input type="number" id="inp_a" oninput="calcFardo()"></div>
+                <div><label>Qtd na Embalagem</label><input type="number" id="inp_b" oninput="calcFardo()"></div>
+                <div><label>% Taxas/Despesas</label><input type="number" id="inp_d" oninput="calcFardo()"></div>
+                <div><label>Preço Venda Unitário</label><input type="number" id="inp_f" oninput="calcFardo()"></div>
             </div>
-            <div id="resP" style="background:rgba(255,255,255,0.05); padding:20px; border-radius:15px; border-left:8px solid var(--gold); margin-top:20px; display:none;">
-                <p style="color:var(--blue); font-size:12px;">PREÇO SUGERIDO PARA META:</p>
-                <h2 id="out_sug" style="font-size:35px; margin-bottom:15px;">R$ 0,00</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><p style="font-size:10px;">LUCRO REAL</p><h4 id="out_lucro">R$ 0,00</h4></div>
-                    <div><p style="font-size:10px;">MARGEM REAL</p><h4 id="out_margem">0%</h4></div>
-                </div>
+            <div class="res-painel">
+                <div class="res-item"><p>Custo Unitário</p><h3 id="res_c">R$ 0,00</h3></div>
+                <div class="res-item"><p>Lucro Real</p><h3 id="res_g">R$ 0,00</h3></div>
+                <div class="res-item" style="grid-column: span 2;"><p>Margem Real %</p><h3 id="res_h" class="destaque">0%</h3></div>
             </div>
         </div>
     </div>
 
     <div id="clientes" class="secao">
         <div class="card-vidro">
-            <h2 style="color: var(--gold); margin-bottom:15px;">Cadastro de Clientes</h2>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px;">
-                <input type="text" id="cli_nome" placeholder="Nome do Cliente">
-                <input type="text" id="cli_tel" placeholder="WhatsApp (DDD)">
-                <input type="text" id="cli_obs" placeholder="Obs: Boticário / Fiado">
-                <button onclick="addCliente()" style="background:var(--gold); border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">SALVAR</button>
+            <h2 style="color:var(--gold); margin-bottom:15px;">👥 Cadastro de Clientes / Fiado</h2>
+            <div class="grid-inputs">
+                <input type="text" id="cli_nome" placeholder="Nome">
+                <input type="text" id="cli_tel" placeholder="WhatsApp">
+                <button onclick="addCli()" style="background:var(--gold); border:none; border-radius:10px; font-weight:bold; cursor:pointer;">SALVAR</button>
             </div>
             <table>
-                <thead>
-                    <tr><th>NOME</th><th>CONTATO</th><th>OBSERVAÇÃO</th><th>AÇÃO</th></tr>
-                </thead>
-                <tbody id="listaClientes">
-                    </tbody>
+                <thead><tr><th>NOME</th><th>CONTATO</th><th>AÇÃO</th></tr></thead>
+                <tbody id="tb_cli"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="estoque" class="secao">
-        <div class="card-vidro">
-            <h2 style="color: var(--gold); margin-bottom:15px;">Lista de Produtos / Estoque</h2>
-            <table>
-                <thead>
-                    <tr><th>CÓDIGO</th><th>PRODUTO</th><th>PREÇO VENDA</th><th>MARGEM</th></tr>
-                </thead>
-                <tbody id="listaEstoque">
-                    <tr><td>001</td><td>Cerveja Skol 269ml</td><td>R$ 3,50</td><td style="color:#00ff88">32%</td></tr>
-                    <tr><td>002</td><td>Combo Smirnoff</td><td>R$ 120,00</td><td style="color:#00ff88">45%</td></tr>
-                </tbody>
-            </table>
+    <div id="vendas" class="secao ativa">
+        <div style="display:grid; grid-template-columns: 1fr 350px; gap:20px;">
+            <div class="card-vidro">
+                <h3 style="color:var(--gold); margin-bottom:15px;">Balcão / Mesas</h3>
+                <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px;" id="mesas"></div>
+            </div>
+            <div class="card-vidro" style="background:#fff; color:#000;">
+                <h3 style="border-bottom:1px solid #ddd; padding-bottom:10px;">COMANDA</h3>
+                <div id="comanda" style="min-height:300px; margin-top:15px;"></div>
+                <h2 style="border-top:2px solid #000; padding-top:10px;">TOTAL: R$ 0,00</h2>
+            </div>
         </div>
     </div>
 
@@ -139,33 +150,46 @@
 <script>
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // Gerar 20 mesas
-    const gMesas = document.getElementById('gridMesas');
-    for(let i=1; i<=20; i++) {
-        gMesas.innerHTML += `<div class="item-box" onclick="this.classList.toggle('mesa-ativa')">Mesa ${i}<span>Livre</span></div>`;
+    // LÓGICA DE DOSES (DESTILADOS)
+    function calcDose() {
+        const custoGarrafa = parseFloat(document.getElementById('ds_custo').value) || 0;
+        const mlGarrafa = parseFloat(document.getElementById('ds_ml_garrafa').value) || 1;
+        const mlDose = parseFloat(document.getElementById('ds_ml_dose').value) || 50;
+        const precoVenda = parseFloat(document.getElementById('ds_venda').value) || 0;
+
+        const qtdDoses = mlGarrafa / mlDose;
+        const custoPorDose = custoGarrafa / qtdDoses;
+        const lucroDose = precoVenda - custoPorDose;
+        const margemDose = precoVenda > 0 ? (lucroDose / precoVenda) * 100 : 0;
+
+        document.getElementById('out_ds_qtd').innerText = `${Math.floor(qtdDoses)} doses`;
+        document.getElementById('out_ds_custo_un').innerText = `R$ ${custoPorDose.toFixed(2)}`;
+        document.getElementById('out_ds_lucro').innerText = `R$ ${lucroDose.toFixed(2)}`;
+        
+        const m = document.getElementById('out_ds_margem');
+        m.innerText = `${margemDose.toFixed(1)}%`;
+        m.style.color = margemDose < 30 ? "#ff4444" : "#00ff88";
     }
 
-    // Lógica da Calculadora
-    function calc() {
+    // LÓGICA FARDO
+    function calcFardo() {
         const a = parseFloat(document.getElementById('inp_a').value) || 0;
         const b = parseFloat(document.getElementById('inp_b').value) || 1;
         const d = parseFloat(document.getElementById('inp_d').value) || 0;
-        const m = parseFloat(document.getElementById('inp_m').value) || 0;
         const f = parseFloat(document.getElementById('inp_f').value) || 0;
-
         const c = a / b;
-        const divisor = 1 - (d/100) - (m/100);
-        const sugerido = divisor > 0 ? (c / divisor) : 0;
         const lucro = f - c - (f * (d/100));
-        const margemReal = f > 0 ? (lucro / f) * 100 : 0;
-
-        document.getElementById('resP').style.display = 'block';
-        document.getElementById('out_sug').innerText = `R$ ${sugerido.toFixed(2)}`;
-        document.getElementById('out_lucro').innerText = `R$ ${lucro.toFixed(2)}`;
-        document.getElementById('out_margem').innerText = `${margemReal.toFixed(1)}%`;
+        const margem = f > 0 ? (lucro/f)*100 : 0;
+        document.getElementById('res_c').innerText = `R$ ${c.toFixed(2)}`;
+        document.getElementById('res_g').innerText = `R$ ${lucro.toFixed(2)}`;
+        document.getElementById('res_h').innerText = `${margem.toFixed(1)}%`;
     }
 
-    // Navegação
+    // MESAS E NAVEGAÇÃO
+    for(let i=1; i<=20; i++){
+        document.getElementById('mesas').innerHTML += `<div style="background:#222; padding:10px; border-radius:8px; text-align:center; cursor:pointer;" onclick="this.style.background='var(--gold)'; this.style.color='#000'">M${i}</div>`;
+    }
+
     function mudar(id, el) {
         document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -173,20 +197,10 @@
         el.classList.add('active');
     }
 
-    // Mock Clientes
-    function addCliente() {
-        const nome = document.getElementById('cli_nome').value;
-        const tel = document.getElementById('cli_tel').value;
-        const obs = document.getElementById('cli_obs').value;
-        if(!nome) return;
-        
-        const lista = document.getElementById('listaClientes');
-        lista.innerHTML += `<tr>
-            <td>${nome}</td>
-            <td>${tel}</td>
-            <td>${obs}</td>
-            <td><a href="https://wa.me/55${tel}" target="_blank" class="btn-whats">WhatsApp</a></td>
-        </tr>`;
+    function addCli() {
+        const n = document.getElementById('cli_nome').value;
+        const t = document.getElementById('cli_tel').value;
+        if(n) document.getElementById('tb_cli').innerHTML += `<tr><td>${n}</td><td>${t}</td><td><button class="btn-acao">WhatsApp</button></td></tr>`;
     }
 </script>
 </body>
