@@ -2,34 +2,31 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Reset e Gestão</title>
+    <title>Boteco 934 - Oficial</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #f0f2f5; color: #333; }
-        header { background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #ffcc00; }
-        .badge { background: #ffcc00; color: #000; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 1.5em; }
-        nav { background: #222; display: flex; padding: 0 40px; gap: 20px; }
-        .nav-link { padding: 15px 10px; color: #fff; font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; }
-        .active { border-bottom: 3px solid #ffcc00; color: #ffcc00; }
-        .container { padding: 20px 40px; }
-        .secao { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #f4f7f6; }
+        header { background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; border-bottom: 3px solid #ffcc00; }
+        .badge { background: #ffcc00; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 1.5em; }
+        nav { background: #000; display: flex; padding: 0 40px; }
+        .nav-item { padding: 15px 20px; color: #fff; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+        .nav-item:hover, .active { background: #ffcc00; color: #000; }
+        .container { padding: 30px; }
+        .tela { display: none; }
         .ativa { display: block; }
-
-        /* MESAS */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; }
-        .mesa { background: #fff; border: 2px solid #2b579a; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 900; font-size: 1.3em; transition: 0.2s; }
+        
+        /* GRID DE MESAS */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .mesa { background: #fff; border: 2px solid #2b579a; padding: 25px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .mesa.ocupada { background: #e74c3c; color: #fff; border-color: #c0392b; }
 
-        /* TABELA ESTILO PLANILHA */
-        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #2b579a; color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border: 1px solid #ddd; font-weight: bold; }
-        .c-custo { background: #fff2cc; }
-        
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
-        .btn-azul { background: #2b579a; }
-        .btn-vermelho { background: #d32f2f; margin-left: 10px; }
+        /* TABELAS */
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2b579a; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; }
+        button { padding: 10px 15px; background: #2b579a; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-reset { background: #d32f2f; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -37,119 +34,121 @@
 <header>
     <div style="display:flex; align-items:center; gap:15px;">
         <div class="badge">934</div>
-        <h1 style="letter-spacing:-2px;">BOTECO</h1>
+        <h1>BOTECO</h1>
     </div>
-    <div style="text-align:right;"><strong>Petrolina-PE</strong></div>
+    <div><strong>Petrolina-PE</strong></div>
 </header>
 
 <nav>
-    <div class="nav-link active" onclick="mudar('operacional', this)">Operacional (Mesas)</div>
-    <div class="nav-link" onclick="mudar('estoque', this)">Estoque / XML</div>
+    <div class="nav-item active" onclick="abrir('operacional', this)">Operacional</div>
+    <div class="nav-item" onclick="abrir('estoque', this)">Estoque / XML</div>
+    <div class="nav-item" onclick="abrir('clientes', this)">Clientes</div>
 </nav>
 
 <div class="container">
-    <div id="operacional" class="secao ativa">
-        <h2>SISTEMA DE MESAS</h2>
-        <div class="grid-mesas" id="gradeMesas"></div>
+    <div id="operacional" class="tela ativa">
+        <h2 style="margin-bottom:20px;">CONTROLE DE MESAS</h2>
+        <div id="grade" class="grid-mesas"></div>
     </div>
 
-    <div id="estoque" class="secao">
+    <div id="estoque" class="tela">
         <div class="card">
             <h3>IMPORTAR XML</h3>
-            <input type="file" id="xmlInput" accept=".xml">
-            <button class="btn btn-azul" onclick="lerXML()">ATUALIZAR ESTOQUE</button>
-            <button class="btn btn-vermelho" onclick="resetarSistema()">LIMPAR TUDO (RESET)</button>
+            <input type="file" id="xmlFile" style="margin-top:10px;">
+            <button onclick="importarXML()">ATUALIZAR ESTOQUE</button>
+            <button class="btn-reset" onclick="resetar()">LIMPAR TUDO</button>
         </div>
         <div class="card">
-            <h3>PRODUTOS LANÇADOS</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th>PRODUTO</th>
-                        <th>ESTOQUE</th>
-                        <th class="c-custo">CUSTO UNIT.</th>
-                        <th>SUGESTÃO VENDA</th>
-                    </tr>
+                    <tr><th>PRODUTO</th><th>QTD</th><th>CUSTO</th><th>VENDA</th></tr>
                 </thead>
                 <tbody id="corpoEstoque"></tbody>
             </table>
         </div>
     </div>
+
+    <div id="clientes" class="tela">
+        <div class="card">
+            <h3>CLIENTES</h3>
+            <div id="listaClientes">Nenhum cliente cadastrado.</div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('b934_data')) || { estoque: {}, notas: [] };
+    // Memória do sistema
+    let dados = JSON.parse(localStorage.getItem('boteco934_db')) || { estoque: {}, notas: [], clientes: [] };
 
-    function mudar(id, btn) {
-        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    function abrir(id, el) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
-        btn.classList.add('active');
-        atualizarTela();
+        el.classList.add('active');
+        renderizar();
     }
 
-    function lerXML() {
-        const file = document.getElementById('xmlInput').files[0];
-        if(!file) return alert("Selecione o arquivo!");
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id") || "";
-
-            if(db.notas.includes(chave)) return alert("⚠️ Nota já importada!");
-
-            const itens = xml.getElementsByTagName("det");
-            for(let i = 0; i < itens.length; i++) {
-                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
-                const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
-                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
-
-                if(db.estoque[nome]) {
-                    db.estoque[nome].qtd += qtd;
-                } else {
-                    db.estoque[nome] = { qtd: qtd, custo: custo };
-                }
-            }
-
-            db.notas.push(chave);
-            localStorage.setItem('b934_data', JSON.stringify(db));
-            alert("✅ Sucesso!");
-            atualizarTela();
-        };
-        reader.readAsText(file);
-    }
-
-    function atualizarTela() {
-        // Renderiza Mesas
-        const grade = document.getElementById('gradeMesas');
-        if(grade.innerHTML === "") {
-            for (let i = 1; i <= 15; i++) {
-                grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
-            }
+    function renderizar() {
+        // Renderizar Mesas
+        const grade = document.getElementById('grade');
+        grade.innerHTML = "";
+        for(let i=1; i<=15; i++) {
+            grade.innerHTML += `<div class="mesa" onclick="this.classList.toggle('ocupada')">MESA ${i}</div>`;
         }
 
-        // Renderiza Tabela
-        const tabela = document.getElementById('corpoEstoque');
-        tabela.innerHTML = "";
-        for(let p in db.estoque) {
-            tabela.innerHTML += `<tr>
+        // Renderizar Estoque
+        const corpo = document.getElementById('corpoEstoque');
+        corpo.innerHTML = "";
+        for(let p in dados.estoque) {
+            corpo.innerHTML += `<tr>
                 <td>${p}</td>
-                <td>${db.estoque[p].qtd}</td>
-                <td class="c-custo">R$ ${db.estoque[p].custo.toFixed(2)}</td>
-                <td>R$ ${(db.estoque[p].custo * 1.5).toFixed(2)}</td>
+                <td>${dados.estoque[p].qtd}</td>
+                <td>R$ ${dados.estoque[p].custo.toFixed(2)}</td>
+                <td>R$ ${(dados.estoque[p].custo * 1.5).toFixed(2)}</td>
             </tr>`;
         }
     }
 
-    function resetarSistema() {
-        if(confirm("Deseja apagar TUDO e começar do zero?")) {
+    function importarXML() {
+        const file = document.getElementById('xmlFile').files[0];
+        if(!file) return alert("Escolha o XML!");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const chave = xml.getElementsByTagName("infNFe")[0]?.getAttribute("Id") || "N/A";
+
+            if(dados.notas.includes(chave)) return alert("Nota já importada!");
+
+            const itens = xml.getElementsByTagName("det");
+            for(let i=0; i<itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const qtd = parseFloat(itens[i].getElementsByTagName("qCom")[0].textContent);
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+
+                if(dados.estoque[nome]) {
+                    dados.estoque[nome].qtd += qtd;
+                } else {
+                    dados.estoque[nome] = { qtd: qtd, custo: custo };
+                }
+            }
+
+            dados.notas.push(chave);
+            localStorage.setItem('boteco934_db', JSON.stringify(dados));
+            alert("Estoque Atualizado!");
+            renderizar();
+        };
+        reader.readAsText(file);
+    }
+
+    function resetar() {
+        if(confirm("Apagar todos os dados?")) {
             localStorage.clear();
             location.reload();
         }
     }
 
-    window.onload = atualizarTela;
+    window.onload = renderizar;
 </script>
 </body>
 </html>
