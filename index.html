@@ -88,7 +88,141 @@
             </table>
         </div>
     </div>
+<div id="estoque" class="secao">
+    <div class="card">
+        <h3 style="color:var(--gold)">📥 Entrada via XML (Nota Fiscal)</h3>
+        <input type="file" id="xmlInput" accept=".xml" onchange="lerXML(this)" style="margin-top:10px;">
+        <div id="previaXML" style="margin-top:15px; color:#fff; font-size:13px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; display:none;"></div>
+        <button class="btn btn-gold" id="btnConfirmarXML" style="display:none; margin-top:10px;" onclick="confirmarEstoqueXML()">✅ Confirmar Itens do XML</button>
+    </div>
 
+    <div class="card">
+        <h3 style="color:var(--gold)">➕ Entrada Manual (Um item)</h3>
+        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:10px; margin-top:15px;">
+            <input type="text" id="m_nome" placeholder="Nome do Produto">
+            <input type="number" id="m_custo" placeholder="Custo Total">
+            <input type="number" id="m_qtd" placeholder="Qtd Itens" value="1">
+            <input type="number" id="m_venda" placeholder="Preço Venda UN">
+            <button class="btn btn-gold" onclick="addEntradaManual()" style="width:100px;">Adicionar</button>
+        </div>
+        <p style="font-size:11px; color:#888;">*O sistema dividirá o custo total pela quantidade automaticamente.</p>
+    </div>
+
+    <div class="card">
+        <h3>📦 Estoque do Boteco 934</h3>
+        <table>
+            <thead>
+                <tr style="color:var(--gold)">
+                    <th>PRODUTO</th>
+                    <th>CUSTO UN.</th>
+                    <th>VENDA UN.</th>
+                    <th>MARGEM</th>
+                    <th>AÇÃO</th>
+                </tr>
+            </thead>
+            <tbody id="corpoEstoque"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Variáveis de controle
+    let estoque = JSON.parse(localStorage.getItem('estoque_934')) || [];
+    let itensTempXML = [];
+
+    // 1. LER XML (Mesma lógica anterior)
+    function lerXML(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const xmlDoc = new DOMParser().parseFromString(e.target.result, "text/xml");
+            const produtos = xmlDoc.getElementsByTagName("det");
+            itensTempXML = [];
+            let listaHtml = "<b>Verifique os itens:</b><br>";
+            
+            for (let i = 0; i < produtos.length; i++) {
+                const nome = produtos[i].getElementsByTagName("xProd")[0].textContent;
+                const custoTotal = parseFloat(produtos[i].getElementsByTagName("vUnCom")[0].textContent);
+                
+                // Pergunta a quantidade para dividir
+                const qtd = prompt(`O item [${nome}] veio no valor de R$ ${custoTotal}. Quantas UNIDADES tem nele?`, "12");
+                const uni = parseInt(qtd) || 1;
+                const custoUni = custoTotal / uni;
+
+                itensTempXML.push({ nome: nome + " (UN)", custo: custoUni, venda: custoUni * 1.5 });
+                listaHtml += `• ${nome} - Custo Un: R$ ${custoUni.toFixed(2)}<br>`;
+            }
+            
+            document.getElementById('previaXML').innerHTML = listaHtml;
+            document.getElementById('previaXML').style.display = 'block';
+            document.getElementById('btnConfirmarXML').style.display = 'block';
+        };
+        reader.readAsText(file);
+    }
+
+    // 2. CONFIRMAR XML NO ESTOQUE
+    function confirmarEstoqueXML() {
+        estoque = [...estoque, ...itensTempXML];
+        salvarEAtualizar();
+        document.getElementById('previaXML').style.display = 'none';
+        document.getElementById('btnConfirmarXML').style.display = 'none';
+        alert("Itens do XML salvos com sucesso!");
+    }
+
+    // 3. ADICIONAR UM ITEM SÓ (MANUAL)
+    function addEntradaManual() {
+        const nome = document.getElementById('m_nome').value;
+        const custoTotal = parseFloat(document.getElementById('m_custo').value);
+        const qtd = parseInt(document.getElementById('m_qtd').value) || 1;
+        const venda = parseFloat(document.getElementById('m_venda').value);
+
+        if(!nome || !custoTotal || !venda) return alert("Preencha todos os campos!");
+
+        const custoUn = custoTotal / qtd;
+
+        estoque.push({ nome, custo: custoUn, venda });
+        salvarEAtualizar();
+
+        // Limpa campos
+        document.getElementById('m_nome').value = '';
+        document.getElementById('m_custo').value = '';
+        document.getElementById('m_venda').value = '';
+        alert("Item adicionado ao estoque!");
+    }
+
+    // 4. SALVAR E RENDERIZAR
+    function salvarEAtualizar() {
+        localStorage.setItem('estoque_934', JSON.stringify(estoque));
+        const corpo = document.getElementById('corpoEstoque');
+        corpo.innerHTML = '';
+
+        estoque.forEach((p, index) => {
+            const margem = ((p.venda - p.custo) / p.venda) * 100;
+            corpo.innerHTML += `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.custo.toFixed(2)}</td>
+                    <td>R$ ${p.venda.toFixed(2)}</td>
+                    <td style="color:${margem > 20 ? '#00ff88' : '#ff4444'}">${margem.toFixed(1)}%</td>
+                    <td><button onclick="removerItem(${index})" style="background:none; border:none; color:red; cursor:pointer;">🗑️</button></td>
+                </tr>
+            `;
+        });
+        
+        // Se você tiver a função de vitrine no PDV, chama ela aqui também
+        if(typeof atualizarVitrineVendas === "function") atualizarVitrineVendas();
+    }
+
+    function removerItem(i) {
+        if(confirm("Remover este produto?")) {
+            estoque.splice(i, 1);
+            salvarEAtualizar();
+        }
+    }
+
+    // Inicia a tabela ao carregar
+    salvarEAtualizar();
+</script>
     <div id="calc" class="secao">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
             <div class="card">
