@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>934 - VENDAS</title>
+    <style>
+        :root { --gold: #ffcc00; --bg: #0b0b0b; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
+        .mesas-area { flex: 1; padding: 20px; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .mesa { background: #222; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .mesa.ocupada { background: #4a0000; border-color: #ff4444; }
+        .mesa.selecionada { border-color: var(--gold); }
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; border-top: 1px solid #333; padding-top: 20px; }
+        .prod-btn { background: #fff; color: #000; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .caixa { width: 350px; background: #fff; color: #000; padding: 20px; display: flex; flex-direction: column; }
+        .btn-whats { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="mesas-area">
+        <h2 style="color:var(--gold)">MESAS</h2>
+        <div id="gridMesas" class="grid"></div>
+        
+        <h2 style="color:var(--gold)">MERCADORIAS</h2>
+        <div id="vitrine" class="vitrine"></div>
+    </div>
+
+    <div class="caixa">
+        <h3 id="infoMesa">Selecione uma mesa</h3>
+        <div id="consumo" style="flex:1; margin-top:20px; border-top:1px solid #ddd;"></div>
+        <hr>
+        <h2>TOTAL: R$ <span id="total">0,00</span></h2>
+        <button class="btn-whats" onclick="fechar()">FECHAR CONTA</button>
+    </div>
+
+    <script>
+        let mSel = null;
+        let mesas = JSON.parse(localStorage.getItem('mesas_ativa')) || {};
+        let estoque = JSON.parse(localStorage.getItem('boteco_est')) || [];
+
+        function init() {
+            const grid = document.getElementById('gridMesas');
+            for(let i=1; i<=20; i++) {
+                if(!mesas[i]) mesas[i] = { ocupada: false, itens: [], total: 0 };
+                grid.innerHTML += `<div class="mesa ${mesas[i].ocupada?'ocupada':''}" id="m${i}" onclick="sel(${i})">M${i}</div>`;
+            }
+            renderVitrine();
+        }
+
+        function sel(n) {
+            mSel = n;
+            document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
+            document.getElementById(`m${n}`).classList.add('selecionada');
+            document.getElementById('infoMesa').innerText = "Mesa " + n;
+            if(!mesas[n].ocupada) {
+                if(confirm("Abrir mesa?")) {
+                    mesas[n].ocupada = true;
+                    document.getElementById(`m${n}`).classList.add('ocupada');
+                    salvar();
+                }
+            }
+            atualizar();
+        }
+
+        function renderVitrine() {
+            document.getElementById('vitrine').innerHTML = estoque.map(p => 
+                `<div class="prod-btn" onclick="add('${p.nome}', ${p.venda})">${p.nome}<br>R$ ${p.venda.toFixed(2)}</div>`
+            ).join('');
+        }
+
+        function add(n, v) {
+            if(!mSel || !mesas[mSel].ocupada) return alert("Abra a mesa primeiro!");
+            mesas[mSel].itens.push({ n, v });
+            mesas[mSel].total += v;
+            salvar();
+            atualizar();
+        }
+
+        function atualizar() {
+            if(!mSel) return;
+            document.getElementById('consumo').innerHTML = mesas[mSel].itens.map(i => `<div>${i.n} - R$ ${i.v.toFixed(2)}</div>`).join('');
+            document.getElementById('total').innerText = mesas[mSel].total.toFixed(2);
+        }
+
+        function salvar() { localStorage.setItem('mesas_ativa', JSON.stringify(mesas)); }
+
+        function fechar() {
+            const texto = `*934 BOTECO*%0AMesa ${mSel}%0ATotal: R$ ${mesas[mSel].total.toFixed(2)}`;
+            window.open(`https://wa.me/?text=${texto}`);
+            mesas[mSel] = { ocupada: false, itens: [], total: 0 };
+            location.reload();
+            salvar();
+        }
+        init();
+    </script>
+</body>
+</html>
