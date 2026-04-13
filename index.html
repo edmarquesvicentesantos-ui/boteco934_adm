@@ -95,14 +95,31 @@
         </div>
 
         <div id="estoque" class="tela">
-            <h4>📦 Estoque Atual</h4>
-            <div class="wrap-tab">
-                <table>
-                    <thead><tr><th>Item</th><th>Custo</th><th>Venda</th><th>Qtd</th></tr></thead>
-                    <tbody id="tab-estoque"></tbody>
-                </table>
-            </div>
-        </div>
+    <h4>📦 Cadastrar Novo Produto / Entrada</h4>
+    <div class="form-cliente" style="grid-template-columns: 1fr 1fr 1fr 1fr auto;">
+        <div><label>Código (EAN):</label><br><input type="text" id="p-ean" placeholder="Bipe o código..." style="width:100%"></div>
+        <div><label>Nome Produto:</label><br><input type="text" id="p-nome" placeholder="Ex: Skol 600ml" style="width:100%"></div>
+        <div><label>Custo (R$):</label><br><input type="number" id="p-custo" step="0.01" style="width:100%"></div>
+        <div><label>Venda (R$):</label><br><input type="number" id="p-venda" step="0.01" style="width:100%"></div>
+        <div><label>Qtd:</label><br><input type="number" id="p-qtd" style="width:60px"></div>
+        <button onclick="salvarProduto()" class="btn" style="background:var(--success); margin:0; padding: 8px 15px;">＋ Add</button>
+    </div>
+
+    <div class="wrap-tab">
+        <table>
+            <thead>
+                <tr>
+                    <th width="20%">Código</th>
+                    <th width="40%">Produto</th>
+                    <th width="15%">Custo</th>
+                    <th width="15%">Venda</th>
+                    <th width="10%">Qtd</th>
+                </tr>
+            </thead>
+            <tbody id="tab-estoque"></tbody>
+        </table>
+    </div>
+</div>
     </section>
 
     <section class="carrinho">
