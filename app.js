@@ -115,3 +115,102 @@ function lerXML(arquivo) {
     };
     reader.readAsText(arquivo);
 }
+// --- BANCO DE DADOS ---
+let db_estoque = JSON.parse(localStorage.getItem('934_est')) || [];
+let db_clientes = JSON.parse(localStorage.getItem('934_cli')) || [];
+
+// --- 1. LEITOR DE XML COM CALCULADORA DE FRACIONAMENTO ---
+function importarXML(arquivo) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(e.target.result, "text/xml");
+        const produtos = xml.getElementsByTagName("det");
+        
+        for (let p of produtos) {
+            let nomeNF = p.getElementsByTagName("xProd")[0].textContent;
+            let qtdPacotes = parseFloat(p.getElementsByTagName("qCom")[0].textContent); 
+            let valorFardo = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent);
+            
+            // Pergunta o fracionamento (Ex: 12 unidades por fardo)
+            let unidadesPorPacote = prompt(`PRODUTO: ${nomeNF}\nQtd na Nota: ${qtdPacotes} pacotes\n\nQuantas UNIDADES vêm em cada pacote?`, "12");
+            
+            if (unidadesPorPacote) {
+                let fator = parseInt(unidadesPorPacote);
+                let totalUnidades = qtdPacotes * fator; // Ex: 10 fardos x 12 = 120 latas
+                let custoUnidade = valorFardo / fator;
+
+                // Sugestão de venda automática (pode ajustar a margem aqui)
+                let precoVenda = custoUnidade * 1.50; 
+
+                let existe = db_estoque.find(i => i.nome === nomeNF);
+                if (existe) {
+                    existe.qtd += totalUnidades;
+                    existe.custo = custoUnidade;
+                } else {
+                    db_estoque.push({ 
+                        nome: nomeNF, 
+                        qtd: totalUnidades, 
+                        preco: precoVenda, 
+                        custo: custoUnidade 
+                    });
+                }
+            }
+        }
+        salvarEShow();
+        alert("XML Processado! O estoque agora reflete as UNIDADES.");
+    };
+    reader.readAsText(arquivo);
+}
+
+// --- 2. GESTÃO DE FIADO (PENDURA) ---
+function pendurarConta(nomeCliente, valorTotal, resumoItens) {
+    if (!nomeCliente) return;
+
+    let cliente = db_clientes.find(c => c.nome.toLowerCase() === nomeCliente.toLowerCase());
+
+    if (cliente) {
+        cliente.debito += valorTotal;
+        cliente.historico.push({ data: new Date().toLocaleDateString(), valor: valorTotal, itens: resumoItens });
+    } else {
+        db_clientes.push({
+            nome: nomeCliente,
+            debito: valorTotal,
+            historico: [{ data: new Date().toLocaleDateString(), valor: valorTotal, itens: resumoItens }]
+        });
+    }
+    salvarEShow();
+    alert(`R$ ${valorTotal.toFixed(2)} pendurado para ${nomeCliente}`);
+}
+
+// --- 3. TABELA DE CLIENTES (RECEBIMENTO) ---
+function renderizarClientes() {
+    const lista = document.getElementById('listaClientes');
+    if(!lista) return;
+
+    lista.innerHTML = db_clientes.map((c, index) => `
+        <div style="display:flex; justify-content:space-between; background:#1a1a1a; padding:15px; margin-bottom:5px; border-radius:5px;">
+            <div>
+                <b style="color:#ffcc00">${c.nome.toUpperCase()}</b><br>
+                <small style="color:#ff4444">Dívida: R$ ${c.debito.toFixed(2)}</small>
+            </div>
+            <button onclick="receberPagamento(${index})" style="background:#25d366; border:none; color:#fff; padding:10px; border-radius:5px; cursor:pointer;">PAGAR</button>
+        </div>
+    `).join('');
+}
+
+function receberPagamento(index) {
+    let valorPagar = parseFloat(prompt(`Quanto ${db_clientes[index].nome} está pagando?`, db_clientes[index].debito));
+    if (valorPagar > 0) {
+        db_clientes[index].debito -= valorPagar;
+        if(db_clientes[index].debito <= 0) db_clientes.splice(index, 1); // Remove se quitou tudo
+        salvarEShow();
+    }
+}
+
+function salvarEShow() {
+    localStorage.setItem('934_est', JSON.stringify(db_estoque));
+    localStorage.setItem('934_cli', JSON.stringify(db_clientes));
+    if (typeof render === "function") render(); // Atualiza sua tela principal
+    renderizarClientes();
+}
