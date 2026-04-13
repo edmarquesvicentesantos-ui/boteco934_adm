@@ -1,202 +1,74 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Boteco 934 - Sistema Completo</title>
-    <style>
-        :root { --amarelo: #ffcc00; --azul: #2b579a; --preto: #0b0b0b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--preto); color: #fff; }
-        
-        header { background: var(--amarelo); padding: 15px 30px; color: #000; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-size: 24px; font-weight: 900; }
+// BANCO DE DADOS ATUALIZADO
+let db_estoque = JSON.parse(localStorage.getItem('934_est')) || [];
+let db_mesas = JSON.parse(localStorage.getItem('934_mes')) || Array(12).fill().map((_, i) => ({ id: i+1, ocupada: false, pedidos: [], total: 0 }));
+let db_clientes = JSON.parse(localStorage.getItem('934_cli')) || []; // Lista de Fiado
+let mesaAberta = null;
 
-        nav { background: #1a1a1a; display: flex; border-bottom: 1px solid #333; }
-        .nav-item { padding: 15px 25px; cursor: pointer; color: #888; font-weight: bold; text-transform: uppercase; font-size: 12px; }
-        .active { color: var(--amarelo); border-bottom: 3px solid var(--amarelo); background: rgba(255,204,0,0.05); }
+// FUNÇÃO PARA FECHAR CONTA COM DIVISÃO (CAIXA OU PENDURA)
+function fecharContaFinal(tipoPagamento) {
+    if (!mesaAberta || mesaAberta.total <= 0) return;
 
-        .container { padding: 20px; }
-        .secao { display: none; }
-        .ativa { display: block; }
+    if (tipoPagamento === 'pendura') {
+        let nomeCli = prompt("Para qual cliente vamos pendurar?");
+        if (!nomeCli) return;
 
-        /* Estilo dos Inputs */
-        .card-form { background: #161616; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; border: 1px solid #333; }
-        input { background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; flex: 1; }
-        button { background: var(--amarelo); color: #000; border: none; padding: 12px 25px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
-
-        /* Tabela de Estoque */
-        .tabela-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; background: var(--azul); padding: 12px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: bold; text-align: center; }
-        .produto-linha { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; background: #fff; color: #000; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
-        .produto-linha div { padding: 12px; }
-
-        /* Cards de Cliente */
-        .cliente-card { background: #fff; color: #000; padding: 15px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .badge-fone { background: #f0f0f0; padding: 5px 10px; border-radius: 5px; font-size: 13px; color: #333; display: flex; align-items: center; gap: 5px; }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>934 BOTECO</h1>
-    <span>SISTEMA COMPLETO</span>
-</header>
-
-<nav>
-    <div class="nav-item active" onclick="mudar('estoque', this)">Estoque XML</div>
-    <div class="nav-item" onclick="mudar('clientes', this)">Clientes / Contatos</div>
-</nav>
-
-<div class="container">
-    <div id="estoque" class="secao ativa">
-        <div class="card-form">
-            <input type="file" id="xmlInput" accept=".xml">
-            <button onclick="lancarXML()">Lançar no Firebase</button>
-        </div>
-        <div class="tabela-header">
-            <div>PRODUTO</div><div>QTD</div><div>CUSTO</div><div>VENDA</div><div>LUCRO</div><div>%</div>
-        </div>
-        <div id="listaProdutos"></div>
-    </div>
-
-    <div id="clientes" class="secao">
-        <div class="card-form">
-            <input type="text" id="nomeCli" placeholder="Nome do Cliente">
-            <input type="text" id="foneCli" placeholder="WhatsApp / Telefone">
-            <button onclick="salvarCliente()">Cadastrar</button>
-        </div>
-        <h3 style="color: var(--amarelo); margin-bottom: 15px; font-size: 14px;">CLIENTES CADASTRADOS</h3>
-        <div id="listaClientes"></div>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSy...", 
-        authDomain: "boteco934-afc3f.firebaseapp.com",
-        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
-        projectId: "boteco934-afc3f",
-        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // --- ESTOQUE COM PROTEÇÃO CONTRA ERRO 'toFixed' ---
-    onValue(ref(db, 'produtos'), (snapshot) => {
-        const div = document.getElementById('listaProdutos');
-        div.innerHTML = "";
-        const dados = snapshot.val();
-        if(dados) {
-            Object.values(dados).forEach(p => {
-                // Proteção: se o valor não existir, vira 0
-                const custo = p.custo || 0;
-                const venda = p.venda || 0;
-                const lucro = p.lucro || 0;
-
-                div.innerHTML += `
-                <div class="produto-linha">
-                    <div style="text-align:left">${p.nome || '---'}</div>
-                    <div>${p.qtd || 0}</div>
-                    <div style="background:#fff2cc">R$ ${custo.toFixed(2)}</div>
-                    <div style="background:#d9e1f2">R$ ${venda.toFixed(2)}</div>
-                    <div style="background:#fce4ec">R$ ${lucro.toFixed(2)}</div>
-                    <div style="background:#e2efda">${p.margem || 0}%</div>
-                </div>`;
+        let cliente = db_clientes.find(c => c.nome.toLowerCase() === nomeCli.toLowerCase());
+        if (cliente) {
+            cliente.debito += mesaAberta.total;
+            cliente.historico.push({ data: new Date().toLocaleDateString(), valor: mesaAberta.total });
+        } else {
+            db_clientes.push({
+                nome: nomeCli,
+                debito: mesaAberta.total,
+                historico: [{ data: new Date().toLocaleDateString(), valor: mesaAberta.total }]
             });
         }
-    });
-
-    // --- CLIENTES SEM O ERRO 'UNDEFINED' ---
-    window.salvarCliente = function() {
-        const nome = document.getElementById('nomeCli').value;
-        const contato = document.getElementById('foneCli').value;
-        if(!nome) return alert("Digite o nome!");
-        
-        push(ref(db, 'clientes'), { nome, contato: contato || "" }).then(() => {
-            document.getElementById('nomeCli').value = "";
-            document.getElementById('foneCli').value = "";
-        });
-    };
-
-    onValue(ref(db, 'clientes'), (snapshot) => {
-        const div = document.getElementById('listaClientes');
-        div.innerHTML = "";
-        const dados = snapshot.val();
-        if(dados) {
-            Object.values(dados).forEach(c => {
-                // Se o contato for vazio ou undefined, mostra ícone cinza
-                const foneDisplay = c.contato ? `📞 ${c.contato}` : "🚫 Sem fone";
-                div.innerHTML += `
-                <div class="cliente-card">
-                    <span>👤 ${c.nome.toUpperCase()}</span>
-                    <div class="badge-fone">${foneDisplay}</div>
-                </div>`;
-            });
-        }
-    });
-
-    window.mudar = (id, el) => {
-        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('ativa');
-        el.classList.add('active');
-    };
-// 1. Função para Abrir a Mesa (Sai da tela de nome e vai para o consumo)
-function abrirMesa() {
-    const nome = document.getElementById('nomeCliente').value;
-    if(!nome) {
-        alert("Edmarques, precisa colocar o nome do cliente antes!");
-        return;
+        alert(`Valor de R$ ${mesaAberta.total.toFixed(2)} lançado no Fiado de ${nomeCli}`);
+    } else {
+        alert("Venda finalizada no CAIXA!");
     }
-    
-    // Salva os dados na mesa selecionada
-    dadosMesas[mesaSelecionada].ocupada = true;
-    dadosMesas[mesaSelecionada].cliente = nome;
-    
-    // Atualiza o visual da mesa na grade
-    const mEl = document.getElementById(`m${mesaSelecionada}`);
-    mEl.classList.add('ocupada');
-    mEl.innerHTML = `<b>Mesa ${mesaSelecionada}</b><br><small>${nome}</small>`;
-    
-    // MUDA A TELA: Esconde o formulário de nome e mostra a área de consumo
-    document.getElementById('areaAbertura').style.display = 'none';
-    document.getElementById('areaConsumo').style.display = 'block';
-    
-    // Atualiza os nomes na tela de consumo
-    document.getElementById('tituloMesa').innerText = `Atendendo Mesa ${mesaSelecionada}`;
-    document.getElementById('clienteAtual').innerText = `Cliente: ${nome}`;
+
+    // Gerar Recibo WhatsApp antes de limpar
+    enviarZap();
+
+    // Limpa a mesa
+    mesaAberta.ocupada = false;
+    mesaAberta.pedidos = [];
+    mesaAberta.total = 0;
+    save();
+    location.reload();
 }
 
-// 2. Função para Preparar o Fechamento (Abre o Modal de Pagamento)
-function prepararFechamento() {
-    const total = document.getElementById('totalVenda').innerText;
-    document.getElementById('valorModal').innerText = `R$ ${total}`;
-    document.getElementById('modalPagamento').style.display = 'block';
+// RENDERIZAR LISTA DE CLIENTES (FIADO)
+function renderClientes() {
+    const corpo = document.getElementById('corpoClientes');
+    if(!corpo) return;
+    
+    corpo.innerHTML = db_clientes.map((c, index) => `
+        <tr style="border-bottom: 1px solid #222;">
+            <td style="padding:10px;"><b>${c.nome.toUpperCase()}</b></td>
+            <td style="padding:10px; color:#ff4444;">R$ ${c.debito.toFixed(2)}</td>
+            <td style="padding:10px;">
+                <button onclick="receberDivida(${index})" style="background:#25d366; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">RECEBER</button>
+            </td>
+        </tr>
+    `).join('');
 }
 
-// 3. Função para Finalizar e Limpar a Mesa
-function confirmarVenda() {
-    const meio = document.getElementById('meioPagamento').value;
-    const cliente = dadosMesas[mesaSelecionada].cliente;
-    const total = document.getElementById('totalVenda').innerText;
+function receberDivida(index) {
+    let valor = parseFloat(prompt(`Quanto o(a) ${db_clientes[index].nome} está pagando?`, db_clientes[index].debito));
+    if (isNaN(valor) || valor <= 0) return;
 
-    alert(`Venda Finalizada!\nCliente: ${cliente}\nTotal: R$ ${total}\nForma: ${meio}`);
-
-    // Limpa a mesa para o próximo cliente
-    dadosMesas[mesaSelecionada] = { ocupada: false, cliente: '', total: 0 };
-    const mEl = document.getElementById(`m${mesaSelecionada}`);
-    mEl.classList.remove('ocupada');
-    mEl.innerHTML = `Mesa ${mesaSelecionada}<br><small>Livre</small>`;
-
-    // Volta para a tela inicial de mesas
-    document.getElementById('modalPagamento').style.display = 'none';
-    document.getElementById('areaConsumo').style.display = 'none';
-    document.getElementById('areaAbertura').style.display = 'block';
-    document.getElementById('nomeCliente').value = '';
+    db_clientes[index].debito -= valor;
+    if (db_clientes[index].debito <= 0) {
+        alert("Dívida quitada!");
+    }
+    save();
+    renderClientes();
 }
-</script>
-</body>
-</html>
+
+function save() {
+    localStorage.setItem('934_est', JSON.stringify(db_estoque));
+    localStorage.setItem('934_mes', JSON.stringify(db_mesas));
+    localStorage.setItem('934_cli', JSON.stringify(db_clientes));
+}
