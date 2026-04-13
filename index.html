@@ -3,115 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - ELITE PDV</title>
+    <title>BOTECO 934 - PDV ELITE</title>
     <style>
-        :root { --primary: #1a252f; --success: #27ae60; --danger: #e74c3c; --accent: #f1c40f; }
+        :root { --primary: #1a252f; --success: #27ae60; --danger: #e74c3c; --accent: #f1c40f; --bg: #f4f7f6; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: #f4f7f6; 
-            height: 100vh; 
-            width: 100vw; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
+        /* CABEÇALHO FIXO */
         header { 
-            height: 50px; 
-            background: var(--primary); 
-            color: white; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 15px; 
-            flex-shrink: 0; 
-            border-bottom: 3px solid var(--accent);
+            background: var(--primary); color: white; padding: 10px 15px; flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent);
         }
 
-        main { 
-            display: flex; 
-            flex: 1; 
-            overflow: hidden; 
-            width: 100%;
+        /* BARRA DE BOTÕES ABAIXO DO CABEÇALHO */
+        .nav-bar {
+            background: #2c3e50; display: flex; gap: 2px; flex-shrink: 0; border-bottom: 1px solid #ddd;
         }
-
-        /* COLUNA 1: MESAS (FIXA NA ESQUERDA) */
-        .col-mesas { 
-            width: 180px; 
-            background: #fff; 
-            border-right: 2px solid #ddd; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 10px; 
-            overflow-y: auto; 
-            flex-shrink: 0; 
+        .nav-btn {
+            flex: 1; padding: 12px; border: none; background: #2c3e50; color: #bdc3c7; 
+            cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase;
         }
+        .nav-btn.active { background: #1abc9c; color: white; }
 
+        main { display: flex; flex: 1; overflow: hidden; }
+
+        /* COLUNA MESAS */
+        .col-mesas { width: 150px; background: #fff; border-right: 2px solid #ddd; overflow-y: auto; padding: 10px; flex-shrink: 0; }
         .mesa-btn { 
-            width: 100%; 
-            padding: 15px 5px; 
-            margin-bottom: 10px; 
-            border: 2px solid #ccc; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-align: center; 
-            font-weight: bold; 
-            background: #fff;
-            flex-shrink: 0;
+            width: 100%; padding: 15px 5px; margin-bottom: 10px; border: 2px solid #ccc; border-radius: 8px; 
+            cursor: pointer; text-align: center; font-weight: bold; background: #fff;
         }
         .mesa-btn.ocupada { background: #fff9db; border-color: var(--accent); color: #d35400; }
         .mesa-btn.selecionada { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* COLUNA 2: PRODUTOS (CENTRO) */
-        .col-produtos { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 15px; 
-            background: #fff;
-            overflow: hidden;
-        }
+        /* COLUNA PRODUTOS */
+        .col-produtos { flex: 1; padding: 15px; overflow-y: auto; background: #fff; }
+        .grid-prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+        .card-p { border: 1px solid #eee; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .grid-produtos { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-            gap: 12px; 
-            overflow-y: auto; 
-            padding: 5px; 
-        }
-
-        .card-p { 
-            border: 1px solid #eee; 
-            padding: 10px; 
-            text-align: center; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            background: white; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-        }
-
-        /* COLUNA 3: CARRINHO (DIREITA) */
-        .col-carrinho { 
-            width: 340px; 
-            background: #fff; 
-            border-left: 2px solid #ddd; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 15px; 
-            flex-shrink: 0; 
-        }
-
-        .itens-lista { flex: 1; overflow-y: auto; margin-bottom: 15px; }
-        .cliente-bloco { margin-bottom: 12px; border: 1px solid #eee; border-radius: 6px; overflow: hidden; }
-        .cliente-header { background: #f8f9fa; padding: 6px 10px; font-weight: bold; font-size: 12px; border-bottom: 1px solid #eee; }
-        .item-linha { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #fafafa; }
+        /* COLUNA CARRINHO */
+        .col-carrinho { width: 320px; background: #fff; border-left: 2px solid #ddd; display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; }
+        .itens-lista { flex: 1; overflow-y: auto; margin-bottom: 10px; }
+        .cliente-bloco { border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+        .cliente-header { background: #f8f9fa; padding: 5px 10px; font-weight: bold; font-size: 12px; border-bottom: 1px solid #eee; }
+        .item-linha { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 13px; border-bottom: 1px solid #fafafa; }
         
-        .btn-del { color: var(--danger); font-weight: bold; cursor: pointer; border: none; background: none; font-size: 16px; padding-left: 10px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; margin-top: 5px; }
-        
-        select { padding: 12px; border: 1px solid #3498db; border-radius: 5px; width: 100%; background: #ebf5fb; margin-bottom: 15px; font-weight: bold; }
+        .btn-del { color: var(--danger); font-weight: bold; cursor: pointer; border: none; background: none; font-size: 16px; margin-left: 8px; }
+        .btn-acao { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; margin-top: 5px; }
+
+        .tela { display: none; width: 100%; height: 100%; }
+        .tela.ativa { display: flex; }
+
+        select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #3498db; border-radius: 6px; background: #ebf5fb; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -121,44 +65,68 @@
     <div>CAIXA: <span id="vTotal">R$ 0.00</span></div>
 </header>
 
+<nav class="nav-bar">
+    <button class="nav-btn active" onclick="ver('vendas', this)">🛒 Vendas</button>
+    <button class="nav-btn" onclick="ver('clientes', this)">👥 Clientes</button>
+    <button class="nav-btn" onclick="ver('estoque', this)">📦 Estoque</button>
+</nav>
+
 <main>
-    <aside class="col-mesas" id="lista-mesas"></aside>
-
-    <section class="col-produtos">
-        <label style="font-size:11px; font-weight:bold; color:#2980b9;">LANÇAR PARA O CLIENTE:</label>
-        <select id="sel-cliente-venda"></select>
-        <div id="grid-produtos" class="grid-produtos"></div>
-    </section>
-
-    <aside class="col-carrinho">
-        <h3 id="mesa-titulo" style="text-align:center; padding-bottom:10px; border-bottom: 2px solid var(--primary); margin-bottom: 10px;">Selecione uma Mesa</h3>
-        <div id="c-itens" class="itens-lista"></div>
+    <div id="vendas" class="tela ativa">
+        <aside class="col-mesas" id="lista-mesas"></aside>
         
-        <div style="background: #fdfefe; padding: 10px; border-top: 2px solid #eee;">
-            <div style="display:flex; justify-content:space-between; font-size:20px; font-weight:bold; margin-bottom:10px;">
-                <span>TOTAL:</span><span>R$ <span id="c-total">0.00</span></span>
+        <section class="col-produtos">
+            <select id="sel-cliente-venda"></select>
+            <div id="grid-produtos" class="grid-prods"></div>
+        </section>
+
+        <aside class="col-carrinho">
+            <h3 id="mesa-titulo" style="text-align:center; padding-bottom:10px; border-bottom: 2px solid var(--primary);">Selecione Mesa</h3>
+            <div id="c-itens" class="itens-lista"></div>
+            
+            <div style="border-top: 2px solid #eee; padding-top: 10px;">
+                <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; margin-bottom:10px;">
+                    <span>TOTAL:</span><span>R$ <span id="c-total">0.00</span></span>
+                </div>
+                <button class="btn-acao" style="background:#3498db" onclick="dividirConta()">➗ DIVIDIR CONTA</button>
+                <button class="btn-acao" style="background:var(--success)" onclick="fechar('PAGO')">FINALIZAR PAGO</button>
+                <button class="btn-acao" style="background:var(--accent); color:#000" onclick="fechar('PENDURA')">PENDURAR</button>
             </div>
-            <button class="btn" style="background:#3498db" onclick="dividirConta()">➗ DIVIDIR CONTA</button>
-            <button class="btn" style="background:var(--success)" onclick="fechar('PAGO')">FINALIZAR PAGO</button>
-            <button class="btn" style="background:var(--accent); color:#000" onclick="fechar('PENDURA')">PENDURAR</button>
-        </div>
-    </aside>
+        </aside>
+    </div>
+
+    <div id="clientes" class="tela" style="padding: 20px; flex-direction: column;">
+        <h2>Cadastro de Clientes</h2>
+        <p>Área para gerenciar sua lista de clientes VIP e Penduras.</p>
+    </div>
+
+    <div id="estoque" class="tela" style="padding: 20px; flex-direction: column;">
+        <h2>Gestão de Estoque</h2>
+        <p>Bipe os produtos aqui para atualizar preços e quantidades.</p>
+    </div>
 </main>
 
 <script>
     let db_estoque = [
         { ean: "1", nome: "Heineken LN", preco: 16.0 },
         { ean: "2", nome: "Skol Lata", preco: 6.5 },
-        { ean: "3", nome: "Petisco", preco: 35.0 },
-        { ean: "4", nome: "Coca-Cola", preco: 5.0 }
+        { ean: "3", nome: "Cerveja 600ml", preco: 14.0 },
+        { ean: "4", nome: "Coca-Cola", preco: 5.5 }
     ];
     let db_clientes = [{ nome: "Edmarques" }, { nome: "Visitante" }, { nome: "Balcão" }];
     let mesas = Array.from({length: 12}, (_, i) => ({ id: i + 1, consumo: {}, total: 0, status: 'livre' }));
     let mesaAtiva = null;
     let vendasHoje = 0;
 
+    function ver(id, el) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('ativa');
+        el.classList.add('active');
+    }
+
     function renderSelects() {
-        document.getElementById('sel-cliente-venda').innerHTML = '<option value="">-- QUEM ESTÁ PEDINDO? --</option>' + db_clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+        document.getElementById('sel-cliente-venda').innerHTML = '<option value="">-- SELECIONE O CLIENTE --</option>' + db_clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
     }
 
     function renderMesas() {
@@ -172,7 +140,7 @@
     function selMesa(id) {
         mesaAtiva = id;
         const m = mesas.find(x => x.id === id);
-        document.getElementById('mesa-titulo').innerText = "CONTA MESA " + id;
+        document.getElementById('mesa-titulo').innerText = "Mesa " + id;
         renderMesas();
         attCar();
     }
@@ -188,8 +156,8 @@
 
     function lancar(ean) {
         const cli = document.getElementById('sel-cliente-venda').value;
-        if(!mesaAtiva) return alert("Clique em uma MESA na esquerda!");
-        if(!cli) return alert("Selecione o CLIENTE no menu azul!");
+        if(!mesaAtiva) return alert("Selecione a MESA na esquerda!");
+        if(!cli) return alert("Escolha o CLIENTE antes!");
 
         const p = db_estoque.find(x => x.ean === ean);
         const m = mesas.find(x => x.id === mesaAtiva);
@@ -253,7 +221,7 @@
         const m = mesas.find(x => x.id === mesaAtiva);
         if(!m || m.total === 0) return;
         const p = prompt("Dividir por quantas pessoas?");
-        if(p > 0) alert("Total: R$ " + m.total.toFixed(2) + "\nFica R$ " + (m.total/p).toFixed(2) + " para cada.");
+        if(p > 0) alert("Total: R$ " + m.total.toFixed(2) + "\nCada um paga R$ " + (m.total/p).toFixed(2));
     }
 
     function fechar(tipo) {
@@ -262,7 +230,7 @@
         if(m.total === 0) return;
         vendasHoje += m.total;
         document.getElementById('vTotal').innerText = "R$ " + vendasHoje.toFixed(2);
-        alert("Mesa finalizada!");
+        alert("Conta finalizada!");
         m.consumo = {}; m.total = 0; m.status = 'livre';
         mesaAtiva = null;
         renderMesas(); attCar();
