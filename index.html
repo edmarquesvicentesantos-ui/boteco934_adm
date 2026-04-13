@@ -19,9 +19,52 @@
         .view.active { display: block; }
 
         /* XML Drop Zone */
-        .xml-zone { border: 2px dashed #444; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; transition: 0.3s; }
-        .xml-zone:hover { border-color: var(--gold); background: #1a1a1a; }
+        // DENTRO DA FUNÇÃO DE LEITURA DO XML
+document.getElementById('xmlInput').onchange = (e) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(event.target.result, "text/xml");
+        const produtos = xml.getElementsByTagName("det");
+        
+        for (let p of produtos) {
+            let nome = p.getElementsByTagName("xProd")[0].textContent;
+            let qtdComprada = parseFloat(p.getElementsByTagName("qCom")[0].textContent); // Ex: 10 fardos
+            let valorUnNF = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent); // Valor do fardo na nota
+            
+            // --- LÓGICA DE FRACIONAMENTO ---
+            let fatorConversao = 1;
 
+            // Se no nome do produto tiver "C/12", "CX12" ou "FD12", ele multiplica
+            if (nome.includes("12")) fatorConversao = 12;
+            else if (nome.includes("15")) fatorConversao = 15;
+            else if (nome.includes("24")) fatorConversao = 24;
+            else if (nome.includes("6")) fatorConversao = 6;
+
+            let qtdRealEstoque = qtdComprada * fatorConversao; // 10 fardos x 12 = 120 unidades
+            let custoUnitarioReal = valorUnNF / fatorConversao; // Preço do fardo / 12 = custo de cada lata
+            // -------------------------------
+
+            let existe = db_estoque.find(i => i.nome === nome);
+            if (existe) {
+                existe.qtd += qtdRealEstoque;
+                existe.custo = custoUnitarioReal;
+            } else {
+                // Cadastra já com o preço sugerido (ex: 30% de margem sobre a unidade)
+                db_estoque.push({ 
+                    nome: nome, 
+                    qtd: qtdRealEstoque, 
+                    preco: custoUnitarioReal * 1.30, 
+                    custo: custoUnitarioReal 
+                });
+            }
+        }
+        save();
+        render();
+        alert("XML Importado: Itens fracionados com sucesso!");
+    };
+    reader.readAsText(e.target.files[0]);
+};
         /* Mesas */
         .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         .mesa { background: var(--card); border: 2px solid #333; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; }
