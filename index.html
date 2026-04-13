@@ -3,144 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Gestão Total</title>
+    <title>PDV Gold - Boteco 934</title>
     <style>
-        :root { --blue: #0081f2; --orange: #e67e22; --bg: #f8f8f7; --border: #e5e7eb; }
+        :root { --blue: #0081f2; --orange: #e67e22; --green: #27ae60; --bg: #f8f8f7; --border: #e5e7eb; }
         * { box-sizing: border-box; margin: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; color: #1a1a1a; }
 
-        /* Sidebar */
-        aside { width: 240px; border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .logo { font-weight: 800; font-size: 20px; margin-bottom: 20px; }
-        .nav-btn { padding: 12px; border-radius: 8px; border: none; text-align: left; cursor: pointer; background: #fff; font-weight: 600; }
-        .nav-btn:hover { background: #eee; }
+        /* Lateral */
+        aside { width: 240px; border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+        .logo { font-weight: 800; font-size: 22px; margin-bottom: 20px; color: #000; }
+        .nav-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); text-align: left; cursor: pointer; background: #fff; font-weight: 600; transition: 0.2s; }
+        .nav-btn:hover { background: var(--blue); color: #fff; }
 
         /* Principal */
-        main { flex: 1; display: flex; flex-direction: column; background: #fff; margin: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        main { flex: 1; display: flex; flex-direction: column; background: #fff; margin: 10px; border-radius: 15px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        /* Cabeçalho Editável */
-        header { padding: 15px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; background: #fdfdfd; }
-        .head-input { padding: 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 13px; }
+        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; background: #fff; border-radius: 15px 15px 0 0; }
+        .head-input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 25px; font-size: 14px; outline: none; background: var(--bg); }
+        .head-input:focus { border-color: var(--blue); background: #fff; }
 
-        .grid { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; overflow-y: auto; flex: 1; }
+        .grid { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; overflow-y: auto; flex: 1; }
         
-        .card { border: 1px solid var(--border); border-radius: 10px; padding: 15px; text-align: center; }
-        .card h3 { font-size: 14px; margin: 10px 0; }
-        .price { color: var(--blue); font-weight: 800; font-size: 18px; }
+        .card { border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; background: #fff; transition: 0.2s; }
+        .card:hover { border-color: var(--blue); transform: translateY(-3px); }
+        .card img { width: 50px; height: 50px; margin-bottom: 10px; }
+        .price { color: var(--blue); font-weight: 800; font-size: 18px; display: block; margin: 10px 0; }
 
-        /* Painel Direita */
-        .panel { width: 320px; border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; background: #fafafa; }
-        .recibo { flex: 1; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 15px 0; font-size: 13px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer; margin-top: 5px; }
-        .btn-blue { background: var(--blue); }
-        .btn-orange { background: var(--orange); }
+        /* Painel de Checkout */
+        .checkout { width: 380px; border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; background: #fafafa; }
+        
+        .info-cliente-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px dotted var(--orange); margin-bottom: 15px; }
+        .info-cliente-box h4 { font-size: 12px; color: #666; text-transform: uppercase; }
+        .info-cliente-box .saldo { font-size: 20px; font-weight: 800; color: var(--orange); }
+
+        .recibo { flex: 1; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 15px; font-size: 13px; overflow-y: auto; line-height: 1.6; }
+        .recibo-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 5px 0; }
+
+        .total-box { padding: 20px 0; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .total-row h2 { font-size: 32px; color: var(--blue); }
+
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-size: 16px; margin-bottom: 10px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-pendura { background: var(--orange); }
+        .btn-fechar { background: var(--green); }
+        .btn-avulso { background: #34495e; }
     </style>
 </head>
 <body>
 
 <aside>
     <div class="logo">BOTECO 934</div>
-    <button class="nav-btn" onclick="mostrarSecao('vendas')">🛒 Frente de Caixa</button>
-    <button class="nav-btn" onclick="mostrarSecao('clientes')">👥 Lista de Clientes</button>
-    <button class="nav-btn" onclick="addManual()">➕ Item Avulso</button>
+    <button class="nav-btn">📦 Estoque Geral</button>
+    <button class="nav-btn">🍻 Bebidas</button>
+    <button class="nav-btn">✨ Boticário</button>
+    <button class="btn btn-avulso" onclick="vendaAvulsa()">+ ITEM AVULSO</button>
 </aside>
 
-<main id="secao-vendas">
+<main>
     <header>
-        <input type="text" class="head-input" placeholder="Pesquisar Produto..." id="busca">
-        <input type="text" class="head-input" placeholder="Nome do Cliente" id="cliente-atual">
-        <div id="info-cliente" style="font-size: 12px; color: var(--orange); padding-top: 8px;">Saldo: R$ 0.00</div>
+        <input type="text" class="head-input" id="inputBusca" placeholder="Bipe o código de barras ou digite o produto..." autofocus>
+        <input type="text" class="head-input" id="inputCliente" placeholder="Nome do Cliente para o Pendura">
     </header>
 
-    <div class="grid" id="lista-prods"></div>
+    <div class="grid" id="gridProdutos">
+        </div>
 </main>
 
-<section class="panel">
-    <h3>RECIBO</h3>
-    <div class="recibo" id="recibo-lista">Vazio</div>
-    <h2 id="total-venda" style="margin-bottom: 10px;">R$ 0,00</h2>
-    <button class="btn btn-orange" onclick="lancarPendura()">Lançar no Pendura</button>
-    <button class="btn btn-blue" onclick="finalizarVenda()">Finalizar no PIX/Dinheiro</button>
+<section class="checkout">
+    <div class="info-cliente-box">
+        <h4>Cliente Selecionado / Saldo Atual</h4>
+        <div id="displayNomeCli">Balcão</div>
+        <div class="saldo" id="displaySaldoCli">R$ 0,00</div>
+    </div>
+
+    <div class="recibo" id="reciboConteudo">
+        <div style="text-align:center; color:#999; margin-top:50px;">Aguardando itens...</div>
+    </div>
+
+    <div class="total-box">
+        <div class="total-row">
+            <span>TOTAL A PAGAR:</span>
+            <h2 id="totalDisplay">R$ 0,00</h2>
+        </div>
+        <button class="btn btn-pendura" onclick="lancarNoPendura()">LANÇAR NO PENDURA</button>
+        <button class="btn btn-fechar" onclick="finalizarVenda()">FECHAR E IMPRIMIR</button>
+    </div>
 </section>
 
 <script>
-    // 1. DADOS DE CLIENTES E SALDO
+    // --- SEUS DADOS (Altere Preços e Custos aqui) ---
     const clientes = [
-        { nome: "Edmarques", tel: "55879...", saldo: 150.00 },
-        { nome: "João Silva", tel: "5587...", saldo: 45.00 }
+        { nome: "Edmarques", tel: "5587999999999", saldo: 150.00 },
+        { nome: "João Silva", tel: "5587988888888", saldo: 45.00 }
     ];
 
-    // 2. DADOS DE PRODUTOS (Altere aqui PREÇO e CUSTO)
     const produtos = [
-        { id: 1, nome: "Heineken 600ml", preco: 18.00, custo: 9.00, icon: "🍻" },
-        { id: 2, nome: "Dose Pitu", preco: 5.00, custo: 1.50, icon: "🥃" },
-        { id: 3, nome: "Perfume Malbec", preco: 199.90, custo: 120.00, icon: "✨" }
+        { ean: "7891991000853", nome: "Heineken 600ml", preco: 18.00, custo: 9.50, icon: "🍻" },
+        { ean: "7891000000012", nome: "Cerveja Latão", preco: 7.50, custo: 4.20, icon: "🍺" },
+        { ean: "7891033123456", nome: "Perfume Malbec", preco: 199.90, custo: 130.00, icon: "✨" },
+        { ean: "1", nome: "Dose Pitu", preco: 5.00, custo: 1.50, icon: "🥃" }
     ];
 
     let carrinho = [];
     let totalVenda = 0;
 
-    // Função para carregar os cards
-    function render() {
-        const grade = document.getElementById('lista-prods');
-        grade.innerHTML = produtos.map(p => `
-            <div class="card">
-                <div style="font-size:30px">${p.icon}</div>
+    // Renderizar tela inicial
+    function carregarProdutos() {
+        const grid = document.getElementById('gridProdutos');
+        grid.innerHTML = produtos.map(p => `
+            <div class="card" onclick="adicionarPeloEan('${p.ean}')">
+                <div style="font-size:35px">${p.icon}</div>
                 <h3>${p.nome}</h3>
-                <div class="price">R$ ${p.preco.toFixed(2)}</div>
-                <button class="btn btn-blue" style="padding:5px" onclick="add(${p.id})">ADD</button>
+                <span class="price">R$ ${p.preco.toFixed(2)}</span>
+                <small style="color:#999; font-size:10px">${p.ean}</small>
             </div>
         `).join('');
     }
 
-    // 3. ADICIONAR PRODUTO MANUAL (AVULSO)
-    function addManual() {
-        const nome = prompt("Nome do item avulso:");
-        const preco = parseFloat(prompt("Preço de venda:"));
-        if(nome && preco) {
-            carrinho.push({ nome, preco });
-            totalVenda += preco;
-            atualizarRecibo();
+    // Busca por Código de Barras (EAN)
+    document.getElementById('inputBusca').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            adicionarPeloEan(this.value);
+            this.value = '';
+        }
+    });
+
+    function adicionarPeloEan(codigo) {
+        const p = produtos.find(item => item.ean === codigo);
+        if (p) {
+            carrinho.push(p);
+            totalVenda += p.preco;
+            atualizarInterface();
         }
     }
 
-    function add(id) {
-        const p = produtos.find(i => i.id === id);
-        carrinho.push(p);
-        totalVenda += p.preco;
-        atualizarRecibo();
+    // Adicionar Item Avulso (Manual)
+    function vendaAvulsa() {
+        const nome = prompt("Nome do produto avulso:");
+        const preco = parseFloat(prompt("Valor (R$):"));
+        if (nome && preco) {
+            carrinho.push({ nome: `*${nome}`, preco: preco });
+            totalVenda += preco;
+            atualizarInterface();
+        }
     }
 
-    function atualizarRecibo() {
-        document.getElementById('total-venda').innerText = `R$ ${totalVenda.toFixed(2)}`;
-        document.getElementById('recibo-lista').innerHTML = carrinho.map(i => `<div>${i.nome} - R$ ${i.preco.toFixed(2)}</div>`).join('');
-    }
+    function atualizarInterface() {
+        const recibo = document.getElementById('reciboConteudo');
+        const displayTotal = document.getElementById('totalDisplay');
 
-    // 4. LÓGICA DO PENDURA COM WHATSAPP
-    function lancarPendura() {
-        const nome = document.getElementById('cliente-atual').value;
-        if(!nome) return alert("Quem é o cliente?");
+        displayTotal.innerText = `R$ ${totalVenda.toFixed(2)}`;
         
-        let msg = `*BOTECO 934 - NOTA*%0ACliente: ${nome}%0ATotal: R$ ${totalVenda.toFixed(2)}%0A---%0A`;
-        carrinho.forEach(i => msg += `- ${i.nome}%0A`);
-        
-        window.open(`https://wa.me/?text=${msg}`);
-        limpar();
+        if (carrinho.length === 0) {
+            recibo.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Aguardando itens...</div>';
+            return;
+        }
+
+        recibo.innerHTML = `
+            <div style="text-align:center; font-weight:bold; border-bottom:1px solid #000; margin-bottom:10px;">BOTECO 934 - RECIBO</div>
+            ${carrinho.map(item => `
+                <div class="recibo-item">
+                    <span>${item.nome}</span>
+                    <span>R$ ${item.preco.toFixed(2)}</span>
+                </div>
+            `).join('')}
+        `;
     }
 
-    function limpar() {
-        carrinho = []; totalVenda = 0;
-        document.getElementById('cliente-atual').value = "";
-        atualizarRecibo();
-    }
-
-    render();
-
-    // Busca automática por nome de cliente para mostrar o saldo
-    document.getElementById('cliente-atual').addEventListener('input', (e) => {
-        const c = clientes.find(cli => cli.nome.toLowerCase().includes(e.target.value.toLowerCase()));
-        if(c) document.getElementById('info-cliente').innerText = `Saldo Devedor: R$ ${c.saldo.toFixed(2)}`;
+    // Identificação de Cliente e Saldo
+    document.getElementById('inputCliente').addEventListener('input', function(e) {
+        const cliente = clientes.find(c => c.nome.toLowerCase().includes(e.target.value.toLowerCase()));
+        if (cliente && e.target.value !== "") {
+            document.getElementById('displayNomeCli').innerText = cliente.nome;
+            document.getElementById('displaySaldoCli').innerText = `R$ ${cliente.saldo.toFixed(2)}`;
+        } else {
+            document.getElementById('displayNomeCli').innerText = "Balcão";
+            document.getElementById('displaySaldoCli').innerText = "R$ 0,00";
+        }
     });
+
+    function lancarNoPendura() {
+        const nomeCli = document.getElementById('displayNomeCli').innerText;
+        if (nomeCli === "Balcão") return alert("Por favor, identifique o cliente!");
+        
+        let msg = `*BOTECO 934 - RECIBO DE PENDURA*%0A`;
+        msg += `*Cliente:* ${nomeCli}%0A`;
+        msg += `---------------------------%0A`;
+        carrinho.forEach(i => msg += `${i.nome}: R$ ${i.preco.toFixed(2)}%0A`);
+        msg += `---------------------------%0A`;
+        msg += `*TOTAL DE HOJE: R$ ${totalVenda.toFixed(2)}*`;
+
+        window.open(`https://wa.me/?text=${msg}`);
+        limparCaixa();
+    }
+
+    function finalizarVenda() {
+        if (totalVenda === 0) return;
+        alert("Venda finalizada! Imprimindo cupom...");
+        limparCaixa();
+    }
+
+    function limparCaixa() {
+        carrinho = [];
+        totalVenda = 0;
+        document.getElementById('inputCliente').value = "";
+        document.getElementById('displayNomeCli').innerText = "Balcão";
+        document.getElementById('displaySaldoCli').innerText = "R$ 0,00";
+        atualizarInterface();
+    }
+
+    carregarProdutos();
 </script>
 
 </body>
