@@ -6,265 +6,88 @@
     <title>PDV ELITE - Boteco 934</title>
     <style>
         :root { --primary: #1a252f; --success: #27ae60; --danger: #c0392b; --accent: #f1c40f; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Redução global do corpo e fontes */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            background: #f4f7f6; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-size: 0.85rem; /* Fonte reduzida */
+        }
 
-        /* CABEÇALHO DRE */
-        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 10; }
-        .dre-container { display: flex; gap: 20px; }
-        .dre-item { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 4px; border-bottom: 3px solid var(--accent); }
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 8px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 10; 
+        }
+
+        .dre-item { background: rgba(255,255,255,0.1); padding: 3px 10px; border-radius: 4px; font-size: 0.8rem; }
         .dre-item span { font-weight: bold; color: var(--accent); }
-        
-        /* Esquerda: Produtos */
-        .produtos-section { flex: 2; display: flex; flex-direction: column; background: white; border-radius: 8px; padding: 15px; }
-        .busca-container { margin-bottom: 15px; }
-        #inputBusca { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
-        
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; }
-        .card-prod { border: 1px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: transform 0.1s; }
-        .card-prod:hover { transform: scale(1.02); border-color: var(--success); }
-        .card-prod img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 5px; }
-        .card-prod h4 { margin: 5px 0; font-size: 0.9rem; color: #333; }
-        .card-prod span { color: var(--success); font-weight: bold; }
-        /* CORPO DO SISTEMA */
-        main { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 10px; }
 
-        /* ÁREA DE PRODUTOS */
-        .area-venda { flex: 2; display: flex; flex-direction: column; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .barra-topo { display: flex; gap: 10px; margin-bottom: 15px; }
-        #busca { flex: 2; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; }
-        #clienteSelect { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; }
+        main { display: flex; flex: 1; overflow: hidden; }
 
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; overflow-y: auto; padding-right: 5px; }
-        .card { border: 1px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
-        .card:hover { border-color: var(--success); background: #f9fff9; transform: translateY(-2px); }
-        .card img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; }
-        .card h4 { margin: 5px 0; font-size: 0.9rem; color: #333; height: 35px; overflow: hidden; }
-        .card b { color: var(--success); font-size: 1rem; }
-
-        /* CARRINHO */
-        .area-carrinho { width: 400px; background: white; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .lista-itens { flex: 1; overflow-y: auto; margin-bottom: 15px; border-bottom: 2px solid #eee; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f1f1; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; }
-
-        /* TOTAIS E BOTÕES */
-        .resumo { background: #f8f9fa; padding: 15px; border-radius: 8px; }
-        .total-venda { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: var(--primary); }
-        .divisao { font-size: 0.9rem; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
-        
-        .acoes button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-whats { background: #25d366; color: white; }
-        .btn-pago { background: var(--success); color: white; font-size: 1.1rem; }
-        .btn-limpar { background: #95a5a6; color: white; font-size: 0.8rem; }
-
-        /* RECIBO (OCULTO NA TELA) */
-        #recibo { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #recibo { display: block !important; visibility: visible; position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; }
+        /* NOVA BARRA LATERAL (SIDEBAR) */
+        .sidebar {
+            width: 70px; /* Largura compacta */
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-top: 10px;
         }
-    </style>
-</head>
-<body>
-
-<header>
-    <div style="font-size: 1.2rem; font-weight: bold;">BOTECO 934 - PDV ELITE</div>
-    <div class="dre-container">
-        <div class="dre-item">Vendas: R$ <span id="vendaDia">0.00</span></div>
-        <div class="dre-item">Lucro DRE: R$ <span id="lucroDia">0.00</span></div>
-    </div>
-</header>
-
-<main>
-    <section class="area-venda">
-        <div class="barra-topo">
-            <input type="text" id="busca" placeholder="Bipar código ou pesquisar produto..." autofocus>
-            <select id="clienteSelect">
-                <option value="">👤 Cliente Avulso</option>
-            </select>
-        </div>
-        <div id="grid" class="grid-produtos"></div>
-    </section>
-
-    <section class="area-carrinho">
-        <h3 style="margin-top: 0;">Carrinho</h3>
-        <div id="lista" class="lista-itens">
-            <p style="text-align: center; color: #999;">Carrinho vazio</p>
-        </div>
-
-        <div class="resumo">
-            <div class="divisao">
-                Dividir para: <input type="number" id="split" value="1" min="1" style="width: 45px;" oninput="calcular()"> pessoas
-                <br>Valor por pessoa: <b>R$ <span id="valorSplit">0.00</span></b>
-            </div>
-            <div class="total-venda">
-                <span>Total:</span>
-                <span>R$ <span id="total">0.00</span></span>
-            </div>
-            <div class="acoes">
-                <button class="btn-whats" onclick="enviarWhats()">📱 Enviar WhatsApp</button>
-                <button class="btn-pago" onclick="finalizarVenda()">✅ Receber e Imprimir</button>
-                <button class="btn-limpar" onclick="limpar()">Limpar Tudo</button>
-            </div>
-        </div>
-    </section>
-</main>
-
-<div id="recibo"></div>
-
-<script>
-    // LISTA DE PRODUTOS (CÓDIGO DE BARRAS, PREÇO E CUSTO)
-    const produtos = [
-        { ean: "7891991000853", nome: "Heineken 330ml", preco: 16.00, custo: 9.50, img: "https://via.placeholder.com/150?text=Heineken" },
-        { ean: "7891149107503", nome: "Skol Lata", preco: 6.50, custo: 3.80, img: "https://via.placeholder.com/150?text=Skol" },
-        { ean: "7896017300112", nome: "Pitu 965ml", preco: 22.00, custo: 14.00, img: "https://via.placeholder.com/150?text=Pitu" },
-        { ean: "001", nome: "Dose Whisky", preco: 18.00, custo: 8.50, img: "https://via.placeholder.com/150?text=Dose" },
-        { ean: "002", nome: "Porção Batata", preco: 25.00, custo: 12.00, img: "https://via.placeholder.com/150?text=Batata" }
-    ];
-
-    // LISTA DE CLIENTES
-    const clientes = [
-        { nome: "Edmarques", fone: "5587999999999" },
-        { nome: "Maria (Esposa)", fone: "5587988888888" },
-        { nome: "João Cliente", fone: "5587977777777" }
-    ];
-
-    let carrinho = [];
-    let vendasAcumuladas = 0;
-    let lucroAcumulado = 0;
-
-    // INICIAR CLIENTES NO SELECT
-    const cSelect = document.getElementById('clienteSelect');
-    clientes.forEach(c => {
-        let opt = document.createElement('option');
-        opt.value = c.fone;
-        opt.innerHTML = c.nome;
-        cSelect.appendChild(opt);
-    });
-
-    // RENDERIZAR PRODUTOS NA TELA
-    function render(filtro = "") {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = "";
-        produtos.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.ean.includes(filtro)).forEach(p => {
-            grid.innerHTML += `
-                <div class="card" onclick="add('${p.ean}')">
-                    <img src="${p.img}">
-                    <h4>${p.nome}</h4>
-                    <b>R$ ${p.preco.toFixed(2)}</b>
-                </div>
-            `;
-        });
-    }
-
-    // ADICIONAR AO CARRINHO
-    function add(ean) {
-        const p = produtos.find(item => item.ean === ean);
-        if(p) {
-            carrinho.push({...p});
-            calcular();
-            document.getElementById('busca').value = ""; // Limpa busca após bipar
-            render();
+        .menu-item {
+            color: #bdc3c7;
+            padding: 12px 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
         }
-    }
-
-    // REMOVER DO CARRINHO
-    function remover(idx) {
-        carrinho.splice(idx, 1);
-        calcular();
-    }
-
-    // CALCULAR TOTAIS E DIVISÃO
-    function calcular() {
-        const lista = document.getElementById('lista');
-        const totalTxt = document.getElementById('total');
-        const splitTxt = document.getElementById('valorSplit');
-        const nPessoas = document.getElementById('split').value || 1;
-
-        if(carrinho.length === 0) {
-            lista.innerHTML = '<p style="text-align: center; color: #999;">Carrinho vazio</p>';
-            totalTxt.innerText = "0.00";
-            splitTxt.innerText = "0.00";
-            return;
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid var(--accent);
         }
+        .menu-item i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
 
-        let soma = 0;
-        lista.innerHTML = "";
-        carrinho.forEach((p, i) => {
-            soma += p.preco;
-            lista.innerHTML += `
-                <div class="item-row">
-                    <span>${p.nome}</span>
-                    <span>R$ ${p.preco.toFixed(2)} <button class="btn-del" onclick="remover(${i})">x</button></span>
-                </div>
-            `;
-        });
+        /* ÁREA CENTRAL DE PRODUTOS */
+        .area-venda { 
+            flex: 2; 
+            display: flex; 
+            flex-direction: column; 
+            background: white; 
+            padding: 10px; 
+            border-right: 1px solid #ddd;
+        }
+        .barra-topo { display: flex; gap: 8px; margin-bottom: 10px; }
+        #busca { flex: 2; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        #clienteSelect { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; }
 
-        totalTxt.innerText = soma.toFixed(2);
-        splitTxt.innerText = (soma / nPessoas).toFixed(2);
-    }
-
-    // FINALIZAR VENDA (DRE E IMPRESSÃO)
-    function finalizarVenda() {
-        if(carrinho.length === 0) return alert("Adicione produtos!");
-
-        let total = 0;
-        let custo = 0;
-        let textoRecibo = "<b>BOTECO 934 - RECIBO</b><br>--------------------------<br>";
-
-        carrinho.forEach(p => {
-            total += p.preco;
-            custo += p.custo;
-            textoRecibo += `${p.nome}: R$ ${p.preco.toFixed(2)}<br>`;
-        });
-
-        vendasAcumuladas += total;
-        lucroAcumulado += (total - custo);
-
-        // Atualiza DRE no Topo
-        document.getElementById('vendaDia').innerText = vendasAcumuladas.toFixed(2);
-        document.getElementById('lucroDia').innerText = lucroAcumulado.toFixed(2);
-
-        // Gera Recibo Térmico
-        document.getElementById('recibo').innerHTML = textoRecibo + `--------------------------<br>TOTAL: R$ ${total.toFixed(2)}<br>Pessoas: ${document.getElementById('split').value}`;
-        
-        window.print();
-        limpar();
-    }
-
-    // WHATSAPP
-    function enviarWhats() {
-        if(carrinho.length === 0) return;
-        const fone = document.getElementById('clienteSelect').value;
-        let msg = "*BOTECO 934 - RECIBO*\n\n";
-        let total = 0;
-        carrinho.forEach(p => {
-            msg += `• ${p.nome}: R$ ${p.preco.toFixed(2)}\n`;
-            total += p.preco;
-        });
-        msg += `\n*TOTAL: R$ ${total.toFixed(2)}*`;
-        
-        const link = fone ? `https://wa.me/${fone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-        window.open(link);
-    }
-
-    function limpar() {
-        carrinho = [];
-        document.getElementById('split').value = 1;
-        calcular();
-    }
-
-    // BUSCA / LEITOR DE BARRAS
-    document.getElementById('busca').addEventListener('input', (e) => {
-        const val = e.target.value;
-        render(val);
-        // Se o código de barras for exato (ex: 13 dígitos), adiciona direto
-        const p = produtos.find(item => item.ean === val);
-        if(p) add(val);
-    });
-
-    render();
-</script>
-
-</body>
-</html>
+        .grid-produtos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* Cards menores */
+            gap: 8px; 
+            overflow-y: auto; 
+        }
+        .card { 
+            border: 1px solid #eee; 
+            border-radius: 6px; 
+            padding: 6px; 
+            text-align: center; 
+            cursor: pointer; 
+            background: #fff;
+        }
+        .card:hover { border-color: var(--success); background: #f9fff9; }
+        .card img { width: 100%; height: 65px; object-fit: cover; border-radius: 3px; }
+        .card h4 { margin: 4px 0; font-size: 0.75rem; height: 30px; overflow: hidden; line-height: 1; }
+        .card b
