@@ -14,30 +14,25 @@
 
         main { display: flex; flex: 1; overflow: hidden; }
 
-        /* SIDEBAR DE NAVEGAÇÃO */
         .sidebar { width: 70px; background: var(--primary); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-item { color: #bdc3c7; padding: 18px 0; text-align: center; cursor: pointer; font-size: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .nav-item.active { background: rgba(255,255,255,0.1); color: var(--accent); border-left: 4px solid var(--accent); }
 
-        /* ÁREA CENTRAL DE CONTEÚDO */
         .area-central { flex: 1; min-width: 0; background: #fff; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #ddd; overflow: hidden; }
         .tela { display: none; height: 100%; flex-direction: column; }
         .tela.ativa { display: flex; }
 
-        /* LAYOUT DE VENDAS (Mesa Esquerda | Produtos Centro) */
         .vendas-container { display: flex; gap: 15px; height: 100%; overflow: hidden; }
         .col-mesas { width: 160px; overflow-y: auto; border-right: 1px solid #eee; padding-right: 10px; flex-shrink: 0; }
-        .mesa-btn { width: 100%; padding: 15px 10px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold; background: #fff; transition: 0.2s; }
+        .mesa-btn { width: 100%; padding: 15px 10px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold; background: #fff; }
         .mesa-btn.ocupada { background: #fff9db; border-color: var(--accent); color: #d35400; }
         .mesa-btn.selecionada { background: var(--primary); color: white; border-color: var(--primary); }
 
         .col-produtos { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; overflow-y: auto; padding: 5px; }
         .card-p { border: 1px solid #eee; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .card-p:hover { border-color: var(--success); }
         .card-p img { width: 100%; height: 60px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; }
 
-        /* FORMULÁRIOS E TABELAS */
         .form-row { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; border: 1px solid #eee; }
         .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
@@ -45,9 +40,8 @@
         .wrap-tab { flex: 1; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 5; }
+        th { background: #f8f9fa; position: sticky; top: 0; }
 
-        /* CARRINHO (DIREITA) */
         .carrinho { width: 300px; background: #fff; display: flex; flex-direction: column; padding: 15px; flex-shrink: 0; }
         .itens-lista { flex: 1; overflow-y: auto; border-bottom: 2px solid #f4f4f4; margin-bottom: 15px; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; margin-top: 8px; font-size: 14px; }
@@ -72,9 +66,11 @@
             <div class="vendas-container">
                 <div class="col-mesas" id="lista-mesas"></div>
                 <div class="col-produtos">
-                    <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <input type="text" placeholder="Buscar produto..." style="flex:1;">
-                        <select id="sel-cliente-venda" style="width:150px;"></select>
+                    <div style="display:flex; gap:10px; margin-bottom:15px; background: #ebf5fb; padding: 10px; border-radius: 8px; border: 1px solid #d4e6f1;">
+                        <div style="flex:1">
+                            <label style="font-size: 11px; font-weight: bold; color: #2980b9;">IDENTIFIQUE O CLIENTE ANTES DE ABRIR MESA:</label>
+                            <select id="sel-cliente-venda" style="width:100%; border-color: #3498db;"></select>
+                        </div>
                     </div>
                     <div id="grid-produtos" class="grid-produtos"></div>
                 </div>
@@ -82,7 +78,7 @@
         </div>
 
         <div id="clientes" class="tela">
-            <h3 style="margin-bottom:15px;">Gerenciar Clientes</h3>
+            <h3>Gerenciar Clientes</h3>
             <div class="form-row">
                 <div class="form-group"><label>Nome:</label><input type="text" id="cli-nome"></div>
                 <div class="form-group"><label>WhatsApp:</label><input type="text" id="cli-zap"></div>
@@ -97,7 +93,7 @@
         </div>
 
         <div id="estoque" class="tela">
-            <h3 style="margin-bottom:15px;">Entrada de Estoque</h3>
+            <h3>Entrada de Estoque</h3>
             <div class="form-row">
                 <div class="form-group"><label>EAN (Código):</label><input type="text" id="p-ean"></div>
                 <div class="form-group"><label>Nome:</label><input type="text" id="p-nome"></div>
@@ -115,7 +111,7 @@
     </section>
 
     <section class="carrinho">
-        <h3 id="mesa-titulo" style="text-align:center; padding-bottom:10px; border-bottom:2px solid var(--primary);">Mesa Livre</h3>
+        <h3 id="mesa-titulo" style="text-align:center; padding-bottom:10px; border-bottom:2px solid var(--primary);">Selecione uma Mesa</h3>
         <div id="c-itens" class="itens-lista"></div>
         <div>
             <div style="display:flex; justify-content:space-between; font-size:22px; font-weight:bold; margin-bottom:15px;">
@@ -146,7 +142,6 @@
         if(id === 'estoque') renderEstoque();
     }
 
-    // CLIENTES
     function salvarCli() {
         const n = document.getElementById('cli-nome').value;
         const z = document.getElementById('cli-zap').value;
@@ -157,10 +152,9 @@
         document.getElementById('t-cli').innerHTML = db_clientes.map((c, i) => `<tr><td>${c.nome}</td><td>${c.zap}</td><td><button onclick="db_clientes.splice(${i},1);renderClientes();">Excluir</button></td></tr>`).join('');
     }
     function renderSelects() {
-        document.getElementById('sel-cliente-venda').innerHTML = '<option value="">👤 Avulso</option>' + db_clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+        document.getElementById('sel-cliente-venda').innerHTML = '<option value="">--- SELECIONE O CLIENTE ---</option>' + db_clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
     }
 
-    // ESTOQUE
     function salvarProd() {
         const ean = document.getElementById('p-ean').value;
         const nome = document.getElementById('p-nome').value;
@@ -177,20 +171,33 @@
         document.getElementById('t-est').innerHTML = db_estoque.map(p => `<tr><td>${p.ean}</td><td>${p.nome}</td><td>R$ ${p.preco}</td><td>${p.qtd}</td></tr>`).join('');
     }
 
-    // VENDAS
     function renderMesas() {
         document.getElementById('lista-mesas').innerHTML = mesas.map(m => `
             <div class="mesa-btn ${m.status} ${mesaAtiva === m.id ? 'selecionada' : ''}" onclick="selMesa(${m.id})">
-                MESA ${m.id}<br><small>${m.status === 'ocupada' ? 'R$ '+m.total.toFixed(2) : 'Livre'}</small>
+                MESA ${m.id}<br><small>${m.status === 'ocupada' ? m.cliente + ' (R$ '+m.total.toFixed(2)+')' : 'Livre'}</small>
             </div>
         `).join('');
     }
+    
     function selMesa(id) {
-        mesaAtiva = id;
         const m = mesas.find(x => x.id === id);
-        document.getElementById('mesa-titulo').innerText = "Mesa " + id + (m.cliente ? " - " + m.cliente : "");
+        const cliSelecionado = document.getElementById('sel-cliente-venda').value;
+
+        // Se a mesa está livre e não escolheu cliente, não abre
+        if(m.status === 'livre' && !cliSelecionado) {
+            return alert("Para abrir uma mesa nova, selecione o CLIENTE primeiro no topo!");
+        }
+
+        mesaAtiva = id;
+        // Se a mesa está livre mas tem cliente selecionado, vincula o nome
+        if(m.status === 'livre' && cliSelecionado) {
+            m.cliente = cliSelecionado;
+        }
+
+        document.getElementById('mesa-titulo').innerText = "Mesa " + id + " - " + m.cliente;
         renderMesas(); attCar();
     }
+
     function renderProdutos() {
         document.getElementById('grid-produtos').innerHTML = db_estoque.map(p => `
             <div class="card-p" onclick="lancar('${p.ean}')">
@@ -201,32 +208,44 @@
             </div>
         `).join('');
     }
+
     function lancar(ean) {
-        if(!mesaAtiva) return alert("Selecione uma mesa!");
+        if(!mesaAtiva) return alert("Clique em uma mesa na esquerda antes de lançar o produto!");
         const p = db_estoque.find(x => x.ean === ean);
         const m = mesas.find(x => x.id === mesaAtiva);
+        
         if(p.qtd <= 0) return alert("Sem estoque!");
-        const cli = document.getElementById('sel-cliente-venda').value;
-        m.itens.push({...p}); m.total += p.preco; m.status = 'ocupada';
-        if(cli) m.cliente = cli;
-        p.qtd--; selMesa(mesaAtiva); renderProdutos();
+        
+        m.itens.push({...p}); 
+        m.total += p.preco; 
+        m.status = 'ocupada';
+        p.qtd--; 
+        
+        renderMesas(); 
+        attCar(); 
+        renderProdutos();
     }
+
     function attCar() {
         const m = mesas.find(x => x.id === mesaAtiva);
         document.getElementById('c-itens').innerHTML = m ? m.itens.map(i => `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted #ccc;"><span>${i.nome}</span><span>${i.preco.toFixed(2)}</span></div>`).join('') : '';
         document.getElementById('c-total').innerText = m ? m.total.toFixed(2) : "0.00";
     }
+
     function fechar(tipo) {
         if(!mesaAtiva) return;
         const m = mesas.find(x => x.id === mesaAtiva);
         if(m.itens.length === 0) return;
-        if(tipo === 'PENDURA' && !m.cliente) return alert("Selecione um cliente para pendurar!");
+        
         vendasHoje += m.total;
         document.getElementById('vTotal').innerText = "R$ " + vendasHoje.toFixed(2);
-        alert("Conta Fechada!");
+        alert(`Mesa fechada para ${m.cliente}!`);
+        
         m.itens = []; m.total = 0; m.status = 'livre'; m.cliente = '';
-        mesaAtiva = null; renderMesas(); attCar();
-        document.getElementById('mesa-titulo').innerText = "Mesa Livre";
+        mesaAtiva = null;
+        document.getElementById('sel-cliente-venda').value = ""; // Limpa seleção de cliente
+        renderMesas(); attCar();
+        document.getElementById('mesa-titulo').innerText = "Selecione uma Mesa";
     }
 
     renderMesas(); renderProdutos(); renderSelects();
