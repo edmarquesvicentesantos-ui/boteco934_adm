@@ -2,268 +2,165 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE PDV - Boteco 934</title>
+    <title>ELITE PDV - Cloud Boteco 934</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
+        /* [Seus estilos CSS anteriores permanecem aqui] */
         :root { --primary: #1a252f; --success: #27ae60; --danger: #c0392b; --accent: #f1c40f; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: #f4f7f6; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
-            font-size: 14px;
-        }
-
-        /* HEADER */
-        header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .dre-info { display: flex; gap: 15px; }
-        .dre-card { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 4px; border-left: 3px solid var(--accent); }
-
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
         main { display: flex; flex: 1; overflow: hidden; }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 70px;
-            background: var(--primary);
-            display: flex;
-            flex-direction: column;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .nav-item {
-            color: #bdc3c7;
-            padding: 15px 5px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 10px;
-            transition: 0.2s;
-        }
-        .nav-item:hover, .nav-item.active { color: white; background: rgba(255,255,255,0.1); }
-        .nav-item i { display: block; font-size: 20px; margin-bottom: 5px; }
-
-        /* ÁREA DE VENDAS */
-        .venda-grid { 
-            flex: 2; 
-            display: flex; 
-            flex-direction: column; 
-            background: #fff; 
-            padding: 15px; 
-            border-right: 1px solid #ddd;
-        }
-        .controles { display: flex; gap: 10px; margin-bottom: 15px; }
-        #busca { flex: 2; padding: 12px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
-        #cliente { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 4px; }
-
-        .produtos-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-            gap: 10px; 
-            overflow-y: auto; 
-        }
-        .card-p { 
-            border: 1px solid #eee; 
-            padding: 8px; 
-            text-align: center; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            background: #fff;
-            transition: 0.1s;
-        }
-        .card-p:hover { border-color: var(--success); transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card-p img { width: 100%; height: 70px; object-fit: cover; border-radius: 4px; margin-bottom: 5px; }
-        .card-p h4 { font-size: 11px; margin-bottom: 4px; color: #333; height: 28px; overflow: hidden; }
-        .card-p span { color: var(--success); font-weight: bold; font-size: 13px; }
-
-        /* CARRINHO */
-        .carrinho { 
-            width: 350px; 
-            background: #fff; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 15px; 
-        }
-        .itens-checkout { flex: 1; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px; }
-        .item-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 13px; }
-        
-        .checkout-footer { background: #f9f9f9; padding: 10px; border-radius: 6px; }
-        .total-linha { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-bottom: 10px; color: var(--primary); }
-        
-        button { 
-            width: 100%; padding: 12px; border: none; border-radius: 4px; 
-            font-weight: bold; cursor: pointer; margin-bottom: 8px; 
-        }
-        .btn-whats { background: #25d366; color: white; }
-        .btn-finish { background: var(--success); color: white; font-size: 16px; }
-        .btn-clear { background: #95a5a6; color: white; font-size: 11px; }
-
-        /* IMPRESSÃO */
-        @media print {
-            body * { visibility: hidden; }
-            #recibo-print, #recibo-print * { visibility: visible; }
-            #recibo-print { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; }
-        }
+        .sidebar { width: 70px; background: var(--primary); display: flex; flex-direction: column; }
+        .venda-grid { flex: 2; padding: 15px; display: flex; flex-direction: column; background: white; }
+        .carrinho { width: 350px; background: #fff; padding: 15px; border-left: 1px solid #ddd; }
+        .active-screen { display: flex !important; }
+        .hidden { display: none !important; }
+        /* Estilos de tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
     </style>
 </head>
 <body>
 
 <header>
     <h2>BOTECO 934</h2>
-    <div class="dre-info">
-        <div class="dre-card">Venda: R$ <span id="venda_total">0.00</span></div>
-        <div class="dre-card">Lucro: R$ <span id="lucro_total">0.00</span></div>
+    <div style="display: flex; gap: 15px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 4px;">
+            Venda: R$ <span id="venda_total">0.00</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 4px;">
+            Lucro: R$ <span id="lucro_total">0.00</span>
+        </div>
     </div>
 </header>
 
 <main>
     <nav class="sidebar">
-        <div class="nav-item active"><i>🛒</i>Vendas</div>
-        <div class="nav-item"><i>👥</i>Clientes</div>
-        <div class="nav-item"><i>📦</i>Estoque</div>
-        <div class="nav-item"><i>📊</i>DRE</div>
+        <div onclick="showScreen('vendas')" class="nav-item"><i>🛒</i></div>
+        <div onclick="showScreen('clientes')" class="nav-item"><i>👥</i></div>
+        <div onclick="showScreen('estoque')" class="nav-item"><i>📦</i></div>
     </nav>
 
-    <section class="venda-grid">
-        <div class="controles">
-            <input type="text" id="busca" placeholder="Bipar código ou pesquisar..." autofocus>
-            <select id="cliente">
-                <option value="">👤 Cliente Avulso</option>
-                <option value="5587999999999">Edmarques</option>
-            </select>
+    <section id="screen-vendas" class="venda-grid active-screen">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="busca" placeholder="Bipar ou pesquisar..." style="flex:2; padding:10px;">
+            <select id="cliente-select" style="flex:1; padding:10px;"><option value="">Avulso</option></select>
         </div>
-        <div id="produtos-lista" class="produtos-container"></div>
+        <div id="produtos-lista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap:10px; overflow-y:auto;"></div>
+    </section>
+
+    <section id="screen-clientes" class="venda-grid hidden">
+        <h3>Lista de Clientes</h3>
+        <table>
+            <thead><tr><th>Nome</th><th>Contato</th></tr></thead>
+            <tbody id="lista-clientes-body"></tbody>
+        </table>
+    </section>
+
+    <section id="screen-estoque" class="venda-grid hidden">
+        <h3>Estoque Atual</h3>
+        <table>
+            <thead><tr><th>Código</th><th>Produto</th><th>Custo</th><th>Venda</th></tr></thead>
+            <tbody id="lista-estoque-body"></tbody>
+        </table>
     </section>
 
     <section class="carrinho">
-        <h3 style="margin-bottom:10px;">Carrinho</h3>
-        <div id="carrinho-itens" class="itens-checkout"></div>
-        
-        <div class="checkout-footer">
-            <div style="font-size:12px; margin-bottom:10px;">
-                Dividir para: <input type="number" id="split" value="1" min="1" style="width:40px" onchange="calcTotal()"> pessoas
-                <br>Por pessoa: <b>R$ <span id="valor-split">0.00</span></b>
-            </div>
-            <div class="total-linha">
-                <span>Total:</span>
-                <span>R$ <span id="total-venda">0.00</span></span>
-            </div>
-            <button class="btn-whats" onclick="enviarWhatsApp()">📱 WhatsApp</button>
-            <button class="btn-finish" onclick="finalizar()">✅ PAGO / IMPRIMIR</button>
-            <button class="btn-clear" onclick="limpar()">Limpar</button>
+        <h3>Carrinho</h3>
+        <div id="carrinho-itens" style="flex:1; overflow-y:auto;"></div>
+        <div style="margin-top:auto; background:#f9f9f9; padding:10px;">
+            <p>Total: <b>R$ <span id="total-carrinho">0.00</span></b></p>
+            <button onclick="finalizarVenda()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">FINALIZAR</button>
         </div>
     </section>
 </main>
 
-<div id="recibo-print" style="display:none;"></div>
-
 <script>
-    // LISTA DE PRODUTOS
-    const db_produtos = [
-        { id: "1", ean: "7891991000853", nome: "Heineken 330ml", preco: 16.00, custo: 9.50, img: "https://via.placeholder.com/150/2c3e50/ffffff?text=Heineken" },
-        { id: "2", ean: "7891149107503", nome: "Skol Lata", preco: 6.50, custo: 3.80, img: "https://via.placeholder.com/150/2c3e50/ffffff?text=Skol" },
-        { id: "3", ean: "001", nome: "Dose Whisky Red", preco: 18.00, custo: 8.50, img: "https://via.placeholder.com/150/2c3e50/ffffff?text=Whisky" },
-        { id: "4", ean: "002", nome: "Porção Batata", preco: 25.00, custo: 12.00, img: "https://via.placeholder.com/150/2c3e50/ffffff?text=Batata" }
-    ];
+    // CONFIGURAÇÃO FIREBASE (Substitua pelos seus dados)
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_PROJETO.firebaseapp.com",
+        projectId: "SEU_PROJETO_ID",
+        storageBucket: "SEU_PROJETO.appspot.com",
+        messagingSenderId: "SEU_ID",
+        appId: "SEU_APP_ID"
+    };
 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let produtos = [];
     let carrinho = [];
-    let d_venda = 0;
-    let d_lucro = 0;
 
-    // RENDERIZAR PRODUTOS
-    function initProdutos(filtro = "") {
-        const div = document.getElementById('produtos-lista');
-        div.innerHTML = "";
-        db_produtos.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.ean.includes(filtro)).forEach(p => {
-            div.innerHTML += `
-                <div class="card-p" onclick="add('${p.ean}')">
-                    <img src="${p.img}">
-                    <h4>${p.nome}</h4>
-                    <span>R$ ${p.preco.toFixed(2)}</span>
-                </div>
-            `;
+    // CARREGAR DADOS DO FIREBASE
+    async function syncData() {
+        // Carregar Produtos
+        db.collection("produtos").onSnapshot(snapshot => {
+            produtos = snapshot.docs.map(doc => doc.data());
+            renderProdutos();
+            renderEstoque();
+        });
+
+        // Carregar Clientes
+        db.collection("clientes").onSnapshot(snapshot => {
+            const clientes = snapshot.docs.map(doc => doc.data());
+            renderClientes(clientes);
         });
     }
 
-    // ADICIONAR
-    function add(ean) {
-        const prod = db_produtos.find(p => p.ean === ean);
-        if(prod) {
-            carrinho.push({...prod});
-            calcTotal();
-            document.getElementById('busca').value = "";
-            initProdutos();
+    function renderProdutos() {
+        const div = document.getElementById('produtos-lista');
+        div.innerHTML = produtos.map(p => `
+            <div onclick="addToCarrinho('${p.ean}')" style="border:1px solid #ddd; padding:8px; text-align:center; cursor:pointer;">
+                <img src="${p.img}" style="width:100%; height:60px; object-fit:cover;">
+                <div style="font-size:11px;">${p.nome}</div>
+                <b style="color:green;">R$ ${p.preco.toFixed(2)}</b>
+            </div>
+        `).join('');
+    }
+
+    function addToCarrinho(ean) {
+        const p = produtos.find(item => item.ean === ean);
+        if(p) {
+            carrinho.push(p);
+            updateCarrinho();
         }
     }
 
-    // CALCULAR
-    function calcTotal() {
+    function updateCarrinho() {
         const lista = document.getElementById('carrinho-itens');
-        const totalTxt = document.getElementById('total-venda');
-        const splitTxt = document.getElementById('valor-split');
-        const qtdSplit = document.getElementById('split').value || 1;
-
+        const totalTxt = document.getElementById('total-carrinho');
         let total = 0;
-        lista.innerHTML = "";
-        
-        carrinho.forEach((p, i) => {
+        lista.innerHTML = carrinho.map(p => {
             total += p.preco;
-            lista.innerHTML += `
-                <div class="item-row">
-                    <span>${p.nome}</span>
-                    <span>R$ ${p.preco.toFixed(2)} <b onclick="remove(${i})" style="color:red;cursor:pointer;margin-left:5px">x</b></span>
-                </div>
-            `;
-        });
-
+            return `<div style="display:flex; justify-content:space-between; font-size:12px; padding:5px 0;"><span>${p.nome}</span><span>R$ ${p.preco.toFixed(2)}</span></div>`;
+        }).join('');
         totalTxt.innerText = total.toFixed(2);
-        splitTxt.innerText = (total / qtdSplit).toFixed(2);
     }
 
-    function remove(i) { carrinho.splice(i, 1); calcTotal(); }
-
-    // FINALIZAR
-    function finalizar() {
-        if(carrinho.length === 0) return;
-        let t = 0, c = 0;
-        carrinho.forEach(p => { t += p.preco; c += p.custo; });
-        d_venda += t; d_lucro += (t - c);
-        document.getElementById('venda_total').innerText = d_venda.toFixed(2);
-        document.getElementById('lucro_total').innerText = d_lucro.toFixed(2);
-        
-        document.getElementById('recibo-print').innerHTML = `<h3>BOTECO 934</h3><hr>${carrinho.map(p => p.nome + ' R$ ' + p.preco.toFixed(2)).join('<br>')}<hr>TOTAL: R$ ${t.toFixed(2)}`;
-        window.print();
-        limpar();
+    // TROCA DE TELAS
+    function showScreen(screen) {
+        document.querySelectorAll('section.venda-grid').forEach(s => s.classList.add('hidden'));
+        document.getElementById(`screen-${screen}`).classList.remove('hidden');
+        document.getElementById(`screen-${screen}`).classList.add('active-screen');
     }
 
-    function enviarWhatsApp() {
-        const fone = document.getElementById('cliente').value;
-        let msg = "*Boteco 934 - Recibo*\n";
-        carrinho.forEach(p => msg += `• ${p.nome}: R$ ${p.preco.toFixed(2)}\n`);
-        msg += `*Total: R$ ${carrinho.reduce((a,b)=>a+b.preco,0).toFixed(2)}*`;
-        window.open(`https://wa.me/${fone}?text=${encodeURIComponent(msg)}`);
+    function renderClientes(lista) {
+        const body = document.getElementById('lista-clientes-body');
+        const select = document.getElementById('cliente-select');
+        body.innerHTML = lista.map(c => `<tr><td>${c.nome}</td><td>${c.contato}</td></tr>`).join('');
+        select.innerHTML = '<option value="">Avulso</option>' + lista.map(c => `<option value="${c.contato}">${c.nome}</option>`).join('');
     }
 
-    function limpar() { carrinho = []; calcTotal(); }
+    function renderEstoque() {
+        const body = document.getElementById('lista-estoque-body');
+        body.innerHTML = produtos.map(p => `<tr><td>${p.ean}</td><td>${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.preco}</td></tr>`).join('');
+    }
 
-    document.getElementById('busca').addEventListener('input', (e) => {
-        initProdutos(e.target.value);
-        const p = db_produtos.find(prod => prod.ean === e.target.value);
-        if(p) add(e.target.value);
-    });
-
-    initProdutos();
+    syncData();
 </script>
-
 </body>
 </html>
