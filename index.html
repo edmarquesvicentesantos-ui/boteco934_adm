@@ -2,124 +2,90 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>934 ELITE - PDV & XML</title>
+    <title>SISTEMA ELITE 934 - COMPLETO</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --card: #111; }
+        :root { --gold: #ffcc00; --bg: #050505; --card: #111; --green: #25d366; --red: #ff4444; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; display: flex; height: 100vh; }
+        body { background: var(--bg); color: #fff; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Menu */
-        nav { width: 200px; background: #000; padding: 20px; border-right: 1px solid #222; display: flex; flex-direction: column; gap: 10px; }
+        /* Menu Lateral */
+        nav { width: 220px; background: #000; padding: 20px; border-right: 1px solid #222; display: flex; flex-direction: column; gap: 10px; }
         .nav-btn { background: var(--card); border: 1px solid #333; color: #fff; padding: 12px; cursor: pointer; border-radius: 6px; text-align: left; }
         .nav-btn.active { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* Main */
+        /* Área Principal */
         main { flex: 1; padding: 20px; overflow-y: auto; }
         .view { display: none; }
         .view.active { display: block; }
 
+        /* Cards e Layout */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; }
+        .card.ocupada { border-color: var(--gold); background: #1a1600; }
+        
         /* XML Drop Zone */
-        // DENTRO DA FUNÇÃO DE LEITURA DO XML
-document.getElementById('xmlInput').onchange = (e) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(event.target.result, "text/xml");
-        const produtos = xml.getElementsByTagName("det");
-        
-        for (let p of produtos) {
-            let nome = p.getElementsByTagName("xProd")[0].textContent;
-            let qtdComprada = parseFloat(p.getElementsByTagName("qCom")[0].textContent); // Ex: 10 fardos
-            let valorUnNF = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent); // Valor do fardo na nota
-            
-            // --- LÓGICA DE FRACIONAMENTO ---
-            let fatorConversao = 1;
+        .xml-zone { border: 2px dashed #444; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
 
-            // Se no nome do produto tiver "C/12", "CX12" ou "FD12", ele multiplica
-            if (nome.includes("12")) fatorConversao = 12;
-            else if (nome.includes("15")) fatorConversao = 15;
-            else if (nome.includes("24")) fatorConversao = 24;
-            else if (nome.includes("6")) fatorConversao = 6;
-
-            let qtdRealEstoque = qtdComprada * fatorConversao; // 10 fardos x 12 = 120 unidades
-            let custoUnitarioReal = valorUnNF / fatorConversao; // Preço do fardo / 12 = custo de cada lata
-            // -------------------------------
-
-            let existe = db_estoque.find(i => i.nome === nome);
-            if (existe) {
-                existe.qtd += qtdRealEstoque;
-                existe.custo = custoUnitarioReal;
-            } else {
-                // Cadastra já com o preço sugerido (ex: 30% de margem sobre a unidade)
-                db_estoque.push({ 
-                    nome: nome, 
-                    qtd: qtdRealEstoque, 
-                    preco: custoUnitarioReal * 1.30, 
-                    custo: custoUnitarioReal 
-                });
-            }
-        }
-        save();
-        render();
-        alert("XML Importado: Itens fracionados com sucesso!");
-    };
-    reader.readAsText(e.target.files[0]);
-};
-        /* Mesas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .mesa { background: var(--card); border: 2px solid #333; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; }
-        .mesa.ocupada { border-color: var(--gold); }
-
-        /* Tabelas */
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        th { text-align: left; color: var(--gold); padding: 10px; border-bottom: 2px solid #222; }
-        td { padding: 10px; border-bottom: 1px solid #222; }
-        
-        .btn-venda { background: #25d366; color: #fff; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        /* Estilo da Conta */
+        .linha-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; }
+        .btn-pg { padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
     </style>
 </head>
 <body>
 
 <nav>
-    <div style="font-size: 24px; font-weight: 900; color: var(--gold); text-align: center; margin-bottom: 20px;">934</div>
-    <button class="nav-btn active" onclick="tab('vendas')">🪑 VENDAS</button>
-    <button class="nav-btn" onclick="tab('estoque')">📦 ESTOQUE/XML</button>
+    <div style="text-align:center; margin-bottom: 30px;"><h1 style="color:var(--gold)">934</h1></div>
+    <button class="nav-btn active" onclick="tab('vendas')">🪑 VENDAS / MESAS</button>
+    <button class="nav-btn" onclick="tab('estoque')">📦 ESTOQUE & XML</button>
+    <button class="nav-btn" onclick="tab('fiado')">👥 FIADO / CLIENTES</button>
 </nav>
 
 <main>
     <div id="vendas" class="view active">
-        <h2>Mapa de Mesas</h2>
-        <div class="grid-mesas" id="gridMesas"></div>
-        <div id="painelMesa" style="margin-top: 20px; display:none; background: var(--card); padding: 20px; border-radius: 8px;">
-            <h3 id="tituloMesa">Mesa</h3>
-            <div id="itensMesa"></div>
-            <hr style="margin: 15px 0; border: #222 1px solid;">
-            <div style="display:flex; justify-content: space-between; font-size: 18px; font-weight: bold;">
-                <span>TOTAL:</span><span id="totalMesa">R$ 0,00</span>
+        <div style="display: flex; gap: 20px;">
+            <div style="flex: 2;">
+                <h2>Mesas</h2>
+                <div class="grid-mesas" id="gridMesas"></div>
             </div>
-            <button class="btn-venda" style="width: 100%; margin-top: 15px;" onclick="fecharComZap()">FECHAR CONTA (WHATSAPP)</button>
+            <div style="flex: 1; background: var(--card); padding: 20px; border-radius: 10px;" id="painelVenda">
+                <h3 id="tituloMesa">Selecione uma Mesa</h3>
+                <div id="listaItens" style="margin: 20px 0; min-height: 200px;"></div>
+                <div style="font-size: 20px; font-weight: bold; border-top: 2px solid var(--gold); padding-top: 10px;">
+                    Total: <span id="totalMesa">R$ 0,00</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <button class="btn-pg" style="background: var(--green);" onclick="fecharConta('caixa')">💰 CAIXA</button>
+                    <button class="btn-pg" style="background: var(--red);" onclick="fecharConta('fiado')">📝 FIADO</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="estoque" class="view">
-        <h2>Importar XML de Compra</h2>
-        <div class="xml-zone" id="dropZone">
-            Arrastar arquivo XML aqui ou clique para selecionar
-            <input type="file" id="xmlInput" hidden accept=".xml">
+        <h2>Entrada via XML (Fracionado)</h2>
+        <div class="xml-zone" onclick="document.getElementById('xmlIn').click()">
+            Arraste seu XML aqui ou Clique para Importar
+            <input type="file" id="xmlIn" hidden accept=".xml" onchange="importarXML(this.files[0])">
         </div>
-
-        <h2>Produtos em Estoque</h2>
-        <table>
-            <thead><tr><th>NOME</th><th>QTD</th><th>PREÇO VENDA</th></tr></thead>
+        <table style="width:100%; text-align:left;">
+            <thead><tr><th>Produto</th><th>Estoque (Unid)</th><th>Preço Venda</th></tr></thead>
             <tbody id="corpoEstoque"></tbody>
         </table>
+    </div>
+
+    <div id="fiado" class="view">
+        <h2>Clientes com Pendura</h2>
+        <div id="listaFiado" style="margin-top: 20px;"></div>
     </div>
 </main>
 
 <script>
-    let db_estoque = JSON.parse(localStorage.getItem('934_est')) || [];
-    let db_mesas = JSON.parse(localStorage.getItem('934_mes')) || Array(12).fill().map((_, i) => ({ id: i+1, ocupada: false, pedidos: [], total: 0 }));
-    let mesaAberta = null;
+    let db = {
+        estoque: JSON.parse(localStorage.getItem('934_est')) || [],
+        mesas: JSON.parse(localStorage.getItem('934_mes')) || Array(12).fill().map((_, i) => ({ id: i+1, ocupada: false, pedidos: [], total: 0 })),
+        clientes: JSON.parse(localStorage.getItem('934_cli')) || []
+    };
+    let mesaAtiva = null;
 
     function tab(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -129,115 +95,108 @@ document.getElementById('xmlInput').onchange = (e) => {
         render();
     }
 
-    // LEITOR DE XML
-    document.getElementById('dropZone').onclick = () => document.getElementById('xmlInput').click();
-    document.getElementById('xmlInput').onchange = (e) => {
+    // --- LÓGICA XML FRACIONADO ---
+    function importarXML(file) {
         const reader = new FileReader();
-        reader.onload = (event) => {
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(event.target.result, "text/xml");
+        reader.onload = (e) => {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
             const produtos = xml.getElementsByTagName("det");
-            
             for (let p of produtos) {
                 let nome = p.getElementsByTagName("xProd")[0].textContent;
-                let qtd = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
-                let vUn = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent);
+                let qtdNF = parseFloat(p.getElementsByTagName("qCom")[0].textContent);
+                let valNF = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent);
                 
-                let existe = db_estoque.find(i => i.nome === nome);
-                if (existe) {
-                    existe.qtd += qtd;
-                } else {
-                    db_estoque.push({ nome, qtd, preco: vUn * 1.3, custo: vUn });
+                let fator = prompt(`Produto: ${nome}\nQuantos vêm no fardo/caixa?`, "12");
+                if (fator) {
+                    let totalUn = qtdNF * parseInt(fator);
+                    let custoUn = valNF / parseInt(fator);
+                    let index = db.estoque.findIndex(i => i.nome === nome);
+                    if (index >= 0) db.estoque[index].qtd += totalUn;
+                    else db.estoque.push({ nome, qtd: totalUn, preco: custoUn * 1.5, custo: custoUn });
                 }
             }
-            save();
-            render();
-            alert("Estoque Atualizado via XML!");
+            salvar(); render();
         };
-        reader.readAsText(e.target.files[0]);
-    };
-
-    function detalharMesa(id) {
-        mesaAberta = db_mesas.find(m => m.id === id);
-        mesaAberta.ocupada = true;
-        document.getElementById('painelMesa').style.display = 'block';
-        document.getElementById('tituloMesa').innerText = "Mesa " + id;
-        renderItensMesa();
+        reader.readAsText(file);
     }
 
-    // ADICIONAR ITEM COM BAIXA NO ESTOQUE
-    function addItem(nome) {
-        let pEstoque = db_estoque.find(i => i.nome === nome);
-        if (pEstoque.qtd <= 0) return alert("Estoque zerado!");
+    // --- VENDAS ---
+    function abrirMesa(id) {
+        mesaAtiva = db.mesas.find(m => m.id === id);
+        mesaAtiva.ocupada = true;
+        render();
+    }
 
-        let item = mesaAberta.pedidos.find(i => i.nome === nome);
-        if (item) {
-            item.qtd++;
-            item.subtotal = item.qtd * item.preco;
-        } else {
-            mesaAberta.pedidos.push({ nome, preco: pEstoque.preco, qtd: 1, subtotal: pEstoque.preco });
+    function addItem(nome) {
+        let p = db.estoque.find(i => i.nome === nome);
+        if (p.qtd <= 0) return alert("Estoque Zerado!");
+        
+        let item = mesaAtiva.pedidos.find(i => i.nome === nome);
+        if (item) { item.qtd++; item.sub = item.qtd * item.preco; }
+        else { mesaAtiva.pedidos.push({ nome, preco: p.preco, qtd: 1, sub: p.preco }); }
+        
+        p.qtd--; mesaAtiva.total = mesaAtiva.pedidos.reduce((a, b) => a + b.sub, 0);
+        salvar(); render();
+    }
+
+    function fecharConta(tipo) {
+        if (!mesaAtiva || mesaAtiva.total === 0) return;
+        
+        if (tipo === 'fiado') {
+            let nome = prompt("Nome do Cliente?");
+            if (!nome) return;
+            let c = db.clientes.find(cli => cli.nome === nome);
+            if (c) c.divida += mesaAtiva.total;
+            else db.clientes.push({ nome, divida: mesaAtiva.total });
         }
         
-        pEstoque.qtd--; // BAIXA NO ESTOQUE AQUI
-        mesaAberta.total = mesaAberta.pedidos.reduce((a, b) => a + b.subtotal, 0);
-        save();
-        render();
-        renderItensMesa();
-    }
-
-    function fecharComZap() {
-        let texto = `*BOTECO 934 - MESA ${mesaAberta.id}*%0A%0A`;
-        mesaAberta.pedidos.forEach(i => {
-            texto += `${i.qtd}x ${i.nome} - R$ ${i.subtotal.toFixed(2)}%0A`;
-        });
-        texto += `%0A*TOTAL: R$ ${mesaAberta.total.toFixed(2)}*`;
-        window.open(`https://wa.me/?text=${texto}`);
+        // Enviar Zap
+        let txt = `*BOTECO 934*%0A${mesaAtiva.pedidos.map(i => `${i.qtd}x ${i.nome}`).join('%0A')}%0A*Total: R$ ${mesaAtiva.total.toFixed(2)}*`;
+        window.open(`https://wa.me/?text=${txt}`);
         
-        mesaAberta.ocupada = false;
-        mesaAberta.pedidos = [];
-        mesaAberta.total = 0;
-        save();
-        location.reload();
+        mesaAtiva.ocupada = false; mesaAtiva.pedidos = []; mesaAtiva.total = 0;
+        salvar(); location.reload();
     }
 
-    function save() {
-        localStorage.setItem('934_est', JSON.stringify(db_estoque));
-        localStorage.setItem('934_mes', JSON.stringify(db_mesas));
+    // --- FUNÇÕES DE APOIO ---
+    function salvar() {
+        localStorage.setItem('934_est', JSON.stringify(db.estoque));
+        localStorage.setItem('934_mes', JSON.stringify(db.mesas));
+        localStorage.setItem('934_cli', JSON.stringify(db.clientes));
     }
 
     function render() {
-        // Grid Mesas
-        document.getElementById('gridMesas').innerHTML = db_mesas.map(m => `
-            <div class="mesa ${m.ocupada ? 'ocupada' : ''}" onclick="detalharMesa(${m.id})">
-                <h4>MESA ${m.id}</h4>
+        // Render Mesas
+        document.getElementById('gridMesas').innerHTML = db.mesas.map(m => `
+            <div class="card ${m.ocupada ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">
+                <h3>MESA ${m.id}</h3>
                 <p>${m.ocupada ? 'R$ '+m.total.toFixed(2) : 'Livre'}</p>
             </div>
         `).join('');
 
-        // Tabela Estoque
-        document.getElementById('corpoEstoque').innerHTML = db_estoque.map(p => `
-            <tr>
-                <td>${p.nome}</td>
-                <td>${p.qtd}</td>
-                <td>R$ ${p.preco.toFixed(2)}</td>
-            </tr>
-        `).join('');
-    }
+        // Render Itens da Mesa Selecionada
+        if (mesaAtiva) {
+            document.getElementById('tituloMesa').innerText = "Mesa " + mesaAtiva.id;
+            document.getElementById('listaItens').innerHTML = `
+                <select onchange="addItem(this.value); this.value=''" style="width:100%; padding:10px; background:#000; color:#fff; margin-bottom:10px;">
+                    <option value="">+ ADICIONAR ITEM</option>
+                    ${db.estoque.map(p => `<option value="${p.nome}">${p.nome} (Sald: ${p.qtd})</option>`)}
+                </select>
+                ${mesaAtiva.pedidos.map(i => `<div class="linha-item"><span>${i.qtd}x ${i.nome}</span><span>R$ ${i.sub.toFixed(2)}</span></div>`).join('')}
+            `;
+            document.getElementById('totalMesa').innerText = "R$ " + mesaAtiva.total.toFixed(2);
+        }
 
-    function renderItensMesa() {
-        document.getElementById('itensMesa').innerHTML = `
-            <select onchange="addItem(this.value); this.value=''">
-                <option value="">+ Adicionar Item do Estoque</option>
-                ${db_estoque.map(p => `<option value="${p.nome}">${p.nome} (R$ ${p.preco.toFixed(2)})</option>`)}
-            </select>
-            ${mesaAberta.pedidos.map(i => `
-                <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <span>${i.qtd}x ${i.nome}</span>
-                    <span>R$ ${i.subtotal.toFixed(2)}</span>
-                </div>
-            `).join('')}
-        `;
-        document.getElementById('totalMesa').innerText = "R$ " + mesaAberta.total.toFixed(2);
+        // Render Estoque
+        document.getElementById('corpoEstoque').innerHTML = db.estoque.map(p => `<tr><td>${p.nome}</td><td>${p.qtd}</td><td>R$ ${p.preco.toFixed(2)}</td></tr>`).join('');
+
+        // Render Fiado
+        document.getElementById('listaFiado').innerHTML = db.clientes.map((c, i) => `
+            <div style="display:flex; justify-content:space-between; background:#1a1a1a; padding:15px; margin-bottom:5px;">
+                <span><b>${c.nome}</b> - <span style="color:var(--red)">R$ ${c.divida.toFixed(2)}</span></span>
+                <button onclick="db.clientes[i].divida=0; salvar(); render();" style="color:var(--green); background:none; border:none; cursor:pointer;">QUITAR</button>
+            </div>
+        `).join('');
     }
 
     window.onload = render;
