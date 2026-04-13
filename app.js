@@ -72,3 +72,46 @@ function save() {
     localStorage.setItem('934_mes', JSON.stringify(db_mesas));
     localStorage.setItem('934_cli', JSON.stringify(db_clientes));
 }
+
+// Função para ler o XML e converter fardos em unidades
+function lerXML(arquivo) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(e.target.result, "text/xml");
+        const produtos = xml.getElementsByTagName("det");
+        
+        for (let p of produtos) {
+            let nomeNF = p.getElementsByTagName("xProd")[0].textContent;
+            let qtdFardos = parseFloat(p.getElementsByTagName("qCom")[0].textContent); // Ex: 10
+            let valorFardo = parseFloat(p.getElementsByTagName("vUnCom")[0].textContent); // Ex: 120.00
+            
+            // 1. PERGUNTA A FRAÇÃO (O segredo está aqui)
+            let unidadesPorFardo = prompt(`PRODUTO: ${nomeNF}\n\nQuantas UNIDADES (ou doses) vêm dentro de cada pacote/garrafa?`, "12");
+            
+            if (unidadesPorFardo !== null) {
+                let fator = parseInt(unidadesPorFardo);
+                let estoqueReal = qtdFardos * fator; // 10 fardos x 12 = 120 latas
+                let custoUnidade = valorFardo / fator; // 120.00 / 12 = 10.00 por lata
+
+                // 2. CHAMA A CALCULADORA (Sugestão de 30% ou o que você definir)
+                let margem = 1.30; 
+                let precoVendaSugerido = custoUnidade * margem;
+
+                // 3. SALVA NO ESTOQUE JÁ FRACIONADO
+                let itemEstoque = {
+                    nome: nomeNF,
+                    qtd: estoqueReal, // Aqui entra os 120, não os 10
+                    custo: custoUnidade,
+                    preco: precoVendaSugerido
+                };
+
+                // Lógica para adicionar ou atualizar no seu banco (localStorage)
+                atualizarOuAdicionarEstoque(itemEstoque);
+            }
+        }
+        alert("Estoque atualizado com sucesso via XML!");
+        renderizarTudo(); // Atualiza a tela
+    };
+    reader.readAsText(arquivo);
+}
