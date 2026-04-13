@@ -170,7 +170,72 @@
         renderSelectClientes();
         alert("Cliente cadastrado!");
     }
+// --- LÓGICA DE ESTOQUE AVANÇADA ---
 
+function salvarProduto() {
+    const ean = document.getElementById('p-ean').value;
+    const nome = document.getElementById('p-nome').value;
+    const custo = parseFloat(document.getElementById('p-custo').value);
+    const venda = parseFloat(document.getElementById('p-venda').value);
+    const qtd = parseInt(document.getElementById('p-qtd').value);
+
+    if (!ean || !nome || isNaN(venda)) {
+        return alert("Preencha Código, Nome e Preço de Venda!");
+    }
+
+    // Verifica se o produto já existe (para atualizar estoque)
+    const index = db_estoque.findIndex(p => p.ean === ean);
+
+    if (index >= 0) {
+        // Atualiza quantidade se o código já existir
+        db_estoque[index].qtd += qtd;
+        db_estoque[index].preco = venda;
+        db_estoque[index].custo = custo;
+        alert("Estoque do produto atualizado!");
+    } else {
+        // Adiciona novo
+        db_estoque.push({
+            ean,
+            nome,
+            preco: venda,
+            custo: custo || 0,
+            qtd: qtd || 0,
+            img: "https://via.placeholder.com/80?text=PROD" 
+        });
+        alert("Novo produto cadastrado com sucesso!");
+    }
+
+    // Limpa campos
+    document.getElementById('p-ean').value = '';
+    document.getElementById('p-nome').value = '';
+    document.getElementById('p-custo').value = '';
+    document.getElementById('p-venda').value = '';
+    document.getElementById('p-qtd').value = '';
+
+    renderEstoque();
+    renderProdutos(); // Atualiza a tela de vendas também
+}
+
+function renderEstoque() {
+    const tbody = document.getElementById('tab-estoque');
+    tbody.innerHTML = db_estoque.map(p => `
+        <tr>
+            <td style="color:#666; font-family: monospace;">${p.ean}</td>
+            <td style="font-weight:bold;">${p.nome}</td>
+            <td style="color:var(--danger)">R$ ${p.custo.toFixed(2)}</td>
+            <td style="color:var(--success)">R$ ${p.preco.toFixed(2)}</td>
+            <td style="text-align:center; background:#f9f9f9;"><b>${p.qtd}</b></td>
+        </tr>
+    `).reverse().join(''); // Mostra os últimos cadastrados no topo
+}
+
+// DICA: Evento para o leitor de código de barras focar no campo automático
+document.addEventListener('keydown', function(e) {
+    // Se você estiver na tela de estoque e apertar F2 (ou outra tecla), foca no EAN
+    if(e.key === "F2") {
+        document.getElementById('p-ean').focus();
+    }
+});
     function renderListaClientes() {
         document.getElementById('tab-clientes').innerHTML = db_clientes.map((c, i) => `
             <tr><td>${c.nome}</td><td>${c.zap}</td><td><button onclick="removerCliente(${i})" style="color:red; background:none; border:none; cursor:pointer;">Excluir</button></td></tr>
