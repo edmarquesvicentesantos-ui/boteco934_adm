@@ -5,76 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDV Elite - Boteco 934</title>
     <style>
-        :root { --primary: #2c3e50; --success: #27ae60; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #ecf0f1; }
+        :root { --primary: #2c3e50; --success: #27ae60; --danger: #e74c3c; --accent: #f39c12; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #ecf0f1; }
         
         /* Cabeçalho e DRE */
-        header { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .dre-box { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 5px; font-size: 0.9rem; }
+        header { background: var(--primary); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .dre-box { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 5px; font-size: 0.9rem; border-left: 4px solid var(--accent); }
 
         main { display: flex; flex: 1; overflow: hidden; gap: 10px; padding: 10px; }
 
-        /* Esquerda: Produtos */
+        /* Esquerda: Busca e Produtos */
         .produtos-section { flex: 2; display: flex; flex-direction: column; background: white; border-radius: 8px; padding: 15px; }
-        .busca-container { margin-bottom: 15px; }
-        #inputBusca { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
+        .controles-topo { display: flex; gap: 10px; margin-bottom: 15px; }
+        #inputBusca { flex: 2; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        #selecionarCliente { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 5px; }
         
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; }
-        .card-prod { border: 1px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: transform 0.1s; }
-        .card-prod:hover { transform: scale(1.02); border-color: var(--success); }
-        .card-prod img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 5px; }
-        .card-prod h4 { margin: 5px 0; font-size: 0.9rem; color: #333; }
-        .card-prod span { color: var(--success); font-weight: bold; }
+        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; overflow-y: auto; }
+        .card-prod { border: 1px solid #eee; border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; }
+        .card-prod:hover { border-color: var(--success); background: #f9fff9; }
+        .card-prod img { width: 100%; height: 70px; object-fit: cover; border-radius: 4px; }
+        .card-prod h4 { margin: 5px 0; font-size: 0.85rem; height: 34px; overflow: hidden; }
+        .card-prod span { color: var(--success); font-weight: bold; font-size: 0.9rem; }
 
         /* Direita: Carrinho */
         .carrinho-section { width: 380px; background: white; border-radius: 8px; display: flex; flex-direction: column; padding: 15px; box-shadow: -2px 0 10px rgba(0,0,0,0.05); }
-        .lista-itens { flex: 1; overflow-y: auto; border-bottom: 2px solid #eee; }
-        .item-car { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
+        .lista-itens { flex: 1; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 10px; }
+        .item-car { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
         
-        .totais-area { padding: 15px 0; }
-        .linha-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
+        .totais-area { padding: 5px 0; }
+        .linha-total { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
         
-        .divisao-box { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.85rem; }
-        .divisao-box input { width: 50px; }
+        .divisao-box { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.85rem; border: 1px solid #ddd; }
 
-        button { width: 100%; padding: 12px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-bottom: 5px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-bottom: 8px; transition: 0.2s; }
         .btn-whats { background: #25d366; }
+        .btn-whats:hover { background: #128c7e; }
         .btn-finalizar { background: var(--success); font-size: 1.1rem; }
-        .btn-limpar { background: var(--danger); }
+        .btn-finalizar:hover { background: #219150; }
+        .btn-limpar { background: var(--danger); opacity: 0.8; }
 
-        /* Impressão */
+        /* Impressão Térmica 80mm */
         @media print {
             body * { visibility: hidden; }
             #cupom, #cupom * { visibility: visible; }
-            #cupom { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; }
+            #cupom { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; padding: 5px; }
+            .no-print { display: none; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div><strong>Boteco 934</strong> - PDV</div>
+    <div><strong>ELITE PDV</strong> - Boteco 934</div>
     <div class="dre-box">
-        Caixa: R$ <span id="valorVendido">0.00</span> | Lucro Estimado: R$ <span id="valorLucro">0.00</span>
+        Vendas: R$ <span id="valorVendido">0.00</span> | <strong>Lucro (DRE): R$ <span id="valorLucro">0.00</span></strong>
     </div>
 </header>
 
 <main>
     <section class="produtos-section">
-        <div class="busca-container">
-            <input type="text" id="inputBusca" placeholder="🔍 Buscar por nome ou bipar código de barras..." autocomplete="off">
+        <div class="controles-topo">
+            <input type="text" id="inputBusca" placeholder="🔍 Nome do produto ou Bipar código..." autofocus>
+            <select id="selecionarCliente">
+                <option value="">👤 Cliente Avulso</option>
+            </select>
         </div>
         <div id="gridProdutos" class="grid-produtos"></div>
     </section>
 
     <section class="carrinho-section">
-        <h3>Pedido Atual</h3>
+        <h3>Pedido</h3>
         <div id="listaItens" class="lista-itens"></div>
 
         <div class="totais-area">
             <div class="divisao-box">
-                Dividir para: <input type="number" id="qtdClientes" value="1" min="1" onchange="atualizarTotais()"> pessoas
-                <br>Valor por pessoa: <strong>R$ <span id="porPessoa">0.00</span></strong>
+                Dividir para: <input type="number" id="qtdClientes" value="1" min="1" style="width: 40px;" onchange="atualizarTotais()"> pessoas
+                <br>Por pessoa: <strong>R$ <span id="porPessoa">0.00</span></strong>
             </div>
             
             <div class="linha-total">
@@ -84,7 +90,7 @@
 
             <button class="btn-whats" onclick="enviarWhats()">📱 Enviar via WhatsApp</button>
             <button class="btn-finalizar" onclick="finalizar()">✅ Finalizar e Imprimir</button>
-            <button class="btn-limpar" onclick="limparCarrinho()">Limpar</button>
+            <button class="btn-limpar" onclick="limparCarrinho()">Limpar Carrinho</button>
         </div>
     </section>
 </main>
@@ -92,138 +98,47 @@
 <div id="cupom" style="display:none;"></div>
 
 <script>
-    // 1. Banco de Dados (Simulado)
+    // 1. BANCO DE DADOS (CLIENTES E PRODUTOS)
+    const db_clientes = [
+        { nome: "Edmarques", tel: "5587900000000" },
+        { nome: "Esposa", tel: "5587900000000" },
+        { nome: "Cliente VIP 1", tel: "5587900000000" }
+    ];
+
     const db_produtos = [
-        { cod: "7891", nome: "Heineken 330ml", preco: 16.00, custo: 9.50, foto: "https://via.placeholder.com/100?text=Heineken" },
-        { cod: "7892", nome: "Skol Lata", preco: 6.50, custo: 3.80, foto: "https://via.placeholder.com/100?text=Skol" },
-        { cod: "7893", nome: "Picanha Dose", preco: 45.00, custo: 22.00, foto: "https://via.placeholder.com/100?text=Picanha" },
-        { cod: "1010", nome: "Combo Whisky", preco: 250.00, custo: 140.00, foto: "https://via.placeholder.com/100?text=Whisky" }
+        { cod: "7891991000853", nome: "Heineken 330ml", preco: 16.00, custo: 9.50, foto: "https://via.placeholder.com/100?text=Heineken" },
+        { cod: "7891149107503", nome: "Skol Lata 350ml", preco: 6.50, custo: 3.80, foto: "https://via.placeholder.com/100?text=Skol" },
+        { cod: "7896017300112", nome: "Pitu 965ml", preco: 18.00, custo: 12.00, foto: "https://via.placeholder.com/100?text=Pitu" },
+        { cod: "001", nome: "Dose Whisky Red", preco: 15.00, custo: 7.20, foto: "https://via.placeholder.com/100?text=Whisky" },
+        { cod: "002", nome: "Petisco Casa", preco: 35.00, custo: 18.00, foto: "https://via.placeholder.com/100?text=Petisco" }
     ];
 
     let carrinho = [];
-    let totalAcumulado = 0;
-    let lucroAcumulado = 0;
+    let vendasTotal = 0;
+    let lucroTotal = 0;
 
-    // 2. Funções de Interface
+    // 2. INICIALIZAÇÃO
+    function init() {
+        renderizarProdutos();
+        const select = document.getElementById('selecionarCliente');
+        db_clientes.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.tel;
+            opt.textContent = c.nome;
+            select.appendChild(opt);
+        });
+    }
+
+    // 3. LÓGICA DE PRODUTOS
     function renderizarProdutos(filtro = "") {
         const grid = document.getElementById('gridProdutos');
         grid.innerHTML = "";
         
-        const filtrados = db_produtos.filter(p => 
-            p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.cod.includes(filtro)
-        );
-
-        filtrados.forEach(p => {
+        db_produtos.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.cod.includes(filtro))
+        .forEach(p => {
             const div = document.createElement('div');
             div.className = 'card-prod';
             div.onclick = () => adicionar(p);
             div.innerHTML = `
                 <img src="${p.foto}">
                 <h4>${p.nome}</h4>
-                <span>R$ ${p.preco.toFixed(2)}</span>
-            `;
-            grid.appendChild(div);
-        });
-    }
-
-    function adicionar(produto) {
-        carrinho.push({...produto});
-        atualizarTotais();
-    }
-
-    function atualizarTotais() {
-        const lista = document.getElementById('listaItens');
-        const totalDisplay = document.getElementById('totalDisplay');
-        const porPessoa = document.getElementById('porPessoa');
-        const qtd = document.getElementById('qtdClientes').value;
-
-        lista.innerHTML = "";
-        let total = 0;
-
-        carrinho.forEach((item, index) => {
-            total += item.preco;
-            lista.innerHTML += `
-                <div class="item-car">
-                    <span>${item.nome}</span>
-                    <span>R$ ${item.preco.toFixed(2)} <small onclick="remover(${index})" style="color:red; cursor:pointer; margin-left:5px;">[x]</small></span>
-                </div>
-            `;
-        });
-
-        totalDisplay.innerText = `R$ ${total.toFixed(2)}`;
-        porPessoa.innerText = (total / qtd).toFixed(2);
-    }
-
-    function remover(index) {
-        carrinho.splice(index, 1);
-        atualizarTotais();
-    }
-
-    // 3. Fechamento e DRE
-    function finalizar() {
-        if(carrinho.length === 0) return alert("Carrinho vazio!");
-
-        let totalVenda = 0;
-        let custoVenda = 0;
-        let resumoItens = "";
-
-        carrinho.forEach(item => {
-            totalVenda += item.preco;
-            custoVenda += item.custo;
-            resumoItens += `${item.nome} - R$ ${item.preco.toFixed(2)}\n`;
-        });
-
-        // Atualiza DRE do Caixa
-        totalAcumulado += totalVenda;
-        lucroAcumulado += (totalVenda - custoVenda);
-        document.getElementById('valorVendido').innerText = totalAcumulado.toFixed(2);
-        document.getElementById('valorLucro').innerText = lucroAcumulado.toFixed(2);
-
-        // Prepara Cupom
-        const cupom = document.getElementById('cupom');
-        cupom.innerHTML = `
-            <center><strong>BOTECO 934</strong><br>RECIBO DE VENDA</center><br>
-            ${resumoItens.replace(/\n/g, '<br>')}
-            <hr>
-            <strong>TOTAL: R$ ${totalVenda.toFixed(2)}</strong><br>
-            Pessoas: ${document.getElementById('qtdClientes').value}
-        `;
-
-        window.print();
-        limparCarrinho();
-    }
-
-    function enviarWhats() {
-        let texto = "*Boteco 934 - Recibo*\n\n";
-        carrinho.forEach(i => texto += `• ${i.nome}: R$ ${i.preco.toFixed(2)}\n`);
-        const total = carrinho.reduce((a, b) => a + b.preco, 0);
-        texto += `\n*Total: R$ ${total.toFixed(2)}*`;
-        
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`);
-    }
-
-    function limparCarrinho() {
-        carrinho = [];
-        document.getElementById('qtdClientes').value = 1;
-        atualizarTotais();
-    }
-
-    // Busca automática
-    document.getElementById('inputBusca').addEventListener('input', (e) => {
-        renderizarProdutos(e.target.value);
-        
-        // Se for um código de barras exato, adiciona direto
-        const buscaEfetiva = db_produtos.find(p => p.cod === e.target.value);
-        if(buscaEfetiva) {
-            adicionar(buscaEfetiva);
-            e.target.value = "";
-            renderizarProdutos();
-        }
-    });
-
-    // Iniciar
-    renderizarProdutos();
-</script>
-
-</body>
-</html>
