@@ -2,186 +2,140 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>934 BOTECO - PDV</title>
+    <title>SISTEMA ELITE 934 - GESTÃO TOTAL</title>
     <style>
-        :root { --gold: #ffcc00; --bg: #050505; --gray: #121212; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-size: 13px; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --gold: #ffcc00; --bg: #050505; --card: #121212; --green: #25d366; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: #fff; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Cabeçalho */
-        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-circulo { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--gold); background: #111; }
-        .brand { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+        /* Menu Lateral Estilo Premium */
+        nav { width: 220px; background: #000; padding: 20px; border-right: 1px solid #222; display: flex; flex-direction: column; gap: 10px; }
+        .logo { font-size: 24px; font-weight: 900; color: var(--gold); text-align: center; margin-bottom: 30px; border: 2px solid var(--gold); border-radius: 50%; width: 60px; height: 60px; line-height: 55px; margin-left: auto; margin-right: auto; }
+        .nav-btn { background: none; border: 1px solid #333; color: #aaa; padding: 12px; text-align: left; cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .nav-btn.active { background: var(--gold); color: #000; font-weight: bold; border-color: var(--gold); }
 
-        /* Menu de Navegação */
-        nav { display: flex; background: #111; border-bottom: 1px solid #222; }
-        .nav-btn { flex: 1; padding: 12px; border: none; background: none; color: #666; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); background: rgba(255,204,0,0.05); }
-
-        .main-content { display: flex; flex: 1; overflow: hidden; }
-        .tela { display: none; flex: 1; padding: 12px; overflow-y: auto; }
-        .tela.ativa { display: block; }
+        /* Conteúdo Principal */
+        main { flex: 1; padding: 25px; overflow-y: auto; background: linear-gradient(135deg, #050505 0%, #111 100%); }
+        .view { display: none; }
+        .view.active { display: block; }
 
         /* Grid de Mesas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .mesa { background: var(--gray); padding: 15px 5px; border-radius: 4px; text-align: center; cursor: pointer; border: 1px solid #222; }
-        .mesa.ocupada { background: #3d0000; border-color: #f33; }
-        .mesa.selecionada { border-color: var(--gold); background: #222; }
+        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .mesa-card { background: var(--card); border: 1px solid #333; padding: 25px; border-radius: 12px; text-align: center; cursor: pointer; position: relative; }
+        .mesa-card.ocupada { border-color: var(--gold); background: #1a1600; }
+        .mesa-card h3 { font-size: 18px; margin-bottom: 10px; }
+        .status-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: #333; }
+        .ocupada .status-badge { background: var(--gold); color: #000; }
 
-        /* Mercadorias e Leitor */
-        .busca-container { position: sticky; top: 0; background: var(--bg); padding-bottom: 10px; z-index: 10; }
-        .input-leitor { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: var(--gold); border-radius: 4px; font-size: 14px; text-align: center; outline: none; }
-        .input-leitor:focus { border-color: var(--gold); }
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
-        .prod-card { background: #fff; color: #000; padding: 12px 4px; border-radius: 4px; text-align: center; cursor: pointer; font-weight: bold; border: none; min-height: 60px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        
-        /* Painel Lateral (Cupom) */
-        .lateral-caixa { width: 280px; background: #fff; color: #000; padding: 15px; display: flex; flex-direction: column; box-shadow: -4px 0 15px rgba(0,0,0,0.4); }
-        .lista-itens { flex: 1; overflow-y: auto; border-top: 1px solid #ddd; margin-top: 10px; padding-top: 10px; }
-        .item-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; font-weight: 500; border-bottom: 1px solid #f5f5f5; padding-bottom: 2px; }
-        .total-area { border-top: 2px solid #000; padding-top: 10px; font-weight: 900; display: flex; justify-content: space-between; font-size: 16px; margin-top: 5px; }
-        .btn-fechar { background: #25d366; color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; font-size: 14px; }
+        /* Estilo da Conta (Carrinho) */
+        .carrinho-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #222; align-items: center; }
+        .carrinho-info b { display: block; color: #fff; }
+        .carrinho-info span { font-size: 11px; color: #888; }
+        .carrinho-preco { color: var(--gold); font-weight: bold; }
+
+        /* Tabelas de Estoque/Clientes */
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; }
+        th { background: #1a1a1a; padding: 15px; text-align: left; color: var(--gold); font-size: 12px; }
+        td { padding: 15px; border-bottom: 1px solid #222; }
+
+        .btn-green { background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo-area">
-        <div class="logo-circulo">934</div>
-        <div class="brand">BOTECO 934 - PDV</div>
-    </div>
-    <div id="relogio" style="color: var(--gold); font-weight: bold; font-family: monospace;">14:34</div>
-</header>
-
 <nav>
-    <button class="nav-btn active" onclick="abrirAba('aba-mesas', this)">🪑 Mesas</button>
-    <button class="nav-btn" onclick="abrirAba('aba-mercadorias', this)">🍺 Mercadorias</button>
+    <div class="logo">934</div>
+    <button class="nav-btn active" onclick="show('vendas')">🛒 FRENTE DE VENDA</button>
+    <button class="nav-btn" onclick="show('estoque')">📦 ESTOQUE & PREÇO</button>
+    <button class="nav-btn" onclick="show('clientes')">👤 CLIENTES / FIADO</button>
 </nav>
 
-<div class="main-content">
-    <div id="aba-mesas" class="tela ativa">
-        <div class="grid-mesas" id="containerMesas"></div>
+<main>
+    <div id="vendas" class="view active">
+        <h2 style="margin-bottom: 20px;">Mapa de Mesas / Balcão</h2>
+        <div class="mesa-grid" id="containerMesas"></div>
     </div>
 
-    <div id="aba-mercadorias" class="tela">
-        <div class="busca-container">
-            <input type="text" id="inputBusca" class="input-leitor" placeholder="[ BIPAR CÓDIGO OU DIGITAR NOME ]" oninput="filtrarEstoque()">
+    <div id="estoque" class="view">
+        <h2 style="margin-bottom: 20px;">Gestão de Estoque</h2>
+        <div style="background: var(--card); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px;">
+                <input type="text" id="p_nome" placeholder="Nome do Produto">
+                <input type="number" id="p_custo" placeholder="Custo Compra">
+                <input type="number" id="p_venda" placeholder="Preço Venda">
+                <button class="btn-green" onclick="addEstoque()">CADASTRAR</button>
+            </div>
         </div>
-        <div id="containerProdutos" class="grid-produtos"></div>
+        <table id="tabEstoque">
+            <thead><tr><th>PRODUTO</th><th>ESTOQUE</th><th>PREÇO</th><th>AÇÕES</th></tr></thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <div class="lateral-caixa">
-        <b id="statusMesa" style="font-size: 14px; color: #666; margin-bottom: 5px;">Mesa --</b>
-        <div id="corpoConta" class="lista-itens"></div>
-        <div class="total-area">
-            <span>TOTAL:</span>
-            <span>R$ <span id="valorTotal">0,00</span></span>
-        </div>
-        <button class="btn-fechar" onclick="encerrarConta()">FECHAR E ENVIAR WHATSAPP</button>
+    <div id="clientes" class="view">
+        <h2>Controle de Fiado</h2>
+        <p style="color: #666; margin-top: 10px;">Em desenvolvimento para o próximo módulo...</p>
     </div>
-</div>
+</main>
 
 <script>
-    let mesaAtual = null;
-    let dadosMesas = JSON.parse(localStorage.getItem('mesas_934')) || {};
-    let estoqueProdutos = JSON.parse(localStorage.getItem('boteco_est')) || [];
+    // BANCO DE DADOS LOCAL
+    let estoque = JSON.parse(localStorage.getItem('934_est')) || [];
+    let mesas = JSON.parse(localStorage.getItem('934_mesas')) || Array(12).fill().map((_, i) => ({ id: i+1, ocupada: false, itens: [], total: 0 }));
 
-    // Organiza por ordem alfabética
-    estoqueProdutos.sort((a, b) => a.nome.localeCompare(b.nome));
-
-    function initPDV() {
-        const grid = document.getElementById('containerMesas');
-        for(let i=1; i<=20; i++) { // Mantive 20 mesas como no seu print recente
-            if(!dadosMesas[i]) dadosMesas[i] = { ocupada: false, pedidos: [], total: 0 };
-            grid.innerHTML += `<div class="mesa ${dadosMesas[i].ocupada?'ocupada':''}" id="mesa-${i}" onclick="focarMesa(${i})"><b>M${i}</b></div>`;
-        }
-        atualizarVitrine(estoqueProdutos);
-    }
-
-    function abrirAba(id, botao) {
-        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    function show(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('ativa');
-        botao.classList.add('active');
-        if(id === 'aba-mercadorias') document.getElementById('inputBusca').focus();
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
+        if(id === 'vendas') renderMesas();
+        if(id === 'estoque') renderEstoque();
     }
 
-    function atualizarVitrine(lista) {
-        document.getElementById('containerProdutos').innerHTML = lista.map(p => 
-            `<button class="prod-card" onclick="adicionarItem('${p.nome}', ${p.venda})">
-                ${p.nome}<br>
-                <span style="font-size:10px; color:#888;">R$ ${p.venda.toFixed(2)}</span>
-            </button>`
-        ).join('');
-    }
-
-    function filtrarEstoque() {
-        const termo = document.getElementById('inputBusca').value.toLowerCase();
-        const filtrados = estoqueProdutos.filter(p => p.nome.toLowerCase().includes(termo));
-        atualizarVitrine(filtrados);
-    }
-
-    function focarMesa(n) {
-        mesaAtual = n;
-        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('selecionada'));
-        document.getElementById(`mesa-${n}`).classList.add('selecionada');
-        document.getElementById('statusMesa').innerText = "CONTA MESA " + n;
-        
-        if(!dadosMesas[n].ocupada) {
-            if(confirm("Deseja abrir o atendimento para a Mesa " + n + "?")) {
-                dadosMesas[n].ocupada = true;
-                document.getElementById(`mesa-${n}`).classList.add('ocupada');
-                salvarDados();
-            }
-        }
-        renderizarLista();
-    }
-
-    function adicionarItem(nome, preco) {
-        if(!mesaAtual || !dadosMesas[mesaAtual].ocupada) {
-            alert("Selecione e abra uma mesa primeiro!");
-            abrirAba('aba-mesas', document.querySelector('.nav-btn'));
-            return;
-        }
-        dadosMesas[mesaAtual].pedidos.push({ nome, preco });
-        dadosMesas[mesaAtual].total += preco;
-        salvarDados();
-        renderizarLista();
-        document.getElementById('inputBusca').value = ''; // Limpa após lançar
-    }
-
-    function renderizarLista() {
-        if(!mesaAtual) return;
-        const container = document.getElementById('corpoConta');
-        container.innerHTML = dadosMesas[mesaAtual].pedidos.map(item => `
-            <div class="item-row">
-                <span>${item.nome}</span>
-                <span>${item.preco.toFixed(2)}</span>
+    function renderMesas() {
+        const grid = document.getElementById('containerMesas');
+        grid.innerHTML = mesas.map(m => `
+            <div class="mesa-card ${m.ocupada ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">
+                <span class="status-badge">${m.ocupada ? 'OCUPADA' : 'LIVRE'}</span>
+                <h3>MESA ${m.id}</h3>
+                <p>${m.ocupada ? 'R$ ' + m.total.toFixed(2) : '---'}</p>
             </div>
         `).join('');
-        document.getElementById('valorTotal').innerText = dadosMesas[mesaAtual].total.toFixed(2);
     }
 
-    function salvarDados() { localStorage.setItem('mesas_934', JSON.stringify(dadosMesas)); }
-
-    function encerrarConta() {
-        if(!mesaAtual || !dadosMesas[mesaAtual].ocupada) return;
-        const texto = `*934 BOTECO*%0A*Conta Mesa ${mesaAtual}*%0ATotal: R$ ${dadosMesas[mesaAtual].total.toFixed(2)}`;
-        window.open(`https://wa.me/?text=${texto}`);
-        
-        dadosMesas[mesaAtual] = { ocupada: false, pedidos: [], total: 0 };
-        salvarDados();
-        location.reload();
+    function addEstoque() {
+        const nome = document.getElementById('p_nome').value;
+        const venda = parseFloat(document.getElementById('p_venda').value);
+        if(!nome || !venda) return alert("Preencha Nome e Venda!");
+        estoque.push({ nome, venda, qtd: 0 });
+        save();
+        renderEstoque();
     }
 
-    // Relógio e Início
-    setInterval(() => { 
-        document.getElementById('relogio').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); 
-    }, 1000);
-    
-    initPDV();
+    function renderEstoque() {
+        const tbody = document.querySelector('#tabEstoque tbody');
+        tbody.innerHTML = estoque.map((p, index) => `
+            <tr>
+                <td>${p.nome}</td>
+                <td>${p.qtd}</td>
+                <td>R$ ${p.venda.toFixed(2)}</td>
+                <td><button onclick="removerItem(${index})">❌</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function save() {
+        localStorage.setItem('934_est', JSON.stringify(estoque));
+        localStorage.setItem('934_mesas', JSON.stringify(mesas));
+    }
+
+    function removerItem(i) {
+        estoque.splice(i, 1);
+        save();
+        renderEstoque();
+    }
+
+    window.onload = () => { renderMesas(); renderEstoque(); };
 </script>
 </body>
 </html>
