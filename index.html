@@ -199,7 +199,26 @@
         document.getElementById('caixa-resumo').innerHTML = Object.keys(financeiro).map(k => `<div class="card-caixa"><h4>${k}</h4><h2 style="color:var(--success)">R$ ${financeiro[k].toFixed(2)}</h2></div>`).join('');
         document.getElementById('historico-corpo').innerHTML = historico.map(h => `<tr><td>${h.hora}</td><td>${h.cliente}</td><td>R$ ${h.valor.toFixed(2)}</td><td>${h.metodo}</td></tr>`).reverse().join('');
     }
+// Coloque esta função dentro do seu window.onload ou no final do <script>
+async function getTempo() {
+    const info = document.getElementById('relogio');
+    try {
+        // API pública para Petrolina
+        const res = await fetch(`https://api.hgbrasil.com/weather?format=json-cors&key=796d10ba&city_name=Petrolina,PE`);
+        const data = await res.json();
+        const t = data.results;
+        // Adiciona o clima ao lado do relógio
+        info.innerHTML += ` | <span style="color:#f1c40f">${t.temp}°C ${getEmoji(t.condition_code)}</span>`;
+    } catch (e) { console.log("Erro clima"); }
+}
 
+function getEmoji(code) {
+    const emojis = { '28': '☁️', '30': '⛅', '32': '☀️', '45': '🌧️' };
+    return emojis[code] || '🌤️';
+}
+
+// Chamar a função
+getTempo();
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
     window.onload = () => { renderMesas(); renderProdutos(); renderSelects(); };
 </script>
