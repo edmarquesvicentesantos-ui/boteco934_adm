@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOTECO 934 - COMPLETO</title>
+    <title>BOTECO 934 - DIVISÃO DE CONTA</title>
     <style>
         :root { --p: #1a252f; --s: #27ae60; --i: #3498db; --a: #f1c40f; --r: #e74c3c; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: var(--p); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--a); }
+        header { background: var(--p); color: white; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 3px solid var(--a); }
         nav { background: #2c3e50; display: flex; height: 50px; flex-shrink: 0; }
         .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; }
         .nav-btn.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 4px solid var(--a); }
@@ -46,7 +46,7 @@
         <div class="col-central">
             <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO AQUI..." autocomplete="off">
             <div id="area-venda" style="display:none;">
-                <label style="font-size:11px; font-weight:bold;">CLIENTE NA MESA:</label>
+                <label style="font-size:11px; font-weight:bold;">QUEM ESTÁ PEDINDO?</label>
                 <select id="sel-cli-venda"></select>
                 <div id="render-prods" class="prod-grid"></div>
             </div>
@@ -55,8 +55,8 @@
             <h3 id="txt-m-sel" style="text-align:center;">Selecione uma mesa</h3>
             <div id="carrinho" style="flex:1; overflow-y:auto; font-size:13px; margin-top:10px;"></div>
             <div style="border-top:2px solid #333; padding-top:10px;">
-                <h2 style="color:var(--r);">Total: R$ <span id="total-v">0.00</span></h2>
-                <button class="btn-acao" onclick="fecharConta()">FINALIZAR CONTA</button>
+                <h2 style="color:var(--r);">Total Mesa: R$ <span id="total-v">0.00</span></h2>
+                <button class="btn-acao" onclick="fecharConta()">FECHAR / DIVIDIR CONTA</button>
             </div>
         </div>
     </div>
@@ -73,8 +73,8 @@
     <div id="clientes" class="tela" style="flex-direction:column;">
         <h3>👥 Clientes</h3>
         <input type="text" id="c-n" placeholder="Nome do Cliente">
-        <input type="text" id="c-f" placeholder="WhatsApp (Opcional)">
-        <button class="btn-acao" style="background:var(--p);" onclick="addC()">CADASTRAR CLIENTE</button>
+        <input type="text" id="c-f" placeholder="WhatsApp">
+        <button class="btn-acao" style="background:var(--p);" onclick="addC()">CADASTRAR</button>
         <table id="t-c"><thead><tr><th>Nome</th><th>Whats</th><th>X</th></tr></thead><tbody></tbody></table>
     </div>
 
@@ -122,62 +122,4 @@
     function selMesa(id) {
         mesaAtiva = id;
         document.getElementById('txt-m-sel').innerText = "MESA " + id;
-        document.getElementById('area-venda').style.display = 'block';
-        renderV(); attCar();
-        document.getElementById('campo-bipe').focus();
-    }
-
-    function lancar(i) {
-        if(!mesaAtiva) return;
-        let m = MESAS.find(x => x.id === mesaAtiva);
-        let cli = document.getElementById('sel-cli-venda').value;
-        m.itens.push({ cli: cli, n: PRODS[i].n, v: parseFloat(PRODS[i].v) });
-        m.total += parseFloat(PRODS[i].v);
-        m.status = 'ocupada';
-        renderV(); attCar();
-    }
-
-    document.getElementById('campo-bipe').addEventListener('keypress', e => {
-        if(e.key === 'Enter') {
-            let pIdx = PRODS.findIndex(x => x.e === e.target.value);
-            if(pIdx !== -1) { lancar(pIdx); e.target.value = ''; }
-            else { alert("Não cadastrado!"); e.target.value = ''; }
-        }
-    });
-
-    function attCar() {
-        let m = MESAS.find(x => x.id === mesaAtiva);
-        document.getElementById('carrinho').innerHTML = m.itens.map(it => `<div><b>${it.cli}:</b> ${it.n} - R$ ${it.v.toFixed(2)}</div>`).join('');
-        document.getElementById('total-v').innerText = m.total.toFixed(2);
-    }
-
-    function fecharConta() {
-        let m = MESAS.find(x => x.id === mesaAtiva);
-        if(!m || m.total <= 0) return;
-        let f = prompt("1-Dinheiro | 2-PIX | 3-Cartão | 4-Pendura");
-        let meios = {"1":"Dinheiro","2":"PIX","3":"Cartão","4":"Pendura"};
-        if(meios[f]) {
-            HIST.push({ h: new Date().toLocaleTimeString(), r: "Mesa "+m.id, v: m.total, t: meios[f] });
-            alert("Venda de R$ " + m.total.toFixed(2) + " Finalizada!");
-            m.itens = []; m.total = 0; m.status = 'livre';
-            salvar(); renderV(); attCar();
-        }
-    }
-
-    function addP() { PRODS.push({e:document.getElementById('p-e').value, n:document.getElementById('p-n').value, v:document.getElementById('p-v').value}); salvar(); renderP(); }
-    function renderP() { document.querySelector('#t-p tbody').innerHTML = PRODS.map((p,i)=>`<tr><td>${p.e}</td><td>${p.n}</td><td>${parseFloat(p.v).toFixed(2)}</td><td onclick="PRODS.splice(${i},1);salvar();renderP()">❌</td></tr>`).join(''); }
-    
-    function addC() { CLIS.push({n:document.getElementById('c-n').value, f:document.getElementById('c-f').value}); salvar(); renderC(); }
-    function renderC() { document.querySelector('#t-c tbody').innerHTML = CLIS.map((c,i)=>`<tr><td>${c.n}</td><td>${c.f}</td><td onclick="CLIS.splice(${i},1);salvar();renderC()">❌</td></tr>`).join(''); }
-
-    function renderCX() {
-        let t = HIST.reduce((s,i)=>s+parseFloat(i.v),0);
-        document.getElementById('cx-total').innerText = "R$ " + t.toFixed(2);
-        document.getElementById('t-h tbody').innerHTML = HIST.map(h=>`<tr><td>${h.h}</td><td>${h.r}</td><td>R$ ${parseFloat(h.v).toFixed(2)}</td><td>${h.t}</td></tr>`).reverse().join('');
-    }
-
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    window.onload = () => { renderV(); renderP(); renderC(); };
-</script>
-</body>
-</html>
+        document.getElementById('area-venda').style.
