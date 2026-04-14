@@ -3,126 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOTECO 934 - GESTÃO TOTAL</title>
+    <title>BOTECO 934 - SISTEMA COMPLETO</title>
     <style>
         :root { --p: #1a252f; --s: #27ae60; --i: #3498db; --a: #f1c40f; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: var(--p); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--a); }
+        header { background: var(--p); color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--a); }
         nav { background: #2c3e50; display: flex; height: 50px; flex-shrink: 0; }
-        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 13px; transition: 0.3s; }
+        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         .nav-btn.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 4px solid var(--a); }
         main { flex: 1; position: relative; overflow: hidden; }
         .tela { display: none; width: 100%; height: 100%; position: absolute; padding: 15px; }
         .ativa { display: flex !important; }
         
-        /* Layout Vendas */
-        .col-mesas { width: 140px; border-right: 1px solid #ddd; overflow-y: auto; padding-right: 10px; background: #fff; }
+        .col-mesas { width: 130px; border-right: 1px solid #ddd; overflow-y: auto; background: #fff; padding: 5px; }
         .col-central { flex: 1; padding: 0 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .col-resumo { width: 320px; background: #fff; border-left: 1px solid #ddd; padding: 15px; display: flex; flex-direction: column; }
         
-        .mesa-card { width: 100%; padding: 15px 5px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; background: #fdfdfd; }
+        .mesa-card { width: 100%; padding: 15px 5px; margin-bottom: 8px; border: 2px solid #eee; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; }
         .mesa-card.ocupada { background: #fff9db; border-color: var(--a); color: #d35400; }
-        .mesa-card.sel { background: var(--p) !important; color: white !important; border-color: var(--p); }
+        .mesa-card.sel { background: var(--p) !important; color: white !important; }
         
-        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 10px; }
-        .prod-btn { background: white; border: 1px solid #ddd; padding: 15px 5px; border-radius: 8px; text-align: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .prod-btn:hover { border-color: var(--i); }
-        .prod-btn b { display: block; font-size: 13px; margin-bottom: 5px; }
-        .prod-btn span { color: var(--s); font-weight: bold; }
+        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        .prod-btn { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: bold; }
         
-        input, select { padding: 12px; border: 2px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px; margin-bottom: 5px; }
-        input:focus { border-color: var(--i); outline: none; }
+        input, select { padding: 12px; border: 2px solid #ddd; border-radius: 6px; width: 100%; font-size: 14px; margin-bottom: 10px; }
+        .btn-acao { padding: 15px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
         
-        .btn-finalizar { padding: 18px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
-        .btn-finalizar:active { transform: scale(0.98); }
-
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<header>
-    <strong>BOTECO 934 - GESTÃO</strong>
-    <div id="relogio">00:00:00</div>
-</header>
+<header><strong>BOTECO 934</strong> <div id="relogio">00:00:00</div></header>
 
 <nav>
     <button class="nav-btn active" onclick="trocar('vendas', this)">Vendas</button>
     <button class="nav-btn" onclick="trocar('estoque', this)">Produtos</button>
+    <button class="nav-btn" onclick="trocar('clientes', this)">Clientes</button>
     <button class="nav-btn" onclick="trocar('caixa', this)">Caixa</button>
 </nav>
 
 <main>
     <div id="vendas" class="tela ativa">
         <div class="col-mesas" id="render-mesas"></div>
-        
         <div class="col-central">
-            <div style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO AQUI..." autocomplete="off">
-                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
-                    <span style="font-size: 12px; font-weight: bold; color: #666;">CLIENTE:</span>
-                    <select id="escolher-cliente" style="margin-bottom: 0;">
-                        <option value="Balcão">Balcão (Geral)</option>
-                        <option value="Mesa">Mesa (Geral)</option>
-                    </select>
-                </div>
-            </div>
-            <div id="render-produtos" class="prod-grid"></div>
+            <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO AQUI..." style="border-color: var(--i);">
+            <select id="sel-cli-venda"></select>
+            <div id="render-prods" class="prod-grid"></div>
         </div>
-        
         <div class="col-resumo">
-            <h3 id="titulo-mesa" style="text-align: center; padding-bottom: 10px; border-bottom: 2px solid #eee;">Selecione uma Mesa</h3>
-            <div id="lista-carrinho" style="flex: 1; overflow-y: auto; margin: 10px 0;"></div>
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: bold;">TOTAL:</span>
-                    <span style="font-size: 24px; font-weight: bold; color: var(--p);">R$ <span id="total-valor">0.00</span></span>
-                </div>
-                <button class="btn-finalizar" onclick="abrirPagamento()">FINALIZAR CONTA</button>
+            <h3 id="txt-mesa" style="text-align: center; margin-bottom: 10px;">Selecione a Mesa</h3>
+            <div id="carrinho" style="flex: 1; overflow-y: auto;"></div>
+            <div style="border-top: 2px solid #eee; padding-top: 10px;">
+                <h2>Total: R$ <span id="total-venda">0.00</span></h2>
+                <button class="btn-acao" onclick="fecharConta()">FINALIZAR / DIVIDIR</button>
             </div>
         </div>
     </div>
 
     <div id="estoque" class="tela" style="flex-direction: column; overflow-y: auto;">
-        <div style="max-width: 600px; width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <h2 style="margin-bottom: 15px;">Cadastrar Novo Produto</h2>
-            <input type="text" id="cad-ean" placeholder="Código de Barras (EAN)">
-            <input type="text" id="cad-nome" placeholder="Nome do Produto">
-            <input type="number" id="cad-preco" placeholder="Preço de Venda (Ex: 16.00)">
-            <button class="btn-finalizar" style="background: var(--i);" onclick="cadastrarProd()">SALVAR NO SISTEMA</button>
-            
-            <table style="margin-top: 25px;">
-                <thead><tr><th>Código</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="lista-estoque"></tbody>
-            </table>
+        <h2>📦 Cadastro de Produtos</h2>
+        <div style="max-width: 500px;">
+            <input type="text" id="p-ean" placeholder="Código de Barras">
+            <input type="text" id="p-nome" placeholder="Nome do Produto">
+            <input type="number" id="p-preco" placeholder="Preço (Ex: 10.00)">
+            <button class="btn-acao" style="background: var(--i);" onclick="addP()">SALVAR PRODUTO</button>
         </div>
+        <table id="tab-p"><thead><tr><th>EAN</th><th>Produto</th><th>Preço</th><th>X</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div id="clientes" class="tela" style="flex-direction: column; overflow-y: auto;">
+        <h2>👥 Cadastro de Clientes</h2>
+        <div style="max-width: 500px;">
+            <input type="text" id="c-nome" placeholder="Nome do Cliente (Freguês)">
+            <button class="btn-acao" style="background: var(--p);" onclick="addC()">SALVAR CLIENTE</button>
+        </div>
+        <table id="tab-c"><thead><tr><th>Nome do Cliente</th><th>Ações</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="caixa" class="tela" style="flex-direction: column; overflow-y: auto;">
-        <div style="max-width: 800px; width: 100%; margin: 0 auto;">
-            <div id="resumo-caixa" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;"></div>
-            <table style="box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <thead><tr style="background: var(--p); color: white;"><th>Hora</th><th>Origem</th><th>Valor</th><th>Tipo</th></tr></thead>
-                <tbody id="historico-vendas"></tbody>
-            </table>
-            <button onclick="zerarSistema()" style="margin-top: 30px; background: none; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 10px; cursor: pointer; border-radius: 5px; font-size: 11px;">⚠️ RESETAR TODOS OS DADOS</button>
-        </div>
+        <h2>💰 Financeiro</h2>
+        <div id="resumo-caixa" style="display: flex; gap: 10px; margin: 15px 0;"></div>
+        <table id="tab-h"><thead><tr style="background:#eee;"><th>Hora</th><th>Ref</th><th>Valor</th><th>Tipo</th></tr></thead><tbody></tbody></table>
+        <button onclick="localStorage.clear(); location.reload();" style="margin-top: 30px; color: red; border: none; background: none; cursor: pointer;">⚠️ Resetar Sistema</button>
     </div>
 </main>
 
 <script>
-    // Inicia os dados com erro-zero
-    let PRODUTOS = JSON.parse(localStorage.getItem('b934_prods')) || [];
-    let FINANCEIRO = JSON.parse(localStorage.getItem('b934_fin')) || { d: 0, p: 0, c: 0, h: [] };
+    let db_p = JSON.parse(localStorage.getItem('b934_p')) || [];
+    let db_c = JSON.parse(localStorage.getItem('b934_c')) || [{n: "Balcão"}];
+    let db_f = JSON.parse(localStorage.getItem('b934_f')) || { d: 0, p: 0, c: 0, h: [] };
     let MESAS = Array.from({length: 12}, (_, i) => ({ id: i+1, pedidos: [], total: 0, status: 'livre' }));
-    let mesaSel = null;
+    let mesaAtiva = null;
 
     function salvar() {
-        localStorage.setItem('b934_prods', JSON.stringify(PRODUTOS));
-        localStorage.setItem('b934_fin', JSON.stringify(FINANCEIRO));
+        localStorage.setItem('b934_p', JSON.stringify(db_p));
+        localStorage.setItem('b934_c', JSON.stringify(db_c));
+        localStorage.setItem('b934_f', JSON.stringify(db_f));
     }
 
     function trocar(id, btn) {
@@ -130,177 +109,113 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('ativa');
         btn.classList.add('active');
-        if(id === 'vendas') renderVendas();
-        if(id === 'estoque') renderEstoque();
-        if(id === 'caixa') renderCaixa();
+        if(id === 'vendas') renderV();
+        if(id === 'estoque') renderP();
+        if(id === 'clientes') renderC();
+        if(id === 'caixa') renderCX();
     }
 
-    function renderVendas() {
-        // Render Mesas
+    // --- VENDAS ---
+    function renderV() {
         document.getElementById('render-mesas').innerHTML = MESAS.map(m => `
-            <div class="mesa-card ${m.status==='ocupada'?'ocupada':''} ${mesaSel===m.id?'sel':''}" onclick="selecionarMesa(${m.id})">
-                MESA ${m.id}<br><small>R$ ${m.total.toFixed(2)}</small>
-            </div>`).join('');
-        
-        // Render Botões de Produtos
-        const grid = document.getElementById('render-produtos');
-        if(PRODUTOS.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">Nenhum produto cadastrado. Vá na aba "Produtos" primeiro.</div>';
-        } else {
-            grid.innerHTML = PRODUTOS.map((p, i) => `
-                <div class="prod-btn" onclick="adicionarItem(${i})">
-                    <b>${p.n}</b>
-                    <span>R$ ${p.v.toFixed(2)}</span>
-                </div>`).join('');
-        }
+            <div class="mesa-card ${m.status==='ocupada'?'ocupada':''} ${mesaAtiva===m.id?'sel':''}" onclick="selMesa(${m.id})">MESA ${m.id}<br>R$ ${m.total.toFixed(2)}</div>`).join('');
+        document.getElementById('render-prods').innerHTML = db_p.map((p, i) => `
+            <div class="prod-btn" onclick="lancar(${i})">${p.n}<br><span style="color:var(--s)">R$ ${p.v.toFixed(2)}</span></div>`).join('');
+        document.getElementById('sel-cli-venda').innerHTML = db_c.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
     }
 
-    function selecionarMesa(id) {
-        mesaSel = id;
-        document.getElementById('titulo-mesa').innerText = "MESA " + id;
-        renderVendas();
-        atualizarCarrinho();
+    function selMesa(id) {
+        mesaAtiva = id;
+        document.getElementById('txt-mesa').innerText = "CONTA MESA " + id;
+        renderV(); attCar();
         document.getElementById('campo-bipe').focus();
     }
 
-    function adicionarItem(idx) {
-        if(!mesaSel) return alert("Por favor, selecione uma mesa primeiro!");
-        const m = MESAS.find(x => x.id === mesaSel);
-        const p = PRODUTOS[idx];
-        const cli = document.getElementById('escolher-cliente').value;
-        
-        m.pedidos.push({ c: cli, n: p.n, v: p.v });
-        m.total += p.v;
-        m.status = 'ocupada';
-        
-        renderVendas();
-        atualizarCarrinho();
+    function lancar(idx) {
+        if(!mesaAtiva) return alert("Selecione a mesa!");
+        let m = MESAS.find(x => x.id === mesaAtiva);
+        let cli = document.getElementById('sel-cli-venda').value;
+        m.pedidos.push({ c: cli, n: db_p[idx].n, v: db_p[idx].v });
+        m.total += db_p[idx].v; m.status = 'ocupada';
+        renderV(); attCar();
     }
 
-    // Código de Barras
-    document.getElementById('campo-bipe').addEventListener('keypress', function(e) {
+    document.getElementById('campo-bipe').addEventListener('keypress', e => {
         if(e.key === 'Enter') {
-            const prod = PRODUTOS.find(p => p.e === this.value);
-            if(prod) {
-                adicionarItem(PRODUTOS.indexOf(prod));
-                this.value = '';
-            } else {
-                alert("Produto com código " + this.value + " não encontrado!");
-                this.value = '';
-            }
+            let p = db_p.find(x => x.e === e.target.value);
+            if(p) { lancar(db_p.indexOf(p)); e.target.value = ''; }
+            else { alert("Não cadastrado!"); e.target.value = ''; }
         }
     });
 
-    function atualizarCarrinho() {
-        const m = MESAS.find(x => x.id === mesaSel);
+    function attCar() {
+        let m = MESAS.find(x => x.id === mesaAtiva);
         if(!m) return;
-        document.getElementById('lista-carrinho').innerHTML = m.pedidos.map((p, i) => `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px;">
-                <span><b>${p.c}:</b> ${p.n}</span>
-                <span style="font-weight: bold;">R$ ${p.v.toFixed(2)}</span>
+        document.getElementById('carrinho').innerHTML = m.pedidos.map(p => `
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee; font-size:12px;">
+                <span><b>${p.c}:</b> ${p.n}</span><span>R$ ${p.v.toFixed(2)}</span>
             </div>`).join('');
-        document.getElementById('total-valor').innerText = m.total.toFixed(2);
+        document.getElementById('total-venda').innerText = m.total.toFixed(2);
     }
 
-    function abrirPagamento() {
-        const m = MESAS.find(x => x.id === mesaSel);
-        if(!m || m.pedidos.length === 0) return alert("Esta mesa não tem consumo.");
-
-        const clientesNaMesa = [...new Set(m.pedidos.map(p => p.c))];
-        let msg = "💳 FINALIZAR MESA " + m.id + "\n\nOpções:\n0 - PAGAR TUDO (R$ " + m.total.toFixed(2) + ")\n";
-        clientesNaMesa.forEach((c, i) => {
-            const subtotal = m.pedidos.filter(p => p.c === c).reduce((acc, p) => acc + p.v, 0);
-            msg += (i + 1) + " - PAGAR SÓ " + c.toUpperCase() + " (R$ " + subtotal.toFixed(2) + ")\n";
+    function fecharConta() {
+        let m = MESAS.find(x => x.id === mesaAtiva);
+        if(!m || m.pedidos.length === 0) return;
+        let clis = [...new Set(m.pedidos.map(p => p.c))];
+        let menu = "FECHAR:\n0-TUDO (R$ "+m.total.toFixed(2)+")\n";
+        clis.forEach((c, i) => {
+            let s = m.pedidos.filter(p => p.c === c).reduce((acc, p) => acc + p.v, 0);
+            menu += (i+1) + "-SÓ " + c + " (R$ "+s.toFixed(2)+")\n";
         });
-
-        const escolha = prompt(msg);
-        if(escolha === null) return;
-
-        let valorPagar = 0;
-        let identificacao = "";
-
-        if(escolha === "0") {
-            valorPagar = m.total;
-            identificacao = "Mesa " + m.id;
-            m.pedidos = []; m.total = 0; m.status = 'livre';
+        let op = prompt(menu); if(op === null) return;
+        let val = 0; let ref = "";
+        if(op === "0") {
+            val = m.total; ref = "Mesa "+m.id; m.pedidos = []; m.total = 0; m.status = 'livre';
         } else {
-            const idx = parseInt(escolha) - 1;
-            const nomeCli = clientesNaMesa[idx];
-            if(!nomeCli) return alert("Opção inválida.");
-            
-            valorPagar = m.pedidos.filter(p => p.c === nomeCli).reduce((acc, p) => acc + p.v, 0);
-            identificacao = nomeCli + " (M" + m.id + ")";
-            m.pedidos = m.pedidos.filter(p => p.c !== nomeCli);
-            m.total -= valorPagar;
-            if(m.pedidos.length === 0) m.status = 'livre';
+            let cNome = clis[parseInt(op)-1];
+            val = m.pedidos.filter(p => p.c === cNome).reduce((acc, p) => acc + p.v, 0);
+            ref = cNome + " (M"+m.id+")";
+            m.pedidos = m.pedidos.filter(p => p.c !== cNome);
+            m.total -= val; if(m.pedidos.length === 0) m.status = 'livre';
         }
-
-        const forma = prompt("RECEBER R$ " + valorPagar.toFixed(2) + "\n1-DINHEIRO | 2-PIX | 3-CARTÃO");
-        const tipos = {"1": ["d", "DINHEIRO"], "2": ["p", "PIX"], "3": ["c", "CARTÃO"]};
-        
-        if(tipos[forma]) {
-            const t = tipos[forma];
-            FINANCEIRO[t[0]] += valorPagar;
-            FINANCEIRO.h.push({ h: new Date().toLocaleTimeString(), o: identificacao, v: valorPagar, t: t[1] });
-            salvar();
-            renderVendas();
-            atualizarCarrinho();
-            alert("✅ Pagamento registrado!");
+        let f = prompt("PG R$ "+val.toFixed(2)+"\n1-DINHEIRO | 2-PIX | 3-CARTÃO");
+        let tps = {"1":["d","DINHEIRO"],"2":["p","PIX"],"3":["c","CARTÃO"]};
+        if(tps[f]) {
+            db_f[tps[f][0]] += val;
+            db_f.h.push({ h: new Date().toLocaleTimeString(), r: ref, v: val, t: tps[f][1] });
+            salvar(); renderV(); attCar();
         }
     }
 
-    // Estoque
-    function cadastrarProd() {
-        const e = document.getElementById('cad-ean').value;
-        const n = document.getElementById('cad-nome').value;
-        const v = parseFloat(document.getElementById('cad-preco').value);
-        if(n && v) {
-            PRODUTOS.push({ e, n, v });
-            salvar();
-            renderEstoque();
-            document.getElementById('cad-ean').value='';
-            document.getElementById('cad-nome').value='';
-            document.getElementById('cad-preco').value='';
-            alert("Produto salvo!");
-        } else alert("Preencha Nome e Preço!");
+    // --- PRODUTOS ---
+    function renderP() {
+        document.querySelector('#tab-p tbody').innerHTML = db_p.map((p, i) => `<tr><td>${p.e||'--'}</td><td>${p.n}</td><td>R$ ${p.v.toFixed(2)}</td><td><button onclick="db_p.splice(${i},1);salvar();renderP()">❌</button></td></tr>`).join('');
+    }
+    function addP() {
+        let e = document.getElementById('p-ean').value, n = document.getElementById('p-nome').value, v = parseFloat(document.getElementById('p-preco').value);
+        if(n && v) { db_p.push({e, n, v}); salvar(); renderP(); }
     }
 
-    function renderEstoque() {
-        document.getElementById('lista-estoque').innerHTML = PRODUTOS.map((p, i) => `
-            <tr>
-                <td>${p.e || '--'}</td>
-                <td>${p.n}</td>
-                <td>R$ ${p.v.toFixed(2)}</td>
-                <td><button onclick="PRODUTOS.splice(${i},1);salvar();renderEstoque()" style="color:red; border:none; background:none; cursor:pointer;">❌</button></td>
-            </tr>`).join('');
+    // --- CLIENTES ---
+    function renderC() {
+        document.querySelector('#tab-c tbody').innerHTML = db_c.map((c, i) => `<tr><td>${c.n}</td><td><button onclick="db_c.splice(${i},1);salvar();renderC()">Excluir</button></td></tr>`).join('');
+    }
+    function addC() {
+        let n = document.getElementById('c-nome').value;
+        if(n) { db_c.push({n}); salvar(); renderC(); document.getElementById('c-nome').value = ''; alert("Cliente Salvo!"); }
     }
 
-    // Caixa
-    function renderCaixa() {
+    // --- CAIXA ---
+    function renderCX() {
         document.getElementById('resumo-caixa').innerHTML = `
-            <div style="background:white; padding:15px; border-radius:8px; border-bottom:5px solid #27ae60; text-align:center;">
-                <small>DINHEIRO</small><br><strong>R$ ${FINANCEIRO.d.toFixed(2)}</strong>
-            </div>
-            <div style="background:white; padding:15px; border-radius:8px; border-bottom:5px solid #3498db; text-align:center;">
-                <small>PIX</small><br><strong>R$ ${FINANCEIRO.p.toFixed(2)}</strong>
-            </div>
-            <div style="background:white; padding:15px; border-radius:8px; border-bottom:5px solid #f1c40f; text-align:center;">
-                <small>CARTÃO</small><br><strong>R$ ${FINANCEIRO.c.toFixed(2)}</strong>
-            </div>`;
-        
-        document.getElementById('historico-vendas').innerHTML = FINANCEIRO.h.map(v => `
-            <tr><td>${v.h}</td><td>${v.o}</td><td>R$ ${v.v.toFixed(2)}</td><td>${v.t}</td></tr>`).reverse().join('');
-    }
-
-    function zerarSistema() {
-        if(confirm("ATENÇÃO: Isso vai apagar todos os produtos e o histórico do caixa. Confirma?")) {
-            localStorage.clear();
-            location.reload();
-        }
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--s);">💵 R$ ${db_f.d.toFixed(2)}</div>
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--i);">⚡ R$ ${db_f.p.toFixed(2)}</div>
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--a);">💳 R$ ${db_f.c.toFixed(2)}</div>`;
+        document.querySelector('#tab-h tbody').innerHTML = db_f.h.map(h => `<tr><td>${h.h}</td><td>${h.r}</td><td>R$ ${h.v.toFixed(2)}</td><td>${h.t}</td></tr>`).reverse().join('');
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    window.onload = renderVendas;
+    window.onload = renderV;
 </script>
 </body>
 </html>
