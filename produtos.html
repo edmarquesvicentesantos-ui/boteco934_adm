@@ -1,37 +1,166 @@
-<!-- ========= PRODUTOS ========= -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Produtos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Boteco 934 Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --success: #22c55e; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 40px; display: flex; justify-content: center; min-height: 100vh; }
+        
+        .container { width: 100%; max-width: 900px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; margin-bottom: 20px; transition: 0.3s; }
+        .back-link:hover { opacity: 0.7; }
+
+        .header-section { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        h1 { font-size: 28px; font-weight: 700; color: var(--text); }
+        p { color: var(--muted); font-size: 14px; }
+
+        /* Card de Cadastro */
+        .form-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 40px; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; }
+        
+        label { display: block; color: var(--muted); font-size: 11px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        input { background: #020617; border: 1px solid #334155; color: white; padding: 15px; border-radius: 12px; font-size: 15px; width: 100%; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+
+        .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 25px; width: 100%; transition: 0.3s; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
+
+        /* Tabela de Produtos */
+        .table-container { background: rgba(30, 41, 59, 0.3); border-radius: 20px; padding: 10px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        th { text-align: left; padding: 10px 15px; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 700; }
+        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; font-size: 14px; }
+        td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; color: var(--accent); font-family: monospace; font-size: 15px; }
+        td:nth-child(2) { font-weight: 600; }
+        td:nth-child(3) { color: var(--success); font-weight: 700; }
+        td:last-child { border-right: 1px solid #334155; border-radius: 0 12px 12px 0; text-align: right; }
+
+        .btn-del { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 10px; transition: 0.3s; }
+        .btn-del:hover { background: var(--danger); color: white; }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    </style>
 </head>
 <body>
-<h1>Produtos</h1>
 
-<input id="codigo" placeholder="Código">
-<input id="nome" placeholder="Nome">
-<input id="preco" placeholder="Preço">
-<button onclick="salvar()">Salvar</button>
+<div class="container">
+    <a href="index.html" class="back-link">← VOLTAR AO PAINEL DE VENDAS</a>
+    
+    <div class="header-section">
+        <div>
+            <h1>📦 Gestão de Estoque</h1>
+            <p>Cadastre bebidas, doses e produtos de revenda.</p>
+        </div>
+        <div id="count-prods" style="font-size: 12px; color: var(--accent); font-weight: 700;">0 PRODUTOS</div>
+    </div>
 
-<div id="lista"></div>
+    <div class="form-card">
+        <div class="grid-inputs">
+            <div>
+                <label>Código (EAN)</label>
+                <input type="text" id="p-cod" placeholder="Bipe aqui...">
+            </div>
+            <div>
+                <label>Nome do Produto</label>
+                <input type="text" id="p-nome" placeholder="Ex: Cerveja 600ml">
+            </div>
+            <div>
+                <label>Preço Venda (R$)</label>
+                <input type="number" step="0.01" id="p-preco" placeholder="0.00">
+            </div>
+        </div>
+        <button class="btn-salvar" onclick="salvar()">ADICIONAR AO ESTOQUE</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>EAN / CÓDIGO</th>
+                    <th>DESCRIÇÃO</th>
+                    <th>PREÇO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody id="lista-prods">
+                </tbody>
+        </table>
+        <div id="no-data" class="empty-state" style="display: none;">Nenhum produto cadastrado no sistema.</div>
+    </div>
+</div>
 
 <script>
-let produtos=JSON.parse(localStorage.getItem('produtos'))||[];
+    let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
-function salvar(){
-produtos.push({codigo:codigo.value,nome:nome.value,preco:parseFloat(preco.value)});
-localStorage.setItem('produtos',JSON.stringify(produtos));
-render();
-}
+    function salvar() {
+        const cod = document.getElementById('p-cod').value;
+        const nome = document.getElementById('p-nome').value;
+        const preco = document.getElementById('p-preco').value;
 
-function render(){
-lista.innerHTML='';
-produtos.forEach(p=>{
-lista.innerHTML+=p.nome+' '+p.preco+'<br>';
-});
-}
-render();
+        if(cod && nome && preco) {
+            produtos.push({ 
+                codigo: cod, 
+                nome: nome, 
+                preco: parseFloat(preco) 
+            });
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+            
+            // Limpa campos e foca no código para o próximo bipe
+            document.getElementById('p-cod').value = '';
+            document.getElementById('p-nome').value = '';
+            document.getElementById('p-preco').value = '';
+            document.getElementById('p-cod').focus();
+            
+            render();
+        } else {
+            alert("Preencha todos os campos para cadastrar!");
+        }
+    }
+
+    function apagar(i) {
+        if(confirm("Remover este item do estoque?")) {
+            produtos.splice(i, 1);
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+            render();
+        }
+    }
+
+    function render() {
+        const corpo = document.getElementById('lista-prods');
+        const empty = document.getElementById('no-data');
+        const count = document.getElementById('count-prods');
+        
+        count.innerText = `${produtos.length} PRODUTOS`;
+
+        if(produtos.length === 0) {
+            corpo.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+
+        empty.style.display = 'none';
+        corpo.innerHTML = produtos.map((p, i) => `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.nome}</td>
+                <td>R$ ${p.preco.toFixed(2)}</td>
+                <td>
+                    <button class="btn-del" onclick="apagar(${i})">APAGAR</button>
+                </td>
+            </tr>
+        `).reverse().join(''); // Mostra os mais recentes no topo
+    }
+
+    // Foco automático no código ao abrir a página
+    window.onload = () => {
+        document.getElementById('p-cod').focus();
+        render();
+    };
 </script>
+
 </body>
 </html>
-
