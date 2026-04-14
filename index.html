@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOTECO 934 - SISTEMA PRO</title>
+    <title>BOTECO 934 - DIVISÃO PRO</title>
     <style>
-        :root { --p: #1a252f; --s: #27ae60; --i: #3498db; --a: #f1c40f; --r: #e74c3c; --d: #95a5a6; }
+        :root { --p: #1a252f; --s: #27ae60; --i: #3498db; --a: #f1c40f; --r: #e74c3c; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: var(--p); color: white; padding: 10px 15px; display: flex; justify-content: space-between; border-bottom: 3px solid var(--a); }
-        nav { background: #2c3e50; display: flex; height: 50px; flex-shrink: 0; }
-        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; }
+        header { background: var(--p); color: white; padding: 10px; display: flex; justify-content: space-between; border-bottom: 3px solid var(--a); }
+        nav { background: #2c3e50; display: flex; height: 45px; flex-shrink: 0; }
+        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; font-size: 10px; text-transform: uppercase; }
         .nav-btn.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 4px solid var(--a); }
         main { flex: 1; position: relative; overflow: hidden; }
         .tela { display: none; width: 100%; height: 100%; position: absolute; padding: 15px; }
         .ativa { display: flex !important; }
         
-        /* Colunas */
-        .col-mesas { width: 150px; border-right: 1px solid #ddd; overflow-y: auto; background: #fff; padding: 5px; }
-        .col-central { flex: 1; padding: 0 15px; overflow-y: auto; display: flex; flex-direction: column; }
-        .col-resumo { width: 320px; background: #fff; border-left: 1px solid #ddd; padding: 15px; display: flex; flex-direction: column; }
-        
-        .mesa-card { width: 100%; padding: 12px 5px; margin-bottom: 8px; border: 2px solid var(--s); border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .col-mesas { width: 140px; border-right: 1px solid #ddd; overflow-y: auto; background: #fff; }
+        .mesa-card { padding: 12px 5px; margin: 5px; border: 2px solid var(--s); border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 12px; }
         .mesa-card.ocupada { background: #fff9db; border-color: var(--a); color: #d35400; }
         .mesa-card.sel { background: var(--p) !important; color: white !important; }
         
-        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 10px; }
-        .prod-btn { background: white; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .col-central { flex: 1; padding: 0 15px; overflow-y: auto; display: flex; flex-direction: column; }
+        .col-resumo { width: 310px; background: #fff; border-left: 1px solid #ddd; padding: 15px; display: flex; flex-direction: column; }
         
-        input, select { padding: 12px; border: 2px solid #ddd; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: 14px; }
-        .btn-acao { padding: 15px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-top: 10px; }
+        .prod-btn { background: white; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 11px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 12px; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background: #f8f9fa; }
+        input, select { padding: 10px; border: 2px solid #ddd; border-radius: 6px; width: 100%; margin-bottom: 8px; }
+        .btn-acao { padding: 15px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        
+        .item-car { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<header><strong>BOTECO 934 - PDV</strong> <div id="relogio">00:00:00</div></header>
+<header><strong>BOTECO 934</strong> <div id="relogio">00:00:00</div></header>
 
 <nav>
     <button class="nav-btn active" onclick="trocar('vendas', this)">Vendas</button>
@@ -53,50 +50,48 @@
         <div class="col-central">
             <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO..." autocomplete="off">
             <div id="area-venda" style="display:none;">
-                <label style="font-size: 11px; font-weight: bold;">LANÇAR PARA QUEM?</label>
-                <select id="sel-cli-venda" style="border-color: var(--i);"></select>
+                <label style="font-size: 10px; font-weight: bold;">LANÇAR PARA:</label>
+                <select id="sel-cli-venda"></select>
                 <div id="render-prods" class="prod-grid"></div>
             </div>
-            <div id="aviso-venda" style="text-align:center; padding:50px; color:#999;">Selecione uma mesa para atender</div>
         </div>
         <div class="col-resumo">
-            <h3 id="txt-m-sel" style="text-align:center;">Mesa Livre</h3>
-            <div id="carrinho" style="flex:1; overflow-y:auto; margin-top:10px; border-top:1px solid #eee;"></div>
+            <h3 id="txt-m-sel" style="text-align:center;">Mesa</h3>
+            <div id="carrinho" style="flex:1; overflow-y:auto; margin-top:10px;"></div>
             <div style="border-top:2px solid #333; padding-top:10px;">
-                <h2 style="color:var(--r);">Total Mesa: R$ <span id="total-v">0.00</span></h2>
-                <button class="btn-acao" onclick="abrirPagamento()">FECHAR CONTA / DIVIDIR</button>
+                <h2 style="color:var(--r);">FALTA: R$ <span id="total-v">0.00</span></h2>
+                <button class="btn-acao" onclick="fecharDivisao()">FECHAR / DIVIDIR CONTA</button>
             </div>
         </div>
     </div>
 
     <div id="estoque" class="tela" style="flex-direction:column; overflow-y:auto;">
-        <h3>📦 Cadastro de Produtos</h3>
-        <input type="text" id="p-e" placeholder="Código de Barras">
-        <input type="text" id="p-n" placeholder="Nome do Produto">
-        <input type="number" id="p-v" placeholder="Preço de Venda">
-        <button class="btn-acao" style="background:var(--i);" onclick="addP()">SALVAR PRODUTO</button>
-        <table id="t-p"><thead><tr><th>EAN</th><th>Nome</th><th>R$</th><th>X</th></tr></thead><tbody></tbody></table>
+        <h3>Produtos</h3>
+        <input type="text" id="p-e" placeholder="Código">
+        <input type="text" id="p-n" placeholder="Nome">
+        <input type="number" id="p-v" placeholder="Preço">
+        <button class="btn-acao" style="background:var(--i);" onclick="addP()">SALVAR</button>
+        <table id="t-p" style="width:100%; border-collapse:collapse; margin-top:10px;"><thead><tr style="background:#eee;"><th>Nome</th><th>Preço</th><th>X</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="clientes" class="tela" style="flex-direction:column; overflow-y:auto;">
-        <h3>👥 Cadastro de Clientes</h3>
-        <input type="text" id="c-n" placeholder="Nome do Cliente">
-        <input type="text" id="c-f" placeholder="WhatsApp">
-        <button class="btn-acao" style="background:var(--p);" onclick="addC()">SALVAR CLIENTE</button>
-        <table id="t-c"><thead><tr><th>Nome</th><th>Contato</th><th>X</th></tr></thead><tbody></tbody></table>
+        <h3>Clientes</h3>
+        <input type="text" id="c-n" placeholder="Nome">
+        <button class="btn-acao" style="background:var(--p);" onclick="addC()">SALVAR</button>
+        <table id="t-c" style="width:100%; border-collapse:collapse; margin-top:10px;"><thead><tr style="background:#eee;"><th>Nome</th><th>X</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="caixa" class="tela" style="flex-direction:column; overflow-y:auto;">
-        <h3>💰 Resumo do Dia</h3>
-        <div id="res-cx" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin:10px 0;"></div>
-        <table id="t-h"><thead><tr><th>Hora</th><th>Ref</th><th>Valor</th><th>Tipo</th></tr></thead><tbody></tbody></table>
-        <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; color:red; border:none; background:none; cursor:pointer;">⚠️ Limpar tudo e destravar</button>
+        <h3>Caixa</h3>
+        <div id="res-cx"></div>
+        <table id="t-h" style="width:100%; border-collapse:collapse; margin-top:10px;"><thead><tr style="background:#eee;"><th>Hora</th><th>Ref</th><th>Valor</th><th>Tipo</th></tr></thead><tbody></tbody></table>
+        <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; color:red;">RESETAR TUDO</button>
     </div>
 </main>
 
 <script>
     let PRODS = JSON.parse(localStorage.getItem('b934_p')) || [];
-    let CLIS = JSON.parse(localStorage.getItem('b934_c')) || [{n: "Geral", f: "-"}];
+    let CLIS = JSON.parse(localStorage.getItem('b934_c')) || [{n: "Geral"}];
     let FINAN = JSON.parse(localStorage.getItem('b934_f')) || { din:0, pix:0, deb:0, cre:0, pen:0, h:[] };
     let MESAS = Array.from({length: 12}, (_, i) => ({ id: i+1, itens: [], total: 0, status: 'livre' }));
     let mesaAtiva = null;
@@ -120,19 +115,15 @@
 
     function renderV() {
         document.getElementById('render-mesas').innerHTML = MESAS.map(m => `
-            <div class="mesa-card ${m.status==='ocupada'?'ocupada':''} ${mesaAtiva===m.id?'sel':''}" onclick="selMesa(${m.id})">
-                MESA ${m.id}<br>${m.status==='ocupada'?'OCUPADA':'LIVRE'}<br>R$ ${m.total.toFixed(2)}
-            </div>`).join('');
+            <div class="mesa-card ${m.status==='ocupada'?'ocupada':''} ${mesaAtiva===m.id?'sel':''}" onclick="selMesa(${m.id})">MESA ${m.id}<br>R$ ${m.total.toFixed(2)}</div>`).join('');
         document.getElementById('render-prods').innerHTML = PRODS.map((p, i) => `<div class="prod-btn" onclick="lancar(${i})">${p.n}<br>R$ ${parseFloat(p.v).toFixed(2)}</div>`).join('');
         document.getElementById('sel-cli-venda').innerHTML = CLIS.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
     }
 
     function selMesa(id) {
         mesaAtiva = id;
-        let m = MESAS.find(x => x.id === id);
         document.getElementById('txt-m-sel').innerText = "MESA " + id;
         document.getElementById('area-venda').style.display = 'block';
-        document.getElementById('aviso-venda').style.display = 'none';
         renderV(); attCar();
         document.getElementById('campo-bipe').focus();
     }
@@ -149,96 +140,86 @@
 
     function attCar() {
         let m = MESAS.find(x => x.id === mesaAtiva);
-        document.getElementById('carrinho').innerHTML = m.itens.map(it => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:4px 0;">
-                <span><b>${it.cli}:</b> ${it.n}</span><span>R$ ${it.v.toFixed(2)}</span>
-            </div>`).join('');
+        document.getElementById('carrinho').innerHTML = m.itens.map(it => `<div class="item-car"><span><b>${it.cli}:</b> ${it.n}</span><span>R$ ${it.v.toFixed(2)}</span></div>`).join('');
         document.getElementById('total-v').innerText = m.total.toFixed(2);
     }
 
-    function abrirPagamento() {
+    function fecharDivisao() {
         let m = MESAS.find(x => x.id === mesaAtiva);
-        if(!m || m.itens.length === 0) return;
+        if(!m || m.total <= 0) return;
 
-        let clientesNaMesa = [...new Set(m.itens.map(it => it.cli))];
-        let menu = "QUAL CONTA DESEJA PAGAR?\n0 - MESA TODA (R$ "+m.total.toFixed(2)+")\n";
-        clientesNaMesa.forEach((c, i) => {
-            let totalCli = m.itens.filter(it => it.cli === c).reduce((sum, it) => sum + it.v, 0);
-            menu += (i+1) + " - SÓ " + c.toUpperCase() + " (R$ "+totalCli.toFixed(2)+")\n";
-        });
-
-        let escolha = prompt(menu);
-        if(escolha === null) return;
-
+        let modo = prompt("COMO DESEJA DIVIDIR?\n1 - POR CLIENTE (O que cada um consumiu)\n2 - POR IGUAL (Rachar o total da mesa)\n3 - PAGAR VALOR AVULSO");
+        
         let valorPagar = 0;
-        let refPagamento = "";
-        let itensPagos = [];
+        let ref = "";
 
-        if(escolha === "0") {
-            valorPagar = m.total;
-            refPagamento = "Mesa " + m.id;
-            itensPagos = [...m.itens];
-        } else {
-            let cliNome = clientesNaMesa[parseInt(escolha)-1];
-            if(!cliNome) return alert("Opção inválida");
-            valorPagar = m.itens.filter(it => it.cli === cliNome).reduce((sum, it) => sum + it.v, 0);
-            refPagamento = cliNome + " (M"+m.id+")";
-            itensPagos = m.itens.filter(it => it.cli === cliNome);
+        if(modo === "1") {
+            let clis = [...new Set(m.itens.map(it => it.cli))];
+            let msg = "SELECIONE O CLIENTE:\n";
+            clis.forEach((c, i) => msg += (i+1) + " - " + c + " (R$ " + m.itens.filter(it => it.cli === c).reduce((s, it) => s + it.v, 0).toFixed(2) + ")\n");
+            let op = prompt(msg);
+            let nome = clis[op-1];
+            if(!nome) return;
+            valorPagar = m.itens.filter(it => it.cli === nome).reduce((s, it) => s + it.v, 0);
+            ref = nome;
+            m.itens = m.itens.filter(it => it.cli !== nome); // Remove itens desse cliente
+        } 
+        else if(modo === "2") {
+            let qtd = prompt("Dividir em quantas pessoas?");
+            if(!qtd || qtd <= 0) return;
+            valorPagar = m.total / qtd;
+            ref = "Rachado 1/" + qtd;
         }
+        else if(modo === "3") {
+            valorPagar = parseFloat(prompt("Qual valor o cliente está pagando? Total: R$ " + m.total.toFixed(2)));
+            ref = "Parcial";
+        } else return;
 
-        let f = prompt("PAGAMENTO DE R$ "+valorPagar.toFixed(2)+"\n1-DINHEIRO | 2-PIX | 3-DÉBITO | 4-CRÉDITO | 5-PENDURA");
-        let tps = {
-            "1": ["din", "DINHEIRO"],
-            "2": ["pix", "PIX"],
-            "3": ["deb", "DÉBITO"],
-            "4": ["cre", "CRÉDITO"],
-            "5": ["pen", "PENDURA"]
-        };
+        receber(valorPagar, ref, modo);
+    }
 
+    function receber(valor, ref, modo) {
+        let m = MESAS.find(x => x.id === mesaAtiva);
+        let f = prompt("PAGAMENTO DE R$ " + valor.toFixed(2) + "\n1-DINHEIRO | 2-PIX | 3-DÉBITO | 4-CRÉDITO | 5-PENDURA");
+        let tps = {"1":["din","DINHEIRO"],"2":["pix","PIX"],"3":["deb","DÉBITO"],"4":["cre","CRÉDITO"],"5":["pen","PENDURA"]};
+        
         if(tps[f]) {
             let t = tps[f];
-            FINAN[t[0]] += valorPagar;
-            FINAN.h.push({ h: new Date().toLocaleTimeString(), r: refPagamento, v: valorPagar, t: t[1] });
+            FINAN[t[0]] += valor;
+            FINAN.h.push({ h: new Date().toLocaleTimeString(), r: ref + " (M"+m.id+")", v: valor, t: t[1] });
             
-            // Remove itens pagos da mesa
-            if(escolha === "0") {
-                m.itens = []; m.total = 0; m.status = 'livre';
+            // Se for modo 2 ou 3, subtrai do total. Se for modo 1, o item já foi removido.
+            if(modo !== "1") {
+                m.total -= valor;
+                if(m.total < 0.05) { m.total = 0; m.itens = []; m.status = 'livre'; }
             } else {
-                let cliNome = clientesNaMesa[parseInt(escolha)-1];
-                m.itens = m.itens.filter(it => it.cli !== cliNome);
-                m.total -= valorPagar;
+                m.total = m.itens.reduce((s, it) => s + it.v, 0);
                 if(m.itens.length === 0) m.status = 'livre';
             }
             
             salvar(); renderV(); attCar();
-            alert("Pagamento em " + t[1] + " realizado!");
+            alert("Recebido com sucesso!");
         }
     }
 
-    // Funções de Cadastro
+    // Cadastro Simples
     function addP() {
-        let e = document.getElementById('p-e').value, n = document.getElementById('p-n').value, v = document.getElementById('p-v').value;
-        if(n && v) { PRODS.push({e,n,v}); salvar(); renderP(); document.getElementById('p-e').value='';document.getElementById('p-n').value='';document.getElementById('p-v').value=''; }
+        let n = document.getElementById('p-n').value, v = document.getElementById('p-v').value, e = document.getElementById('p-e').value;
+        if(n && v) { PRODS.push({e,n,v}); salvar(); renderP(); }
     }
     function renderP() {
-        document.querySelector('#t-p tbody').innerHTML = PRODS.map((p,i)=>`<tr><td>${p.e}</td><td>${p.n}</td><td>${parseFloat(p.v).toFixed(2)}</td><td><button onclick="PRODS.splice(${i},1);salvar();renderP()">❌</button></td></tr>`).join('');
+        document.querySelector('#t-p tbody').innerHTML = PRODS.map((p,i)=>`<tr><td>${p.n}</td><td>${p.v}</td><td onclick="PRODS.splice(${i},1);salvar();renderP()">❌</td></tr>`).join('');
     }
     function addC() {
-        let n = document.getElementById('c-n').value, f = document.getElementById('c-f').value;
-        if(n) { CLIS.push({n,f}); salvar(); renderC(); document.getElementById('c-n').value='';document.getElementById('c-f').value=''; }
+        let n = document.getElementById('c-n').value;
+        if(n) { CLIS.push({n}); salvar(); renderC(); }
     }
     function renderC() {
-        document.querySelector('#t-c tbody').innerHTML = CLIS.map((c,i)=>`<tr><td>${c.n}</td><td>${c.f}</td><td><button onclick="CLIS.splice(${i},1);salvar();renderC()">❌</button></td></tr>`).join('');
+        document.querySelector('#t-c tbody').innerHTML = CLIS.map((c,i)=>`<tr><td>${c.n}</td><td onclick="CLIS.splice(${i},1);salvar();renderC()">❌</td></tr>`).join('');
     }
     function renderCX() {
-        document.getElementById('res-cx').innerHTML = `
-            <div style="background:#fff;padding:8px;border-bottom:3px solid var(--s)">💵 Dinheiro<br><b>R$ ${FINAN.din.toFixed(2)}</b></div>
-            <div style="background:#fff;padding:8px;border-bottom:3px solid var(--i)">⚡ PIX<br><b>R$ ${FINAN.pix.toFixed(2)}</b></div>
-            <div style="background:#fff;padding:8px;border-bottom:3px solid var(--a)">💳 Débito<br><b>R$ ${FINAN.deb.toFixed(2)}</b></div>
-            <div style="background:#fff;padding:8px;border-bottom:3px solid var(--p)">💳 Crédito<br><b>R$ ${FINAN.cre.toFixed(2)}</b></div>
-            <div style="background:#fff;padding:8px;border-bottom:3px solid var(--r)">📝 Pendura<br><b>R$ ${FINAN.pen.toFixed(2)}</b></div>
-        `;
-        document.querySelector('#t-h tbody').innerHTML = FINAN.h.map(h=>`<tr><td>${h.h}</td><td>${h.r}</td><td>R$ ${h.v.toFixed(2)}</td><td>${h.t}</td></tr>`).reverse().join('');
+        document.getElementById('res-cx').innerHTML = `<b>Dinheiro: R$ ${FINAN.din.toFixed(2)} | PIX: R$ ${FINAN.pix.toFixed(2)} | Cartões: R$ ${(FINAN.deb + FINAN.cre).toFixed(2)}</b>`;
+        document.querySelector('#t-h tbody').innerHTML = FINAN.h.map(h=>`<tr><td>${h.h}</td><td>${h.r}</td><td>${h.v.toFixed(2)}</td><td>${h.t}</td></tr>`).reverse().join('');
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
