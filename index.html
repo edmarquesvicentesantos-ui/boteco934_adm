@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOTECO 934 - SISTEMA COMPLETO</title>
+    <title>BOTECO 934 - GESTÃO E CONTATOS</title>
     <style>
         :root { --p: #1a252f; --s: #27ae60; --i: #3498db; --a: #f1c40f; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         header { background: var(--p); color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--a); }
         nav { background: #2c3e50; display: flex; height: 50px; flex-shrink: 0; }
-        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        .nav-btn { flex: 1; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; }
         .nav-btn.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 4px solid var(--a); }
         main { flex: 1; position: relative; overflow: hidden; }
         .tela { display: none; width: 100%; height: 100%; position: absolute; padding: 15px; }
@@ -49,7 +49,7 @@
     <div id="vendas" class="tela ativa">
         <div class="col-mesas" id="render-mesas"></div>
         <div class="col-central">
-            <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO AQUI..." style="border-color: var(--i);">
+            <input type="text" id="campo-bipe" placeholder="BIPE O CÓDIGO AQUI...">
             <select id="sel-cli-venda"></select>
             <div id="render-prods" class="prod-grid"></div>
         </div>
@@ -77,10 +77,11 @@
     <div id="clientes" class="tela" style="flex-direction: column; overflow-y: auto;">
         <h2>👥 Cadastro de Clientes</h2>
         <div style="max-width: 500px;">
-            <input type="text" id="c-nome" placeholder="Nome do Cliente (Freguês)">
+            <input type="text" id="c-nome" placeholder="Nome do Cliente">
+            <input type="text" id="c-fone" placeholder="WhatsApp / Telefone">
             <button class="btn-acao" style="background: var(--p);" onclick="addC()">SALVAR CLIENTE</button>
         </div>
-        <table id="tab-c"><thead><tr><th>Nome do Cliente</th><th>Ações</th></tr></thead><tbody></tbody></table>
+        <table id="tab-c"><thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="caixa" class="tela" style="flex-direction: column; overflow-y: auto;">
@@ -93,7 +94,7 @@
 
 <script>
     let db_p = JSON.parse(localStorage.getItem('b934_p')) || [];
-    let db_c = JSON.parse(localStorage.getItem('b934_c')) || [{n: "Balcão"}];
+    let db_c = JSON.parse(localStorage.getItem('b934_c')) || [{n: "Balcão", f: "-"}];
     let db_f = JSON.parse(localStorage.getItem('b934_f')) || { d: 0, p: 0, c: 0, h: [] };
     let MESAS = Array.from({length: 12}, (_, i) => ({ id: i+1, pedidos: [], total: 0, status: 'livre' }));
     let mesaAtiva = null;
@@ -121,7 +122,7 @@
             <div class="mesa-card ${m.status==='ocupada'?'ocupada':''} ${mesaAtiva===m.id?'sel':''}" onclick="selMesa(${m.id})">MESA ${m.id}<br>R$ ${m.total.toFixed(2)}</div>`).join('');
         document.getElementById('render-prods').innerHTML = db_p.map((p, i) => `
             <div class="prod-btn" onclick="lancar(${i})">${p.n}<br><span style="color:var(--s)">R$ ${p.v.toFixed(2)}</span></div>`).join('');
-        document.getElementById('sel-cli-venda').innerHTML = db_c.map(c => `<option value="${c.n}">${c.n}</option>`).join('');
+        document.getElementById('sel-cli-venda').innerHTML = db_c.map(c => `<option value="${c.n}">${c.n} ${c.f !== '-' ? '('+c.f+')' : ''}</option>`).join('');
     }
 
     function selMesa(id) {
@@ -193,29 +194,30 @@
     }
     function addP() {
         let e = document.getElementById('p-ean').value, n = document.getElementById('p-nome').value, v = parseFloat(document.getElementById('p-preco').value);
-        if(n && v) { db_p.push({e, n, v}); salvar(); renderP(); }
+        if(n && v) { db_p.push({e, n, v}); salvar(); renderP(); document.getElementById('p-ean').value=''; document.getElementById('p-nome').value=''; document.getElementById('p-preco').value=''; }
     }
 
     // --- CLIENTES ---
     function renderC() {
-        document.querySelector('#tab-c tbody').innerHTML = db_c.map((c, i) => `<tr><td>${c.n}</td><td><button onclick="db_c.splice(${i},1);salvar();renderC()">Excluir</button></td></tr>`).join('');
+        document.querySelector('#tab-c tbody').innerHTML = db_c.map((c, i) => `<tr><td>${c.n}</td><td>${c.f}</td><td><button onclick="db_c.splice(${i},1);salvar();renderC()">Excluir</button></td></tr>`).join('');
     }
     function addC() {
         let n = document.getElementById('c-nome').value;
-        if(n) { db_c.push({n}); salvar(); renderC(); document.getElementById('c-nome').value = ''; alert("Cliente Salvo!"); }
+        let f = document.getElementById('c-fone').value || '-';
+        if(n) { db_c.push({n, f}); salvar(); renderC(); document.getElementById('c-nome').value = ''; document.getElementById('c-fone').value = ''; alert("Cliente Salvo!"); }
     }
 
     // --- CAIXA ---
     function renderCX() {
         document.getElementById('resumo-caixa').innerHTML = `
-            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--s);">💵 R$ ${db_f.d.toFixed(2)}</div>
-            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--i);">⚡ R$ ${db_f.p.toFixed(2)}</div>
-            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--a);">💳 R$ ${db_f.c.toFixed(2)}</div>`;
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--s); text-align:center;">💵 <b>Dinheiro</b><br>R$ ${db_f.d.toFixed(2)}</div>
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--i); text-align:center;">⚡ <b>PIX</b><br>R$ ${db_f.p.toFixed(2)}</div>
+            <div style="flex:1; background:#fff; padding:10px; border-bottom:4px solid var(--a); text-align:center;">💳 <b>Cartão</b><br>R$ ${db_f.c.toFixed(2)}</div>`;
         document.querySelector('#tab-h tbody').innerHTML = db_f.h.map(h => `<tr><td>${h.h}</td><td>${h.r}</td><td>R$ ${h.v.toFixed(2)}</td><td>${h.t}</td></tr>`).reverse().join('');
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString(); }, 1000);
-    window.onload = renderV;
+    window.onload = () => { renderV(); };
 </script>
 </body>
 </html>
