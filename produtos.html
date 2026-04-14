@@ -1,0 +1,37 @@
+<!-- ========= PRODUTOS ========= -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Produtos</title>
+</head>
+<body>
+<h1>Produtos</h1>
+
+<input id="codigo" placeholder="Código">
+<input id="nome" placeholder="Nome">
+<input id="preco" placeholder="Preço">
+<button onclick="salvar()">Salvar</button>
+
+<div id="lista"></div>
+
+<script>
+let produtos=JSON.parse(localStorage.getItem('produtos'))||[];
+
+function salvar(){
+produtos.push({codigo:codigo.value,nome:nome.value,preco:parseFloat(preco.value)});
+localStorage.setItem('produtos',JSON.stringify(produtos));
+render();
+}
+
+function render(){
+lista.innerHTML='';
+produtos.forEach(p=>{
+lista.innerHTML+=p.nome+' '+p.preco+'<br>';
+});
+}
+render();
+</script>
+</body>
+</html>
+
