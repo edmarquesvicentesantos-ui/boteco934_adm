@@ -3,136 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BOTECO 934 - GESTÃO TOTAL</title>
+    <title>BOTECO 934 - OFICIAL</title>
     <style>
         :root { --primary: #1a252f; --success: #27ae60; --danger: #e74c3c; --accent: #f1c40f; --info: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        
-        header { background: var(--primary); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); flex-shrink: 0; }
-        
-        .nav-bar { background: #2c3e50; display: flex; flex-shrink: 0; }
-        .nav-btn { flex: 1; padding: 12px 5px; border: none; background: #2c3e50; color: #bdc3c7; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; border-bottom: 3px solid transparent; }
-        .nav-btn.active { background: #1abc9c; color: white; border-bottom: 3px solid var(--accent); }
-
-        main { flex: 1; overflow: hidden; position: relative; display: block !important; }
-        
-        .tela { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-        .tela.ativa { display: flex !important; flex-direction: row; }
-
-        /* COLUNAS VENDAS */
-        .col-mesas { width: 130px; background: #fff; border-right: 2px solid #ddd; overflow-y: auto; padding: 10px; flex-shrink: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; }
+        header { background: var(--primary); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); }
+        .nav-bar { background: #2c3e50; display: flex; }
+        .nav-btn { flex: 1; padding: 12px 5px; border: none; background: #2c3e50; color: #bdc3c7; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .nav-btn.active { background: #1abc9c; color: white; }
+        main { flex: 1; display: flex !important; overflow: hidden; }
+        .col-mesas { width: 140px; background: #fff; border-right: 2px solid #ddd; overflow-y: auto; padding: 10px; }
         .col-produtos { flex: 1; padding: 15px; overflow-y: auto; background: #fff; }
-        .col-carrinho { width: 310px; background: #fff; border-left: 2px solid #ddd; display: flex; flex-direction: column; padding: 10px; flex-shrink: 0; }
-
-        /* COMPONENTES */
-        .mesa-btn { width: 100%; padding: 12px 5px; margin-bottom: 8px; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold; font-size: 11px; background: #fff; }
-        .mesa-btn.ocupada { background: #fff9db; border-color: var(--accent); color: #d35400; }
-        .mesa-btn.selecionada { background: var(--primary); color: white; border-color: var(--primary); }
-        
-        .grid-prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; }
-        .card-p { border: 1px solid #eee; padding: 15px 5px; text-align: center; border-radius: 8px; cursor: pointer; background: white; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
+        .col-carrinho { width: 320px; background: #fff; border-left: 2px solid #ddd; display: flex; flex-direction: column; padding: 10px; }
+        .mesa-btn { width: 100%; padding: 12px 5px; margin-bottom: 8px; border: 2px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; background: #fff; cursor: pointer; }
+        .mesa-btn.ocupada { background: #fff9db; border-color: var(--accent); }
+        .mesa-btn.selecionada { background: var(--primary); color: white; }
+        .grid-prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .card-p { border: 1px solid #eee; padding: 15px 5px; text-align: center; border-radius: 8px; cursor: pointer; background: white; font-size: 12px; }
         .cli-box { background: #f0f7ff; margin-bottom: 10px; padding: 8px; border-radius: 5px; border-left: 4px solid var(--info); }
-        .btn-acao { background: var(--success); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-
-        /* TABELAS GERAIS */
-        .sessao-interna { padding: 20px; width: 100%; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 15px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        tr:nth-child(even) { background: #fafafa; }
-
-        .card-caixa { flex: 1; min-width: 150px; background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
-<header><strong>BOTECO 934 - GESTÃO</strong> <div id="info-topo">00:00:00</div></header>
+<header><strong>BOTECO 934</strong> <div id="info-topo">Carregando...</div></header>
 
 <nav class="nav-bar">
-    <button class="nav-btn active" onclick="ver('vendas', this)">🛒 Vendas</button>
-    <button class="nav-btn" onclick="ver('estoque', this)">📦 Estoque</button>
-    <button class="nav-btn" onclick="ver('clientes', this)">👥 Clientes</button>
-    <button class="nav-btn" onclick="ver('financas', this)">💰 Caixa</button>
+    <button class="nav-btn active" onclick="location.reload()">🛒 Vendas</button>
+    <button class="nav-btn">💰 Caixa</button>
 </nav>
 
-<main>
-    <div id="vendas" class="tela ativa">
-        <aside class="col-mesas" id="lista-mesas"></aside>
-        
-        <section class="col-produtos">
-            <select id="sel-cliente-venda" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--info); border-radius: 5px; font-weight: bold;">
-                <option value="">⚠️ SELECIONE O CLIENTE</option>
-            </select>
-            <div id="grid-produtos" class="grid-prods"></div>
-        </section>
+<main id="conteudo-principal">
+    <aside class="col-mesas" id="lista-mesas"></aside>
+    
+    <section class="col-produtos">
+        <select id="sel-cliente" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--info); border-radius: 5px; font-weight: bold;">
+            <option value="Balcão">Balcão (Geral)</option>
+        </select>
+        <div id="grid-produtos" class="grid-prods"></div>
+    </section>
 
-        <aside class="col-carrinho">
-            <h3 id="mesa-titulo" style="text-align:center; padding: 10px; background: #f8f9fa;">Mesa Livre</h3>
-            <div id="c-itens" style="flex:1; overflow-y:auto; padding:5px;"></div>
-            <div style="border-top:2px solid #eee; padding-top:10px;">
-                <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold;">Total: R$ <span id="c-total">0.00</span></div>
-                <button class="btn-acao" onclick="fecharConta()">FINALIZAR CONTA</button>
-            </div>
-        </aside>
-    </div>
-
-    <div id="estoque" class="tela">
-        <div class="sessao-interna">
-            <h2>📦 Cadastro de Produtos</h2>
-            <div style="display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;">
-                <input type="text" id="est-ean" placeholder="Código/EAN" style="padding:10px;">
-                <input type="text" id="est-nome" placeholder="Nome do Produto" style="padding:10px;">
-                <input type="number" id="est-preco" placeholder="Preço R$" style="padding:10px;">
-                <button onclick="salvarProduto()" class="btn-acao" style="width:auto; margin:0;">SALVAR</button>
-            </div>
-            <table>
-                <thead><tr style="background:#f4f4f4;"><th>EAN</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="lista-estoque-corpo"></tbody>
-            </table>
+    <aside class="col-carrinho">
+        <h3 id="mesa-titulo" style="text-align:center; padding: 10px;">Mesa Livre</h3>
+        <div id="c-itens" style="flex:1; overflow-y:auto;"></div>
+        <div style="border-top:2px solid #eee; padding-top:10px;">
+            <div style="font-size:20px; font-weight:bold;">Total: R$ <span id="c-total">0.00</span></div>
+            <button onclick="fecharConta()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer;">FINALIZAR</button>
         </div>
-    </div>
-
-    <div id="clientes" class="tela">
-        <div class="sessao-interna">
-            <h2>👥 Cadastro de Clientes</h2>
-            <div style="display:flex; gap:10px; margin:20px 0;">
-                <input type="text" id="cli-nome" placeholder="Nome do Cliente" style="padding:10px; flex:1;">
-                <button onclick="salvarCliente()" class="btn-acao" style="width:auto; margin:0;">CADASTRAR</button>
-            </div>
-            <table>
-                <thead><tr style="background:#f4f4f4;"><th>Nome</th><th>Ação</th></tr></thead>
-                <tbody id="lista-clientes-corpo"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="financas" class="tela">
-        <div class="sessao-interna">
-            <h2>💰 Financeiro de Hoje</h2>
-            <div id="caixa-resumo" style="display:flex; gap:15px; margin:20px 0; flex-wrap:wrap;"></div>
-            <h3>📋 Histórico de Recebimentos</h3>
-            <table>
-                <thead><tr style="background:#2c3e50; color:white;"><th>Hora</th><th>Info</th><th>Valor</th><th>Forma</th></tr></thead>
-                <tbody id="historico-corpo"></tbody>
-            </table>
-            <button onclick="limparCaixa()" style="margin-top:20px; background:var(--danger); color:white; border:none; padding:10px; cursor:pointer;">ZERAR CAIXA</button>
-        </div>
-    </div>
+    </aside>
 </main>
 
 <script>
-    // BANCO DE DADOS
-    let db_estoque = JSON.parse(localStorage.getItem('boteco_estoque')) || [{ean:"1", nome:"Heineken LN", preco:16.0}];
-    let db_clientes = JSON.parse(localStorage.getItem('boteco_clientes')) || [{nome: "Balcão"}];
-    let financeiro = JSON.parse(localStorage.getItem('boteco_financeiro')) || { DINHEIRO: 0, PIX: 0, CARTAO: 0 };
-    let historico = JSON.parse(localStorage.getItem('boteco_historico')) || [];
-    
+    let db_estoque = JSON.parse(localStorage.getItem('boteco_estoque')) || [
+        {ean:"1", nome:"Heineken LN", preco:16.0},
+        {ean:"2", nome:"Skol Lata", preco:7.0},
+        {ean:"3", nome:"Dose Cana", preco:5.0}
+    ];
+
     let mesas = Array.from({length: 12}, (_, i) => ({ id: i + 1, consumo: {}, total: 0, status: 'livre' }));
     let mesaAtiva = null;
 
-    function saveAll() {
-        localStorage.setItem('boteco_estoque', JSON.stringify(db_estoque));
-        localStorage.setItem('boteco_clientes', JSON.stringify(db_clientes));
-        localStorage.setItem('boteco_financeiro', JSON.stringify(financeiro));
-        localStorage.setItem('boteco_historico', JSON.stringify(historico));
+    function render() {
+        const dMesas = document.getElementById('lista-mesas');
+        const dProds = document.getElementById('grid-produtos');
+        
+        if(!dMesas || !dProds) return;
+
+        dMesas.innerHTML = mesas.map(m => `
+            <div class="mesa-btn ${m.status} ${mesaAtiva === m.id ? 'selecionada' : ''}" onclick="selMesa(${m.id})">
+                MESA ${m.id}<br><small>R$ ${m.total.toFixed(2)}</small>
+            </div>`).join('');
+
+        dProds.innerHTML = db_estoque.map(p => `
+            <div class="card-p" onclick="lancar('${p.ean}')"><b>${p.nome}</b><br>R$ ${p.preco.toFixed(2)}</div>
+        `).join('');
+    }
+
+    function selMesa(id) { mesaAtiva = id; document.getElementById('mesa-titulo').innerText = "Mesa " + id; render(); attCar(); }
+
+    function lancar(ean) {
+        if(!mesaAtiva) return alert("Selecione a mesa!");
+        const p = {...db_estoque.find(x => x.ean === ean)};
+        const m = mesas.find(x => x.id === mesaAtiva);
+        const cli = document.getElementById('sel-cliente').value;
+        
+        if(!m.consumo[cli]) m.consumo[cli] = [];
+        m.consumo[cli].push(p);
+        m.total += p.preco;
+        m.status = 'ocupada';
+        render(); attCar();
+    }
+
+    function attCar() {
+        const div = document.getElementById('c-itens');
+        const m = mesas.find(x => x.id === mesaAtiva);
+        if(!m) return;
+        let h = "";
+        for (let c in m.consumo) {
+            h += `<div class="cli-box"><strong>👤 ${c}</strong><br>`;
+            m.consumo[c].forEach(i => h += `<small style="display:block">• ${i.nome} - R$ ${i.preco.toFixed(2)}</small>`);
+            h += `</div>`;
+        }
+        div.innerHTML = h || "Vazio";
+        document.getElementById('c-total').innerText = m.total.toFixed(2);
+    }
+
+    function fecharConta() {
+        const m = mesas.find(x => x.id === mesaAtiva);
+        if(!m || m.total === 0) return;
+        if(confirm("Fechar conta?")) {
+            m.total = 0; m.consumo = {}; m.status = 'livre'; mesaAtiva = null;
+            render(); attCar();
+        }
+    }
+
+    setInterval(() => {
+        document.getElementById('info-topo').innerText = new Date().toLocaleTimeString() + " | Petrolina ☀️";
+    }, 1000);
+
+    window.onload = render;
+</script>
+</body>
+</html>
