@@ -1,50 +1,30 @@
+<!-- ========================= -->
+<!-- PDV BOTECO 934 V5 CLASSICO -->
+<!-- SISTEMA MULTIPÁGINAS SIMPLES -->
+<!-- ========================= -->
+
+<!-- ========= INDEX (CAIXA) ========= -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDV Boteco 934 V4 PRO</title>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
+<title>PDV - Caixa</title>
 <style>
-body{font-family:Arial;margin:0;background:#020617;color:#fff}
-header{text-align:center;padding:10px}
-.container{display:flex}
-.mesas{width:25%;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:5px}
-.mesa{background:green;padding:15px;text-align:center;border-radius:8px;cursor:pointer}
-.mesa.ocupada{background:red}
-.area{width:75%;padding:10px}
-button,input,select{padding:8px;margin:5px;border-radius:6px;border:none}
-button{background:#2563eb;color:#fff}
-.box{background:#111;padding:10px;margin-top:10px;border-radius:8px;max-height:200px;overflow:auto}
+body{font-family:Arial;background:#111;color:#fff}
+button,input{padding:10px;margin:5px}
 </style>
 </head>
 <body>
-<header>
-<h2>PDV Boteco 934 PRO</h2>
-Total Dia: R$ <span id="totalDia">0</span>
-</header>
+<h1>CAIXA</h1>
 
-<div class="container">
-<div class="mesas" id="mesas"></div>
+<a href="clientes.html"><button>Clientes</button></a>
+<a href="produtos.html"><button>Produtos</button></a>
 
-<div class="area">
+<h3>Venda</h3>
+<input id="codigo" placeholder="Código">
+<button onclick="add()">Adicionar</button>
 
-<h3>Mesa: <span id="mesaAtual">-</span></h3>
-
-<input id="clienteNome" placeholder="Nome">
-<input id="clienteTel" placeholder="Telefone">
-<button onclick="addCliente()">Adicionar Cliente</button>
-<div id="clientes"></div>
-
-<hr>
-
-<input id="codigo" placeholder="Código" onkeypress="if(event.key==='Enter')addProduto()">
-<button onclick="addProduto()">Adicionar Produto</button>
-
-<div class="box" id="lista"></div>
+<div id="lista"></div>
 
 <select id="pagamento">
 <option>Dinheiro</option>
@@ -54,143 +34,119 @@ Total Dia: R$ <span id="totalDia">0</span>
 <option>Pendura</option>
 </select>
 
-<button onclick="fecharCliente()">Fechar Cliente</button>
-<button onclick="fecharMesa()">Fechar Mesa</button>
-<button onclick="dividirConta()">Dividir Conta</button>
-
-<div class="box" id="caixa"></div>
-
-</div>
-</div>
+<button onclick="fechar()">Fechar Conta</button>
 
 <script>
-const firebaseConfig={apiKey:"COLE_AQUI",authDomain:"COLE_AQUI",projectId:"COLE_AQUI"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
+let produtos=JSON.parse(localStorage.getItem('produtos'))||[];
+let venda=[];
 
-let mesas=[], caixa=[], produtos=[
-{codigo:'1',nome:'Cerveja',preco:6,estoque:100},
-{codigo:'2',nome:'Whisky',preco:10,estoque:50}
-];
-
-let mesaAtual=null, clienteAtual=null;
-
-function criarMesas(){
-let m=document.getElementById('mesas');
-for(let i=1;i<=12;i++){
-mesas[i]={clientes:[],ocupada:false};
-let d=document.createElement('div');
-d.className='mesa';
-d.innerText=i;
-d.onclick=()=>{mesaAtual=i;mesaAtualUI()};
-m.appendChild(d);
-}
-}
-
-function mesaAtualUI(){
-document.getElementById('mesaAtual').innerText=mesaAtual;
-renderClientes();
-}
-
-function addCliente(){
-let nome=clienteNome.value;
-let tel=clienteTel.value;
-mesas[mesaAtual].clientes.push({nome,tel,consumo:[]});
-mesas[mesaAtual].ocupada=true;
-renderClientes();
-}
-
-function renderClientes(){
-let c=document.getElementById('clientes');
-c.innerHTML='';
-mesas[mesaAtual].clientes.forEach((cli,i)=>{
-let b=document.createElement('button');
-b.innerText=cli.nome;
-b.onclick=()=>{clienteAtual=i;renderLista()};
-c.appendChild(b);
-});
-}
-
-function addProduto(){
-let cod=codigo.value;
+function add(){
+let cod=document.getElementById('codigo').value;
 let p=produtos.find(x=>x.codigo==cod);
-if(p && p.estoque>0){
-p.estoque--;
-mesas[mesaAtual].clientes[clienteAtual].consumo.push(p);
-renderLista();
-}
+if(p){venda.push(p);render();}
 }
 
-function renderLista(){
+function render(){
 let l=document.getElementById('lista');
 l.innerHTML='';
 let total=0;
-mesas[mesaAtual].clientes[clienteAtual].consumo.forEach(p=>{
-l.innerHTML+=p.nome+' R$'+p.preco+'<br>';
-total+=p.preco;
-});
-l.innerHTML+='<hr>Total:'+total;
+venda.forEach(p=>{l.innerHTML+=p.nome+' '+p.preco+'<br>';total+=p.preco});
+l.innerHTML+='<hr>'+total;
 }
 
-function fecharCliente(){
-let cli=mesas[mesaAtual].clientes[clienteAtual];
-let total=cli.consumo.reduce((s,p)=>s+p.preco,0);
-registrar(total,cli.nome);
-mesas[mesaAtual].clientes.splice(clienteAtual,1);
-renderClientes();
+function fechar(){
+let total=venda.reduce((s,p)=>s+p.preco,0);
+alert('Total: '+total);
+window.print();
+venda=[];render();
 }
-
-function dividirConta(){
-let total=0;
-mesas[mesaAtual].clientes.forEach(c=>{
-c.consumo.forEach(p=> total+=p.preco);
-});
-let n=prompt('Qtd pessoas');
-registrar(total,'Dividido '+n);
-mesas[mesaAtual]={clientes:[],ocupada:false};
-}
-
-function fecharMesa(){
-let total=0;
-mesas[mesaAtual].clientes.forEach(c=>{
-c.consumo.forEach(p=> total+=p.preco);
-});
-registrar(total,'Mesa '+mesaAtual);
-mesas[mesaAtual]={clientes:[],ocupada:false};
-}
-
-function registrar(valor,desc){
-let forma=document.getElementById('pagamento').value;
-let venda={hora:new Date().toLocaleTimeString(),desc,total:valor,forma};
-caixa.push(venda);
-db.collection("vendas").add(venda);
-imprimirRecibo(venda);
-renderCaixa();
-}
-
-function imprimirRecibo(v){
-let texto=`BOTEC0 934\n${v.hora}\n${v.desc}\nR$${v.total}\n${v.forma}`;
-let w=window.open('');
-w.document.write('<pre>'+texto+'</pre>');
-w.print();
-
-// whatsapp
-let msg=encodeURIComponent(texto);
-window.open(`https://wa.me/?text=${msg}`);
-}
-
-function renderCaixa(){
-let c=document.getElementById('caixa');
-c.innerHTML='';
-let total=0;
-caixa.forEach(v=>{
-c.innerHTML+=`${v.hora} ${v.desc} R$${v.total} ${v.forma}<br>`;
-total+=v.total;
-});
-document.getElementById('totalDia').innerText=total;
-}
-
-criarMesas();
 </script>
 </body>
 </html>
+
+<!-- ========= CLIENTES ========= -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Clientes</title>
+</head>
+<body>
+<h1>Clientes</h1>
+
+<input id="nome" placeholder="Nome">
+<input id="tel" placeholder="Telefone">
+<button onclick="salvar()">Salvar</button>
+
+<div id="lista"></div>
+
+<script>
+let clientes=JSON.parse(localStorage.getItem('clientes'))||[];
+
+function salvar(){
+clientes.push({nome:nome.value,tel:tel.value});
+localStorage.setItem('clientes',JSON.stringify(clientes));
+render();
+}
+
+function render(){
+lista.innerHTML='';
+clientes.forEach(c=>{
+lista.innerHTML+=c.nome+' - '+c.tel+'<br>';
+});
+}
+render();
+</script>
+</body>
+</html>
+
+<!-- ========= PRODUTOS ========= -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Produtos</title>
+</head>
+<body>
+<h1>Produtos</h1>
+
+<input id="codigo" placeholder="Código">
+<input id="nome" placeholder="Nome">
+<input id="preco" placeholder="Preço">
+<button onclick="salvar()">Salvar</button>
+
+<div id="lista"></div>
+
+<script>
+let produtos=JSON.parse(localStorage.getItem('produtos'))||[];
+
+function salvar(){
+produtos.push({codigo:codigo.value,nome:nome.value,preco:parseFloat(preco.value)});
+localStorage.setItem('produtos',JSON.stringify(produtos));
+render();
+}
+
+function render(){
+lista.innerHTML='';
+produtos.forEach(p=>{
+lista.innerHTML+=p.nome+' '+p.preco+'<br>';
+});
+}
+render();
+</script>
+</body>
+</html>
+
+<!-- ========= INSTRUÇÕES ========= -->
+<!--
+1. CRIE 3 ARQUIVOS:
+- index.html
+- clientes.html
+- produtos.html
+
+2. COLE CADA PARTE NO ARQUIVO CERTO
+
+3. ABRA O index.html
+
+PRONTO: SISTEMA FUNCIONANDO
+-->
