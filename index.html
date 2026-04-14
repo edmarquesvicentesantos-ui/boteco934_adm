@@ -7,27 +7,102 @@
     <style>
         :root { --primary: #1a252f; --success: #27ae60; --info: #3498db; --accent: #f1c40f; --danger: #e74c3c; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        header { background: var(--primary); color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); }
-        nav { background: #2c3e50; display: flex; }
-        .nav-btn { flex: 1; padding: 15px 5px; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
-        .nav-btn.active { background: #1abc9c; color: white; }
-        main { flex: 1; position: relative; overflow: hidden; }
-        
-        /* ESTILO PARA AS TELAS */
-        .tela { display: none; width: 100%; height: 100%; position: absolute; top:0; left:0; background: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; height: 100vh; display: flex; flex-direction: column; }
+        header { background: var(--primary); color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); }
+        nav { background: #2c3e50; display: flex; flex-wrap: wrap; }
+        .nav-btn { flex: 1; min-width: 80px; padding: 15px 5px; border: none; background: transparent; color: #bdc3c7; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; border-bottom: 3px solid transparent; }
+        .nav-btn.active { background: #1abc9c; color: white; border-bottom: 3px solid var(--accent); }
+        main { flex: 1; position: relative; background: #f4f7f6; }
+        .tela { display: none; width: 100%; height: 100%; position: absolute; background: #f4f7f6; overflow: hidden; }
         .tela-ativa { display: flex !important; }
+        .col { height: 100%; overflow-y: auto; background: white; border-right: 1px solid #ddd; padding: 10px; }
+        .mesa-btn { width: 100%; padding: 15px 5px; margin-bottom: 10px; border: 2px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; background: white; }
+        .mesa-ocupada { background: #fff9db; border-color: var(--accent); color: #d35400; }
+        .mesa-sel { background: var(--primary); color: white; border-color: var(--primary); }
+        .grid-p { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .card-p { border: 1px solid #eee; padding: 15px 5px; text-align: center; border-radius: 8px; cursor: pointer; background: white; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .cli-box { background: #f0f7ff; padding: 8px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid var(--info); font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; }
+        th, td { padding: 10px; border: 1px solid #eee; text-align: left; }
+    </style>
+</head>
+<body>
 
-        .col { height: 100%; overflow-y: auto; background: white; border-right: 1px solid #ddd; }
-        .col-vendas-mesas { width: 120px; padding: 10px; }
-        .col-vendas-meio { flex: 1; padding: 20px; }
-        .col-vendas-dir { width: 300px; padding: 15px; border-right: none; border-left: 1px solid #ddd; display: flex; flex-direction: column; }
+<header><strong>BOTECO 934</strong> <div id="clock">00:00:00</div></header>
 
-        .mesa-btn { width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; }
-        .mesa-ocupada { background: #fff9db; border-color: var(--accent); }
-        .mesa-sel { background: var(--primary); color: white; }
-        
-        .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-        .prod-card { border: 1px solid #eee; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        .cli-item { background: #eef7ff; padding: 8px; border-radius:
+<nav id="menu">
+    <button class="nav-btn active" onclick="ver('vendas', this)">Vendas</button>
+    <button class="nav-btn" onclick="ver('estoque', this)">Estoque</button>
+    <button class="nav-btn" onclick="ver('clientes', this)">Clientes</button>
+    <button class="nav-btn" onclick="ver('caixa', this)">Caixa</button>
+</nav>
+
+<main>
+    <div id="vendas" class="tela tela-ativa">
+        <div class="col" style="width: 120px;" id="render-mesas"></div>
+        <div class="col" style="flex: 1;">
+            <select id="select-cli" style="width:100%; padding:12px; margin-bottom:15px; border:2px solid var(--info); border-radius:5px; font-weight:bold;"></select>
+            <div id="render-prods" class="grid-p"></div>
+        </div>
+        <div class="col" style="width: 280px; border-right:none; display:flex; flex-direction:column;">
+            <h3 id="txt-mesa" style="text-align:center; background:#eee; padding:5px;">Mesa Livre</h3>
+            <div id="render-itens" style="flex:1; margin:15px 0; overflow-y:auto;"></div>
+            <div style="border-top:2px solid #333; padding-top:10px;">
+                <h2 style="margin-bottom:10px;">Total: R$ <span id="txt-total">0.00</span></h2>
+                <button onclick="pagar()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; font-weight:bold; cursor:pointer; border-radius:5px; font-size:16px;">FECHAR CONTA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="estoque" class="tela" style="padding:20px; flex-direction:column;">
+        <h2>📦 Produtos</h2>
+        <div style="margin:15px 0; display:flex; gap:5px;">
+            <input type="text" id="in-pnoma" placeholder="Nome" style="padding:10px; flex:1;">
+            <input type="number" id="in-ppreco" placeholder="R$" style="padding:10px; width:80px;">
+            <button onclick="addP()" style="padding:10px; background:var(--success); color:white; border:none;">+</button>
+        </div>
+        <table id="tab-p"><thead><tr style="background:#eee;"><th>Item</th><th>Preço</th><th>X</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div id="clientes" class="tela" style="padding:20px; flex-direction:column;">
+        <h2>👥 Clientes</h2>
+        <div style="margin:15px 0; display:flex; gap:5px;">
+            <input type="text" id="in-cnome" placeholder="Nome do Cliente" style="padding:10px; flex:1;">
+            <button onclick="addC()" style="padding:10px; background:var(--info); color:white; border:none;">OK</button>
+        </div>
+        <table id="tab-c"><thead><tr style="background:#eee;"><th>Nome</th><th>X</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div id="caixa" class="tela" style="padding:20px; flex-direction:column;">
+        <h2>💰 Caixa</h2>
+        <div id="resumo" style="display:flex; gap:10px; margin:15px 0; flex-wrap:wrap;"></div>
+        <table id="tab-h"><thead><tr style="background:#1a252f; color:white;"><th>Hora</th><th>Mesa</th><th>Total</th><th>Tipo</th></tr></thead><tbody></tbody></table>
+        <button onclick="reset()" style="margin-top:30px; color:red; border:none; background:none; cursor:pointer;">⚠️ Limpar Sistema</button>
+    </div>
+</main>
+
+<script>
+    // BANCO DE DADOS
+    let PRODS = JSON.parse(localStorage.getItem('b934_prods')) || [{n:"Heineken", p:16.0}];
+    let CLIS = JSON.parse(localStorage.getItem('b934_clis')) || [{n:"Balcão"}];
+    let FIN = JSON.parse(localStorage.getItem('b934_fin')) || { DINHEIRO: 0, PIX: 0, CARTAO: 0 };
+    let HIST = JSON.parse(localStorage.getItem('b934_hist')) || [];
+    let MESAS = Array.from({length:12}, (_, i) => ({id: i+1, consumo: {}, total: 0, status: 'livre'}));
+    let ATIVA = null;
+
+    function salvar() {
+        localStorage.setItem('b934_prods', JSON.stringify(PRODS));
+        localStorage.setItem('b934_clis', JSON.stringify(CLIS));
+        localStorage.setItem('b934_fin', JSON.stringify(FIN));
+        localStorage.setItem('b934_hist', JSON.stringify(HIST));
+    }
+
+    function ver(id, btn) {
+        document.querySelectorAll('.tela').forEach(t => t.classList.remove('tela-ativa'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('tela-ativa');
+        btn.classList.add('active');
+        if(id === 'vendas') renderV();
+        if(id === 'estoque') renderE();
+        if(id === 'clientes') renderC();
+        if(id === 'ca
