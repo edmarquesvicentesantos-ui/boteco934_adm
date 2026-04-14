@@ -1,0 +1,36 @@
+<!-- ========= CLIENTES ========= -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Clientes</title>
+</head>
+<body>
+<h1>Clientes</h1>
+
+<input id="nome" placeholder="Nome">
+<input id="tel" placeholder="Telefone">
+<button onclick="salvar()">Salvar</button>
+
+<div id="lista"></div>
+
+<script>
+let clientes=JSON.parse(localStorage.getItem('clientes'))||[];
+
+function salvar(){
+clientes.push({nome:nome.value,tel:tel.value});
+localStorage.setItem('clientes',JSON.stringify(clientes));
+render();
+}
+
+function render(){
+lista.innerHTML='';
+clientes.forEach(c=>{
+lista.innerHTML+=c.nome+' - '+c.tel+'<br>';
+});
+}
+render();
+</script>
+</body>
+</html>
+
