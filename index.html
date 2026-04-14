@@ -1,66 +1,145 @@
-<!-- ========================= -->
-<!-- PDV BOTECO 934 V5 CLASSICO -->
-<!-- SISTEMA MULTIPÁGINAS SIMPLES -->
-<!-- ========================= -->
-
-<!-- ========= INDEX (CAIXA) ========= -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>PDV - Caixa</title>
-<style>
-body{font-family:Arial;background:#111;color:#fff}
-button,input{padding:10px;margin:5px}
-</style>
+    <meta charset="UTF-8">
+    <title>Boteco 934 - PDV Premium</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #ef4444; --text: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Menu Lateral */
+        nav { width: 100px; background: #020617; display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #334155; }
+        nav a { color: #94a3b8; text-decoration: none; margin-bottom: 25px; font-size: 11px; text-transform: uppercase; font-weight: bold; transition: 0.3s; }
+        nav a:hover { color: var(--accent); }
+
+        /* Area das Mesas */
+        .area-mesas { width: 250px; background: var(--card); padding: 15px; overflow-y: auto; border-right: 1px solid #334155; }
+        .mesa { background: #334155; padding: 20px; margin-bottom: 12px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+        .mesa.ocupada { border-color: var(--accent); background: #1e293b; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .mesa.ativa { background: var(--accent); color: #020617; }
+
+        /* Centro */
+        .painel-venda { flex: 1; padding: 30px; display: flex; flex-direction: column; background: #0f172a; }
+        input, select { background: #1e293b; border: 1px solid #475569; color: white; padding: 15px; border-radius: 8px; font-size: 16px; margin-bottom: 20px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+
+        /* Resumo Lateral */
+        .resumo { width: 400px; background: #020617; padding: 25px; display: flex; flex-direction: column; border-left: 1px solid #334155; }
+        #lista-carrinho { flex: 1; overflow-y: auto; margin: 20px 0; }
+        .item-car { background: #1e293b; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 14px; }
+        
+        .footer-car { background: #1e293b; padding: 20px; border-radius: 12px; }
+        .total { font-size: 28px; font-weight: bold; color: var(--success); text-align: center; margin-bottom: 15px; }
+        .btn-fechar { width: 100%; padding: 18px; background: var(--accent); color: #020617; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-fechar:hover { opacity: 0.9; transform: translateY(-2px); }
+    </style>
 </head>
 <body>
-<h1>CAIXA</h1>
 
-<a href="clientes.html"><button>Clientes</button></a>
-<a href="produtos.html"><button>Produtos</button></a>
+<nav>
+    <div style="color:var(--accent); font-weight: bold; margin-bottom: 40px; font-size: 20px;">934</div>
+    <a href="index.html">Caixa</a>
+    <a href="clientes.html">Clientes</a>
+    <a href="produtos.html">Estoque</a>
+</nav>
 
-<h3>Venda</h3>
-<input id="codigo" placeholder="Código">
-<button onclick="add()">Adicionar</button>
+<div class="area-mesas" id="grid-mesas"></div>
 
-<div id="lista"></div>
+<div class="painel-venda">
+    <h1 id="titulo-mesa" style="margin-top:0;">Selecione uma Mesa</h1>
+    <label style="color:#94a3b8; margin-bottom: 8px; display: block;">Código do Produto</label>
+    <input type="text" id="codigo-bipe" placeholder="Aguardando bipe..." autocomplete="off">
+    
+    <label style="color:#94a3b8; margin-bottom: 8px; display: block;">Cliente Responsável</label>
+    <select id="select-cliente"></select>
+</div>
 
-<select id="pagamento">
-<option>Dinheiro</option>
-<option>PIX</option>
-<option>Crédito</option>
-<option>Débito</option>
-<option>Pendura</option>
-</select>
-
-<button onclick="fechar()">Fechar Conta</button>
+<div class="resumo">
+    <h2 style="margin-top:0;">Detalhes</h2>
+    <div id="lista-carrinho"></div>
+    
+    <div class="footer-car">
+        <div class="total">R$ <span id="total-v">0.00</span></div>
+        <select id="meio-pagto" style="width: 100%;">
+            <option>Dinheiro</option>
+            <option>PIX</option>
+            <option>Cartão Crédito</option>
+            <option>Cartão Débito</option>
+            <option>Pendura</option>
+        </select>
+        <button class="btn-fechar" onclick="fecharConta()">FINALIZAR VENDA</button>
+    </div>
+</div>
 
 <script>
-let produtos=JSON.parse(localStorage.getItem('produtos'))||[];
-let venda=[];
+    let PRODS = JSON.parse(localStorage.getItem('produtos')) || [];
+    let CLIS = JSON.parse(localStorage.getItem('clientes')) || [{nome: "Consumidor Geral"}];
+    let MESAS = Array.from({length: 12}, (_, i) => ({ id: i+1, itens: [], total: 0, ocupada: false }));
+    let mesaAtiva = null;
+    let clienteMemoria = "Consumidor Geral";
 
-function add(){
-let cod=document.getElementById('codigo').value;
-let p=produtos.find(x=>x.codigo==cod);
-if(p){venda.push(p);render();}
-}
+    function carregarClientes() {
+        const s = document.getElementById('select-cliente');
+        s.innerHTML = CLIS.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+        s.value = clienteMemoria;
+    }
 
-function render(){
-let l=document.getElementById('lista');
-l.innerHTML='';
-let total=0;
-venda.forEach(p=>{l.innerHTML+=p.nome+' '+p.preco+'<br>';total+=p.preco});
-l.innerHTML+='<hr>'+total;
-}
+    document.getElementById('select-cliente').onchange = (e) => clienteMemoria = e.target.value;
 
-function fechar(){
-let total=venda.reduce((s,p)=>s+p.preco,0);
-alert('Total: '+total);
-window.print();
-venda=[];render();
-}
+    function renderMesas() {
+        document.getElementById('grid-mesas').innerHTML = MESAS.map(m => `
+            <div class="mesa ${m.ocupada?'ocupada':''} ${mesaAtiva===m.id?'ativa':''}" onclick="selMesa(${m.id})">
+                MESA ${String(m.id).padStart(2, '0')}<br>
+                <span style="font-size:12px; opacity:0.8">R$ ${m.total.toFixed(2)}</span>
+            </div>
+        `).join('');
+    }
+
+    function selMesa(id) {
+        mesaAtiva = id;
+        document.getElementById('titulo-mesa').innerText = "MESA " + id;
+        renderMesas();
+        renderCarrinho();
+        document.getElementById('codigo-bipe').focus();
+    }
+
+    document.getElementById('codigo-bipe').onkeypress = (e) => {
+        if(e.key === 'Enter' && mesaAtiva) {
+            let p = PRODS.find(x => x.codigo == e.target.value);
+            if(p) {
+                let m = MESAS.find(x => x.id === mesaAtiva);
+                m.itens.push({ cli: clienteMemoria, nome: p.nome, preco: p.preco });
+                m.total += p.preco;
+                m.ocupada = true;
+                e.target.value = '';
+                renderMesas(); renderCarrinho();
+            } else { alert("Produto não cadastrado!"); e.target.value = ''; }
+        }
+    }
+
+    function renderCarrinho() {
+        if(!mesaAtiva) return;
+        let m = MESAS.find(x => x.id === mesaAtiva);
+        document.getElementById('lista-carrinho').innerHTML = m.itens.map(it => `
+            <div class="item-car">
+                <span><b>${it.cli}</b><br>${it.nome}</span>
+                <span>R$ ${it.preco.toFixed(2)}</span>
+            </div>
+        `).join('');
+        document.getElementById('total-v').innerText = m.total.toFixed(2);
+    }
+
+    function fecharConta() {
+        let m = MESAS.find(x => x.id === mesaAtiva);
+        if(!m || m.total === 0) return;
+        if(confirm(`Confirmar recebimento de R$ ${m.total.toFixed(2)}?`)){
+            m.itens = []; m.total = 0; m.ocupada = false;
+            renderMesas(); renderCarrinho();
+        }
+    }
+
+    carregarClientes();
+    renderMesas();
 </script>
 </body>
 </html>
-
