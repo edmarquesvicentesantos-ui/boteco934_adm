@@ -137,7 +137,16 @@
             renderMesas(); renderCarrinho();
         }
     }
-
+// Procure a função carregarClientes no seu index.html e substitua por esta:
+function carregarClientes() {
+    const s = document.getElementById('select-cliente');
+    
+    // Organiza clientes A-Z antes de mostrar no seletor
+    let clisOrdenados = [...CLIS].sort((a, b) => a.nome.localeCompare(b.nome));
+    
+    s.innerHTML = clisOrdenados.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+    s.value = clienteMemoria;
+}
     carregarClientes();
     renderMesas();
 </script>
