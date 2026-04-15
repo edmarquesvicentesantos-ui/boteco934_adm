@@ -9,16 +9,16 @@
         :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --success: #22c55e; --indigo: #6366f1; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 30px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 950px; }
+        .container { width: 100%; max-width: 1000px; }
         .back-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
         
-        /* Cabeçalho */
         .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
         h1 { font-size: 26px; font-weight: 700; }
 
-        /* Card de Cadastro */
         .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .grid-inputs { display: grid; grid-template-columns: 1.2fr 2fr 0.8fr 1fr; gap: 15px; }
+        /* Grid ajustado para caber a quantidade */
+        .grid-inputs { display: grid; grid-template-columns: 1.2fr 1.8fr 0.8fr 0.8fr 1fr; gap: 12px; }
+        
         label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { background: #020617; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; outline: none; font-size: 14px; transition: 0.3s; }
         input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
@@ -26,16 +26,15 @@
         .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; text-transform: uppercase; }
         .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
 
-        /* Tabela A-Z */
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         th { text-align: left; padding: 10px 15px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
-        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; transition: 0.2s; }
+        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; }
         td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; font-family: monospace; color: var(--accent); }
         td:last-child { border-right: 1px solid #334155; border-radius: 0 12px 12px 0; text-align: right; }
         
-        .cat-tag { background: rgba(99, 102, 241, 0.1); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--indigo); border: 1px solid var(--indigo); text-transform: uppercase; }
-        .status-web { font-size: 10px; color: var(--indigo); font-weight: 800; position: absolute; top: 12px; right: 25px; display: none; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .cat-tag { background: rgba(99, 102, 241, 0.1); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--indigo); border: 1px solid var(--indigo); }
+        .status-web { font-size: 10px; color: var(--indigo); font-weight: 800; position: absolute; top: 12px; right: 25px; display: none; }
+        .qtd-badge { background: #0f172a; padding: 5px 10px; border-radius: 8px; font-weight: 700; color: var(--success); border: 1px solid #334155; }
     </style>
 </head>
 <body>
@@ -45,39 +44,43 @@
     
     <div class="header">
         <div>
-            <h1>📦 Estoque Inteligente</h1>
-            <p style="color:var(--muted); font-size:14px;">Boteco 934 - Organização Automática A-Z</p>
+            <h1>📦 Gestão de Estoque</h1>
+            <p style="color:var(--muted); font-size:14px;">Controle de produtos e quantidades - Boteco 934</p>
         </div>
-        <div id="contagem" style="font-size: 12px; font-weight: 700; color: var(--accent);">0 PRODUTOS</div>
+        <div id="contagem" style="font-size: 12px; font-weight: 700; color: var(--accent);">0 ITENS NO SISTEMA</div>
     </div>
 
     <div class="form-card">
-        <div id="status-web" class="status-web">🔎 BUSCANDO DADOS NA INTERNET...</div>
+        <div id="status-web" class="status-web">🔎 BUSCANDO NA INTERNET...</div>
         <div class="grid-inputs">
             <div>
-                <label>Cód. Barras (EAN)</label>
-                <input type="text" id="p-cod" placeholder="Bipe aqui..." autocomplete="off">
+                <label>Cód. Barras</label>
+                <input type="text" id="p-cod" placeholder="Bipe aqui...">
             </div>
             <div>
                 <label>Nome do Produto</label>
-                <input type="text" id="p-nome" placeholder="Aguardando bipe ou digite...">
+                <input type="text" id="p-nome" placeholder="Nome do produto">
             </div>
             <div>
-                <label>Preço Venda</label>
+                <label>Preço</label>
                 <input type="number" step="0.01" id="p-preco" placeholder="0.00">
+            </div>
+            <div>
+                <label>Qtd.</label>
+                <input type="number" id="p-qtd" placeholder="0" value="1">
             </div>
             <div>
                 <label>Categoria</label>
                 <select id="p-cat">
-                    <option value="Cervejas">Cervejas</option>
-                    <option value="Refrigerantes">Refrigerantes</option>
-                    <option value="Alimentos">Alimentos</option>
-                    <option value="Boticário">Boticário</option>
-                    <option value="Doses">Doses</option>
+                    <option>Cervejas</option>
+                    <option>Refrigerantes</option>
+                    <option>Alimentos</option>
+                    <option>Boticário</option>
+                    <option>Doses</option>
                 </select>
             </div>
         </div>
-        <button class="btn-salvar" onclick="salvarProduto()">ADICIONAR AO ESTOQUE</button>
+        <button class="btn-salvar" onclick="salvarProduto()">SALVAR NO ESTOQUE</button>
     </div>
 
     <table>
@@ -86,6 +89,7 @@
                 <th>CÓDIGO</th>
                 <th>CATEGORIA</th>
                 <th>DESCRIÇÃO (A-Z)</th>
+                <th>QTD.</th>
                 <th>PREÇO</th>
                 <th>AÇÃO</th>
             </tr>
@@ -97,7 +101,7 @@
 <script>
     let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
-    // GATILHO DO LEITOR DE CÓDIGO DE BARRAS
+    // Busca ao bipar
     document.getElementById('p-cod').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -105,90 +109,55 @@
         }
     });
 
-    // GATILHO DO ENTER NO PREÇO PARA SALVAR RÁPIDO
-    document.getElementById('p-preco').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            salvarProduto();
-        }
-    });
-
     async function buscarWeb(codigo) {
-        if (!codigo || codigo.length < 5) return;
-        
-        // Verifica se já existe
-        if (produtos.find(p => p.codigo == codigo)) {
-            alert("Este produto já está cadastrado!");
-            document.getElementById('p-cod').value = '';
-            document.getElementById('p-cod').focus();
-            return;
-        }
-
+        if (!codigo) return;
         const statusLabel = document.getElementById('status-web');
         const nomeInput = document.getElementById('p-nome');
-        
         statusLabel.style.display = 'block';
-        nomeInput.placeholder = "Consultando banco de dados...";
 
         try {
-            const resposta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`, {
-                headers: { 'User-Agent': 'Boteco934-App/1.0' }
-            });
+            const resposta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
             const dados = await resposta.json();
-
             if (dados.status === 1) {
                 const p = dados.product;
-                const nomeFinal = p.product_name_pt || p.product_name || p.generic_name || "";
-                const marca = p.brands ? ` - ${p.brands.split(',')[0]}` : "";
-                
-                nomeInput.value = (nomeFinal + marca).toUpperCase();
-                nomeInput.style.borderColor = "var(--indigo)";
-                // Foca no preço para terminar o cadastro
+                nomeInput.value = (p.product_name_pt || p.product_name || "").toUpperCase();
                 document.getElementById('p-preco').focus();
-            } else {
-                nomeInput.placeholder = "Não encontrado. Digite manualmente.";
-                nomeInput.focus();
             }
-        } catch (erro) {
-            nomeInput.placeholder = "Erro de conexão. Digite o nome.";
-        } finally {
-            statusLabel.style.display = 'none';
-        }
+        } catch (erro) { console.log("Erro na busca"); }
+        finally { statusLabel.style.display = 'none'; }
     }
 
     function salvarProduto() {
-        const codInput = document.getElementById('p-cod');
-        const nomeInput = document.getElementById('p-nome');
-        const precoInput = document.getElementById('p-preco');
-        const catInput = document.getElementById('p-cat');
+        const cod = document.getElementById('p-cod').value.trim();
+        const nome = document.getElementById('p-nome').value.trim();
+        const preco = document.getElementById('p-preco').value;
+        const qtd = document.getElementById('p-qtd').value;
+        const cat = document.getElementById('p-cat').value;
 
-        if (codInput.value && nomeInput.value && precoInput.value) {
+        if (cod && nome && preco && qtd) {
             produtos.push({
-                codigo: codInput.value.trim(),
-                nome: nomeInput.value.trim().toUpperCase(),
-                preco: parseFloat(precoInput.value),
-                cat: catInput.value
+                codigo: cod,
+                nome: nome.toUpperCase(),
+                preco: parseFloat(preco),
+                qtd: parseInt(qtd),
+                cat: cat
             });
 
             localStorage.setItem('produtos', JSON.stringify(produtos));
-
+            
             // Reseta campos
-            codInput.value = '';
-            nomeInput.value = '';
-            nomeInput.style.borderColor = "#334155";
-            precoInput.value = '';
-            codInput.focus();
+            document.getElementById('p-cod').value = '';
+            document.getElementById('p-nome').value = '';
+            document.getElementById('p-preco').value = '';
+            document.getElementById('p-qtd').value = '1';
+            document.getElementById('p-cod').focus();
 
             renderTable();
-        } else {
-            alert("Preencha todos os campos obrigatórios!");
-        }
+        } else { alert("Preencha todos os campos!"); }
     }
 
     function renderTable() {
-        // ORGANIZAÇÃO A-Z
         produtos.sort((a, b) => a.nome.localeCompare(b.nome));
-
         document.getElementById('contagem').innerText = `${produtos.length} PRODUTOS`;
 
         const corpo = document.getElementById('lista-estoque');
@@ -197,26 +166,24 @@
                 <td>${p.codigo}</td>
                 <td><span class="cat-tag">${p.cat}</span></td>
                 <td><b>${p.nome}</b></td>
+                <td><span class="qtd-badge">${p.qtd}</span></td>
                 <td style="color:var(--success); font-weight:700;">R$ ${p.preco.toFixed(2)}</td>
                 <td>
-                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;">❌</button>
+                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer;">❌</button>
                 </td>
             </tr>
         `).join('');
     }
 
     function remover(i) {
-        if (confirm("Deseja remover este item do estoque?")) {
+        if (confirm("Remover item?")) {
             produtos.splice(i, 1);
             localStorage.setItem('produtos', JSON.stringify(produtos));
             renderTable();
         }
     }
 
-    window.onload = () => {
-        renderTable();
-        document.getElementById('p-cod').focus();
-    };
+    window.onload = renderTable;
 </script>
 
 </body>
