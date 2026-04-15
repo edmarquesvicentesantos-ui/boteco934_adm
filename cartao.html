@@ -3,68 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cartão Digital</title>
+<title>Boteco 934</title>
 
 <style>
 body{
-  font-family: Arial;
-  background:#0f172a;
+  font-family: -apple-system, Arial;
+  background: linear-gradient(180deg,#0B0616,#140A2E);
   color:white;
   text-align:center;
   padding:20px;
 }
 
 .card{
-  background:#111827;
-  padding:25px;
-  border-radius:25px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(15px);
+  padding:28px;
+  border-radius:28px;
   max-width:420px;
   margin:auto;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
-  position:relative;
-  overflow:hidden;
+  box-shadow:0 0 40px rgba(124,58,237,0.35);
+  border:1px solid rgba(167,139,250,0.2);
 }
 
-/* Marca d'água */
-.watermark{
-  position:absolute;
-  opacity:0.06;
-  width:350px;
-  top:120px;
-  left:50%;
-  transform:translateX(-50%);
+h1{
+  color:#A78BFA;
+  margin-bottom:5px;
 }
 
-/* Logo topo */
-.logo{
-  width:180px;
-  margin-bottom:10px;
+.subtitle{
+  color:#c4b5fd;
+  margin-bottom:25px;
 }
-
-.subtitle{color:#9ca3af;margin-bottom:20px;}
 
 .btn{
   display:block;
-  margin:10px 0;
-  padding:15px;
+  margin:12px 0;
+  padding:16px;
   color:white;
   text-decoration:none;
-  border-radius:12px;
+  border-radius:14px;
   font-size:18px;
   font-weight:bold;
+  transition:0.3s;
 }
 
-.whats{background:#25D366;}
-.tel{background:#2563eb;}
-.pix{background:#06b6d4;}
+.btn:hover{
+  transform:scale(1.04);
+}
+
+.whats{ background:linear-gradient(45deg,#7C3AED,#4C1D95);}
+.tel{ background:linear-gradient(45deg,#8B5CF6,#6D28D9);}
+.pix{ background:linear-gradient(45deg,#A78BFA,#7C3AED);}
+
+.section{
+  margin-top:28px;
+}
 
 img.qr{
-  width:200px;
+  width:220px;
   margin-top:10px;
-  border-radius:12px;
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(124,58,237,0.4);
 }
 
-.section{ margin-top:25px; }
+.divisor{
+  height:1px;
+  background:linear-gradient(90deg,transparent,#7C3AED,transparent);
+  margin:25px 0;
+}
 </style>
 </head>
 
@@ -72,25 +78,28 @@ img.qr{
 
 <div class="card">
 
-<img src="logo.png" class="logo">
-<img src="logo.png" class="watermark">
-
+<h1>🍻 Boteco 934</h1>
 <div class="subtitle">Contato • Wi-Fi • PIX</div>
 
 <a class="btn whats" href="https://wa.me/5587996806181">💬 WhatsApp</a>
 <a class="btn tel" href="tel:+5587996806181">📞 Ligar</a>
-
 <div class="btn pix">💳 PIX: 87996806181</div>
+
+<div class="divisor"></div>
 
 <div class="section">
 <h3>📶 Wi-Fi do Local</h3>
 <p><b>jr telecom jato da mangueira</b></p>
-<img src="wifi.png" class="qr">
+<img class="qr"
+src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=WIFI:T:WPA;S:jr%20telecom%20jato%20da%20mangueira;P:Boteco934@;;">
 </div>
+
+<div class="divisor"></div>
 
 <div class="section">
 <h3>💰 Pagar no PIX</h3>
-<img src="pix.png" class="qr">
+<img class="qr"
+src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=87996806181">
 </div>
 
 </div>
