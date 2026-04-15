@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios - Boteco 934</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0b0f1a; --card: #161b2a; --accent: #38bdf8; --success: #22c55e; --text: #f8fafc; --muted: #94a3b8; --radius: 12px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 40px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .logo-934 { background: var(--accent); color: #020617; padding: 10px 20px; border-radius: var(--radius); font-weight: 900; font-size: 24px; }
+        
+        .grid-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .card-valor { background: var(--card); padding: 30px; border-radius: var(--radius); border: 2px solid #1e293b; text-align: center; }
+        .card-valor h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 900; }
+        .card-valor p { font-size: 32px; font-weight: 900; color: var(--success); }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        th { text-align: left; padding: 15px; color: var(--muted); font-weight: 900; text-transform: uppercase; font-size: 13px; }
+        td { background: var(--card); padding: 20px; font-weight: 700; border-top: 2px solid #1e293b; border-bottom: 2px solid #1e293b; }
+        td:first-child { border-left: 2px solid #1e293b; border-radius: 12px 0 0 12px; }
+        td:last-child { border-right: 2px solid #1e293b; border-radius: 0 12px 12px 0; }
+        
+        .metodo-tag { background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 12px; border: 1px solid var(--accent); }
+        .btn-limpar { background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div class="logo-934">934</div>
+            <h1 style="font-weight:900; font-size:32px;">RELATÓRIO DE VENDAS</h1>
+        </div>
+        <a href="index.html" style="color:var(--accent); text-decoration:none; font-weight:900;">← VOLTAR AO CAIXA</a>
+    </div>
+
+    <div class="grid-resumo">
+        <div class="card-valor">
+            <h3>Total Pix</h3>
+            <p id="total-pix">R$ 0,00</p>
+        </div>
+        <div class="card-valor">
+            <h3>Outros Métodos</h3>
+            <p id="total-outros" style="color:var(--text)">R$ 0,00</p>
+        </div>
+        <div class="card-valor">
+            <h3>Vendas Totais</h3>
+            <p id="total-geral">R$ 0,00</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DATA/HORA</th>
+                <th>CLIENTE</th>
+                <th>MÉTODO</th>
+                <th>VALOR</th>
+            </tr>
+        </thead>
+        <tbody id="lista-vendas"></tbody>
+    </table>
+
+    <button class="btn-limpar" onclick="limparHistorico()" style="margin-top:40px; background:#ef4444;">LIMPAR HISTÓRICO DO DIA</button>
+
+    <script>
+        function carregarRelatorio() {
+            const vendas = JSON.parse(localStorage.getItem('historico_vendas')) || [];
+            const corpo = document.getElementById('lista-vendas');
+            
+            let pix = 0, outros = 0;
+
+            corpo.innerHTML = vendas.map(v => {
+                if(v.metodo === 'Pix') pix += v.valor;
+                else outros += v.valor;
+
+                return `
+                    <tr>
+                        <td>${v.data}</td>
+                        <td>${v.cliente}</td>
+                        <td><span class="metodo-tag">${v.metodo}</span></td>
+                        <td style="color:var(--success)">R$ ${v.valor.toFixed(2)}</td>
+                    </tr>
+                `;
+            }).reverse().join('');
+
+            document.getElementById('total-pix').innerText = `R$ ${pix.toFixed(2)}`;
+            document.getElementById('total-outros').innerText = `R$ ${outros.toFixed(2)}`;
+            document.getElementById('total-geral').innerText = `R$ ${(pix + outros).toFixed(2)}`;
+        }
+
+        function limparHistorico() {
+            if(confirm("Deseja zerar o relatório de hoje?")) {
+                localStorage.removeItem('historico_vendas');
+                carregarRelatorio();
+            }
+        }
+
+        window.onload = carregarRelatorio;
+    </script>
+</body>
+</html>
