@@ -2,56 +2,40 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - PDV Oficial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boteco 934 - PDV Mobile</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --green: #22c55e; --text: #f8fafc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 10px; }
         
-        /* Menu lateral */
-        .sidebar { width: 280px; background: var(--card); border-right: 1px solid #1e293b; display: flex; flex-direction: column; }
-        .mesas-grid { flex: 1; overflow-y: auto; padding: 15px; }
-        .mesa { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; cursor: pointer; text-align: center; }
-        .mesa.ativa { border-color: var(--accent); background: var(--accent); color: #000; }
-
-        /* Area Principal */
-        .main { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #status { font-size: 12px; font-weight: bold; }
+        .header-bar { text-align: center; padding: 10px; border-bottom: 1px solid #1e293b; margin-bottom: 15px; }
+        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 20px; font-weight: bold; }
         
-        input { background: #1e293b; border: 1px solid #334155; color: white; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; margin-bottom: 20px; outline: none; }
-        input:focus { border-color: var(--accent); }
+        .lista-estoque { background: var(--card); border-radius: 12px; border: 1px solid #1e293b; overflow: hidden; }
+        .produto-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #1e293b; }
+        .produto-item:last-child { border-bottom: none; }
+        .nome-prod { font-size: 13px; font-weight: 600; text-transform: uppercase; flex: 1; padding-right: 10px; }
+        .preco-prod { color: var(--green); font-weight: 900; font-size: 15px; white-space: nowrap; }
 
-        .estoque-lista { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; }
-        .item-prod { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #ffffff10; }
-
-        .btn-flutuante { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--green); color: black; border-radius: 50%; border: none; font-size: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); }
+        .btn-acao { background: var(--green); color: black; border: none; padding: 18px; border-radius: 12px; width: 100%; font-weight: 900; font-size: 16px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div style="padding: 20px; font-weight: 900; color: var(--accent); font-size: 24px;">934</div>
-    <div class="mesas-grid" id="grid-mesas"></div>
+<div class="header-bar">
+    <h2 style="color:var(--accent); margin:0; font-size: 20px;">BOTECO 934</h2>
+    <span id="status-rede" class="status-tag" style="background:#450a0a; color:#f87171;">OFFLINE</span>
 </div>
 
-<div class="main">
-    <header>
-        <h2 id="titulo-mesa">Selecione uma mesa</h2>
-        <div id="status">CONECTANDO...</div>
-    </header>
-
-    <label style="font-size: 11px; color: var(--accent); font-weight: bold;">BIPAR CÓDIGO</label>
-    <input type="text" id="campo-bipe" placeholder="Bipe o produto aqui..." autofocus>
-
-    <h3>Produtos no Estoque (Nuvem)</h3>
-    <div class="estoque-lista" id="lista-estoque">Carregando estoque...</div>
+<div class="lista-estoque" id="display-estoque">
+    <p style="padding:20px; text-align:center; color:#64748b;">Sincronizando com a nuvem...</p>
 </div>
 
-<button class="btn-flutuante" onclick="cadastrarProduto()">+</button>
+<button class="btn-acao" onclick="cadastrarNovo()">+ NOVO PRODUTO</button>
 
 <script>
     const firebaseConfig = {
@@ -64,82 +48,64 @@
         appId: "1:182023728304:web:80c8402f068c8578508f75"
     };
 
+    // Inicializa
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let PRODUTOS_BANCO = {};
-    let mesaAtiva = null;
-
-    // Monitor de conexão
+    // 1. Monitor de Conexão (Para ver se o iPhone pegou a internet)
     db.ref('.info/connected').on('value', snap => {
-        const s = document.getElementById('status');
-        if (snap.val() === true) { s.innerText = "ONLINE ✅"; s.style.color = "#22c55e"; }
-        else { s.innerText = "OFFLINE ❌"; s.style.color = "red"; }
-    });
-
-    // Carregar estoque
-    db.ref('produtos').on('value', snapshot => {
-        const lista = document.getElementById('lista-estoque');
-        PRODUTOS_BANCO = snapshot.val() || {};
-        
-        if (Object.keys(PRODUTOS_BANCO).length > 0) {
-            let html = '';
-            Object.values(PRODUTOS_BANCO).forEach(p => {
-                html += `<div class="item-prod"><span>${p.nome}</span> <b>R$ ${parseFloat(p.preco).toFixed(2)}</b></div>`;
-            });
-            lista.innerHTML = html;
+        const el = document.getElementById('status-rede');
+        if (snap.val() === true) {
+            el.innerText = "SISTEMA ONLINE ✅";
+            el.style.background = "#064e3b"; el.style.color = "#4ade80";
         } else {
-            lista.innerHTML = "Estoque vazio no Firebase!";
+            el.innerText = "SEM CONEXÃO ❌";
+            el.style.background = "#450a0a"; el.style.color = "#f87171";
         }
     });
 
-    // Função de Cadastrar (IMPORTANTE: agora pede código de barras)
-    function cadastrarProduto() {
-        const cod = prompt("CÓDIGO DE BARRAS (ou número simples):");
-        const nome = prompt("NOME DO PRODUTO:");
-        const preco = prompt("PREÇO DE VENDA:");
+    // 2. Carregar e Corrigir os Dados (Resolve o erro do R$ NaN)
+    db.ref('produtos').on('value', snapshot => {
+        const listaDiv = document.getElementById('display-estoque');
+        const dados = snapshot.val();
+        
+        if (dados) {
+            let html = '';
+            // Transforma em array e organiza
+            const itens = Object.values(dados);
+            
+            itens.forEach(p => {
+                // Força o preço a ser um número para não dar erro no iPhone
+                let precoLimpo = parseFloat(p.preco) || 0;
+                html += `
+                    <div class="produto-item">
+                        <div class="nome-prod">${p.nome || 'SEM NOME'}</div>
+                        <div class="preco-prod">R$ ${precoLimpo.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            listaDiv.innerHTML = html;
+        } else {
+            listaDiv.innerHTML = '<p style="padding:20px; text-align:center;">Estoque vazio no Firebase.</p>';
+        }
+    }, error => {
+        alert("Erro ao ler dados: " + error.message);
+    });
 
-        if (cod && nome && preco) {
-            db.ref('produtos/' + cod).set({
-                codigo: cod,
+    // 3. Função de Cadastro
+    function cadastrarNovo() {
+        const nome = prompt("Nome do Produto:");
+        const preco = prompt("Preço (use ponto em vez de vírgula, ex: 10.50):");
+        
+        if (nome && preco) {
+            const id = Date.now();
+            db.ref('produtos/' + id).set({
                 nome: nome.toUpperCase(),
-                preco: parseFloat(preco)
-            }).then(() => alert("Produto salvo com sucesso!"));
+                preco: preco.replace(',', '.') // Troca vírgula por ponto automaticamente
+            }).then(() => {
+                alert("Salvo com sucesso!");
+            });
         }
-    }
-
-    // Lógica do Bipe
-    document.getElementById('campo-bipe').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const bipe = e.target.value;
-            const produto = PRODUTOS_BANCO[bipe];
-
-            if (produto) {
-                if (mesaAtiva) {
-                    alert("Lançado: " + produto.nome + " na Mesa " + mesaAtiva);
-                    // Aqui entra a lógica de salvar a venda na mesa
-                } else {
-                    alert("Selecione uma mesa primeiro!");
-                }
-            } else {
-                alert("Produto " + bipe + " não encontrado! Cadastre-o primeiro.");
-            }
-            e.target.value = '';
-        }
-    });
-
-    // Gerar Mesas
-    const grid = document.getElementById('grid-mesas');
-    for(let i=1; i<=12; i++) {
-        grid.innerHTML += `<div class="mesa" id="m${i}" onclick="selMesa(${i})">MESA ${i}</div>`;
-    }
-
-    function selMesa(n) {
-        mesaAtiva = n;
-        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('ativa'));
-        document.getElementById('m'+n).classList.add('ativa');
-        document.getElementById('titulo-mesa').innerText = "Lançando na Mesa " + n;
-        document.getElementById('campo-bipe').focus();
     }
 </script>
 
