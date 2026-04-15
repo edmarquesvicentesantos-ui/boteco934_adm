@@ -2,152 +2,164 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV Premium</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --success: #22c55e; --danger: #ef4444; --text: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root { --bg: #020617; --card: #0f172a; --item: #1e293b; --accent: #38bdf8; --success: #22c55e; --warning: #f59e0b; --text: #f8fafc; --muted: #64748b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
         /* Menu Lateral */
-        nav { width: 100px; background: #020617; display: flex; flex-direction: column; align-items: center; padding: 20px 0; border-right: 1px solid #334155; }
-        nav a { color: #94a3b8; text-decoration: none; margin-bottom: 25px; font-size: 11px; text-transform: uppercase; font-weight: bold; transition: 0.3s; }
+        nav { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; border-right: 1px solid #1e293b; }
+        nav a { color: var(--muted); text-decoration: none; margin-bottom: 30px; font-size: 10px; font-weight: 700; text-transform: uppercase; transition: 0.3s; }
         nav a:hover { color: var(--accent); }
 
-        /* Area das Mesas */
-        .area-mesas { width: 250px; background: var(--card); padding: 15px; overflow-y: auto; border-right: 1px solid #334155; }
-        .mesa { background: #334155; padding: 20px; margin-bottom: 12px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
-        .mesa.ocupada { border-color: var(--accent); background: #1e293b; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
-        .mesa.ativa { background: var(--accent); color: #020617; }
+        /* Mesas */
+        .area-mesas { width: 280px; background: var(--card); padding: 20px; overflow-y: auto; border-right: 1px solid #1e293b; }
+        .mesa { background: var(--item); padding: 18px; margin-bottom: 12px; border-radius: 14px; text-align: center; cursor: pointer; transition: 0.3s; border: 1px solid #334155; }
+        .mesa.ocupada { border-color: var(--warning); box-shadow: 0 0 15px rgba(245, 158, 11, 0.1); }
+        .mesa.ativa { background: var(--accent); color: #000; border-color: var(--accent); }
+        .mesa span { display: block; font-size: 11px; font-weight: 600; margin-top: 4px; opacity: 0.8; }
 
-        /* Centro */
-        .painel-venda { flex: 1; padding: 30px; display: flex; flex-direction: column; background: #0f172a; }
-        input, select { background: #1e293b; border: 1px solid #475569; color: white; padding: 15px; border-radius: 8px; font-size: 16px; margin-bottom: 20px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+        /* Centro de Lançamento */
+        .painel-central { flex: 1; padding: 40px; display: flex; flex-direction: column; }
+        input, select { background: var(--item); border: 1px solid #334155; color: white; padding: 16px; border-radius: 12px; font-size: 16px; margin-bottom: 20px; outline: none; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
 
-        /* Resumo Lateral */
-        .resumo { width: 400px; background: #020617; padding: 25px; display: flex; flex-direction: column; border-left: 1px solid #334155; }
+        /* Resumo da Conta */
+        .checkout { width: 400px; background: #000; padding: 30px; border-left: 1px solid #1e293b; display: flex; flex-direction: column; }
         #lista-carrinho { flex: 1; overflow-y: auto; margin: 20px 0; }
-        .item-car { background: #1e293b; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 14px; }
-        
-        .footer-car { background: #1e293b; padding: 20px; border-radius: 12px; }
-        .total { font-size: 28px; font-weight: bold; color: var(--success); text-align: center; margin-bottom: 15px; }
-        .btn-fechar { width: 100%; padding: 18px; background: var(--accent); color: #020617; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-fechar:hover { opacity: 0.9; transform: translateY(-2px); }
+        .item-venda { background: var(--item); padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .total-box { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid #334155; }
+        .total-v { font-size: 32px; font-weight: 800; color: var(--success); text-align: center; margin-bottom: 15px; }
+        .btn-finalizar { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-finalizar:hover { transform: scale(1.02); }
     </style>
 </head>
 <body>
 
 <nav>
-    <div style="color:var(--accent); font-weight: bold; margin-bottom: 40px; font-size: 20px;">934</div>
-    <a href="index.html">Caixa</a>
+    <div style="color:var(--accent); font-weight: 800; font-size: 20px; margin-bottom: 40px;">934</div>
+    <a href="index.html">Vendas</a>
     <a href="clientes.html">Clientes</a>
     <a href="produtos.html">Estoque</a>
 </nav>
 
 <div class="area-mesas" id="grid-mesas"></div>
 
-<div class="painel-venda">
-    <h1 id="titulo-mesa" style="margin-top:0;">Selecione uma Mesa</h1>
-    <label style="color:#94a3b8; margin-bottom: 8px; display: block;">Código do Produto</label>
-    <input type="text" id="codigo-bipe" placeholder="Aguardando bipe..." autocomplete="off">
+<div class="painel-central">
+    <h1 id="mesa-titulo" style="margin-bottom: 30px;">Selecione uma mesa</h1>
+    <label style="color:var(--muted); font-size: 12px; font-weight: bold; margin-bottom: 8px;">BIPAR PRODUTO</label>
+    <input type="text" id="campo-bipe" placeholder="Aguardando código..." autofocus>
     
-    <label style="color:#94a3b8; margin-bottom: 8px; display: block;">Cliente Responsável</label>
+    <label style="color:var(--muted); font-size: 12px; font-weight: bold; margin-bottom: 8px;">CLIENTE NA MESA</label>
     <select id="select-cliente"></select>
 </div>
 
-<div class="resumo">
-    <h2 style="margin-top:0;">Detalhes</h2>
+<div class="checkout">
+    <h2>Consumo Atual</h2>
     <div id="lista-carrinho"></div>
-    
-    <div class="footer-car">
-        <div class="total">R$ <span id="total-v">0.00</span></div>
-        <select id="meio-pagto" style="width: 100%;">
+    <div class="total-box">
+        <div class="total-v">R$ <span id="valor-total">0.00</span></div>
+        <select id="pgto" style="width: 100%;">
             <option>Dinheiro</option>
-            <option>PIX</option>
-            <option>Cartão Crédito</option>
-            <option>Cartão Débito</option>
+            <option>Pix</option>
+            <option>Cartão</option>
             <option>Pendura</option>
         </select>
-        <button class="btn-fechar" onclick="fecharConta()">FINALIZAR VENDA</button>
+        <button class="btn-finalizar" onclick="fechar()">FECHAR CONTA</button>
     </div>
 </div>
 
 <script>
-    let PRODS = JSON.parse(localStorage.getItem('produtos')) || [];
-    let CLIS = JSON.parse(localStorage.getItem('clientes')) || [{nome: "Consumidor Geral"}];
+    // Configuração Firebase do seu projeto Boteco934
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY", // Adicione sua API Key aqui
+      authDomain: "boteco934-afc3f.firebaseapp.com",
+      databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+      projectId: "boteco934-afc3f",
+      storageBucket: "boteco934-afc3f.appspot.com",
+      messagingSenderId: "182023728304",
+      appId: "SEU_APP_ID" // Adicione seu App ID aqui
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let PRODUTOS = [];
+    let CLIENTES = [];
     let MESAS = Array.from({length: 12}, (_, i) => ({ id: i+1, itens: [], total: 0, ocupada: false }));
     let mesaAtiva = null;
-    let clienteMemoria = "Consumidor Geral";
 
-    function carregarClientes() {
-        const s = document.getElementById('select-cliente');
-        s.innerHTML = CLIS.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
-        s.value = clienteMemoria;
-    }
+    // Sincroniza Produtos A-Z do Firebase
+    db.ref('produtos').on('value', snapshot => {
+        const data = snapshot.val();
+        PRODUTOS = data ? Object.values(data).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
+    });
 
-    document.getElementById('select-cliente').onchange = (e) => clienteMemoria = e.target.value;
+    // Sincroniza Clientes A-Z do Firebase
+    db.ref('clientes').on('value', snapshot => {
+        const data = snapshot.val();
+        CLIENTES = data ? Object.values(data).sort((a,b) => a.nome.localeCompare(b.nome)) : [{nome: "Consumidor Geral"}];
+        document.getElementById('select-cliente').innerHTML = CLIENTES.map(c => `<option>${c.nome}</option>`).join('');
+    });
 
     function renderMesas() {
         document.getElementById('grid-mesas').innerHTML = MESAS.map(m => `
-            <div class="mesa ${m.ocupada?'ocupada':''} ${mesaAtiva===m.id?'ativa':''}" onclick="selMesa(${m.id})">
-                MESA ${String(m.id).padStart(2, '0')}<br>
-                <span style="font-size:12px; opacity:0.8">R$ ${m.total.toFixed(2)}</span>
+            <div class="mesa ${m.ocupada?'ocupada':''} ${mesaAtiva==m.id?'ativa':''}" onclick="selMesa(${m.id})">
+                MESA ${String(m.id).padStart(2, '0')}
+                <span>R$ ${m.total.toFixed(2)}</span>
             </div>
         `).join('');
     }
 
     function selMesa(id) {
         mesaAtiva = id;
-        document.getElementById('titulo-mesa').innerText = "MESA " + id;
+        document.getElementById('mesa-titulo').innerText = "Lançando na Mesa " + id;
         renderMesas();
         renderCarrinho();
-        document.getElementById('codigo-bipe').focus();
+        document.getElementById('campo-bipe').focus();
     }
 
-    document.getElementById('codigo-bipe').onkeypress = (e) => {
+    document.getElementById('campo-bipe').onkeypress = (e) => {
         if(e.key === 'Enter' && mesaAtiva) {
-            let p = PRODS.find(x => x.codigo == e.target.value);
+            let p = PRODUTOS.find(x => x.codigo == e.target.value);
             if(p) {
-                let m = MESAS.find(x => x.id === mesaAtiva);
-                m.itens.push({ cli: clienteMemoria, nome: p.nome, preco: p.preco });
+                let m = MESAS.find(x => x.id == mesaAtiva);
+                let cli = document.getElementById('select-cliente').value;
+                m.itens.push({ cli: cli, nome: p.nome, preco: p.preco });
                 m.total += p.preco;
                 m.ocupada = true;
                 e.target.value = '';
                 renderMesas(); renderCarrinho();
-            } else { alert("Produto não cadastrado!"); e.target.value = ''; }
+            } else { alert("Produto não encontrado!"); e.target.value = ''; }
         }
     }
 
     function renderCarrinho() {
         if(!mesaAtiva) return;
-        let m = MESAS.find(x => x.id === mesaAtiva);
+        let m = MESAS.find(x => x.id == mesaAtiva);
         document.getElementById('lista-carrinho').innerHTML = m.itens.map(it => `
-            <div class="item-car">
-                <span><b>${it.cli}</b><br>${it.nome}</span>
-                <span>R$ ${it.preco.toFixed(2)}</span>
+            <div class="item-venda">
+                <div><small style="color:var(--accent); font-size:10px;">${it.cli}</small><br>${it.nome}</div>
+                <b>R$ ${it.preco.toFixed(2)}</b>
             </div>
-        `).join('');
-        document.getElementById('total-v').innerText = m.total.toFixed(2);
+        `).reverse().join('');
+        document.getElementById('valor-total').innerText = m.total.toFixed(2);
     }
 
-    function fecharConta() {
-        let m = MESAS.find(x => x.id === mesaAtiva);
+    function fechar() {
+        let m = MESAS.find(x => x.id == mesaAtiva);
         if(!m || m.total === 0) return;
-        if(confirm(`Confirmar recebimento de R$ ${m.total.toFixed(2)}?`)){
+        if(confirm(`Confirmar pagamento de R$ ${m.total.toFixed(2)}?`)){
             m.itens = []; m.total = 0; m.ocupada = false;
             renderMesas(); renderCarrinho();
         }
     }
-// Procure a função carregarClientes no seu index.html e substitua por esta:
-function carregarClientes() {
-    const s = document.getElementById('select-cliente');
-    
-    // Organiza clientes A-Z antes de mostrar no seletor
-    let clisOrdenados = [...CLIS].sort((a, b) => a.nome.localeCompare(b.nome));
-    
-    s.innerHTML = clisOrdenados.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
-    s.value = clienteMemoria;
-}
-    carregarClientes();
+
     renderMesas();
 </script>
 </body>
