@@ -5,7 +5,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boteco 934 - PDV Cloud</title>
     
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco 934 - PDV Cloud</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --bg: #020617; --card: #0f172a; --item: #1e293b; --accent: #38bdf8; --success: #22c55e; --text: #f8fafc; --muted: #64748b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Menu Lateral */
+        nav { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; border-right: 1px solid #1e293b; }
+        .logo { color: var(--accent); font-weight: 800; font-size: 20px; margin-bottom: 40px; }
+
+        /* Mesas */
+        .area-mesas { width: 260px; background: var(--card); padding: 15px; overflow-y: auto; border-right: 1px solid #1e293b; }
+        .mesa { background: var(--item); padding: 15px; margin-bottom: 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
+        .mesa.ativa { border-color: var(--accent); background: var(--accent); color: #000; }
+        .mesa span { display: block; font-size: 11px; font-weight: bold; margin-top: 4px; opacity: 0.7; }
+
+        /* Painel Central */
+        .painel { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+        input { background: var(--item); border: 1px solid #334155; color: white; padding: 15px; border-radius: 12px; font-size: 16px; width: 100%; margin-bottom: 20px; outline: none; }
+        
+        /* Lista de Produtos (Estoque) */
+        .estoque-visual { margin-top: 10px; flex: 1; overflow-y: auto; }
+        .prod-item { background: #00000040; padding: 10px; border-bottom: 1px solid #ffffff10; display: flex; justify-content: space-between; font-size: 14px; }
+
+        /* Botão de Cadastro Flutuante */
+        #btn-cadastrar { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--success); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">934</div>
+</nav>
+
+<div class="area-mesas" id="grid-mesas">
+    </div>
+
+<div class="painel">
+    <h2 id="mesa-titulo">Selecione uma mesa</h2>
+    
+    <label style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 5px; display: block;">BIPAR CÓDIGO</label>
+    <input type="text" id="campo-bipe" placeholder="Aguardando bipagem..." autofocus>
+    
+    <h3>Produtos no Estoque (Nuvem)</h3>
+    <div class="estoque-visual" id="lista-estoque">
+        <p style="color:var(--muted)">Carregando estoque do Firebase...</p>
+    </div>
+</div>
+
+<button id="btn-cadastrar" onclick="cadastrarProduto()" title="Cadastrar novo produto">+</button>
+
+<script>
+    // CONFIGURAÇÃO OFICIAL DO BOTECO 934 (Conforme sua imagem do Firebase)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX70Jks",
+      authDomain: "boteco934-afc3f.firebaseapp.com",
+      databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
+      projectId: "boteco934-afc3f",
+      storageBucket: "boteco934-afc3f.appspot.com",
+      messagingSenderId: "182023728304",
+      appId: "1:182023728304:web:80c8402f068c8578508f75"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let LISTA_PRODUTOS = [];
+    let mesaSelecionada = null;
+
+    // 1. ESCUTA O ESTOQUE EM TEMPO REAL
+    db.ref('produtos').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const listaDiv = document.getElementById('lista-estoque');
+        
+        if (data) {
+            LISTA_PRODUTOS = Object.values(data).sort((a,b) => a.nome.localeCompare(b.nome));
+            listaDiv.innerHTML = LISTA_PRODUTOS.map(p => `
+                <div class="prod-item">
+                    <span>${p.nome}</span>
+                    <b style="color:var(--success)">R$ ${p.preco.toFixed(2)}</b>
+                </div>
+            `).join('');
+        } else {
+            listaDiv.innerHTML = '<p style="color:var(--warning)">Estoque vazio! Clique no + para cadastrar.</p>';
+        }
+    });
+
+    // 2. FUNÇÃO PARA CADASTRAR PRODUTO (Salva na Nuvem)
+    function cadastrarProduto() {
+        const cod = prompt("Código de Barras:");
+        const nome = prompt("Nome do Produto:");
+        const preco = prompt("Preço de Venda:");
+
+        if(cod && nome && preco) {
+            db.ref('produtos/' + cod).set({
+                codigo: cod,
+                nome: nome.toUpperCase(),
+                preco: parseFloat(preco)
+            }).then(() => alert("Salvo no Firebase!"));
+        }
+    }
+
+    // 3. GERAÇÃO DAS MESAS
+    const gridMesas = document.getElementById('grid-mesas');
+    for(let i=1; i<=12; i++) {
+        gridMesas.innerHTML += `
+            <div class="mesa" id="mesa-${i}" onclick="selecionarMesa(${i})">
+                MESA ${String(i).padStart(2, '0')}
+                <span>R$ 0.00</span>
+            </div>
+        `;
+    }
+
+    function selecionarMesa(id) {
+        mesaSelecionada = id;
+        document.querySelectorAll('.mesa').forEach(m => m.classList.remove('ativa'));
+        document.getElementById('mesa-'+id).classList.add('ativa');
+        document.getElementById('mesa-titulo').innerText = "Lançando na Mesa " + id;
+        document.getElementById('campo-bipe').focus();
+    }
+
+    // 4. LÓGICA DO BIPE
+    document.getElementById('campo-bipe').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') {
+            const cod = e.target.value;
+            const produto = LISTA_PRODUTOS.find(p => p.codigo == cod);
+            
+            if(produto && mesaSelecionada) {
+                alert("Lançado: " + produto.nome);
+                // Aqui você pode adicionar a lógica de salvar a venda no Firebase também!
+            } else {
+                alert("Produto não encontrado no estoque!");
+            }
+            e.target.value = '';
+        }
+    });
+
+</script>
+
+</body>
+</html>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
