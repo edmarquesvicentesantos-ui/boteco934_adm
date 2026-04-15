@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque - Boteco 934</title>
+    <title>Estoque Inteligente - Boteco 934</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --success: #22c55e; }
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --success: #22c55e; --indigo: #6366f1; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 30px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 900px; }
+        .container { width: 100%; max-width: 950px; }
         .back-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
         
-        .header { margin-bottom: 30px; }
-        h1 { font-size: 24px; margin-bottom: 5px; }
-        
         /* Formulário */
-        .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; }
-        .grid-inputs { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap: 15px; }
+        .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; position: relative; }
+        .grid-inputs { display: grid; grid-template-columns: 1.2fr 2fr 0.8fr 1fr; gap: 15px; }
         label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
-        input, select { background: #020617; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; outline: none; font-size: 14px; }
-        input:focus { border-color: var(--accent); }
+        input, select { background: #020617; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; outline: none; font-size: 14px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
         
         .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; }
         .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
@@ -32,30 +29,32 @@
         td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; color: var(--accent); font-family: monospace; }
         td:last-child { border-right: 1px solid #334155; border-radius: 0 12px 12px 0; text-align: right; }
         
-        .cat-tag { background: #334155; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: #fff; }
+        .cat-tag { background: #334155; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--indigo); border: 1px solid var(--indigo); }
+        .status-web { font-size: 10px; color: var(--indigo); font-weight: 600; position: absolute; top: 10px; right: 25px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a href="index.html" class="back-link">← VOLTAR AO CAIXA</a>
-    <div class="header">
+    <div class="header" style="margin-bottom:30px;">
         <h1>📦 Gestão de Estoque</h1>
-        <p style="color:var(--muted); font-size:14px;">Cadastre seus produtos e organize por categoria.</p>
+        <p style="color:var(--muted); font-size:14px;">Bipe o produto para buscar informações na internet automaticamente.</p>
     </div>
 
     <div class="form-card">
+        <div id="status-web" class="status-web">🔎 BUSCANDO NA WEB...</div>
         <div class="grid-inputs">
             <div>
-                <label>Cód. Barras</label>
-                <input type="text" id="p-cod" placeholder="Bipe aqui...">
+                <label>Cód. Barras (EAN)</label>
+                <input type="text" id="p-cod" placeholder="Bipe aqui..." onchange="buscarWeb(this.value)">
             </div>
             <div>
                 <label>Nome do Produto</label>
-                <input type="text" id="p-nome" placeholder="Ex: Cerveja 600ml">
+                <input type="text" id="p-nome" placeholder="Nome do produto">
             </div>
             <div>
-                <label>Preço (R$)</label>
+                <label>Preço Venda</label>
                 <input type="number" step="0.01" id="p-preco" placeholder="0.00">
             </div>
             <div>
@@ -76,7 +75,7 @@
         <thead>
             <tr>
                 <th>CÓDIGO</th>
-                <th>CAT.</th>
+                <th>CATEGORIA</th>
                 <th>PRODUTO (A-Z)</th>
                 <th>PREÇO</th>
                 <th>AÇÃO</th>
@@ -87,8 +86,43 @@
 </div>
 
 <script>
-    // Carrega os produtos salvos no navegador
     let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+
+    // BUSCA NA INTERNET
+    async function buscarWeb(codigo) {
+        if (!codigo || codigo.length < 5) return;
+        
+        // Verifica se já existe para não buscar à toa
+        if (produtos.find(p => p.codigo == codigo)) return;
+
+        const statusLabel = document.getElementById('status-web');
+        const nomeInput = document.getElementById('p-nome');
+        
+        statusLabel.style.display = 'block';
+        nomeInput.placeholder = "Buscando dados...";
+
+        try {
+            const resposta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
+            const dados = await resposta.json();
+
+            if (dados.status === 1) {
+                const p = dados.product;
+                const nomeFinal = p.product_name || p.generic_name || "";
+                const marca = p.brands ? ` - ${p.brands.split(',')[0]}` : "";
+                
+                nomeInput.value = (nomeFinal + marca).toUpperCase();
+                nomeInput.style.borderColor = "var(--indigo)";
+                // Foca no preço para você apenas digitar o valor e dar Enter
+                document.getElementById('p-preco').focus();
+            } else {
+                nomeInput.placeholder = "Não encontrado. Digite o nome manualmente.";
+            }
+        } catch (erro) {
+            console.error("Erro na busca:", erro);
+        } finally {
+            statusLabel.style.display = 'none';
+        }
+    }
 
     function salvarProduto() {
         const cod = document.getElementById('p-cod').value.trim();
@@ -97,57 +131,54 @@
         const cat = document.getElementById('p-cat').value;
 
         if (cod && nome && preco) {
-            // Adiciona na lista
             produtos.push({
                 codigo: cod,
-                nome: nome,
+                nome: nome.toUpperCase(),
                 preco: parseFloat(preco),
                 cat: cat
             });
 
-            // Grava no LocalStorage
             localStorage.setItem('produtos', JSON.stringify(produtos));
 
-            // Limpa os campos e foca no código para o próximo
+            // Limpa tudo
             document.getElementById('p-cod').value = '';
             document.getElementById('p-nome').value = '';
+            document.getElementById('p-nome').style.borderColor = "#334155";
             document.getElementById('p-preco').value = '';
             document.getElementById('p-cod').focus();
 
-            // Atualiza a tabela
             renderTable();
         } else {
-            alert("Preencha todos os campos antes de salvar!");
+            alert("Preencha Código, Nome e Preço!");
         }
     }
 
     function renderTable() {
-        // ORGANIZA DE A A Z PELO NOME
+        // ORDEM ALFABÉTICA A-Z
         produtos.sort((a, b) => a.nome.localeCompare(b.nome));
 
         const corpo = document.getElementById('lista-estoque');
         corpo.innerHTML = produtos.map((p, i) => `
             <tr>
                 <td>${p.codigo}</td>
-                <td><span class="cat-tag">${p.cat}</span></td>
+                <td><span class="cat-tag">${p.cat.toUpperCase()}</span></td>
                 <td><b>${p.nome}</b></td>
                 <td style="color:var(--success); font-weight:700;">R$ ${p.preco.toFixed(2)}</td>
                 <td>
-                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">❌</button>
+                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer;">❌</button>
                 </td>
             </tr>
         `).join('');
     }
 
     function remover(i) {
-        if (confirm("Deseja remover este item do estoque?")) {
+        if (confirm("Remover item?")) {
             produtos.splice(i, 1);
             localStorage.setItem('produtos', JSON.stringify(produtos));
             renderTable();
         }
     }
 
-    // Inicia a tabela ao abrir a página
     window.onload = () => {
         renderTable();
         document.getElementById('p-cod').focus();
