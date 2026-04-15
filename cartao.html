@@ -13,6 +13,7 @@ body{
   text-align:center;
   padding:20px;
 }
+
 .card{
   background:#111827;
   padding:25px;
@@ -20,8 +21,26 @@ body{
   max-width:420px;
   margin:auto;
   box-shadow:0 0 20px rgba(0,0,0,0.5);
+  position:relative;
+  overflow:hidden;
 }
-h1{margin-bottom:5px;}
+
+/* Marca d'água */
+.watermark{
+  position:absolute;
+  opacity:0.06;
+  width:350px;
+  top:120px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* Logo topo */
+.logo{
+  width:180px;
+  margin-bottom:10px;
+}
+
 .subtitle{color:#9ca3af;margin-bottom:20px;}
 
 .btn{
@@ -38,25 +57,25 @@ h1{margin-bottom:5px;}
 .whats{background:#25D366;}
 .tel{background:#2563eb;}
 .pix{background:#06b6d4;}
-.insta{background:#E1306C;}
 
-img{
-  width:190px;
+img.qr{
+  width:200px;
   margin-top:10px;
   border-radius:12px;
 }
 
-.section{
-  margin-top:25px;
-}
+.section{ margin-top:25px; }
 </style>
 </head>
 
 <body>
 
 <div class="card">
-<h1>📲 Meu Cartão Digital</h1>
-<div class="subtitle">Contato rápido • Wi-Fi • PIX</div>
+
+<img src="logo.png" class="logo">
+<img src="logo.png" class="watermark">
+
+<div class="subtitle">Contato • Wi-Fi • PIX</div>
 
 <a class="btn whats" href="https://wa.me/5587996806181">💬 WhatsApp</a>
 <a class="btn tel" href="tel:+5587996806181">📞 Ligar</a>
@@ -65,13 +84,13 @@ img{
 
 <div class="section">
 <h3>📶 Wi-Fi do Local</h3>
-<p>jr telecom jato da mangueira</p>
-<img src="wifi.png">
+<p><b>jr telecom jato da mangueira</b></p>
+<img src="wifi.png" class="qr">
 </div>
 
 <div class="section">
 <h3>💰 Pagar no PIX</h3>
-<img src="pix.png">
+<img src="pix.png" class="qr">
 </div>
 
 </div>
