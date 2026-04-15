@@ -3,67 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Boteco 934 - Gestão Elite</title>
+    <title>934 ELITE - GESTÃO TOTAL</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --green: #22c55e; --red: #ef4444; --text: #f8fafc; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root { 
+            --bg: #000; --card: #0a0a0a; --accent: #00f2ff; 
+            --green: #00ff88; --yellow: #f4ff00; --text: #fff; --red: #ff3131;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* Cabeçalho com Botões Pequenos */
-        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #1e293b; display: flex; flex-direction: column; gap: 10px; }
-        .topo-info { display: flex; justify-content: space-between; align-items: center; }
-        .botoes-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        header { background: #050505; padding: 12px; border-bottom: 2px solid var(--accent); display: flex; flex-direction: column; gap: 10px; }
+        .topo { display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--accent); font-weight: 900; font-size: 18px; text-shadow: 0 0 10px var(--accent); }
         
-        .btn-sm { background: #1e293b; color: var(--text); border: 1px solid #334155; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; text-transform: uppercase; }
-        .btn-sm.active { background: var(--accent); color: #000; border-color: var(--accent); }
-        .btn-add { background: var(--green); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        /* Mesas com Nome */
+        .botoes-mesas { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
+        .btn-mesa { background: #111; color: #fff; border: 1px solid #333; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; min-width: 80px; text-align: center; }
+        .btn-mesa.ocupada { border-color: var(--yellow); color: var(--yellow); }
+        .btn-mesa.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        .btn-mesa span { display: block; font-size: 9px; opacity: 0.8; }
 
-        /* Área de Venda e Estoque */
-        .main-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        input#bipe { background: #111827; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; outline: none; margin-bottom: 5px; }
+        .main { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; }
+        input#bipe { width: 100%; background: #111; border: 2px solid #222; padding: 15px; border-radius: 12px; color: var(--green); font-size: 18px; font-weight: bold; outline: none; margin-bottom: 10px; }
 
-        /* Tabela de Estoque Profissional */
-        .tabela-estoque { background: var(--card); border-radius: 10px; border: 1px solid #1e293b; width: 100%; }
-        .item-estoque { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #1e293b; font-size: 12px; gap: 10px; }
-        .item-estoque:last-child { border-bottom: none; }
+        /* Painel de Fechamento */
+        .painel-venda { background: #111; border: 1px solid var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 15px; display: none; }
+        .btn-fechar { background: var(--red); color: #fff; border: none; padding: 10px; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; }
+
+        .tabela-header { display: grid; grid-template-columns: 70px 1fr 50px 70px; padding: 8px; font-size: 9px; font-weight: 900; color: #666; }
+        .lista-produtos { background: var(--card); border-radius: 12px; border: 1px solid #1a1a1a; flex: 1; overflow-y: auto; }
+        .linha-produto { display: grid; grid-template-columns: 70px 1fr 50px 70px; padding: 12px 8px; border-bottom: 1px solid #1a1a1a; align-items: center; font-size: 11px; }
         
-        .col-nome { flex: 1; font-weight: bold; color: #cbd5e1; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; }
-        .col-qtd { width: 60px; text-align: center; background: #1e293b; color: var(--accent); padding: 4px; border-radius: 4px; font-weight: 800; border: 1px solid #334155; }
-        .col-preco { width: 75px; text-align: right; color: var(--green); font-weight: 800; }
+        .cod-txt { color: var(--yellow); font-family: monospace; }
+        .nome-txt { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .qtd-txt { text-align: center; background: #1a1a1a; color: var(--accent); padding: 4px; border-radius: 4px; font-weight: 900; }
+        .preco-txt { text-align: right; color: var(--green); font-weight: 900; }
 
-        #status-con { font-size: 9px; font-weight: bold; text-align: center; padding: 2px; }
+        .btn-novo { background: var(--green); border: none; padding: 6px 12px; border-radius: 6px; font-weight: 900; color: #000; font-size: 10px; }
+        #status-ws { font-size: 9px; text-align: center; padding: 3px; background: #050505; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="topo-info">
-        <h2 style="color:var(--accent); font-size: 18px; font-weight: 900;">934 ELITE</h2>
-        <button class="btn-add" onclick="cadastrar()">+ NOVO</button>
+    <div class="topo">
+        <div class="logo">934 ELITE</div>
+        <button class="btn-novo" onclick="cadastrar()">+ PRODUTO</button>
     </div>
-    
-    <div class="botoes-nav" id="btn-mesas">
-        </div>
+    <div class="botoes-mesas" id="container-mesas"></div>
 </header>
 
-<div id="status-con">CONECTANDO...</div>
+<div id="status-ws">SINCRONIZANDO...</div>
 
-<div class="main-content">
-    <input type="text" id="bipe" placeholder="Bipar código de barras..." autofocus>
-    
-    <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; padding: 0 10px; font-weight: bold;">
-        <span>PRODUTO</span>
-        <div style="display: flex; gap: 35px;">
-            <span>ESTOQUE</span>
-            <span>PREÇO</span>
-        </div>
+<div class="main">
+    <div id="painel-fechamento" class="painel-venda">
+        <p id="info-cliente" style="font-size: 12px; font-weight: bold; color: var(--accent);"></p>
+        <p id="total-mesa" style="font-size: 18px; font-weight: 900; margin: 5px 0; color: var(--green);">Total: R$ 0.00</p>
+        <button class="btn-fechar" onclick="fecharMesa()">CONFIRMAR PAGAMENTO / ZERAR</button>
     </div>
 
-    <div class="tabela-estoque" id="lista-estoque">
-        <p style="text-align:center; padding: 20px; color:#64748b;">Sincronizando banco de dados...</p>
+    <input type="text" id="bipe" placeholder="BIPAR PRODUTO..." autofocus>
+
+    <div class="tabela-header">
+        <span>CÓD.</span><span>PRODUTO</span><span style="text-align:center">EST.</span><span style="text-align:right">PREÇO</span>
     </div>
+    <div class="lista-produtos" id="estoque-real"></div>
 </div>
 
 <script>
@@ -80,71 +86,129 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Gerar Mesas Pequenas no Topo
-    const navMesas = document.getElementById('btn-mesas');
-    for(let i=1; i<=12; i++) {
-        navMesas.innerHTML += `<button class="btn-sm" id="m${i}" onclick="selMesa(${i})">M${i}</button>`;
+    let mesaAtiva = null;
+    let dadosMesas = {}; // Para guardar quem está em qual mesa
+
+    // Gerar Mesas
+    function atualizarMesasUI() {
+        const box = document.getElementById('container-mesas');
+        box.innerHTML = '';
+        for(let i=1; i<=15; i++) {
+            let info = dadosMesas[i] || { nome: "Livre", total: 0 };
+            let classe = info.total > 0 ? "btn-mesa ocupada" : "btn-mesa";
+            if(mesaAtiva == i) classe += " active";
+            
+            box.innerHTML += `
+                <button class="${classe}" onclick="selecionarMesa(${i})">
+                    MESA ${i}
+                    <span>${info.nome}</span>
+                </button>`;
+        }
     }
 
-    let mesaAtiva = null;
-    function selMesa(n) {
+    function selecionarMesa(n) {
         mesaAtiva = n;
-        document.querySelectorAll('.btn-sm').forEach(b => b.classList.remove('active'));
-        document.getElementById('m'+n).classList.add('active');
+        if(!dadosMesas[n] || dadosMesas[n].total == 0) {
+            let nome = prompt("Nome do Cliente para a Mesa " + n + ":");
+            if(nome) {
+                dadosMesas[n] = { nome: nome.toUpperCase(), total: 0 };
+                db.ref('mesas_ativas/' + n).set(dadosMesas[n]);
+            } else {
+                mesaAtiva = null;
+            }
+        }
+        mostrarPainelFechamento();
+        atualizarMesasUI();
         document.getElementById('bipe').focus();
     }
 
-    // Monitor de Conexão
-    db.ref('.info/connected').on('value', s => {
-        const el = document.getElementById('status-con');
-        if(s.val()) { el.innerText = "SISTEMA SINCRONIZADO ✅"; el.style.color = "#22c55e"; }
-        else { el.innerText = "OFFLINE ❌"; el.style.color = "#ef4444"; }
+    function mostrarPainelFechamento() {
+        const painel = document.getElementById('painel-fechamento');
+        if(mesaAtiva && dadosMesas[mesaAtiva] && dadosMesas[mesaAtiva].total > 0) {
+            painel.style.display = 'block';
+            document.getElementById('info-cliente').innerText = "Cliente: " + dadosMesas[mesaAtiva].nome;
+            document.getElementById('total-mesa').innerText = "Total: R$ " + dadosMesas[mesaAtiva].total.toFixed(2);
+        } else {
+            painel.style.display = 'none';
+        }
+    }
+
+    function fecharMesa() {
+        if(confirm("Confirmar que a Mesa " + mesaAtiva + " pagou TUDO?")) {
+            db.ref('mesas_ativas/' + mesaAtiva).remove();
+            alert("Recibo Zerado. Mesa Livre!");
+            mesaAtiva = null;
+        }
+    }
+
+    // Sincronizar mesas do Firebase
+    db.ref('mesas_ativas').on('value', snap => {
+        dadosMesas = snap.val() || {};
+        atualizarMesasUI();
+        mostrarPainelFechamento();
     });
 
-    // Listar Estoque com Quantidade
+    // Lógica do BIPE
+    document.getElementById('bipe').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') {
+            const cod = e.target.value;
+            if(!mesaAtiva) { alert("Selecione uma mesa primeiro!"); e.target.value = ''; return; }
+
+            db.ref('produtos/' + cod).once('value', snap => {
+                const p = snap.val();
+                if(p) {
+                    if(p.estoque > 0) {
+                        // Baixa no estoque
+                        db.ref('produtos/' + cod + '/estoque').set(p.estoque - 1);
+                        // Soma na conta da mesa
+                        let novoTotal = (dadosMesas[mesaAtiva].total || 0) + parseFloat(p.preco);
+                        db.ref('mesas_ativas/' + mesaAtiva + '/total').set(novoTotal);
+                    } else { alert("Estoque zerado!"); }
+                } else { alert("Não cadastrado!"); }
+            });
+            e.target.value = '';
+        }
+    });
+
+    // Listar Estoque
     db.ref('produtos').on('value', snap => {
-        const container = document.getElementById('lista-estoque');
+        const container = document.getElementById('estoque-real');
         const dados = snap.val() || {};
         let html = '';
-        
         Object.values(dados).sort((a,b) => a.nome.localeCompare(b.nome)).forEach(p => {
-            let preco = parseFloat(p.preco) || 0;
-            let qtd = p.estoque || 0; // Se não existir estoque, mostra 0
-
             html += `
-                <div class="item-estoque">
-                    <div class="col-nome">${p.nome}</div>
-                    <div class="col-qtd" onclick="editarEstoque('${p.codigo}', ${qtd})">${qtd}</div>
-                    <div class="col-preco">R$ ${preco.toFixed(2)}</div>
-                </div>
-            `;
+                <div class="linha-produto">
+                    <span class="cod-txt">${p.codigo}</span>
+                    <span class="nome-txt">${p.nome}</span>
+                    <span class="qtd-txt" onclick="mudarEstoque('${p.codigo}', ${p.estoque})">${p.estoque}</span>
+                    <span class="preco-txt">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                </div>`;
         });
-        container.innerHTML = html || '<p style="padding:20px; text-align:center;">Estoque vazio.</p>';
+        container.innerHTML = html;
     });
 
     function cadastrar() {
-        const cod = prompt("Código:");
-        const nome = prompt("Nome:");
-        const preco = prompt("Preço:");
-        const qtd = prompt("Quantidade em Estoque:");
+        const cod = prompt("CÓDIGO:");
+        const nome = prompt("NOME:");
+        const preco = prompt("PREÇO:");
+        const qtd = prompt("QTD:");
         if(cod && nome && preco) {
             db.ref('produtos/' + cod).set({
-                codigo: cod,
-                nome: nome.toUpperCase(),
-                preco: preco.replace(',', '.'),
-                estoque: parseInt(qtd) || 0
+                codigo: cod, nome: nome.toUpperCase(),
+                preco: preco.replace(',', '.'), estoque: parseInt(qtd) || 0
             });
         }
     }
 
-    // Função para editar estoque rapidamente clicando no número
-    function editarEstoque(cod, atual) {
-        const novaQtd = prompt("Nova quantidade em estoque:", atual);
-        if(novaQtd !== null) {
-            db.ref('produtos/' + cod + '/estoque').set(parseInt(novaQtd));
-        }
+    function mudarEstoque(cod, atual) {
+        const nova = prompt("Repor para:", atual);
+        if(nova !== null) db.ref('produtos/' + cod + '/estoque').set(parseInt(nova));
     }
-</script>
 
+    db.ref('.info/connected').on('value', s => {
+        document.getElementById('status-ws').innerText = s.val() ? "SISTEMA ONLINE ✅" : "OFFLINE ❌";
+        document.getElementById('status-ws').style.color = s.val() ? "#00ff88" : "#ff4444";
+    });
+</script>
 </body>
 </html>
