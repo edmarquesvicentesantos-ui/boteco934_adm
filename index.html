@@ -267,7 +267,34 @@
             m.itens = []; m.total = 0; m.ocupada = false;
             fecharModal(); renderMesas(); renderCarrinho();
         }
+function finalizar(metodo) {
+    let m = MESAS.find(x => x.id === mesaAtiva);
+    
+    // REGISTRO PARA O RELATÓRIO
+    let vendasRealizadas = JSON.parse(localStorage.getItem('historico_vendas')) || [];
+    vendasRealizadas.push({
+        data: new Date().toLocaleString('pt-BR'),
+        mesa: m.id,
+        valor: m.total,
+        metodo: metodo,
+        cliente: m.itens.length > 0 ? m.itens[0].cli : "Geral"
+    });
+    localStorage.setItem('historico_vendas', JSON.stringify(vendasRealizadas));
 
+    // GERAR RECIBO WHATSAPP (Lógica que você já tem)
+    let textoRecibo = `*BOTECO 934 - RECIBO MESA ${m.id}*\n--------------------------\n`;
+    m.itens.forEach(it => { textoRecibo += `${it.nome} - R$ ${it.preco.toFixed(2)} (${it.cli})\n`; });
+    textoRecibo += `--------------------------\n*TOTAL: R$ ${m.total.toFixed(2)}*\nPGTO: ${metodo}\nObrigado!`;
+
+    let tel = m.itens.length > 0 ? m.itens[m.itens.length-1].tel : "-";
+    if(tel && tel !== "-") {
+        window.open(`https://wa.me/55${tel.replace(/\D/g,'')}?text=${encodeURIComponent(textoRecibo)}`, '_blank');
+    } else { alert(`Venda em ${metodo} registrada com sucesso!`); }
+
+    // Resetar Mesa
+    m.itens = []; m.total = 0; m.ocupada = false;
+    fecharModal(); renderMesas(); renderCarrinho();
+}
         carregarClientes(); renderMesas();
     </script>
 </body>
