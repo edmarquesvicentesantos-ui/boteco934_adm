@@ -3,39 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Boteco 934 - PDV Mobile</title>
+    <title>Boteco 934 - Gestão Elite</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --green: #22c55e; --text: #f8fafc; }
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 10px; }
-        
-        .header-bar { text-align: center; padding: 10px; border-bottom: 1px solid #1e293b; margin-bottom: 15px; }
-        .status-tag { font-size: 10px; padding: 4px 8px; border-radius: 20px; font-weight: bold; }
-        
-        .lista-estoque { background: var(--card); border-radius: 12px; border: 1px solid #1e293b; overflow: hidden; }
-        .produto-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #1e293b; }
-        .produto-item:last-child { border-bottom: none; }
-        .nome-prod { font-size: 13px; font-weight: 600; text-transform: uppercase; flex: 1; padding-right: 10px; }
-        .preco-prod { color: var(--green); font-weight: 900; font-size: 15px; white-space: nowrap; }
+        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --green: #22c55e; --red: #ef4444; --text: #f8fafc; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        .btn-acao { background: var(--green); color: black; border: none; padding: 18px; border-radius: 12px; width: 100%; font-weight: 900; font-size: 16px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+        /* Cabeçalho com Botões Pequenos */
+        header { background: #000; padding: 10px 15px; border-bottom: 1px solid #1e293b; display: flex; flex-direction: column; gap: 10px; }
+        .topo-info { display: flex; justify-content: space-between; align-items: center; }
+        .botoes-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        
+        .btn-sm { background: #1e293b; color: var(--text); border: 1px solid #334155; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; text-transform: uppercase; }
+        .btn-sm.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .btn-add { background: var(--green); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+
+        /* Área de Venda e Estoque */
+        .main-content { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        input#bipe { background: #111827; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; outline: none; margin-bottom: 5px; }
+
+        /* Tabela de Estoque Profissional */
+        .tabela-estoque { background: var(--card); border-radius: 10px; border: 1px solid #1e293b; width: 100%; }
+        .item-estoque { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #1e293b; font-size: 12px; gap: 10px; }
+        .item-estoque:last-child { border-bottom: none; }
+        
+        .col-nome { flex: 1; font-weight: bold; color: #cbd5e1; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; }
+        .col-qtd { width: 60px; text-align: center; background: #1e293b; color: var(--accent); padding: 4px; border-radius: 4px; font-weight: 800; border: 1px solid #334155; }
+        .col-preco { width: 75px; text-align: right; color: var(--green); font-weight: 800; }
+
+        #status-con { font-size: 9px; font-weight: bold; text-align: center; padding: 2px; }
     </style>
 </head>
 <body>
 
-<div class="header-bar">
-    <h2 style="color:var(--accent); margin:0; font-size: 20px;">BOTECO 934</h2>
-    <span id="status-rede" class="status-tag" style="background:#450a0a; color:#f87171;">OFFLINE</span>
-</div>
+<header>
+    <div class="topo-info">
+        <h2 style="color:var(--accent); font-size: 18px; font-weight: 900;">934 ELITE</h2>
+        <button class="btn-add" onclick="cadastrar()">+ NOVO</button>
+    </div>
+    
+    <div class="botoes-nav" id="btn-mesas">
+        </div>
+</header>
 
-<div class="lista-estoque" id="display-estoque">
-    <p style="padding:20px; text-align:center; color:#64748b;">Sincronizando com a nuvem...</p>
-</div>
+<div id="status-con">CONECTANDO...</div>
 
-<button class="btn-acao" onclick="cadastrarNovo()">+ NOVO PRODUTO</button>
+<div class="main-content">
+    <input type="text" id="bipe" placeholder="Bipar código de barras..." autofocus>
+    
+    <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; padding: 0 10px; font-weight: bold;">
+        <span>PRODUTO</span>
+        <div style="display: flex; gap: 35px;">
+            <span>ESTOQUE</span>
+            <span>PREÇO</span>
+        </div>
+    </div>
+
+    <div class="tabela-estoque" id="lista-estoque">
+        <p style="text-align:center; padding: 20px; color:#64748b;">Sincronizando banco de dados...</p>
+    </div>
+</div>
 
 <script>
     const firebaseConfig = {
@@ -48,63 +77,71 @@
         appId: "1:182023728304:web:80c8402f068c8578508f75"
     };
 
-    // Inicializa
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 1. Monitor de Conexão (Para ver se o iPhone pegou a internet)
-    db.ref('.info/connected').on('value', snap => {
-        const el = document.getElementById('status-rede');
-        if (snap.val() === true) {
-            el.innerText = "SISTEMA ONLINE ✅";
-            el.style.background = "#064e3b"; el.style.color = "#4ade80";
-        } else {
-            el.innerText = "SEM CONEXÃO ❌";
-            el.style.background = "#450a0a"; el.style.color = "#f87171";
-        }
+    // Gerar Mesas Pequenas no Topo
+    const navMesas = document.getElementById('btn-mesas');
+    for(let i=1; i<=12; i++) {
+        navMesas.innerHTML += `<button class="btn-sm" id="m${i}" onclick="selMesa(${i})">M${i}</button>`;
+    }
+
+    let mesaAtiva = null;
+    function selMesa(n) {
+        mesaAtiva = n;
+        document.querySelectorAll('.btn-sm').forEach(b => b.classList.remove('active'));
+        document.getElementById('m'+n).classList.add('active');
+        document.getElementById('bipe').focus();
+    }
+
+    // Monitor de Conexão
+    db.ref('.info/connected').on('value', s => {
+        const el = document.getElementById('status-con');
+        if(s.val()) { el.innerText = "SISTEMA SINCRONIZADO ✅"; el.style.color = "#22c55e"; }
+        else { el.innerText = "OFFLINE ❌"; el.style.color = "#ef4444"; }
     });
 
-    // 2. Carregar e Corrigir os Dados (Resolve o erro do R$ NaN)
-    db.ref('produtos').on('value', snapshot => {
-        const listaDiv = document.getElementById('display-estoque');
-        const dados = snapshot.val();
+    // Listar Estoque com Quantidade
+    db.ref('produtos').on('value', snap => {
+        const container = document.getElementById('lista-estoque');
+        const dados = snap.val() || {};
+        let html = '';
         
-        if (dados) {
-            let html = '';
-            // Transforma em array e organiza
-            const itens = Object.values(dados);
-            
-            itens.forEach(p => {
-                // Força o preço a ser um número para não dar erro no iPhone
-                let precoLimpo = parseFloat(p.preco) || 0;
-                html += `
-                    <div class="produto-item">
-                        <div class="nome-prod">${p.nome || 'SEM NOME'}</div>
-                        <div class="preco-prod">R$ ${precoLimpo.toFixed(2)}</div>
-                    </div>
-                `;
-            });
-            listaDiv.innerHTML = html;
-        } else {
-            listaDiv.innerHTML = '<p style="padding:20px; text-align:center;">Estoque vazio no Firebase.</p>';
-        }
-    }, error => {
-        alert("Erro ao ler dados: " + error.message);
+        Object.values(dados).sort((a,b) => a.nome.localeCompare(b.nome)).forEach(p => {
+            let preco = parseFloat(p.preco) || 0;
+            let qtd = p.estoque || 0; // Se não existir estoque, mostra 0
+
+            html += `
+                <div class="item-estoque">
+                    <div class="col-nome">${p.nome}</div>
+                    <div class="col-qtd" onclick="editarEstoque('${p.codigo}', ${qtd})">${qtd}</div>
+                    <div class="col-preco">R$ ${preco.toFixed(2)}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html || '<p style="padding:20px; text-align:center;">Estoque vazio.</p>';
     });
 
-    // 3. Função de Cadastro
-    function cadastrarNovo() {
-        const nome = prompt("Nome do Produto:");
-        const preco = prompt("Preço (use ponto em vez de vírgula, ex: 10.50):");
-        
-        if (nome && preco) {
-            const id = Date.now();
-            db.ref('produtos/' + id).set({
+    function cadastrar() {
+        const cod = prompt("Código:");
+        const nome = prompt("Nome:");
+        const preco = prompt("Preço:");
+        const qtd = prompt("Quantidade em Estoque:");
+        if(cod && nome && preco) {
+            db.ref('produtos/' + cod).set({
+                codigo: cod,
                 nome: nome.toUpperCase(),
-                preco: preco.replace(',', '.') // Troca vírgula por ponto automaticamente
-            }).then(() => {
-                alert("Salvo com sucesso!");
+                preco: preco.replace(',', '.'),
+                estoque: parseInt(qtd) || 0
             });
+        }
+    }
+
+    // Função para editar estoque rapidamente clicando no número
+    function editarEstoque(cod, atual) {
+        const novaQtd = prompt("Nova quantidade em estoque:", atual);
+        if(novaQtd !== null) {
+            db.ref('produtos/' + cod + '/estoque').set(parseInt(novaQtd));
         }
     }
 </script>
