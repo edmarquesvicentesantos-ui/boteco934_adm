@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDV Elite - Boteco 934</title>
+    <title>Boteco 934 - PDV Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b0f1a; --card: #161b2a; --accent: #38bdf8; --success: #22c55e; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; }
+        /* Variáveis de Cores e Estilo */
+        :root { 
+            --bg: #0b0f1a; 
+            --card: #161b2a; 
+            --accent: #38bdf8; 
+            --success: #22c55e; 
+            --text: #f8fafc; 
+            --muted: #94a3b8; 
+            --danger: #ef4444;
+            --radius: 12px; /* Harmonia nos cantos */
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
         body { 
             background: var(--bg); 
             color: var(--text); 
             display: grid; 
-            grid-template-rows: 70px 1fr; /* Cabeçalho fixo no topo */
-            grid-template-columns: 280px 1fr 420px; /* Mesas | Centro | Resumo */
+            grid-template-rows: 70px 1fr; 
+            grid-template-columns: 280px 1fr 420px; 
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- CABEÇALHO SUPERIOR --- */
+        /* --- CABEÇALHO HARMONIZADO --- */
         .top-header {
             grid-column: 1 / span 3;
             background: #020617;
@@ -27,71 +38,81 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 2px solid #1e293b;
             z-index: 10;
         }
         .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-934 { background: var(--accent); color: #020617; padding: 6px 14px; border-radius: 8px; font-weight: 900; font-size: 20px; }
+        .logo-934 { 
+            background: var(--accent); 
+            color: #020617; 
+            padding: 8px 16px; 
+            border-radius: var(--radius); 
+            font-weight: 900; 
+            font-size: 22px; 
+            letter-spacing: -1px;
+        }
         
-        .nav-buttons { display: flex; gap: 12px; }
+        .nav-buttons { display: flex; gap: 10px; }
         .nav-btn { 
             background: var(--card); color: var(--text); text-decoration: none; 
-            padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; 
-            border: 1px solid #334155; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+            padding: 12px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 800; 
+            border: 1px solid #334155; transition: 0.3s;
         }
-        .nav-btn:hover { border-color: var(--accent); background: #1e293b; }
         .nav-btn.active { background: var(--accent); color: #020617; border-color: var(--accent); }
 
         /* --- COLUNA ESQUERDA (MESAS) --- */
         .area-mesas { 
-            background: rgba(15, 23, 42, 0.5); padding: 20px; overflow-y: auto; 
+            background: rgba(15, 23, 42, 0.3); padding: 20px; overflow-y: auto; 
             border-right: 1px solid #1e293b; 
         }
         .mesa { 
-            background: var(--card); padding: 18px; margin-bottom: 12px; border-radius: 15px; 
-            cursor: pointer; border: 1px solid #1e293b; transition: 0.3s; 
+            background: var(--card); padding: 20px; margin-bottom: 12px; border-radius: var(--radius); 
+            cursor: pointer; border: 1px solid #1e293b; transition: 0.3s; text-align: center;
         }
         .mesa.ocupada { border-left: 6px solid var(--accent); }
         .mesa.ativa { background: var(--accent); color: #020617; border-color: white; transform: scale(1.02); }
+        .mesa-num { font-size: 24px; font-weight: 900; display: block; }
 
-        /* --- ÁREA CENTRAL (LANÇAMENTOS) --- */
-        .painel-venda { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: #0b0f1a; }
-        h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        /* --- ÁREA CENTRAL --- */
+        .painel-venda { padding: 40px; display: flex; flex-direction: column; gap: 25px; }
+        .titulo-secao { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+        
+        .input-box { display: flex; flex-direction: column; gap: 10px; }
+        label { font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+        
         input, select { 
-            background: var(--card); border: 1px solid #334155; color: white; 
-            padding: 18px; border-radius: 12px; font-size: 16px; outline: none; width: 100%; transition: 0.3s;
+            background: var(--card); border: 2px solid #1e293b; color: white; 
+            padding: 20px; border-radius: var(--radius); font-size: 16px; font-weight: 600; outline: none; transition: 0.3s;
         }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+        input:focus { border-color: var(--accent); background: #1e293b; }
 
         /* --- COLUNA DIREITA (RESUMO) --- */
-        .resumo { 
-            background: #020617; padding: 30px; display: flex; flex-direction: column; 
-            border-left: 1px solid #1e293b; 
-        }
-        #lista-carrinho { flex: 1; overflow-y: auto; margin: 20px 0; }
+        .resumo { background: #020617; padding: 30px; display: flex; flex-direction: column; border-left: 2px solid #1e293b; }
         .item-carrinho { 
-            background: #161b2a; padding: 12px; border-radius: 10px; margin-bottom: 8px; 
+            background: var(--card); padding: 15px; border-radius: var(--radius); margin-bottom: 10px; 
             display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;
         }
-        .total-box { border-top: 2px solid #1e293b; padding-top: 20px; margin-top: auto; }
-        .btn-fechar { 
-            width: 100%; padding: 22px; background: var(--accent); color: #020617; 
-            border: none; border-radius: 15px; font-weight: 900; font-size: 16px; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase;
-        }
-        .btn-fechar:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2); }
+        .item-info b { display: block; font-size: 14px; font-weight: 800; }
+        .item-info small { color: var(--accent); font-weight: 700; font-size: 10px; text-transform: uppercase; }
 
-        /* --- MODAL PAGAMENTO --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: var(--card); padding: 40px; border-radius: 25px; width: 100%; max-width: 500px; border: 1px solid var(--accent); }
-        .grid-pagamento { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
-        .btn-pgto { 
-            background: #0b0f1a; border: 1px solid #334155; color: white; padding: 20px; 
-            border-radius: 15px; cursor: pointer; font-weight: 700; transition: 0.2s;
+        .btn-finalizar { 
+            width: 100%; padding: 25px; background: var(--accent); color: #020617; 
+            border: none; border-radius: var(--radius); font-weight: 900; font-size: 18px; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 15px;
         }
-        .btn-pgto:hover { border-color: var(--accent); color: var(--accent); background: rgba(56, 189, 248, 0.05); }
+        .btn-finalizar:hover { filter: brightness(1.1); transform: translateY(-3px); }
+
+        /* --- MODAL HARMONIZADO --- */
+        .modal-content { 
+            background: var(--card); padding: 40px; border-radius: 20px; 
+            width: 100%; max-width: 500px; border: 2px solid var(--accent); text-align: center;
+        }
+        .btn-pgto { 
+            background: #0b0f1a; border: 2px solid #1e293b; color: white; padding: 20px; 
+            border-radius: var(--radius); font-weight: 800; cursor: pointer; transition: 0.2s;
+        }
+        .btn-pgto:hover { border-color: var(--accent); color: var(--accent); }
+
     </style>
 </head>
 <body>
@@ -99,67 +120,62 @@
     <header class="top-header">
         <div class="logo-area">
             <div class="logo-934">934</div>
-            <h2 style="font-weight: 800; letter-spacing: -0.5px;">BOTECO PDV <span style="color:var(--accent)">ELITE</span></h2>
+            <h2 class="titulo-secao" style="font-size: 20px;">PDV ELITE</h2>
         </div>
         <div class="nav-buttons">
-            <a href="index.html" class="nav-btn active">🛒 CAIXA</a>
-            <a href="clientes.html" class="nav-btn">👥 CLIENTES</a>
-            <a href="produtos.html" class="nav-btn">📦 ESTOQUE</a>
+            <a href="index.html" class="nav-btn active">CAIXA</a>
+            <a href="clientes.html" class="nav-btn">CLIENTES</a>
+            <a href="produtos.html" class="nav-btn">ESTOQUE</a>
         </div>
     </header>
 
-    <div class="area-mesas" id="grid-mesas">
-        </div>
+    <aside class="area-mesas" id="grid-mesas"></aside>
 
-    <div class="painel-venda">
-        <h1 id="titulo-mesa">Selecione uma Mesa</h1>
+    <main class="painel-venda">
+        <h1 id="titulo-mesa" class="titulo-secao">Selecione uma Mesa</h1>
         
-        <div class="input-group">
-            <label>Quem está consumindo?</label>
+        <div class="input-box">
+            <label>👤 Cliente na Mesa</label>
             <select id="select-cliente"></select>
         </div>
 
-        <div class="input-group">
-            <label>Bipar ou digitar código</label>
-            <input type="text" id="codigo-bipe" placeholder="Aguardando leitor..." autofocus>
+        <div class="input-box">
+            <label>🔍 Bipar Produto</label>
+            <input type="text" id="codigo-bipe" placeholder="Aguardando leitura de código de barras..." autofocus>
         </div>
-    </div>
+    </main>
 
-    <div class="resumo">
-        <h2 style="font-weight: 800; color: var(--muted)">Consumo da Mesa</h2>
-        <div id="lista-carrinho">
-            </div>
+    <section class="resumo">
+        <label>🧾 Itens da Conta</label>
+        <div id="lista-carrinho" style="flex:1; overflow-y:auto; margin-top:15px;"></div>
         
-        <div class="total-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <span style="font-weight: 700; opacity: 0.7;">TOTAL GERAL</span>
-                <span style="color:var(--success); font-weight:900; font-size:32px;">R$ <span id="total-v">0.00</span></span>
+        <div style="padding-top:20px; border-top: 2px solid #1e293b;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label>Total Mesa</label>
+                <span style="color:var(--success); font-weight:900; font-size:36px;">R$ <span id="total-v">0.00</span></span>
             </div>
-            <button class="btn-fechar" onclick="abrirPagamento()">Fechar Conta / Recibo</button>
+            <button class="btn-finalizar" onclick="abrirPagamento()">Fechar Conta</button>
         </div>
-    </div>
+    </section>
 
-    <div id="modal-pagamento" class="modal">
+    <div id="modal-pagamento" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center;">
         <div class="modal-content">
-            <h2 style="text-align:center; margin-bottom: 10px;">Finalizar Recebimento</h2>
-            <div style="font-size: 40px; color: var(--success); font-weight: 900; text-align: center; margin-bottom: 30px;">
-                R$ <span id="total-modal-v">0.00</span>
-            </div>
+            <h2 class="titulo-secao" style="font-size:24px;">Recebimento</h2>
+            <div style="font-size: 48px; color: var(--success); font-weight: 900; margin: 20px 0;">R$ <span id="total-modal-v">0.00</span></div>
             
-            <label>Forma de Pagamento</label>
-            <div class="grid-pagamento">
-                <button class="btn-pgto" onclick="finalizar('Dinheiro')">💵 Dinheiro</button>
-                <button class="btn-pgto" onclick="finalizar('Pix')">💎 Pix</button>
-                <button class="btn-pgto" onclick="finalizar('Cartão Crédito')">💳 Crédito</button>
-                <button class="btn-pgto" onclick="finalizar('Cartão Débito')">💳 Débito</button>
-                <button class="btn-pgto" onclick="finalizar('Pendura')" style="grid-column: span 2; border-color: var(--danger); color: var(--danger);">📌 Pendurar na Conta</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <button class="btn-pgto" onclick="finalizar('Dinheiro')">DINHEIRO</button>
+                <button class="btn-pgto" onclick="finalizar('Pix')">PIX</button>
+                <button class="btn-pgto" onclick="finalizar('Crédito')">CARTÃO CRÉDITO</button>
+                <button class="btn-pgto" onclick="finalizar('Débito')">CARTÃO DÉBITO</button>
+                <button class="btn-pgto" onclick="finalizar('Pendura')" style="grid-column: span 2; border-color: var(--danger); color: var(--danger);">📌 PENDURAR CONTA</button>
             </div>
-            <button onclick="fecharModal()" style="width:100%; margin-top:25px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:600;">Voltar ao Caixa</button>
+            <button onclick="fecharModal()" style="margin-top:20px; background:none; border:none; color:var(--muted); cursor:pointer; font-weight:700;">CANCELAR</button>
         </div>
     </div>
 
     <script>
-        // Lógica de dados (Mantendo sincronia com Estoque e Clientes)
+        // Mesma lógica anterior para manter o funcionamento do seu bar
         let PRODS = JSON.parse(localStorage.getItem('produtos')) || [];
         let CLIS = JSON.parse(localStorage.getItem('clientes')) || [{nome: "Consumidor Geral", tel: "-"}];
         let MESAS = JSON.parse(localStorage.getItem('mesas_estado')) || Array.from({length: 12}, (_, i) => ({ id: i+1, itens: [], total: 0, ocupada: false }));
@@ -174,9 +190,8 @@
         function renderMesas() {
             document.getElementById('grid-mesas').innerHTML = MESAS.map(m => `
                 <div class="mesa ${m.ocupada?'ocupada':''} ${mesaAtiva===m.id?'ativa':''}" onclick="selMesa(${m.id})">
-                    <div style="font-size:11px; color:var(--muted); font-weight:800;">MESA</div>
-                    <div style="font-size:20px; font-weight:900;">${String(m.id).padStart(2, '0')}</div>
-                    <div style="font-size:13px; font-weight:700; color:var(--success); margin-top:5px;">R$ ${m.total.toFixed(2)}</div>
+                    <span class="mesa-num">${String(m.id).padStart(2, '0')}</span>
+                    <span style="font-weight:700; opacity:0.8;">R$ ${m.total.toFixed(2)}</span>
                 </div>
             `).join('');
             localStorage.setItem('mesas_estado', JSON.stringify(MESAS));
@@ -198,7 +213,7 @@
                     m.itens.push({ cli: sel.value, tel: sel.options[sel.selectedIndex].getAttribute('data-tel'), nome: p.nome, preco: p.preco });
                     m.total += p.preco; m.ocupada = true;
                     e.target.value = ''; renderMesas(); renderCarrinho();
-                } else { alert("Não cadastrado!"); e.target.value = ''; }
+                } else { alert("Produto não cadastrado!"); e.target.value = ''; }
             }
         });
 
@@ -207,13 +222,13 @@
             let m = MESAS.find(x => x.id === mesaAtiva);
             document.getElementById('lista-carrinho').innerHTML = m.itens.map((it, idx) => `
                 <div class="item-carrinho">
-                    <div>
-                        <div style="font-size:10px; color:var(--accent); font-weight:800;">${it.cli}</div>
-                        <div style="font-weight:600;">${it.nome}</div>
+                    <div class="item-info">
+                        <small>${it.cli}</small>
+                        <b>${it.nome}</b>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-weight:700;">R$ ${it.preco.toFixed(2)}</span>
-                        <button onclick="removerItem(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <span style="font-weight:900;">R$ ${it.preco.toFixed(2)}</span>
+                        <button onclick="removerItem(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">✕</button>
                     </div>
                 </div>
             `).reverse().join('');
@@ -231,7 +246,7 @@
 
         function abrirPagamento() {
             let m = MESAS.find(x => x.id === mesaAtiva);
-            if(!m || m.total === 0) return alert("Mesa sem consumo!");
+            if(!m || m.total === 0) return alert("Mesa sem consumo.");
             document.getElementById('total-modal-v').innerText = m.total.toFixed(2);
             document.getElementById('modal-pagamento').style.display = 'flex';
         }
@@ -242,12 +257,12 @@
             let m = MESAS.find(x => x.id === mesaAtiva);
             let textoRecibo = `*BOTECO 934 - RECIBO MESA ${m.id}*\n--------------------------\n`;
             m.itens.forEach(it => { textoRecibo += `${it.nome} - R$ ${it.preco.toFixed(2)} (${it.cli})\n`; });
-            textoRecibo += `--------------------------\n*TOTAL: R$ ${m.total.toFixed(2)}*\nPGTO: ${metodo}\nObrigado!`;
+            textoRecibo += `--------------------------\n*TOTAL: R$ ${m.total.toFixed(2)}*\nFORMA DE PGTO: ${metodo}\nObrigado!`;
 
             let tel = m.itens[m.itens.length-1].tel;
             if(tel && tel !== "-") {
                 window.open(`https://wa.me/55${tel.replace(/\D/g,'')}?text=${encodeURIComponent(textoRecibo)}`, '_blank');
-            } else { alert("Venda Finalizada!"); }
+            } else { alert("Venda Finalizada com Sucesso!"); }
 
             m.itens = []; m.total = 0; m.ocupada = false;
             fecharModal(); renderMesas(); renderCarrinho();
