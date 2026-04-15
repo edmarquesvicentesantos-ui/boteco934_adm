@@ -3,55 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estoque Inteligente - Boteco 934</title>
+    <title>Estoque Premium - Boteco 934</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --success: #22c55e; --indigo: #6366f1; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 30px; display: flex; justify-content: center; }
+        body { background: var(--bg); color: var(--text); padding: 30px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 950px; }
         .back-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
         
-        /* Formulário */
-        .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; position: relative; }
+        /* Cabeçalho */
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        h1 { font-size: 26px; font-weight: 700; }
+
+        /* Card de Cadastro */
+        .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .grid-inputs { display: grid; grid-template-columns: 1.2fr 2fr 0.8fr 1fr; gap: 15px; }
-        label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { background: #020617; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; outline: none; font-size: 14px; transition: 0.3s; }
         input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
         
-        .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; }
+        .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; text-transform: uppercase; }
         .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
 
-        /* Tabela */
+        /* Tabela A-Z */
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        th { text-align: left; padding: 10px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
-        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; }
-        td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; color: var(--accent); font-family: monospace; }
+        th { text-align: left; padding: 10px 15px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; transition: 0.2s; }
+        td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; font-family: monospace; color: var(--accent); }
         td:last-child { border-right: 1px solid #334155; border-radius: 0 12px 12px 0; text-align: right; }
         
-        .cat-tag { background: #334155; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--indigo); border: 1px solid var(--indigo); }
-        .status-web { font-size: 10px; color: var(--indigo); font-weight: 600; position: absolute; top: 10px; right: 25px; display: none; }
+        .cat-tag { background: rgba(99, 102, 241, 0.1); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--indigo); border: 1px solid var(--indigo); text-transform: uppercase; }
+        .status-web { font-size: 10px; color: var(--indigo); font-weight: 800; position: absolute; top: 12px; right: 25px; display: none; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a href="index.html" class="back-link">← VOLTAR AO CAIXA</a>
-    <div class="header" style="margin-bottom:30px;">
-        <h1>📦 Gestão de Estoque</h1>
-        <p style="color:var(--muted); font-size:14px;">Bipe o produto para buscar informações na internet automaticamente.</p>
+    
+    <div class="header">
+        <div>
+            <h1>📦 Estoque Inteligente</h1>
+            <p style="color:var(--muted); font-size:14px;">Boteco 934 - Organização Automática A-Z</p>
+        </div>
+        <div id="contagem" style="font-size: 12px; font-weight: 700; color: var(--accent);">0 PRODUTOS</div>
     </div>
 
     <div class="form-card">
-        <div id="status-web" class="status-web">🔎 BUSCANDO NA WEB...</div>
+        <div id="status-web" class="status-web">🔎 BUSCANDO DADOS NA INTERNET...</div>
         <div class="grid-inputs">
             <div>
                 <label>Cód. Barras (EAN)</label>
-                <input type="text" id="p-cod" placeholder="Bipe aqui..." onchange="buscarWeb(this.value)">
+                <input type="text" id="p-cod" placeholder="Bipe aqui..." autocomplete="off">
             </div>
             <div>
                 <label>Nome do Produto</label>
-                <input type="text" id="p-nome" placeholder="Nome do produto">
+                <input type="text" id="p-nome" placeholder="Aguardando bipe ou digite...">
             </div>
             <div>
                 <label>Preço Venda</label>
@@ -68,7 +77,7 @@
                 </select>
             </div>
         </div>
-        <button class="btn-salvar" onclick="salvarProduto()">SALVAR NO ESTOQUE</button>
+        <button class="btn-salvar" onclick="salvarProduto()">ADICIONAR AO ESTOQUE</button>
     </div>
 
     <table>
@@ -76,7 +85,7 @@
             <tr>
                 <th>CÓDIGO</th>
                 <th>CATEGORIA</th>
-                <th>PRODUTO (A-Z)</th>
+                <th>DESCRIÇÃO (A-Z)</th>
                 <th>PREÇO</th>
                 <th>AÇÃO</th>
             </tr>
@@ -88,91 +97,116 @@
 <script>
     let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
-    // BUSCA NA INTERNET
+    // GATILHO DO LEITOR DE CÓDIGO DE BARRAS
+    document.getElementById('p-cod').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarWeb(this.value);
+        }
+    });
+
+    // GATILHO DO ENTER NO PREÇO PARA SALVAR RÁPIDO
+    document.getElementById('p-preco').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            salvarProduto();
+        }
+    });
+
     async function buscarWeb(codigo) {
         if (!codigo || codigo.length < 5) return;
         
-        // Verifica se já existe para não buscar à toa
-        if (produtos.find(p => p.codigo == codigo)) return;
+        // Verifica se já existe
+        if (produtos.find(p => p.codigo == codigo)) {
+            alert("Este produto já está cadastrado!");
+            document.getElementById('p-cod').value = '';
+            document.getElementById('p-cod').focus();
+            return;
+        }
 
         const statusLabel = document.getElementById('status-web');
         const nomeInput = document.getElementById('p-nome');
         
         statusLabel.style.display = 'block';
-        nomeInput.placeholder = "Buscando dados...";
+        nomeInput.placeholder = "Consultando banco de dados...";
 
         try {
-            const resposta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
+            const resposta = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`, {
+                headers: { 'User-Agent': 'Boteco934-App/1.0' }
+            });
             const dados = await resposta.json();
 
             if (dados.status === 1) {
                 const p = dados.product;
-                const nomeFinal = p.product_name || p.generic_name || "";
+                const nomeFinal = p.product_name_pt || p.product_name || p.generic_name || "";
                 const marca = p.brands ? ` - ${p.brands.split(',')[0]}` : "";
                 
                 nomeInput.value = (nomeFinal + marca).toUpperCase();
                 nomeInput.style.borderColor = "var(--indigo)";
-                // Foca no preço para você apenas digitar o valor e dar Enter
+                // Foca no preço para terminar o cadastro
                 document.getElementById('p-preco').focus();
             } else {
-                nomeInput.placeholder = "Não encontrado. Digite o nome manualmente.";
+                nomeInput.placeholder = "Não encontrado. Digite manualmente.";
+                nomeInput.focus();
             }
         } catch (erro) {
-            console.error("Erro na busca:", erro);
+            nomeInput.placeholder = "Erro de conexão. Digite o nome.";
         } finally {
             statusLabel.style.display = 'none';
         }
     }
 
     function salvarProduto() {
-        const cod = document.getElementById('p-cod').value.trim();
-        const nome = document.getElementById('p-nome').value.trim();
-        const preco = document.getElementById('p-preco').value;
-        const cat = document.getElementById('p-cat').value;
+        const codInput = document.getElementById('p-cod');
+        const nomeInput = document.getElementById('p-nome');
+        const precoInput = document.getElementById('p-preco');
+        const catInput = document.getElementById('p-cat');
 
-        if (cod && nome && preco) {
+        if (codInput.value && nomeInput.value && precoInput.value) {
             produtos.push({
-                codigo: cod,
-                nome: nome.toUpperCase(),
-                preco: parseFloat(preco),
-                cat: cat
+                codigo: codInput.value.trim(),
+                nome: nomeInput.value.trim().toUpperCase(),
+                preco: parseFloat(precoInput.value),
+                cat: catInput.value
             });
 
             localStorage.setItem('produtos', JSON.stringify(produtos));
 
-            // Limpa tudo
-            document.getElementById('p-cod').value = '';
-            document.getElementById('p-nome').value = '';
-            document.getElementById('p-nome').style.borderColor = "#334155";
-            document.getElementById('p-preco').value = '';
-            document.getElementById('p-cod').focus();
+            // Reseta campos
+            codInput.value = '';
+            nomeInput.value = '';
+            nomeInput.style.borderColor = "#334155";
+            precoInput.value = '';
+            codInput.focus();
 
             renderTable();
         } else {
-            alert("Preencha Código, Nome e Preço!");
+            alert("Preencha todos os campos obrigatórios!");
         }
     }
 
     function renderTable() {
-        // ORDEM ALFABÉTICA A-Z
+        // ORGANIZAÇÃO A-Z
         produtos.sort((a, b) => a.nome.localeCompare(b.nome));
+
+        document.getElementById('contagem').innerText = `${produtos.length} PRODUTOS`;
 
         const corpo = document.getElementById('lista-estoque');
         corpo.innerHTML = produtos.map((p, i) => `
             <tr>
                 <td>${p.codigo}</td>
-                <td><span class="cat-tag">${p.cat.toUpperCase()}</span></td>
+                <td><span class="cat-tag">${p.cat}</span></td>
                 <td><b>${p.nome}</b></td>
                 <td style="color:var(--success); font-weight:700;">R$ ${p.preco.toFixed(2)}</td>
                 <td>
-                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer;">❌</button>
+                    <button onclick="remover(${i})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;">❌</button>
                 </td>
             </tr>
         `).join('');
     }
 
     function remover(i) {
-        if (confirm("Remover item?")) {
+        if (confirm("Deseja remover este item do estoque?")) {
             produtos.splice(i, 1);
             localStorage.setItem('produtos', JSON.stringify(produtos));
             renderTable();
