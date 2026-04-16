@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>934 Elite - Otimizado</title>
+    <title>934 Elite - Lado a Lado</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,174 +11,170 @@
             --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; --radius: 12px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
         body { 
             background: var(--bg); color: var(--text); 
-            display: flex; flex-direction: column;
+            display: grid;
+            grid-template-rows: 60px 1fr; /* Cabeçalho e Corpo */
             height: 100vh; overflow: hidden;
         }
 
         /* --- CABEÇALHO --- */
         .top-header {
-            background: #020617; padding: 10px 15px;
+            background: #020617; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #1e293b;
-        }
-        .logo-934 { 
-            background: var(--accent); color: #020617; padding: 5px 10px; 
-            border-radius: 6px; font-weight: 900; font-size: 16px; 
-        }
-
-        /* --- BARRA DE MESAS (MINI) --- */
-        .area-mesas { 
-            display: flex; gap: 8px; padding: 10px; 
-            overflow-x: auto; background: rgba(15, 23, 42, 0.8);
             border-bottom: 2px solid #1e293b;
         }
-        .area-mesas::-webkit-scrollbar { display: none; }
+        .logo-934 { background: var(--accent); color: #020617; padding: 5px 12px; border-radius: 8px; font-weight: 900; }
 
-        .mesa { 
-            min-width: 65px; background: var(--card); padding: 8px; 
-            border-radius: 8px; border: 2px solid #1e293b; 
-            text-align: center; flex-shrink: 0;
-        }
-        .mesa.ocupada { border-top: 3px solid var(--accent); }
-        .mesa.ativa { background: var(--accent); color: #020617; border-color: white; }
-        .mesa-num { font-size: 16px; font-weight: 900; display: block; }
-        .mesa-val { font-size: 9px; font-weight: 900; opacity: 0.8; }
-
-        /* --- DIVISÃO DO CAIXA (CENTRO) --- */
-        .conteudo-principal { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        /* Parte 1: Busca e Lançamento */
-        .secao-busca { 
-            padding: 15px; background: #0b0f1a; 
-            border-bottom: 1px solid #1e293b;
-            display: flex; flex-direction: column; gap: 10px;
+        /* --- CORPO DIVIDIDO --- */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* DIVISÃO EXATA: ESQUERDA | DIREITA */
+            overflow: hidden;
         }
 
-        /* Parte 2: Lista de Produtos (Carrinho) */
-        .secao-lista { flex: 1; overflow-y: auto; padding: 15px; background: #020617; }
-
-        label { font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; margin-left: 4px; }
-        
-        input, select { 
-            background: var(--card); border: 2px solid #334155; color: white; 
-            padding: 14px; border-radius: var(--radius); 
-            font-size: 15px; font-weight: 900; outline: none; width: 100%;
-        }
-        input:focus { border-color: var(--accent); }
-
-        .item-carrinho { 
-            background: var(--card); padding: 12px; border-radius: 10px; 
-            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid #1e293b;
-        }
-        .item-info b { font-size: 13px; font-weight: 900; text-transform: uppercase; }
-        .item-info small { color: var(--accent); font-size: 10px; font-weight: 900; display: block; }
-
-        /* --- RODAPÉ FIXO --- */
-        .resumo { padding: 15px; background: #020617; border-top: 2px solid #1e293b; }
-        .btn-finalizar { 
-            width: 100%; padding: 18px; background: var(--accent); color: #020617; 
-            border: none; border-radius: var(--radius); font-weight: 900; 
-            font-size: 18px; cursor: pointer; text-transform: uppercase;
+        /* --- LADO ESQUERDO: SELEÇÃO E MESAS --- */
+        .left-panel {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 15px;
+            border-right: 2px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
         }
 
-        /* Modal Pagamento */
-        .grid-pgto { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-modal { padding: 15px; background: #1e293b; color: white; border: none; border-radius: 10px; font-weight: 900; }
+        .area-mesas-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 mesas por linha */
+            gap: 8px;
+        }
+
+        .mesa-mini {
+            aspect-ratio: 1; background: var(--card); border-radius: 8px;
+            border: 2px solid #334155; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+        }
+        .mesa-mini.ocupada { border-color: var(--accent); }
+        .mesa-mini.ativa { background: var(--accent); color: #020617; border-color: white; }
+        .mesa-mini b { font-size: 16px; font-weight: 900; }
+        .mesa-mini span { font-size: 8px; font-weight: 900; }
+
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; }
+        select, input { 
+            background: var(--card); border: 2px solid #334155; color: white; padding: 12px; 
+            border-radius: 10px; font-size: 14px; font-weight: 900; outline: none;
+        }
+
+        /* --- LADO DIREITO: EXTRATO DO CAIXA --- */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            background: #020617;
+            padding: 15px;
+        }
+
+        .extrato-lista { flex: 1; overflow-y: auto; padding-right: 5px; }
+
+        .item-linha {
+            background: var(--card); padding: 10px; border-radius: 8px;
+            margin-bottom: 6px; display: flex; justify-content: space-between;
+            align-items: center; border: 1px solid #1e293b;
+        }
+        .item-linha b { font-size: 12px; font-weight: 900; text-transform: uppercase; }
+        .item-linha small { color: var(--accent); font-size: 9px; font-weight: 900; display: block; }
+
+        .footer-caixa {
+            border-top: 2px solid #1e293b; padding-top: 15px; margin-top: 10px;
+        }
+
+        .btn-fechar {
+            width: 100%; padding: 18px; background: var(--accent); color: #020617;
+            border: none; border-radius: 12px; font-weight: 900; font-size: 18px;
+            cursor: pointer; text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
     <header class="top-header">
         <div class="logo-934">934</div>
-        <div style="font-weight: 900; font-size: 12px; color: var(--muted);">CAIXA MÓVEL</div>
-        <a href="produtos.html" style="text-decoration:none; font-size:12px; font-weight:900; color:var(--accent);">ESTOQUE</a>
+        <div style="font-weight: 900; font-size: 12px;" id="mesa-atual">SELECIONE MESA</div>
+        <a href="produtos.html" style="text-decoration:none; color:var(--accent); font-weight:900; font-size:12px;">ESTOQUE</a>
     </header>
 
-    <div class="area-mesas" id="grid-mesas"></div>
-
-    <main class="conteudo-principal">
-        <section class="secao-busca">
-            <h2 id="titulo-mesa" style="font-size: 18px; font-weight: 900; color: var(--accent);">MESA ...</h2>
-            <div>
-                <label>👤 CLIENTE</label>
+    <div class="main-container">
+        <aside class="left-panel">
+            <div class="input-group">
+                <label>👤 Cliente</label>
                 <select id="select-cliente"></select>
             </div>
-            <div>
-                <label>🔍 BIPAR / BUSCAR</label>
-                <input type="text" id="codigo-bipe" placeholder="CÓDIGO OU NOME..." autofocus>
+            
+            <div class="input-group">
+                <label>🔍 Produto (Bipe)</label>
+                <input type="text" id="codigo-bipe" placeholder="CÓDIGO..." autofocus>
             </div>
-        </section>
 
-        <section class="secao-lista" id="lista-carrinho">
-            </section>
-    </main>
+            <label>🪑 Mesas</label>
+            <div class="area-mesas-grid" id="grid-mesas">
+                </div>
+        </aside>
 
-    <footer class="resumo">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-            <span style="font-weight: 900; color: var(--muted); font-size: 14px;">TOTAL</span>
-            <span style="color:var(--success); font-weight: 900; font-size: 26px;">R$ <span id="total-v">0.00</span></span>
-        </div>
-        <button class="btn-finalizar" onclick="abrirPagamento()">FECHAR CONTA</button>
-    </footer>
+        <main class="right-panel">
+            <label>🧾 Extrato de Consumo</label>
+            <div class="extrato-lista" id="lista-carrinho"></div>
 
-    <div id="modal-pagamento" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:100; justify-content:center; align-items:center;">
-        <div style="background:var(--card); padding:25px; border-radius:20px; width:90%; border:2px solid var(--accent); text-align:center;">
-            <h2 style="font-weight:900; font-size:20px;">RECEBIMENTO</h2>
-            <div style="font-size: 35px; color:var(--success); font-weight:900; margin:15px 0;">R$ <span id="total-modal-v">0.00</span></div>
-            <div class="grid-pgto">
-                <button onclick="finalizar('Dinheiro')" class="btn-modal">DINHEIRO</button>
-                <button onclick="finalizar('Pix')" class="btn-modal">PIX</button>
-                <button onclick="finalizar('Cartão')" class="btn-modal">CARTÃO</button>
-                <button onclick="finalizar('Pendura')" class="btn-modal" style="background:var(--danger)">PENDURA</button>
+            <div class="footer-caixa">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <span style="font-weight:900; color:var(--muted); font-size: 12px;">TOTAL</span>
+                    <span style="color:var(--success); font-weight:900; font-size: 24px;">R$ <span id="total-v">0.00</span></span>
+                </div>
+                <button class="btn-fechar" onclick="abrirPagamento()">FECHAR</button>
             </div>
-            <button onclick="fecharModal()" style="margin-top:20px; background:none; border:none; color:var(--muted); font-weight:900;">CANCELAR</button>
-        </div>
+        </main>
     </div>
 
     <script>
         let PRODS = JSON.parse(localStorage.getItem('produtos')) || [];
         let CLIS = JSON.parse(localStorage.getItem('clientes')) || [{nome: "AVULSO", tel: "-"}];
-        let MESAS = JSON.parse(localStorage.getItem('mesas_state')) || Array.from({length: 8}, (_, i) => ({ id: i+1, itens: [], total: 0, ocupada: false }));
+        let MESAS = JSON.parse(localStorage.getItem('mesas_st')) || Array.from({length: 12}, (_, i) => ({ id: i+1, itens: [], total: 0, ocupada: false }));
         let mesaAtiva = null;
 
         function carregarClientes() {
             const s = document.getElementById('select-cliente');
-            CLIS.sort((a,b) => a.nome.localeCompare(b.nome));
             s.innerHTML = CLIS.map(c => `<option value="${c.nome}" data-tel="${c.tel}">${c.nome}</option>`).join('');
         }
 
         function renderMesas() {
             document.getElementById('grid-mesas').innerHTML = MESAS.map(m => `
-                <div class="mesa ${m.ocupada?'ocupada':''} ${mesaAtiva===m.id?'ativa':''}" onclick="selMesa(${m.id})">
-                    <span class="mesa-num">${m.id}</span>
-                    <span class="mesa-val">R$${m.total.toFixed(0)}</span>
+                <div class="mesa-mini ${m.ocupada?'ocupada':''} ${mesaAtiva===m.id?'ativa':''}" onclick="selMesa(${m.id})">
+                    <b>${m.id}</b>
+                    <span>R$${m.total.toFixed(0)}</span>
                 </div>
             `).join('');
-            localStorage.setItem('mesas_state', JSON.stringify(MESAS));
+            localStorage.setItem('mesas_st', JSON.stringify(MESAS));
         }
 
         function selMesa(id) {
             mesaAtiva = id;
-            document.getElementById('titulo-mesa').innerText = "MESA " + id;
+            document.getElementById('mesa-atual').innerText = "MESA " + id;
             renderMesas(); renderCarrinho();
             document.getElementById('codigo-bipe').focus();
         }
 
         document.getElementById('codigo-bipe').addEventListener('keypress', (e) => {
             if(e.key === 'Enter' && mesaAtiva) {
-                let p = PRODS.find(x => x.codigo == e.target.value || x.nome.toLowerCase() == e.target.value.toLowerCase());
+                let p = PRODS.find(x => x.codigo == e.target.value);
                 if(p) {
                     let m = MESAS.find(x => x.id === mesaAtiva);
                     let sel = document.getElementById('select-cliente');
                     m.itens.push({ cli: sel.value, tel: sel.options[sel.selectedIndex].getAttribute('data-tel'), nome: p.nome, preco: p.preco });
                     m.total += p.preco; m.ocupada = true;
                     e.target.value = ''; renderMesas(); renderCarrinho();
-                } else { alert("Produto não encontrado!"); e.target.value = ''; }
+                } else { alert("Não encontrado!"); e.target.value = ''; }
             }
         });
 
@@ -186,11 +182,11 @@
             if(!mesaAtiva) return;
             let m = MESAS.find(x => x.id === mesaAtiva);
             document.getElementById('lista-carrinho').innerHTML = m.itens.map((it, idx) => `
-                <div class="item-carrinho">
-                    <div class="item-info"><small>${it.cli}</small><b>${it.nome}</b></div>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <span style="font-weight:900; font-size:16px;">R$${it.preco.toFixed(2)}</span>
-                        <button onclick="removerItem(${idx})" style="background:none; border:none; color:var(--danger); font-weight:900; font-size:20px;">✕</button>
+                <div class="item-linha">
+                    <div><small>${it.cli}</small><b>${it.nome}</b></div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-weight:900;">R$${it.preco.toFixed(2)}</span>
+                        <button onclick="removerItem(${idx})" style="background:none; border:none; color:var(--danger); font-weight:900;">✕</button>
                     </div>
                 </div>
             `).reverse().join('');
@@ -208,26 +204,9 @@
 
         function abrirPagamento() {
             let m = MESAS.find(x => x.id === mesaAtiva);
-            if(!m || m.total === 0) return alert("Selecione uma mesa com consumo!");
-            document.getElementById('total-modal-v').innerText = m.total.toFixed(2);
-            document.getElementById('modal-pagamento').style.display = 'flex';
-        }
-
-        function fecharModal() { document.getElementById('modal-pagamento').style.display = 'none'; }
-
-        function finalizar(metodo) {
-            let m = MESAS.find(x => x.id === mesaAtiva);
-            let textoRecibo = `*BOTECO 934*\n*MESA ${m.id}*\n------------------\n`;
-            m.itens.forEach(it => { textoRecibo += `${it.nome} - R$ ${it.preco.toFixed(2)}\n`; });
-            textoRecibo += `------------------\n*TOTAL: R$ ${m.total.toFixed(2)}*\nPGTO: ${metodo}`;
-
-            let tel = m.itens[m.itens.length-1].tel;
-            if(tel && tel !== "-") {
-                window.open(`https://wa.me/55${tel.replace(/\D/g,'')}?text=${encodeURIComponent(textoRecibo)}`, '_blank');
-            } else { alert("Finalizado com sucesso!"); }
-
-            m.itens = []; m.total = 0; m.ocupada = false;
-            fecharModal(); renderMesas(); renderCarrinho();
+            if(!m || m.total === 0) return alert("Selecione uma mesa!");
+            alert("Finalizando R$ " + m.total.toFixed(2));
+            m.itens = []; m.total = 0; m.ocupada = false; renderMesas(); renderCarrinho();
         }
 
         carregarClientes(); renderMesas();
