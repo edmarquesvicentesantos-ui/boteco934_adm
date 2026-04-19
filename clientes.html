@@ -1,129 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --red: #ef4444; --green: #10b981; }
-        
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; }
-        .card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        
-        .form-cli { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; flex: 1; font-size: 0.9rem; }
-        
-        .btn-add { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: #94a3b8; padding: 12px; border-bottom: 2px solid var(--border); font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        
-        .status-em-dia { color: var(--green); font-weight: bold; }
-        .status-devendo { color: var(--red); font-weight: bold; }
-        
-        .badge-debito { background: rgba(239, 68, 68, 0.1); color: var(--red); padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        body { background: #05070a; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #12151c; padding: 15px; border-radius: 10px; border: 1px solid #1e293b; margin-bottom: 20px; }
+        input { background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; margin-right: 10px; }
+        button { background: #ffb800; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #1e293b; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <h2 style="font-size:1rem; margin-bottom:15px;"><i class="fas fa-user-plus"></i> NOVO CLIENTE / PENDURA</h2>
-        <div class="form-cli">
-            <input type="text" id="nomeCliente" placeholder="Nome Completo do Cliente">
-            <input type="text" id="telCliente" placeholder="Telefone (Opcional)">
-            <button class="btn-add" onclick="salvarCliente()"><i class="fas fa-plus"></i> CADASTRAR</button>
-        </div>
+        <h3>CADASTRO DE CLIENTES (PENDURA)</h3>
+        <input type="text" id="nome" placeholder="Nome do Cliente">
+        <button onclick="salvar()">CADASTRAR</button>
     </div>
-
-    <div class="card">
-        <h3 style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">LISTA DE CLIENTES E SALDOS</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>NOME</th>
-                    <th>CONTATO</th>
-                    <th>SALDO DEVEDOR</th>
-                    <th>AÇÕES</th>
-                </tr>
-            </thead>
-            <tbody id="listaClientes">
-                </tbody>
-        </table>
-    </div>
-
+    <table>
+        <thead><tr><th>NOME</th><th>DÍVIDA</th><th>AÇÃO</th></tr></thead>
+        <tbody id="lista"></tbody>
+    </table>
 <script>
-    // Configuração do Firebase
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
-        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
-        projectId: "boteco934-afc3f" 
-    };
-    firebase.initializeApp(firebaseConfig);
+    const config = { databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com" };
+    if (!firebase.apps.length) firebase.initializeApp(config);
     const db = firebase.database();
 
-    // Função para Salvar Cliente
-    function salvarCliente() {
-        const nome = document.getElementById('nomeCliente').value.trim().toUpperCase();
-        const tel = document.getElementById('telCliente').value.trim();
-
-        if(!nome) return alert("Digite o nome do cliente!");
-
-        db.ref('clientes/' + nome).set({
-            nome: nome,
-            telefone: tel,
-            saldoDevedor: 0 // Começa com zero
-        }).then(() => {
-            alert("Cliente cadastrado!");
-            document.getElementById('nomeCliente').value = "";
-            document.getElementById('telCliente').value = "";
-        });
+    function salvar() {
+        const n = document.getElementById('nome').value.toUpperCase().trim();
+        if(n) db.ref('clientes/' + n).set({ nome: n, saldo: 0 }).then(() => document.getElementById('nome').value = "");
     }
 
-    // Listar Clientes em Tempo Real
-    db.ref('clientes').on('value', (snapshot) => {
-        const corpo = document.getElementById('listaClientes');
+    db.ref('clientes').on('value', snap => {
+        const corpo = document.getElementById('lista');
         corpo.innerHTML = "";
-        
-        if(snapshot.exists()){
-            const dados = [];
-            snapshot.forEach(item => { dados.push(item.val()); });
-            
-            // Ordenar por nome
-            dados.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            dados.forEach(c => {
-                const statusClasse = c.saldoDevedor > 0 ? 'status-devendo' : 'status-em-dia';
-                corpo.innerHTML += `
-                    <tr>
-                        <td><b>${c.nome}</b></td>
-                        <td>${c.telefone || '---'}</td>
-                        <td><span class="${c.saldoDevedor > 0 ? 'badge-debito' : 'status-em-dia'}">
-                            R$ ${parseFloat(c.saldoDevedor).toFixed(2)}
-                        </span></td>
-                        <td>
-                            <button onclick="quitarMoeda('${c.nome}')" style="background:none; border:none; color:var(--green); cursor:pointer; margin-right:10px;" title="Quitar Dívida"><i class="fas fa-check-circle"></i></button>
-                            <button onclick="removerCliente('${c.nome}')" style="background:none; border:none; color:var(--red); cursor:pointer;"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+        snap.forEach(item => {
+            const c = item.val();
+            const saldoFormatado = parseFloat(c.saldo || 0).toFixed(2);
+            corpo.innerHTML += `<tr>
+                <td>${c.nome}</td>
+                <td style="color:${saldoFormatado > 0 ? '#ef4444' : '#10b981'}">R$ ${saldoFormatado}</td>
+                <td><button onclick="quitar('${c.nome}')">QUITAR</button></td>
+            </tr>`;
+        });
     });
 
-    function removerCliente(nome) {
-        if(confirm("Deseja excluir o cliente " + nome + "?")) {
-            db.ref('clientes/' + nome).remove();
-        }
-    }
-
-    function quitarMoeda(nome) {
-        if(confirm("O cliente " + nome + " pagou a conta?")) {
-            db.ref('clientes/' + nome).update({ saldoDevedor: 0 });
-        }
-    }
+    function quitar(n) { if(confirm("Zerar dívida de " + n + "?")) db.ref('clientes/'+n).update({saldo: 0}); }
 </script>
 </body>
 </html>
