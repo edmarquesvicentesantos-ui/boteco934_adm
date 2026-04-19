@@ -1,105 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - Sistema Modular</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        
-        :root { 
-            --bg: #05070a; --card: #12151c; --accent: #ffb800; --border: #1e293b; 
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
-        
-        body { 
-            background: var(--bg); 
-            display: flex; 
-            height: 100vh; 
-            width: 100vw; 
-            overflow: hidden; 
-        }
-
-        /* Menu Lateral Fixo */
-        .sidebar { 
-            width: 75px; 
-            background: var(--card); 
-            border-right: 1px solid var(--border); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding-top: 20px;
-            flex-shrink: 0;
-        }
-
-        .nav-btn { 
-            background: none; border: none; color: #64748b; 
-            padding: 15px 5px; cursor: pointer; 
-            display: flex; flex-direction: column; 
-            align-items: center; font-size: 0.55rem; 
-            width: 100%; gap: 5px;
-            transition: 0.3s;
-        }
-
-        .nav-btn i { font-size: 1.3rem; }
-        .nav-btn.active { color: var(--accent); background: rgba(255,184,0,0.1); }
-
-        /* O PALCO CENTRAL (Onde as páginas vão aparecer) */
-        .main-stage { 
-            flex: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: var(--bg);
-        }
-
-        /* Moldura que carrega as páginas externas */
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            max-width: 1200px; /* Limite para não espalhar demais em telas grandes */
-        }
-    </style>
-</head>
-<body>
-
-<nav class="sidebar">
-    <div style="color:var(--accent); font-weight:700; font-size:0.7rem; margin-bottom:20px">B934</div>
-    
-    <button class="nav-btn active" onclick="mudarPagina('caixa.html', this)">
-        <i class="fas fa-cash-register"></i>CAIXA
-    </button>
-    
-    <button class="nav-btn" onclick="mudarPagina('estoque.html', this)">
-        <i class="fas fa-boxes-stacked"></i>ESTOQUE
-    </button>
-    
-    <button class="nav-btn" onclick="mudarPagina('clientes.html', this)">
-        <i class="fas fa-user-friends"></i>CLIENTES
-    </button>
-    
-    <button class="nav-btn" onclick="mudarPagina('financas.html', this)">
-        <i class="fas fa-chart-pie"></i>FINANÇAS
-    </button>
-</nav>
-
-<main class="main-stage">
-    <iframe src="caixa.html" id="conteudo"></iframe>
-</main>
-
 <script>
-    function mudarPagina(url, btn) {
-        // Troca o link do iframe
-        document.getElementById('conteudo').src = url;
+    function navegar(pagina, elemento) {
+        const iframe = document.getElementById('tela-principal');
         
-        // Atualiza o visual dos botões
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        // Adiciona um pequeno carregamento para evitar o erro visual
+        iframe.style.opacity = '0.5';
+        
+        // Tenta carregar a página
+        iframe.src = pagina;
+
+        iframe.onload = function() {
+            iframe.style.opacity = '1';
+        };
+
+        // Atualiza o visual do menu lateral
+        const itens = document.querySelectorAll('.nav-item');
+        itens.forEach(item => item.classList.remove('active'));
+        elemento.classList.add('active');
     }
 </script>
-
-</body>
-</html>
