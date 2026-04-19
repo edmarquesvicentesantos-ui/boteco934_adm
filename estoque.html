@@ -5,157 +5,138 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
         :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; }
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; }
-        .card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
-        .btn-salvar { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
-        .btn-xml { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 2px dashed #3b82f6; padding: 15px; text-align: center; cursor: pointer; border-radius: 8px; display: block; margin-bottom: 15px; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; font-size: 0.85rem; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 0.8rem; }
+        label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .btn { border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; }
+        .btn-salvar { background: var(--accent); color: #000; margin-top: 10px; }
+        .sugestao { background: rgba(255,184,0,0.1); border: 1px solid var(--accent); color: var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-weight: bold; font-size: 0.75rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.7rem; }
-        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-        #statusMsg { padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
+        td, th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+        .pos { color: var(--green); } .neg { color: var(--red); }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2 style="text-align:center; font-size:1rem; margin-bottom:15px;">GERENCIAR ESTOQUE</h2>
+        <h2 style="text-align:center; font-size:0.9rem; margin-bottom:15px;">ENTRADA INTELIGENTE</h2>
         
-        <div id="statusMsg"></div>
-
-        <label for="inputXml" class="btn-xml">📁 CLIQUE PARA IMPORTAR XML</label>
+        <label for="inputXml" style="background:rgba(59,130,246,0.1); color:#3b82f6; border:1px dashed #3b82f6; padding:10px; text-align:center; cursor:pointer; border-radius:8px; display:block; margin-bottom:15px;">
+            <i class="fas fa-file-invoice"></i> CLIQUE PARA LER XML
+        </label>
         <input type="file" id="inputXml" accept=".xml" style="display:none" onchange="lerNota(this)">
 
-        <input type="text" id="nome" placeholder="NOME DO PRODUTO">
-        <input type="number" id="custo" placeholder="PREÇO DE CUSTO">
-        <input type="number" id="venda" placeholder="PREÇO DE VENDA">
+        <div id="areaSugestao" class="sugestao" style="display:none;"></div>
+
+        <div class="grid-inputs">
+            <div><label>Produto</label><input type="text" id="nome"></div>
+            <div><label>Qtd na Caixa</label><input type="number" id="qtd" value="1" oninput="calcularSugestao()"></div>
+            <div><label>Custo Total (Nota)</label><input type="number" id="custo" oninput="calcularSugestao()"></div>
+            <div><label>Imposto %</label><input type="number" id="imposto" value="10" oninput="calcularSugestao()"></div>
+            <div><label>Preço Venda</label><input type="number" id="venda" placeholder="R$ 0.00"></div>
+        </div>
         
-        <button class="btn-salvar" onclick="salvarNoFirebase()">💾 SALVAR NO SISTEMA</button>
+        <button class="btn btn-salvar" onclick="salvarNoFirebase()">💾 SALVAR NO ESTOQUE</button>
     </div>
 
     <div class="card">
-        <h3 style="font-size:0.8rem; color:#94a3b8; margin-bottom:10px;">LISTA DE PRODUTOS (A-Z)</h3>
         <table>
             <thead>
-                <tr>
-                    <th>PRODUTO</th>
-                    <th>CUSTO</th>
-                    <th>VENDA</th>
-                    <th>AÇÃO</th>
-                </tr>
+                <tr><th>PRODUTO</th><th>CUSTO UN.</th><th>VENDA</th><th>MARGEM</th><th>AÇÃO</th></tr>
             </thead>
-            <tbody id="tabelaCorpo">
-                </tbody>
+            <tbody id="tabelaCorpo"></tbody>
         </table>
     </div>
 
 <script>
-    // Configuração do seu Firebase
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
-        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
-        projectId: "boteco934-afc3f" 
-    };
-    
-    // Inicializa o Firebase
+    const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function mostrarStatus(texto, erro = false) {
-        const msg = document.getElementById('statusMsg');
-        msg.style.display = 'block';
-        msg.style.backgroundColor = erro ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)';
-        msg.style.color = erro ? '#ef4444' : '#10b981';
-        msg.innerHTML = texto;
-        setTimeout(() => { msg.style.display = 'none'; }, 3000);
-    }
-
-    // Função para Ler XML
     function lerNota(input) {
-        const arquivo = input.files[0];
-        const leitor = new FileReader();
-        leitor.onload = function(e) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const prodNome = xml.getElementsByTagName("xProd")[0]?.textContent || "";
-            const prodPreco = xml.getElementsByTagName("vUnCom")[0]?.textContent || "";
-            
-            if(prodNome) {
-                document.getElementById('nome').value = prodNome.toUpperCase();
-                document.getElementById('custo').value = parseFloat(prodPreco).toFixed(2);
-                mostrarStatus("✅ XML Carregado!");
+            const prod = xml.getElementsByTagName("xProd")[0]?.textContent || "";
+            const valor = xml.getElementsByTagName("vProd")[0]?.textContent || "";
+            if(prod) {
+                document.getElementById('nome').value = prod.toUpperCase();
+                document.getElementById('custo').value = parseFloat(valor).toFixed(2);
+                calcularSugestao();
             }
         };
-        leitor.readAsText(arquivo);
+        reader.readAsText(input.files[0]);
     }
 
-    // FUNÇÃO PARA SALVAR (COM ATUALIZAÇÃO FORÇADA)
+    function calcularSugestao() {
+        const custoTotal = parseFloat(document.getElementById('custo').value) || 0;
+        const unidades = parseFloat(document.getElementById('qtd').value) || 1;
+        const impPerc = parseFloat(document.getElementById('imposto').value) || 0;
+        
+        const custoUnitario = custoTotal / unidades;
+        
+        // Sugestão baseada em 30% de margem sobre o preço final
+        // Fórmula: Preço = Custo / (1 - Margem - Imposto)
+        const margemDesejada = 0.30; 
+        const impostoDecimal = impPerc / 100;
+        const precoSugerido = custoUnitario / (1 - margemDesejada - impostoDecimal);
+
+        const area = document.getElementById('areaSugestao');
+        area.style.display = 'block';
+        area.innerHTML = `Custo Unitário: R$ ${custoUnitario.toFixed(2)} | Sugestão de Venda (30% lucro): R$ ${precoSugerido.toFixed(2)}`;
+        
+        // Preenche o campo de venda automaticamente com a sugestão, mas deixa você mudar
+        document.getElementById('venda').value = precoSugerido.toFixed(2);
+    }
+
     function salvarNoFirebase() {
         const n = document.getElementById('nome').value.trim().toUpperCase();
-        const c = parseFloat(document.getElementById('custo').value) || 0;
+        const cTotal = parseFloat(document.getElementById('custo').value) || 0;
+        const qtd = parseFloat(document.getElementById('qtd').value) || 1;
         const v = parseFloat(document.getElementById('venda').value) || 0;
+        const imp = parseFloat(document.getElementById('imposto').value) || 0;
 
-        if(!n || v <= 0) {
-            mostrarStatus("❌ Preencha Nome e Venda!", true);
-            return;
-        }
+        const cUn = cTotal / qtd;
+        const lucroReal = v - cUn - (v * (imp/100));
+        const margemReal = (lucroReal / v) * 100;
 
-        // Salva no caminho 'produtos/NOMEDOPRODUTO'
+        if(!n || v <= 0) return alert("Preencha Nome e Venda!");
+
         database.ref('produtos/' + n).set({
-            nome: n,
-            custo: c,
-            venda: v
+            nome: n, custo: cUn, venda: v, margem: margemReal
         }).then(() => {
-            mostrarStatus("✅ Salvo com Sucesso!");
+            alert("Salvo!");
             document.getElementById('nome').value = "";
             document.getElementById('custo').value = "";
-            document.getElementById('venda').value = "";
-        }).catch((e) => {
-            mostrarStatus("❌ Erro ao salvar: " + e.message, true);
+            document.getElementById('areaSugestao').style.display = 'none';
         });
     }
 
-    // FUNÇÃO QUE PUXA OS DADOS E MONTA A TABELA (REAL-TIME)
-    database.ref('produtos').on('value', (snapshot) => {
+    database.ref('produtos').on('value', (snap) => {
         const corpo = document.getElementById('tabelaCorpo');
-        corpo.innerHTML = ""; // Limpa a tabela antes de carregar
-        
-        if (snapshot.exists()) {
-            const dados = [];
-            snapshot.forEach((item) => {
-                dados.push(item.val());
-            });
-
-            // Organiza de A a Z
-            dados.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            // Cria as linhas da tabela
-            dados.forEach((p) => {
-                corpo.innerHTML += `
-                    <tr>
-                        <td><b>${p.nome}</b></td>
-                        <td>R$ ${p.custo.toFixed(2)}</td>
-                        <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
-                        <td>
-                            <i class="fas fa-trash" style="color:var(--red); cursor:pointer" 
-                               onclick="removerProduto('${p.nome}')"></i>
-                        </td>
-                    </tr>
-                `;
-            });
-        } else {
-            corpo.innerHTML = "<tr><td colspan='4' style='text-align:center'>Nenhum produto encontrado.</td></tr>";
-        }
+        corpo.innerHTML = "";
+        const dados = [];
+        snap.forEach(i => dados.push(i.val()));
+        dados.sort((a,b) => a.nome.localeCompare(b.nome));
+        dados.forEach(p => {
+            corpo.innerHTML += `<tr>
+                <td><b>${p.nome}</b></td>
+                <td>R$ ${p.custo.toFixed(2)}</td>
+                <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
+                <td class="${p.margem > 20 ? 'pos' : 'neg'}">${parseFloat(p.margem).toFixed(1)}%</td>
+                <td><i class="fas fa-trash" style="color:var(--red); cursor:pointer" onclick="remover('${p.nome}')"></i></td>
+            </tr>`;
+        });
     });
 
-    function removerProduto(nome) {
-        if(confirm("Deseja apagar " + nome + "?")) {
-            database.ref('produtos/' + nome).remove();
-        }
-    }
+    function remover(n) { if(confirm("Apagar " + n + "?")) database.ref('produtos/'+n).remove(); }
 </script>
 </body>
 </html>
