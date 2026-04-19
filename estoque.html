@@ -3,96 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --red: #ef4444; }
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; }
         
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        body::-webkit-scrollbar { display: none; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; font-size: 0.8rem; }
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 1100px; margin: 0 auto; }
+        
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        
+        input, select { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; width: 100%; font-size: 0.75rem; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 700; color: var(--bg); background: var(--accent); transition: 0.2s; }
+        .btn-excel { background: var(--green); color: white; margin-left: 5px; }
 
-        .container { width: 100%; max-width: 450px; }
-        h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
-
-        /* Card de Cadastro */
-        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 0.8rem; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; background: var(--accent); color: var(--bg); font-size: 0.8rem; }
-
-        /* Tabela de Produtos */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
-        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.65rem; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid var(--border); }
-        .btn-del { color: var(--red); cursor: pointer; background: none; border: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #94a3b8; padding: 8px; border-bottom: 2px solid var(--border); font-size: 0.65rem; text-transform: uppercase; cursor: pointer; }
+        td { padding: 8px; border-bottom: 1px solid var(--border); }
+        
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; }
+        .pos { color: var(--green); } .neg { color: var(--red); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Gerenciar Estoque</h2>
-
-        <div class="card">
-            <input type="text" id="pNome" placeholder="Nome do Produto (Ex: Heineken)">
-            <input type="number" id="pVal" placeholder="Preço de Venda (R$)">
-            <button class="btn" onclick="salvarProduto()">SALVAR PRODUTO</button>
+<div class="grid-layout">
+    <div class="card">
+        <h2 style="font-size:0.9rem; margin-bottom:15px"><i class="fas fa-file-import"></i> Entrada de Produtos (XML ou Manual)</h2>
+        
+        <div class="form-row">
+            <input type="file" id="xmlInput" accept=".xml" style="grid-column: span 2">
+            <button class="btn" onclick="processarXML()" style="background:#3b82f6; color:white">LER XML</button>
         </div>
 
-        <div class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Preço</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="listaEstoque"></tbody>
-            </table>
+        <div class="form-row">
+            <input type="text" id="pNome" placeholder="Nome do Produto / AED">
+            <input type="number" id="pQtd" placeholder="Qtd Caixa">
+            <input type="number" id="pCustoCx" placeholder="Custo Caixa (R$)" oninput="calcUnitario()">
+            <input type="number" id="pImposto" placeholder="Imposto (%)" value="10">
+        </div>
+
+        <div class="form-row">
+            <input type="number" id="pUnit" placeholder="Custo Unitário" readonly style="background:#1e293b">
+            <input type="number" id="pVenda" placeholder="Preço de Venda (R$)" oninput="calcLucro()">
+            <button class="btn" onclick="salvarProduto()">SALVAR NO SISTEMA</button>
+            <button class="btn btn-excel" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> EXCEL</button>
         </div>
     </div>
 
+    <div class="card" style="overflow-x: auto;">
+        <table id="tabelaEstoque">
+            <thead>
+                <tr>
+                    <th onclick="ordenar(0)">Produto <i class="fas fa-sort"></i></th>
+                    <th>Custo Un.</th>
+                    <th>Venda</th>
+                    <th>Margem Real</th>
+                    <th>Lucro R$</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="listaEstoque"></tbody>
+        </table>
+    </div>
+</div>
+
 <script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
-        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
-        projectId: "boteco934-afc3f" 
-    };
+    const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function salvarProduto() {
-        const nome = document.getElementById('pNome').value.trim().toUpperCase();
-        const preco = parseFloat(document.getElementById('pVal').value);
-
-        if(!nome || isNaN(preco)) return alert("Preencha nome e preço corretamente!");
-
-        db.ref('produtos/' + nome).set({ nome: nome, val: preco })
-        .then(() => {
-            document.getElementById('pNome').value = "";
-            document.getElementById('pVal').value = "";
-        });
+    function calcUnitario() {
+        const cx = parseFloat(document.getElementById('pCustoCx').value) || 0;
+        const qtd = parseFloat(document.getElementById('pQtd').value) || 1;
+        document.getElementById('pUnit').value = (cx / qtd).toFixed(2);
+        calcLucro();
     }
 
-    // Escuta o Banco de Dados e atualiza a tabela
+    function calcLucro() {
+        const unit = parseFloat(document.getElementById('pUnit').value) || 0;
+        const venda = parseFloat(document.getElementById('pVenda').value) || 0;
+        const impostoPerc = parseFloat(document.getElementById('pImposto').value) || 0;
+        
+        const valorImposto = venda * (impostoPerc / 100);
+        const lucroBruto = venda - unit;
+        const lucroReal = venda - unit - valorImposto;
+        const margemReal = venda > 0 ? (lucroReal / venda) * 100 : 0;
+
+        return { lucroReal, margemReal };
+    }
+
+    function salvarProduto() {
+        const nome = document.getElementById('pNome').value.trim().toUpperCase();
+        const info = calcLucro();
+        const dados = {
+            nome: nome,
+            custoUnit: parseFloat(document.getElementById('pUnit').value),
+            venda: parseFloat(document.getElementById('pVenda').value),
+            lucroReal: info.lucroReal,
+            margemReal: info.margemReal,
+            timestamp: Date.now()
+        };
+        if(nome) db.ref('produtos/' + nome).set(dados);
+    }
+
     db.ref('produtos').on('value', snap => {
         const produtos = snap.val() ? Object.values(snap.val()) : [];
-        const tbody = document.getElementById('listaEstoque');
+        produtos.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordem A-Z automática
         
+        const tbody = document.getElementById('listaEstoque');
         tbody.innerHTML = produtos.map(p => `
             <tr>
-                <td>${p.nome}</td>
-                <td>R$ ${(p.val || 0).toFixed(2)}</td>
-                <td><button class="btn-del" onclick="remover('${p.nome}')"><i class="fas fa-trash"></i></button></td>
+                <td style="font-weight:700">${p.nome}</td>
+                <td>R$ ${p.custoUnit.toFixed(2)}</td>
+                <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
+                <td class="${p.margemReal > 20 ? 'pos' : 'neg'}">${p.margemReal.toFixed(1)}%</td>
+                <td class="pos">R$ ${p.lucroReal.toFixed(2)}</td>
+                <td><button class="btn-del" onclick="remover('${p.nome}')" style="background:none; border:none; color:var(--red); cursor:pointer"><i class="fas fa-trash"></i></button></td>
             </tr>
         `).join('');
     });
 
-    function remover(nome) {
-        if(confirm("Deseja remover " + nome + "?")) {
-            db.ref('produtos/' + nome).remove();
-        }
+    function exportarExcel() {
+        const table = document.getElementById("tabelaEstoque");
+        const wb = XLSX.utils.table_to_book(table);
+        XLSX.writeFile(wb, "Estoque_Boteco934.xlsx");
     }
+
+    function remover(id) { if(confirm("Remover?")) db.ref('produtos/'+id).remove(); }
 </script>
 </body>
 </html>
