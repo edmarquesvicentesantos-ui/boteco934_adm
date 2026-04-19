@@ -2,58 +2,32 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <title>Boteco 934</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #05070a; color: white; font-family: sans-serif; padding: 20px; }
-        .card { background: #12151c; border: 1px solid #1e293b; padding: 15px; border-radius: 10px; }
-        input { background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 5px; border-radius: 5px; }
-        button { background: #ffb800; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        td, th { padding: 10px; border-bottom: 1px solid #1e293b; text-align: left; }
+        body { margin: 0; display: flex; height: 100vh; background: #05070a; font-family: sans-serif; }
+        .sidebar { width: 80px; background: #0f1218; border-right: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+        .nav-item { color: #64748b; padding: 20px; cursor: pointer; font-size: 1.5rem; }
+        .nav-item:hover, .active { color: #ffb800; }
+        .main { flex: 1; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>CADASTRO DE CLIENTE (PENDURA)</h3>
-        <input type="text" id="nomeCli" placeholder="Nome do Cliente">
-        <button onclick="addCliente()">CADASTRAR</button>
+    <div class="sidebar">
+        <div class="nav-item active" onclick="ir('caixa.html', this)"><i class="fas fa-cash-register"></i></div>
+        <div class="nav-item" onclick="ir('estoque.html', this)"><i class="fas fa-boxes-stacked"></i></div>
+        <div class="nav-item" onclick="ir('clientes.html', this)"><i class="fas fa-users"></i></div>
     </div>
-
-    <table id="tabClientes">
-        <thead>
-            <tr><th>NOME</th><th>DÍVIDA ATUAL</th><th>AÇÃO</th></tr>
-        </thead>
-        <tbody id="corpoCli"></tbody>
-    </table>
-
-<script>
-    const config = { databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com" };
-    if (!firebase.apps.length) firebase.initializeApp(config);
-    const db = firebase.database();
-
-    function addCliente() {
-        const nome = document.getElementById('nomeCli').value.toUpperCase();
-        if(nome) {
-            db.ref('clientes/' + nome).set({ nome: nome, saldo: 0 });
-            document.getElementById('nomeCli').value = "";
+    <div class="main">
+        <iframe id="tela" src="caixa.html"></iframe>
+    </div>
+    <script>
+        function ir(pag, el) {
+            document.getElementById('tela').src = pag;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
         }
-    }
-
-    db.ref('clientes').on('value', snap => {
-        const corpo = document.getElementById('corpoCli');
-        corpo.innerHTML = "";
-        snap.forEach(cli => {
-            const c = cli.val();
-            corpo.innerHTML += `<tr>
-                <td>${c.nome}</td>
-                <td style="color:${c.saldo > 0 ? '#ef4444' : '#10b981'}">R$ ${parseFloat(c.saldo).toFixed(2)}</td>
-                <td><button onclick="pagar('${c.nome}')">QUITAR</button></td>
-            </tr>`;
-        });
-    });
-
-    function pagar(n) { if(confirm("Zerar conta de "+n+"?")) db.ref('clientes/'+n).update({saldo: 0}); }
-</script>
+    </script>
 </body>
 </html>
