@@ -3,70 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v56 XML Import</title>
+    <title>Boteco 934 - v57 Platinum</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --border: #1e293b; --green: #10b981; }
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --border: #1e293b; --green: #10b981; --red: #ef4444; }
+        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.2s; }
         body { margin: 0; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-        
-        .sidebar { width: 200px; background: var(--card); border-right: 1px solid var(--border); padding: 10px; }
-        .nav-btn { padding: 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--subtext); border-radius: 10px; margin-bottom: 5px; }
-        .nav-btn.active { background: var(--accent); color: var(--bg); font-weight: bold; }
 
-        .main { flex: 1; padding: 20px; overflow-y: auto; }
+        /* Sidebar Estilizada das Imagens */
+        .sidebar { width: 180px; background: var(--card); border-right: 1px solid var(--border); padding: 10px; display: flex; flex-direction: column; }
+        .brand { padding: 20px 10px; color: var(--accent); font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btn { padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--subtext); border-radius: 8px; margin-bottom: 5px; font-size: 14px; }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,184,0,0.1); color: var(--accent); border-left: 3px solid var(--accent); }
+
+        .main { flex: 1; padding: 25px; overflow-y: auto; }
         .view { display: none; }
         .view.active { display: block; }
 
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
-        .btn { border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
-        .btn-gold { background: var(--accent); color: var(--bg); }
-        .btn-xml { background: #3b82f6; color: white; }
+        /* Grid de Mesas conforme image_347ea6.png */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .mesa-card { background: #1c212b; border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; }
+        .mesa-card.ocupada { border-color: var(--accent); background: rgba(255,184,0,0.05); }
+        .mesa-card h4 { margin: 0; font-size: 14px; color: var(--subtext); }
+        .mesa-card b { font-size: 18px; display: block; margin-top: 5px; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        td, th { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
-        th { color: var(--accent); font-size: 12px; }
+        /* Inputs e Botões */
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn { border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-gold { background: var(--accent); color: var(--bg); }
+        .btn-green { background: var(--green); color: white; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--accent); padding: 12px; font-size: 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     </style>
 </head>
 <body>
 
-<nav class="sidebar">
-    <div style="padding:20px; text-align:center; color:var(--accent); font-weight:700">BOTECO 934</div>
-    <div class="nav-btn active" onclick="show('caixa', this)"><i class="fas fa-cash-register"></i> CAIXA</div>
-    <div class="nav-btn" onclick="show('estoque', this)"><i class="fas fa-boxes-stacked"></i> ESTOQUE</div>
-</nav>
+<aside class="sidebar">
+    <div class="brand">BOTECO 934</div>
+    <div class="nav-btn active" onclick="nav('caixa', this)"><i class="fas fa-desktop"></i> CAIXA</div>
+    <div class="nav-btn" onclick="nav('estoque', this)"><i class="fas fa-box"></i> ESTOQUE</div>
+    <div class="nav-btn" onclick="nav('clientes', this)"><i class="fas fa-users"></i> CLIENTES</div>
+    <div class="nav-btn" onclick="nav('financas', this)"><i class="fas fa-wallet"></i> FINANÇAS</div>
+</aside>
 
 <main class="main">
     <section id="caixa" class="view active">
-        <h2>PDV Ativo</h2>
-        <p>Use o menu para gerenciar produtos e clientes.</p>
+        <div style="display: grid; grid-template-columns: 1fr 350px; gap: 20px;">
+            <div class="grid-mesas" id="mesasRender"></div>
+            
+            <div id="checkout" style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--border); display:none">
+                <h3 id="mesaLabel" style="color:var(--accent); margin-top:0">MESA --</h3>
+                <div id="clienteMesa" style="font-size:12px; color:var(--subtext); margin-bottom:15px"></div>
+                <div id="itensLista" style="min-height:200px; border-top:1px solid var(--border); padding-top:10px"></div>
+                <h2 id="totalMesa" style="text-align:right">R$ 0,00</h2>
+                <button class="btn btn-green" onclick="fecharVenda()">PAGAR E IMPRIMIR</button>
+                <button class="btn" style="background:#25d366; color:white; margin-top:10px" onclick="abrirZap()">WHATSAPP</button>
+            </div>
+        </div>
     </section>
 
     <section id="estoque" class="view">
         <div style="display:grid; grid-template-columns: 350px 1fr; gap:20px">
             <div style="background:var(--card); padding:20px; border-radius:15px">
-                <h3>Entrada de Produtos</h3>
-                <input type="file" id="xmlInput" accept=".xml" style="display:none" onchange="lerXML(this)">
-                <button class="btn btn-xml" onclick="document.getElementById('xmlInput').click()">
-                    <i class="fas fa-file-code"></i> IMPORTAR NFe (XML)
-                </button>
+                <h3>Importar XML</h3>
+                <input type="file" id="xmlFile" accept=".xml" onchange="importarXML(this)">
+                <p style="font-size:11px; color:var(--subtext)">O sistema aplicará 50% de markup automático nos produtos da nota.</p>
                 <hr style="border:0; border-top:1px solid var(--border); margin:20px 0">
-                
-                <input type="text" id="pNome" placeholder="Nome do Produto">
-                <input type="number" id="pPreco" placeholder="Preço de Venda R$">
-                <button class="btn btn-gold" onclick="addManual()">SALVAR MANUAL</button>
+                <h3>Manual</h3>
+                <input type="text" id="pNome" placeholder="Produto">
+                <input type="number" id="pPreco" placeholder="Preço Venda R$">
+                <button class="btn btn-gold" onclick="addManual()">SALVAR</button>
             </div>
-
             <div style="background:var(--card); padding:20px; border-radius:15px">
-                <h3>Produtos Cadastrados</h3>
-                <table>
-                    <thead><tr><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                    <tbody id="listaEstoque"></tbody>
-                </table>
+                <table><thead><tr><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead><tbody id="listaProd"></tbody></table>
             </div>
+        </div>
+    </section>
+
+    <section id="clientes" class="view">
+        <div style="background:var(--card); padding:20px; border-radius:15px; max-width:500px">
+            <h3>Novo Cliente</h3>
+            <input type="text" id="cNome" placeholder="Nome do Cliente">
+            <input type="text" id="cZap" placeholder="WhatsApp (5587...)">
+            <button class="btn btn-gold" onclick="addCli()">CADASTRAR</button>
+        </div>
+        <div style="margin-top:20px; background:var(--card); padding:20px; border-radius:15px">
+            <table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Ação</th></tr></thead><tbody id="listaCli"></tbody></table>
+        </div>
+    </section>
+
+    <section id="financas" class="view">
+        <div style="background:var(--card); padding:30px; border-radius:15px; text-align:center">
+            <h3>Vendido Hoje</h3>
+            <h1 id="resumoHoje" style="color:var(--green)">R$ 0,00</h1>
         </div>
     </section>
 </main>
@@ -76,47 +110,66 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let estoque = [];
+    let produtos = [], clientes = [], vendas = [], mesas = Array(12).fill(null).map((_,i) => ({id:i+1, itens:[], cliente:null}));
+    let mesaSel = null;
 
-    db.ref('produtos').on('value', snap => {
-        estoque = snap.val() ? Object.values(snap.val()) : [];
+    db.ref().on('value', s => {
+        const d = s.val() || {};
+        produtos = d.produtos ? Object.values(d.produtos) : [];
+        clientes = d.clientes ? Object.values(d.clientes) : [];
+        vendas = d.vendas ? Object.values(d.vendas) : [];
         render();
     });
 
     function render() {
-        document.getElementById('listaEstoque').innerHTML = estoque.map(p => `
-            <tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:#ef4444; cursor:pointer" onclick="remover('${p.nome}')"></i></td></tr>
+        document.getElementById('mesasRender').innerHTML = mesas.map(m => `
+            <div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">
+                <h4>MESA</h4><b>${m.id}</b>
+                <small>${m.cliente ? m.cliente.nome : ''}</small>
+            </div>
         `).join('');
+
+        document.getElementById('listaProd').innerHTML = produtos.map(p => `<tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" onclick="delP('${p.nome}')"></i></td></tr>`).join('');
+        document.getElementById('listaCli').innerHTML = clientes.map(c => `<tr><td>${c.nome}</td><td>${c.zap}</td><td><i class="fas fa-trash" onclick="delC('${c.nome}')"></i></td></tr>`).join('');
+        
+        const totalH = vendas.filter(v => v.data === new Date().toLocaleDateString()).reduce((a,b) => a + b.valor, 0);
+        document.getElementById('resumoHoje').innerText = "R$ " + totalH.toFixed(2);
     }
 
-    // FUNÇÃO PARA LER XML DA NOTA FISCAL
-    function lerXML(input) {
+    function importarXML(input) {
         const reader = new FileReader();
         reader.onload = function() {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(reader.result, "text/xml");
-            
-            // Busca as tags <det> que contêm os produtos na NFe
-            const itens = xmlDoc.getElementsByTagName("det");
-            
-            if(itens.length === 0) return alert("XML Inválido ou sem produtos!");
-
+            const xml = new DOMParser().parseFromString(reader.result, "text/xml");
+            const itens = xml.getElementsByTagName("det");
             for (let i = 0; i < itens.length; i++) {
-                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
-                const precoCusto = itens[i].getElementsByTagName("vUnCom")[0].textContent;
-                
-                // Sugere um lucro de 50% em cima do custo do XML (você pode alterar depois)
-                const precoVenda = parseFloat(precoCusto) * 1.5;
-
-                // Adiciona ao Firebase
-                db.ref('produtos/' + nome.replace(/[.#$/[\]]/g, "")).set({
-                    nome: nome.toUpperCase(),
-                    val: precoVenda
-                });
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                const custo = parseFloat(itens[i].getElementsByTagName("vUnCom")[0].textContent);
+                db.ref('produtos/' + nome.replace(/[.#$/[\]]/g, "")).set({ nome, val: custo * 1.5 });
             }
             alert(itens.length + " produtos importados com sucesso!");
         };
         reader.readAsText(input.files[0]);
+    }
+
+    function abrirMesa(id) {
+        mesaSel = mesas.find(m => m.id === id);
+        document.getElementById('checkout').style.display = 'block';
+        document.getElementById('mesaLabel').innerText = "MESA " + id;
+        if(!mesaSel.cliente) {
+            const n = prompt("Nome do Cliente:");
+            const c = clientes.find(x => x.nome === n?.toUpperCase());
+            if(c) mesaSel.cliente = c;
+        }
+        document.getElementById('clienteMesa').innerText = mesaSel.cliente ? "👤 " + mesaSel.cliente.nome : "Cliente Avulso";
+        
+        // Simulação de adicionar produto rápido para teste
+        if(produtos.length > 0 && mesaSel.itens.length === 0) {
+            mesaSel.itens.push({nome: produtos[0].nome, val: produtos[0].val, qtd: 1});
+        }
+        
+        const total = mesaSel.itens.reduce((a,b) => a + (b.val * b.qtd), 0);
+        document.getElementById('itensLista').innerHTML = mesaSel.itens.map(i => `<div>${i.qtd}x ${i.nome} - R$ ${i.val.toFixed(2)}</div>`).join('');
+        document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
     }
 
     function addManual() {
@@ -125,8 +178,31 @@
         if(n && v) db.ref('produtos/' + n).set({ nome: n, val: v });
     }
 
-    function remover(nome) { if(confirm("Remover?")) db.ref('produtos/' + nome).remove(); }
-    function show(id, b) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active')); b.classList.add('active'); }
+    function addCli() {
+        const n = document.getElementById('cNome').value.toUpperCase();
+        const z = document.getElementById('cZap').value;
+        if(n) db.ref('clientes/' + n).set({ nome: n, zap: z });
+    }
+
+    function fecharVenda() {
+        const total = parseFloat(document.getElementById('totalMesa').innerText.replace('R$ ',''));
+        if(total > 0) {
+            db.ref('vendas').push({ valor: total, data: new Date().toLocaleDateString() });
+            mesaSel.itens = []; mesaSel.cliente = null;
+            document.getElementById('checkout').style.display = 'none';
+        }
+    }
+
+    function nav(id, b) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+        b.classList.add('active');
+    }
+    
+    function delP(n) { db.ref('produtos/' + n).remove(); }
+    function delC(n) { db.ref('clientes/' + n).remove(); }
+    function abrirZap() { if(mesaSel.cliente) window.open(`https://wa.me/${mesaSel.cliente.zap}?text=Conta Boteco 934: ${document.getElementById('totalMesa').innerText}`); }
 </script>
 </body>
 </html>
