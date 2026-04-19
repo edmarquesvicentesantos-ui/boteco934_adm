@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; --blue: #3b82f6; }
+        
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 20px; margin: 0; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-card i { font-size: 1.5rem; color: var(--accent); margin-bottom: 10px; }
+        .stat-card h3 { font-size: 0.8rem; color: #94a3b8; margin: 5px 0; text-transform: uppercase; }
+        .stat-card .valor { font-size: 1.8rem; font-weight: 700; }
+
+        .tabela-area { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; color: #94a3b8; font-size: 0.75rem; padding: 12px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        
+        .valor-negativo { color: var(--red); font-weight: bold; }
+        .valor-positivo { color: var(--green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-bottom: 20px; font-size: 1.2rem;"><i class="fas fa-chart-pie"></i> FINANCEIRO - BOTECO 934</h2>
+
+    <div class="grid-stats">
+        <div class="stat-card">
+            <i class="fas fa-hand-holding-usd"></i>
+            <h3>Total a Receber (Penduras)</h3>
+            <div class="valor valor-negativo" id="totalPenduras">R$ 0,00</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fas fa-boxes"></i>
+            <h3>Valor em Estoque (Custo)</h3>
+            <div class="valor valor-blue" id="valorEstoque" style="color: var(--blue);">R$ 0,00</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fas fa-users"></i>
+            <h3>Clientes Cadastrados</h3>
+            <div class="valor" id="qtdClientes">0</div>
+        </div>
+    </div>
+
+    <div class="tabela-area">
+        <h3 style="font-size: 0.9rem; margin-bottom: 15px;">RESUMO DE DEVEDORES</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>NOME DO CLIENTE</th>
+                    <th>SALDO DEVEDOR</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="listaFinancas">
+                </tbody>
+        </table>
+    </div>
+
+<script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 1. Carregar Dados dos Clientes (Penduras)
+    db.ref('clientes').on('value', snap => {
+        let totalReceber = 0;
+        let contagem = 0;
+        const tabela = document.getElementById('listaFinancas');
+        tabela.innerHTML = "";
+
+        snap.forEach(item => {
+            const c = item.val();
+            const saldo = parseFloat(c.saldo || 0);
+            totalReceber += saldo;
+            contagem++;
+
+            if(saldo > 0) {
+                tabela.innerHTML += `
+                    <tr>
+                        <td><b>${c.nome}</b></td>
+                        <td class="valor-negativo">R$ ${saldo.toFixed(2)}</td>
+                        <td><span style="background: rgba(239,68,68,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;">DEVEDOR</span></td>
+                    </tr>
+                `;
+            }
+        });
+
+        document.getElementById('totalPenduras').innerText = `R$ ${totalReceber.toFixed(2)}`;
+        document.getElementById('qtdClientes').innerText = contagem;
+        
+        if(tabela.innerHTML === "") {
+            tabela.innerHTML = "<tr><td colspan='3' style='text-align:center; color:#94a3b8;'>Nenhum pendura em aberto no momento.</td></tr>";
+        }
+    });
+
+    // 2. Carregar Valor do Estoque
+    db.ref('produtos').on('value', snap => {
+        let custoTotal = 0;
+        snap.forEach(item => {
+            const p = item.val();
+            const custo = parseFloat(p.custo || 0);
+            const qtd = parseInt(p.estoque || 0);
+            custoTotal += (custo * qtd);
+        });
+        document.getElementById('valorEstoque').innerText = `R$ ${custoTotal.toFixed(2)}`;
+    });
+</script>
+</body>
+</html>
