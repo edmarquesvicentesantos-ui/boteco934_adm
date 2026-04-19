@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v60.4 Nano</title>
+    <title>Boteco 934 - v60.5 Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -13,68 +13,46 @@
         :root { 
             --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; 
             --subtext: #94a3b8; --border: #1e293b; --green: #10b981;
-            /* ESCALA REDUZIDA */
-            --f-mesa: 1rem;      /* Tamanho do número da mesa */
-            --f-geral: 0.75rem;   /* Tamanho padrão do app */
-            --f-mini: 0.6rem;     /* Legendas */
+            --f-mesa: 1rem; --f-geral: 0.75rem; --f-mini: 0.6rem;
         }
 
         * { box-sizing: border-box; font-family: 'Outfit', sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: var(--f-geral); }
 
-        /* SIDEBAR ESTREITA */
-        .sidebar { width: 100px; background: var(--card); border-right: 1px solid var(--border); padding: 5px; display: flex; flex-direction: column; }
-        .brand { color: var(--accent); font-weight: 700; font-size: 0.65rem; padding: 10px 0; text-align: center; text-transform: uppercase; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        
-        .nav-btn { 
-            padding: 6px; 
-            cursor: pointer; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            color: var(--subtext); 
-            border-radius: 6px; 
-            margin-bottom: 5px; 
-            border: none; 
-            background: none; 
-            width: 100%; 
-            font-size: 0.6rem; 
-        }
-        .nav-btn i { font-size: 0.9rem; margin-bottom: 2px; }
-        .nav-btn.active { background: rgba(255,184,0,0.1); color: var(--accent); font-weight: 600; }
+        /* Sidebar Mantida Estreita */
+        .sidebar { width: 90px; background: var(--card); border-right: 1px solid var(--border); padding: 5px; display: flex; flex-direction: column; align-items: center; }
+        .nav-btn { padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: var(--subtext); border-radius: 6px; margin-bottom: 8px; border: none; background: none; width: 100%; font-size: 0.55rem; }
+        .nav-btn i { font-size: 1rem; margin-bottom: 3px; }
+        .nav-btn.active { background: rgba(255,184,0,0.1); color: var(--accent); }
 
-        .main { flex: 1; padding: 12px; overflow-y: auto; }
+        /* ÁREA CENTRALIZADA */
+        .main { flex: 1; display: flex; justify-content: center; overflow-y: auto; padding: 20px; }
+        .content-wrapper { width: 100%; max-width: 800px; } /* Centraliza o conteúdo aqui */
+
         .view { display: none; }
         .view.active { display: block; }
 
-        /* CAIXAS DAS MESAS (REDUZIDAS) */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 6px; }
-        .mesa-card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 6px; 
-            border-radius: 6px; 
-            text-align: center; 
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .mesa-card:active { transform: scale(0.95); }
-        .mesa-card span { font-size: var(--f-mesa); font-weight: 700; color: var(--accent); display: block; line-height: 1; }
-        .mesa-card label { font-size: 0.55rem; color: var(--subtext); text-transform: uppercase; display: block; margin-bottom: 2px; }
+        /* Mesas Alinhadas ao Centro */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 65px)); gap: 10px; justify-content: center; }
+        .mesa-card { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; }
+        .mesa-card span { font-size: var(--f-mesa); font-weight: 700; color: var(--accent); display: block; }
+        .mesa-card label { font-size: 0.5rem; color: var(--subtext); text-transform: uppercase; }
 
-        /* ELEMENTOS GERAIS COMPACTOS */
-        .card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 4px; width: 100%; margin-bottom: 6px; font-size: var(--f-geral); }
-        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; background: var(--accent); color: var(--bg); font-size: var(--f-geral); }
+        /* Forms Centralizados */
+        .flex-center { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 10px; width: 100%; }
         
-        table { width: 100%; border-collapse: collapse; font-size: var(--f-geral); }
-        td, th { padding: 5px; border-bottom: 1px solid var(--border); text-align: left; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: var(--f-geral); }
+        .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; background: var(--accent); color: var(--bg); font-size: var(--f-geral); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td, th { padding: 8px; border-bottom: 1px solid var(--border); text-align: left; }
     </style>
 </head>
 <body>
 
 <nav class="sidebar">
-    <div class="brand">B934</div>
+    <div style="font-size: 0.6rem; font-weight: 700; color: var(--accent); margin-bottom: 15px;">B934</div>
     <button class="nav-btn active" onclick="nav('caixa', this)"><i class="fas fa-desktop"></i>CAIXA</button>
     <button class="nav-btn" onclick="nav('estoque', this)"><i class="fas fa-box"></i>ESTOQUE</button>
     <button class="nav-btn" onclick="nav('clientes', this)"><i class="fas fa-users"></i>CLIENTES</button>
@@ -82,37 +60,47 @@
 </nav>
 
 <main class="main">
-    <section id="caixa" class="view active">
-        <div class="grid-mesas" id="mesasUI"></div>
-    </section>
+    <div class="content-wrapper">
+        
+        <section id="caixa" class="view active">
+            <div class="grid-mesas" id="mesasUI"></div>
+        </section>
 
-    <section id="estoque" class="view">
-        <div style="display:grid; grid-template-columns: 200px 1fr; gap:12px">
-            <div class="card">
-                <input type="text" id="pNome" placeholder="Produto">
-                <input type="number" id="pVal" placeholder="R$">
-                <button class="btn" onclick="addP()">SALVAR</button>
+        <section id="estoque" class="view">
+            <div class="flex-center">
+                <div class="card" style="max-width: 400px;">
+                    <h3 style="margin-bottom:10px; font-size:0.8rem">Novo Produto</h3>
+                    <input type="text" id="pNome" placeholder="Produto">
+                    <input type="number" id="pVal" placeholder="Preço">
+                    <button class="btn" onclick="addP()">SALVAR NO ESTOQUE</button>
+                </div>
+                <div class="card">
+                    <table id="tabEstoque"><thead><tr><th>Item</th><th>Preço</th></tr></thead><tbody></tbody></table>
+                </div>
             </div>
-            <div class="card">
-                <table id="tabEstoque"><thead><tr><th>Item</th><th>R$</th></tr></thead><tbody></tbody></table>
+        </section>
+
+        <section id="clientes" class="view">
+            <div class="flex-center">
+                <div class="card" style="max-width: 400px;">
+                    <h3 style="margin-bottom:10px; font-size:0.8rem">Novo Cliente</h3>
+                    <input type="text" id="cNome" placeholder="Nome">
+                    <input type="text" id="cZap" placeholder="WhatsApp">
+                    <button class="btn" onclick="addC()">CADASTRAR</button>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="clientes" class="view">
-        <div class="card" style="max-width:250px">
-            <input type="text" id="cNome" placeholder="Nome">
-            <input type="text" id="cZap" placeholder="Whats">
-            <button class="btn" onclick="addC()">CADASTRAR</button>
-        </div>
-    </section>
+        <section id="financas" class="view">
+            <div class="flex-center">
+                <div class="card" style="text-align:center; max-width:300px">
+                    <label style="font-size:0.6rem; color:var(--subtext)">TOTAL VENDIDO HOJE</label>
+                    <h1 id="vendaHoje" style="color:var(--green); font-size:1.5rem; margin-top:5px">R$ 0,00</h1>
+                </div>
+            </div>
+        </section>
 
-    <section id="financas" class="view">
-        <div class="card" style="text-align:center; max-width:200px">
-            <label style="font-size:0.6rem">HOJE</label>
-            <h1 id="vendaHoje" style="color:var(--green); font-size:1.2rem">R$ 0,00</h1>
-        </div>
-    </section>
+    </div>
 </main>
 
 <script>
@@ -132,15 +120,14 @@
         const produtos = data.produtos ? Object.values(data.produtos) : [];
         const vendas = data.vendas ? Object.values(data.vendas) : [];
 
-        // Render Mesas Compactas
         let mesasHtml = "";
-        for(let i=1; i<=15; i++) { // Aumentei para 15 mesas já que o card é menor
+        for(let i=1; i<=12; i++) {
             mesasHtml += `<div class="mesa-card"><label>Mesa</label><span>${i}</span></div>`;
         }
         document.getElementById('mesasUI').innerHTML = mesasHtml;
 
         document.getElementById('tabEstoque').querySelector('tbody').innerHTML = produtos.map(p => `
-            <tr><td>${p.nome}</td><td>${(p.val || 0).toFixed(2)}</td></tr>
+            <tr><td>${p.nome}</td><td>R$ ${(p.val || 0).toFixed(2)}</td></tr>
         `).join('');
 
         const hoje = new Date().toLocaleDateString();
@@ -150,12 +137,12 @@
 
     function addP() {
         const n = document.getElementById('pNome').value.toUpperCase(), v = parseFloat(document.getElementById('pVal').value);
-        if(n && v) db.ref('produtos/'+n).set({nome:n, val:v});
+        if(n && v) db.ref('produtos/'+n).set({nome:n, val:v}).then(()=>alert("OK!"));
     }
 
     function addC() {
         const n = document.getElementById('cNome').value.toUpperCase(), z = document.getElementById('cZap').value;
-        if(n) db.ref('clientes/'+n).set({nome:n, zap:z});
+        if(n) db.ref('clientes/'+n).set({nome:n, zap:z}).then(()=>alert("OK!"));
     }
 </script>
 </body>
