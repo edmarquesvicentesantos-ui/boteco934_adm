@@ -2,32 +2,52 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Boteco 934 - Gestão</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boteco 934 PDV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        body { margin: 0; background: #05070a; color: white; font-family: 'Outfit', sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 90px; background: #0f1218; border-right: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        .nav-item { padding: 20px 0; width: 100%; text-align: center; cursor: pointer; color: #64748b; font-size: 0.6rem; text-transform: uppercase; font-weight: 700; transition: 0.2s; }
-        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        .nav-item:hover, .active { color: #ffb800; background: #1c222d; }
-        .main { flex: 1; position: relative; }
+        body { margin: 0; background: #05070a; color: white; font-family: sans-serif; display: flex; height: 100vh; flex-direction: row; }
+        
+        /* Menu Lateral (Tablet/PC) */
+        .sidebar { width: 80px; background: #0f1218; border-right: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; }
+        .nav-item { color: #64748b; padding: 20px; cursor: pointer; text-align: center; width: 100%; transition: 0.3s; }
+        .nav-item i { font-size: 1.5rem; display: block; }
+        .nav-item span { font-size: 0.6rem; display: block; margin-top: 5px; font-weight: bold; }
+        .active { color: #ffb800; background: #1c222d; }
+
+        .main-content { flex: 1; position: relative; overflow: hidden; }
         iframe { width: 100%; height: 100%; border: none; }
+
+        /* Ajuste para iPhone/Celular (Menu vira barra inferior) */
+        @media (max-width: 600px) {
+            body { flex-direction: column; }
+            .sidebar { 
+                width: 100%; height: 70px; flex-direction: row; 
+                position: fixed; bottom: 0; border-right: none; 
+                border-top: 1px solid #1e293b; padding: 0; justify-content: space-around;
+            }
+            .nav-item { padding: 10px; }
+            .main-content { height: calc(100vh - 70px); }
+        }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
-        <div class="nav-item active" onclick="ir('caixa.html', this)"><i class="fas fa-cash-register"></i>Caixa</div>
-        <div class="nav-item" onclick="ir('estoque.html', this)"><i class="fas fa-boxes-stacked"></i>Estoque</div>
-        <div class="nav-item" onclick="ir('clientes.html', this)"><i class="fas fa-users"></i>Clientes</div>
+        <div class="nav-item active" onclick="ir('caixa.html', this)"><i class="fas fa-cash-register"></i><span>CAIXA</span></div>
+        <div class="nav-item" onclick="ir('estoque.html', this)"><i class="fas fa-boxes-stacked"></i><span>ESTOQUE</span></div>
+        <div class="nav-item" onclick="ir('clientes.html', this)"><i class="fas fa-users"></i><span>CLIENTES</span></div>
+        <div class="nav-item" onclick="ir('financas.html', this)"><i class="fas fa-chart-line"></i><span>FINANÇAS</span></div>
     </div>
-    <div class="main">
-        <iframe id="janela" src="caixa.html"></iframe>
+
+    <div class="main-content">
+        <iframe id="tela" src="caixa.html"></iframe>
     </div>
+
     <script>
-        function ir(pag, el) {
-            document.getElementById('janela').src = pag;
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        function ir(pagina, el) {
+            document.getElementById('tela').src = pagina;
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             el.classList.add('active');
         }
     </script>
