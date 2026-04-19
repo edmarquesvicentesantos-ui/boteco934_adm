@@ -3,51 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v44 Compact</title>
+    <title>Boteco 934 - v45 Full Compact</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --primary: #020617; --sidebar: #0f172a; --accent: #fbbf24; --card: #1e293b; --text: #f8fafc; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; --f-small: 13px; }
-        
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--primary); color: var(--text); overflow: hidden; font-size: var(--f-small); }
         
-        /* Sidebar Reduzida */
-        .sidebar { width: 160px; background: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
-        .logo-area { padding: 15px; text-align: center; border-bottom: 1px solid #334155; color: var(--accent); font-weight: bold; font-size: 12px; }
-        .menu-item { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: var(--f-small); transition: 0.2s; }
-        .menu-item:hover { background: #1e293b; color: white; }
+        /* Sidebar */
+        .sidebar { width: 150px; background: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo-area { padding: 15px; text-align: center; border-bottom: 1px solid #334155; color: var(--accent); font-weight: bold; font-size: 13px; }
+        .menu-item { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 12px; }
         .menu-item.active { background: #1e293b; color: var(--accent); border-left: 3px solid var(--accent); }
         
-        /* Layout Principal */
-        .main-content { flex: 1; overflow-y: auto; padding: 15px; }
-        .view-section { display: none; }
+        /* Main */
+        .main-content { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; }
+        .view-section { display: none; height: 100%; }
         .view-section.active { display: block; }
-        .glass-card { background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px; }
+        .glass-card { background: var(--card); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; }
         
-        /* Mesas e Grades Menores */
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-bottom: 12px; }
-        .mesa-card { padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; border: 1px solid #334155; background: #0f172a; color: #94a3b8; font-size: 12px; }
+        /* Grid de Mesas */
+        .mesa-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px; }
+        .mesa-card { padding: 8px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #334155; background: #0f172a; color: #94a3b8; font-size: 11px; font-weight: bold; }
         .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; }
+
+        /* Categorias e Busca */
+        .caixa-controles { display: flex; flex-direction: column; gap: 8px; }
+        .cat-row { display: flex; gap: 4px; flex-wrap: wrap; }
+        .btn-cat { background: #334155; border: none; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; text-transform: uppercase; }
+        .btn-cat.active { background: var(--info); }
         
-        /* Inputs e Botões Compactos */
-        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: var(--f-small); }
-        .btn { border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; width: 100%; text-transform: uppercase; font-size: 11px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; font-size: var(--f-small); outline: none; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; width: 100%; text-transform: uppercase; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-success { background: var(--success); }
         .btn-warning { background: var(--accent); color: #000; }
-        .btn-cat { background: #334155; width: auto; padding: 5px 10px; font-size: 10px; }
         
-        .grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; margin-top: 10px; }
-        .item-grade { background: #0f172a; padding: 8px; border-radius: 5px; text-align: center; cursor: pointer; border: 1px solid #334155; font-size: 11px; line-height: 1.2; }
-        
-        /* Tabelas */
-        table { width: 100%; border-collapse: collapse; font-size: var(--f-small); }
-        th { text-align: left; color: var(--accent); padding: 8px; border-bottom: 2px solid #334155; }
-        td { padding: 8px; border-bottom: 1px solid #334155; }
+        .grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-top: 10px; max-height: 250px; overflow-y: auto; }
+        .item-grade { background: #0f172a; padding: 6px; border-radius: 4px; text-align: center; cursor: pointer; border: 1px solid #334155; font-size: 10px; }
 
-        h2, h3 { margin: 0 0 10px 0; font-size: 15px; color: var(--accent); }
-        #totalHoje { font-size: 24px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; color: var(--accent); padding: 6px; border-bottom: 2px solid #334155; }
+        td { padding: 6px; border-bottom: 1px solid #334155; }
 
         @media print { body * { display:none; } #reciboArea, #reciboArea * { display:block; } }
     </style>
@@ -65,39 +63,53 @@
 
 <main class="main-content">
     <section id="view-mesas" class="view-section active">
-        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 280px; gap: 10px; height: 100%;">
             <div>
                 <div class="mesa-grid" id="mapaMesas"></div>
-                <div class="glass-card">
-                    <input type="text" id="barcodeMesa" placeholder="BIPAR..." onkeypress="handleBarcode(event)" autofocus>
+                <div class="glass-card caixa-controles">
+                    <input type="text" id="barcodeMesa" placeholder="BIPAR PRODUTO..." onkeypress="handleBarcode(event)" autofocus>
+                    <div class="cat-row">
+                        <button class="btn-cat" onclick="renderGrade('CERVEJA')">Cervejas</button>
+                        <button class="btn-cat" onclick="renderGrade('DESTILADO')">Destilados</button>
+                        <button class="btn-cat" onclick="renderGrade('REFRIGERANTE')">Refri</button>
+                        <button class="btn-cat" onclick="renderGrade('TIRA-GOSTO')">Petiscos</button>
+                        <button class="btn-cat active" onclick="renderGrade('TODOS')">Todos</button>
+                    </div>
                     <div id="gradeVenda" class="grade-venda"></div>
                 </div>
             </div>
-            <div id="detalheMesa" class="glass-card" style="display:none; border: 1px solid var(--accent);">
-                <h3 id="tituloMesa">Mesa --</h3>
-                <p id="clienteNome" style="font-size: 11px; color: #94a3b8; margin-top: -5px;"></p>
-                <div id="consumoMesa" style="max-height: 200px; overflow-y: auto; border-top: 1px solid #444; padding-top: 10px; font-size: 12px;"></div>
-                <h2 id="totalMesa" style="text-align:right; margin: 15px 0;">R$ 0,00</h2>
-                <button class="btn btn-success" onclick="finalizarVenda('PAGO')">RECEBER</button>
+            
+            <div id="detalheMesa" class="glass-card" style="display:none; border: 1px solid var(--accent); display: flex; flex-direction: column;">
+                <h3 id="tituloMesa" style="font-size:14px; margin:0">Mesa --</h3>
+                <p id="clienteNome" style="font-size: 11px; color: #94a3b8; margin: 2px 0 10px 0;"></p>
+                <div id="consumoMesa" style="flex:1; overflow-y: auto; border-top: 1px solid #444; padding-top: 5px;"></div>
+                <h2 id="totalMesa" style="text-align:right; color:var(--accent); margin: 10px 0; font-size: 18px;">R$ 0,00</h2>
+                <button class="btn btn-success" onclick="finalizarVenda('PAGO')" style="margin-bottom:5px">RECEBER</button>
                 <button class="btn btn-warning" id="btnPendura" onclick="finalizarVenda('PENDURA')">PENDURA</button>
             </div>
         </div>
     </section>
 
     <section id="view-estoque" class="view-section">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="glass-card">
+        <div class="glass-card" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div>
                 <h3>Novo Produto</h3>
                 <input type="text" id="eCod" placeholder="Cód. Barras">
                 <input type="text" id="eNome" placeholder="Nome">
+                <select id="eCat">
+                    <option value="CERVEJA">CERVEJA</option>
+                    <option value="DESTILADO">DESTILADO</option>
+                    <option value="REFRIGERANTE">REFRIGERANTE</option>
+                    <option value="TIRA-GOSTO">TIRA-GOSTO</option>
+                </select>
                 <input type="number" id="eVenda" placeholder="Preço R$">
                 <button class="btn btn-success" onclick="addEstoque()">SALVAR</button>
             </div>
-            <div class="glass-card">
-                <h3>Excel</h3>
-                <button class="btn btn-info" onclick="exportarExcel()">EXPORTAR</button>
+            <div>
+                <h3>Dados Excel</h3>
+                <button class="btn btn-info" onclick="exportarExcel()" style="margin-bottom:8px">EXPORTAR EXCEL</button>
                 <input type="file" id="excelIn" style="display:none" onchange="importarExcel(event)">
-                <button class="btn" style="background:#6366f1" onclick="document.getElementById('excelIn').click()">IMPORTAR</button>
+                <button class="btn" style="background:#6366f1" onclick="document.getElementById('excelIn').click()">IMPORTAR EXCEL</button>
             </div>
         </div>
         <div class="glass-card">
@@ -108,8 +120,8 @@
     <section id="view-clientes" class="view-section">
         <div class="glass-card">
             <h3>Novo Cliente</h3>
-            <input type="text" id="cNome" placeholder="Nome">
-            <button class="btn btn-success" onclick="addCliente()">SALVAR</button>
+            <input type="text" id="cNome" placeholder="Nome Completo">
+            <button class="btn btn-success" onclick="addCliente()">CADASTRAR</button>
         </div>
         <div class="glass-card">
             <table><thead><tr><th>Nome</th><th>Dívida</th><th>Ação</th></tr></thead><tbody id="tabClientes"></tbody></table>
@@ -118,13 +130,17 @@
 
     <section id="view-financas" class="view-section">
         <div class="glass-card" style="text-align: center;">
-            <p>Vendido Hoje</p>
-            <h1 id="totalHoje">R$ 0,00</h1>
+            <p>Vendas Hoje</p>
+            <h1 id="totalHoje" style="font-size: 32px; color: var(--success);">R$ 0,00</h1>
         </div>
     </section>
 
     <section id="view-config" class="view-section">
-        <div class="glass-card"><button class="btn btn-danger" onclick="db.ref('vendas').remove()">ZERAR VENDAS</button></div>
+        <div class="glass-card">
+            <h3>Ajustes do Sistema</h3>
+            <button class="btn btn-danger" onclick="limparVendas()">ZERAR TODAS AS VENDAS</button>
+            <p style="font-size: 10px; color: #94a3b8; margin-top: 15px;">Desenvolvido para Boteco 934 - Petrolina-PE</p>
+        </div>
     </section>
 </main>
 
@@ -148,23 +164,31 @@
         renderMesas();
         renderEstoque();
         renderClientes();
-        document.getElementById('gradeVenda').innerHTML = estoque.map(p => `<div class="item-grade" onclick="adicionarItem('${p.nome}')">${p.nome}<br><b>R$ ${parseFloat(p.val).toFixed(2)}</b></div>`).join('');
+        renderGrade('TODOS');
         const hoje = new Date().toLocaleDateString();
-        const total = vendas.filter(v => v.data === hoje).reduce((s, v) => s + v.valor, 0);
-        document.getElementById('totalHoje').innerText = "R$ " + total.toFixed(2);
+        const t = vendas.filter(v => v.data === hoje).reduce((s, v) => s + v.valor, 0);
+        document.getElementById('totalHoje').innerText = "R$ " + t.toFixed(2);
+    }
+
+    function renderGrade(cat) {
+        const lista = cat === 'TODOS' ? estoque : estoque.filter(p => p.cat === cat);
+        document.getElementById('gradeVenda').innerHTML = lista.map(p => `
+            <div class="item-grade" onclick="adicionarItem('${p.nome}')">
+                ${p.nome}<br><b>R$ ${parseFloat(p.val).toFixed(2)}</b>
+            </div>
+        `).join('');
     }
 
     function abrirMesa(id) {
         mesaAtiva = mesas.find(m => m.id === id);
         if (!mesaAtiva.cliente && mesaAtiva.itens.length === 0) {
-            const op = confirm("Vincular Cliente?");
-            if (op) {
+            if (confirm("Vincular Cliente?")) {
                 const lista = clientes.map((c, i) => `${i}: ${c.nome}`).join('\n');
                 const idx = prompt("Digite o Nº do cliente:\n" + lista);
                 if (idx !== null && clientes[idx]) mesaAtiva.cliente = clientes[idx];
             }
         }
-        document.getElementById('detalheMesa').style.display = 'block';
+        document.getElementById('detalheMesa').style.display = 'flex';
         document.getElementById('tituloMesa').innerText = "Mesa " + id;
         document.getElementById('clienteNome').innerText = mesaAtiva.cliente ? "👤 " + mesaAtiva.cliente.nome : "🛒 Balcão";
         document.getElementById('btnPendura').style.display = mesaAtiva.cliente ? 'flex' : 'none';
@@ -181,7 +205,7 @@
 
     function renderDetalhe() {
         const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>`).join('');
+        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:3px"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>`).join('');
         document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
         renderMesas();
     }
@@ -201,14 +225,32 @@
         renderAll();
     }
 
-    function addEstoque() { const n = document.getElementById('eNome').value.toUpperCase(); const v = parseFloat(document.getElementById('eVenda').value); if(n && v) { estoque.push({ cod: document.getElementById('eCod').value, nome: n, val: v }); db.ref('produtos').set(estoque); } }
-    function renderEstoque() { document.getElementById('tabEstoque').innerHTML = estoque.map((p,i) => `<tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td></tr>`).join(''); }
-    function addCliente() { const n = document.getElementById('cNome').value.toUpperCase(); if(n) { clientes.push({nome: n, saldo: 0}); db.ref('clientes').set(clientes); } }
-    function renderClientes() { document.getElementById('tabClientes').innerHTML = clientes.map((c,i) => `<tr><td>${c.nome}</td><td>R$ ${c.saldo.toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="clientes.splice(${i},1);db.ref('clientes').set(clientes)"></i></td></tr>`).join(''); }
-    
+    function addEstoque() {
+        const n = document.getElementById('eNome').value.toUpperCase();
+        const v = parseFloat(document.getElementById('eVenda').value);
+        if(n && v) {
+            estoque.push({ cod: document.getElementById('eCod').value, nome: n, cat: document.getElementById('eCat').value, val: v });
+            db.ref('produtos').set(estoque);
+        }
+    }
+
+    function renderEstoque() { 
+        document.getElementById('tabEstoque').innerHTML = estoque.map((p,i) => `<tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td></tr>`).join(''); 
+    }
+
+    function addCliente() {
+        const n = document.getElementById('cNome').value.toUpperCase();
+        if(n) { clientes.push({nome: n, saldo: 0}); db.ref('clientes').set(clientes); }
+    }
+
+    function renderClientes() { 
+        document.getElementById('tabClientes').innerHTML = clientes.map((c,i) => `<tr><td>${c.nome}</td><td>R$ ${c.saldo.toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="clientes.splice(${i},1);db.ref('clientes').set(clientes)"></i></td></tr>`).join(''); 
+    }
+
     function handleBarcode(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value.trim()); if(p) adicionarItem(p.nome); e.target.value = ''; } }
-    function renderMesas() { document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}${m.cliente ? '<br><span style="font-size:9px">'+m.cliente.nome.split(' ')[0]+'</span>' : ''}</div>`).join(''); }
+    function renderMesas() { document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}${m.cliente ? '<br><span style="font-size:8px">'+m.cliente.nome.split(' ')[0]+'</span>' : ''}</div>`).join(''); }
     function show(id, el) { document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); el.classList.add('active'); }
+    function limparVendas() { if(confirm("Deseja zerar o histórico?")) db.ref('vendas').remove(); }
     function exportarExcel() { const ws = XLSX.utils.json_to_sheet(estoque); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Estoque"); XLSX.writeFile(wb, "estoque.xlsx"); }
     function importarExcel(e) { const r = new FileReader(); r.onload = (ev) => { const d = new Uint8Array(ev.target.result); const wb = XLSX.read(d, {type:'array'}); db.ref('produtos').set(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])); }; r.readAsArrayBuffer(e.target.files[0]); }
 </script>
