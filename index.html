@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v36 Full</title>
+    <title>Boteco 934 - v37 XML + Recibo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -25,6 +25,7 @@
         .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; width: 100%; text-transform: uppercase; margin-bottom: 5px; }
         .btn-success { background: var(--success); }
         .btn-info { background: var(--info); }
+        .btn-xml { background: #6366f1; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; color: var(--accent); padding: 12px; border-bottom: 2px solid #334155; }
         td { padding: 12px; border-bottom: 1px solid #334155; }
@@ -41,7 +42,6 @@
     <div class="logo-area">BOTECO 934</div>
     <div class="menu-item active" onclick="show('view-mesas', this)"><i class="fas fa-chair"></i> Mesas</div>
     <div class="menu-item" onclick="show('view-estoque', this)"><i class="fas fa-boxes"></i> Estoque</div>
-    <div class="menu-item" onclick="show('view-clientes', this)"><i class="fas fa-users"></i> Clientes</div>
 </aside>
 
 <main class="main-content">
@@ -63,9 +63,9 @@
     </section>
 
     <section id="view-estoque" class="view-section">
-        <div class="glass-card">
-            <h3>Novo Produto</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="glass-card">
+                <h3>Novo Produto</h3>
                 <input type="text" id="eCod" placeholder="Cód. Barras">
                 <input type="text" id="eNome" placeholder="Nome">
                 <select id="eCat">
@@ -75,9 +75,20 @@
                     <option value="TIRA-GOSTO">TIRA-GOSTO</option>
                 </select>
                 <input type="number" id="eVenda" placeholder="Preço Venda R$">
+                <button class="btn btn-success" onclick="addEstoque()">SALVAR</button>
             </div>
-            <button class="btn btn-success" onclick="addEstoque()">SALVAR NO FIREBASE</button>
+            
+            <div class="glass-card">
+                <h3>Importar Nota Fiscal (XML)</h3>
+                <p style="font-size: 12px; color: #94a3b8;">Suba o arquivo .xml para cadastrar produtos automaticamente.</p>
+                <input type="file" id="xmlFile" accept=".xml" style="display:none" onchange="lerXML(event)">
+                <button class="btn btn-xml" onclick="document.getElementById('xmlFile').click()">
+                    <i class="fas fa-file-import"></i> SELECIONAR XML
+                </button>
+                <div id="statusXML" style="margin-top: 10px; font-size: 11px; color: var(--accent);"></div>
+            </div>
         </div>
+
         <div class="glass-card">
             <table>
                 <thead><tr><th>Cat.</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
@@ -119,6 +130,34 @@
         renderEstoque(); 
     });
 
+    // --- FUNÇÃO XML ---
+    function lerXML(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+            const prods = xmlDoc.getElementsByTagName("det");
+            let novos = 0;
+
+            for (let i = 0; i < prods.length; i++) {
+                const nome = prods[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
+                const cod = prods[i].getElementsByTagName("cEAN")[0]?.textContent || "S/C";
+                const valorUn = parseFloat(prods[i].getElementsByTagName("vUnCom")[0].textContent);
+                
+                // Sugere lucro de 30% se for novo
+                if (!estoque.find(p => p.nome === nome)) {
+                    estoque.push({ cod: cod, nome: nome, cat: "OUTROS", val: (valorUn * 1.3).toFixed(2) });
+                    novos++;
+                }
+            }
+            db.ref('produtos').set(estoque);
+            document.getElementById('statusXML').innerText = novos + " novos produtos importados!";
+        };
+        reader.readAsText(file);
+    }
+
     function addEstoque() {
         estoque.push({ 
             cod: document.getElementById('eCod').value, 
@@ -140,15 +179,15 @@
             </tr>`).join('');
     }
 
-    function handleBarcode(e) {
-        if(e.key === 'Enter') {
-            const p = estoque.find(x => x.cod === e.target.value.trim());
+    function handleBarcode(event) {
+        if(event.key === 'Enter') {
+            const p = estoque.find(x => x.cod === event.target.value.trim());
             if(p && mesaAtiva) {
                 const item = mesaAtiva.itens.find(i => i.nome === p.nome);
                 if(item) item.qtd++; else mesaAtiva.itens.push({nome: p.nome, val: p.val, qtd: 1});
                 renderDetalheMesa();
             }
-            e.target.value = '';
+            event.target.value = '';
         }
     }
 
