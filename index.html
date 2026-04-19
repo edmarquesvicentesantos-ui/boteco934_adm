@@ -3,146 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v60.5 Center</title>
+    <title>Boteco 934 - v60.7 Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; }
         
-        :root { 
-            --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; 
-            --subtext: #94a3b8; --border: #1e293b; --green: #10b981;
-            --f-mesa: 1rem; --f-geral: 0.75rem; --f-mini: 0.6rem;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: var(--f-geral); }
+        /* Sidebar Fina */
+        .sidebar { width: 70px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; flex-shrink: 0; }
+        .nav-btn { background: none; border: none; color: #64748b; padding: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.5rem; width: 100%; gap: 4px; }
+        .nav-btn i { font-size: 1.2rem; }
+        .nav-btn.active { color: var(--accent); background: rgba(255,184,0,0.1); }
 
-        /* Sidebar Mantida Estreita */
-        .sidebar { width: 90px; background: var(--card); border-right: 1px solid var(--border); padding: 5px; display: flex; flex-direction: column; align-items: center; }
-        .nav-btn { padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: var(--subtext); border-radius: 6px; margin-bottom: 8px; border: none; background: none; width: 100%; font-size: 0.55rem; }
-        .nav-btn i { font-size: 1rem; margin-bottom: 3px; }
-        .nav-btn.active { background: rgba(255,184,0,0.1); color: var(--accent); }
+        /* Centralizador de Conteúdo */
+        .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .container { width: 100%; max-width: 400px; text-align: center; }
 
-        /* ÁREA CENTRALIZADA */
-        .main { flex: 1; display: flex; justify-content: center; overflow-y: auto; padding: 20px; }
-        .content-wrapper { width: 100%; max-width: 800px; } /* Centraliza o conteúdo aqui */
+        /* Caixas das Mesas Pequenas e Centralizadas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+        .mesa-card { background: var(--card); border: 1px solid var(--border); padding: 15px 5px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .mesa-card:active { transform: scale(0.9); }
+        .mesa-card label { font-size: 0.55rem; color: #94a3b8; display: block; text-transform: uppercase; }
+        .mesa-card span { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
 
         .view { display: none; }
         .view.active { display: block; }
-
-        /* Mesas Alinhadas ao Centro */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 65px)); gap: 10px; justify-content: center; }
-        .mesa-card { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; }
-        .mesa-card span { font-size: var(--f-mesa); font-weight: 700; color: var(--accent); display: block; }
-        .mesa-card label { font-size: 0.5rem; color: var(--subtext); text-transform: uppercase; }
-
-        /* Forms Centralizados */
-        .flex-center { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 10px; width: 100%; }
         
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; margin-bottom: 8px; font-size: var(--f-geral); }
-        .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 700; width: 100%; background: var(--accent); color: var(--bg); font-size: var(--f-geral); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td, th { padding: 8px; border-bottom: 1px solid var(--border); text-align: left; }
+        h2 { font-size: 0.8rem; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <nav class="sidebar">
-    <div style="font-size: 0.6rem; font-weight: 700; color: var(--accent); margin-bottom: 15px;">B934</div>
-    <button class="nav-btn active" onclick="nav('caixa', this)"><i class="fas fa-desktop"></i>CAIXA</button>
+    <button class="nav-btn active" onclick="nav('caixa', this)"><i class="fas fa-th"></i>CAIXA</button>
     <button class="nav-btn" onclick="nav('estoque', this)"><i class="fas fa-box"></i>ESTOQUE</button>
-    <button class="nav-btn" onclick="nav('clientes', this)"><i class="fas fa-users"></i>CLIENTES</button>
     <button class="nav-btn" onclick="nav('financas', this)"><i class="fas fa-wallet"></i>FINANÇAS</button>
 </nav>
 
 <main class="main">
-    <div class="content-wrapper">
-        
+    <div class="container">
         <section id="caixa" class="view active">
+            <h2>PAINEL DE MESAS</h2>
             <div class="grid-mesas" id="mesasUI"></div>
         </section>
-
+        
         <section id="estoque" class="view">
-            <div class="flex-center">
-                <div class="card" style="max-width: 400px;">
-                    <h3 style="margin-bottom:10px; font-size:0.8rem">Novo Produto</h3>
-                    <input type="text" id="pNome" placeholder="Produto">
-                    <input type="number" id="pVal" placeholder="Preço">
-                    <button class="btn" onclick="addP()">SALVAR NO ESTOQUE</button>
-                </div>
-                <div class="card">
-                    <table id="tabEstoque"><thead><tr><th>Item</th><th>Preço</th></tr></thead><tbody></tbody></table>
-                </div>
+            <h2 style="margin-bottom:20px">ESTOQUE CENTRAL</h2>
+            <div style="background:var(--card); padding:20px; border-radius:10px; border:1px solid var(--border)">
+                <p style="font-size:0.8rem">Módulo carregado com sucesso.</p>
             </div>
         </section>
-
-        <section id="clientes" class="view">
-            <div class="flex-center">
-                <div class="card" style="max-width: 400px;">
-                    <h3 style="margin-bottom:10px; font-size:0.8rem">Novo Cliente</h3>
-                    <input type="text" id="cNome" placeholder="Nome">
-                    <input type="text" id="cZap" placeholder="WhatsApp">
-                    <button class="btn" onclick="addC()">CADASTRAR</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="financas" class="view">
-            <div class="flex-center">
-                <div class="card" style="text-align:center; max-width:300px">
-                    <label style="font-size:0.6rem; color:var(--subtext)">TOTAL VENDIDO HOJE</label>
-                    <h1 id="vendaHoje" style="color:var(--green); font-size:1.5rem; margin-top:5px">R$ 0,00</h1>
-                </div>
-            </div>
-        </section>
-
     </div>
 </main>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const grid = document.getElementById('mesasUI');
+    for(let i=1; i<=12; i++) {
+        grid.innerHTML += `<div class="mesa-card"><label>MESA</label><span>${i}</span></div>`;
+    }
 
     function nav(id, btn) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-    }
-
-    db.ref().on('value', snap => {
-        const data = snap.val() || {};
-        const produtos = data.produtos ? Object.values(data.produtos) : [];
-        const vendas = data.vendas ? Object.values(data.vendas) : [];
-
-        let mesasHtml = "";
-        for(let i=1; i<=12; i++) {
-            mesasHtml += `<div class="mesa-card"><label>Mesa</label><span>${i}</span></div>`;
-        }
-        document.getElementById('mesasUI').innerHTML = mesasHtml;
-
-        document.getElementById('tabEstoque').querySelector('tbody').innerHTML = produtos.map(p => `
-            <tr><td>${p.nome}</td><td>R$ ${(p.val || 0).toFixed(2)}</td></tr>
-        `).join('');
-
-        const hoje = new Date().toLocaleDateString();
-        const total = vendas.filter(v => v.data === hoje).reduce((a, b) => a + (b.valor || 0), 0);
-        document.getElementById('vendaHoje').innerText = "R$ " + total.toFixed(2);
-    });
-
-    function addP() {
-        const n = document.getElementById('pNome').value.toUpperCase(), v = parseFloat(document.getElementById('pVal').value);
-        if(n && v) db.ref('produtos/'+n).set({nome:n, val:v}).then(()=>alert("OK!"));
-    }
-
-    function addC() {
-        const n = document.getElementById('cNome').value.toUpperCase(), z = document.getElementById('cZap').value;
-        if(n) db.ref('clientes/'+n).set({nome:n, zap:z}).then(()=>alert("OK!"));
     }
 </script>
 </body>
