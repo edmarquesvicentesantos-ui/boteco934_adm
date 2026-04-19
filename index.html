@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v39 Excel Full</title>
+    <title>Boteco 934 - v41 Final</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -11,25 +11,30 @@
     <style>
         :root { --primary: #020617; --sidebar: #0f172a; --accent: #fbbf24; --card: #1e293b; --text: #f8fafc; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; }
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--primary); color: var(--text); overflow: hidden; }
-        .sidebar { width: 160px; background: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
-        .logo-area { padding: 20px 15px; text-align: center; border-bottom: 1px solid #334155; color: var(--accent); font-weight: bold; }
-        .menu-item { padding: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 13px; }
-        .menu-item.active { background: #1e293b; color: var(--accent); border-right: 4px solid var(--accent); }
+        .sidebar { width: 180px; background: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .logo-area { padding: 25px 15px; text-align: center; border-bottom: 1px solid #334155; color: var(--accent); font-weight: bold; font-size: 18px; }
+        .menu-item { padding: 18px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; font-size: 14px; transition: 0.3s; }
+        .menu-item:hover { background: #1e293b; color: white; }
+        .menu-item.active { background: #1e293b; color: var(--accent); border-left: 4px solid var(--accent); }
         .main-content { flex: 1; overflow-y: auto; padding: 20px; }
         .view-section { display: none; }
         .view-section.active { display: block; }
         .glass-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .mesa-card { padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border: 1px solid #334155; background: #0f172a; color: #94a3b8; }
-        .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; }
+        .mesa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; max-width: 500px; }
+        .mesa-card { padding: 25px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border: 1px solid #334155; background: #0f172a; color: #94a3b8; font-size: 16px; }
+        .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
         input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; width: 100%; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
+        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; width: 100%; text-transform: uppercase; font-size: 11px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-success { background: var(--success); }
-        .btn-excel { background: #166534; }
-        .btn-cat { background: #334155; font-size: 10px; padding: 8px; width: auto; }
-        .grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
-        .prod-item { background: #0f172a; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #334155; font-size: 11px; }
-        @media print { body * { display:none; } #reciboArea, #reciboArea * { display:block; } }
+        .btn-info { background: var(--info); }
+        .btn-cat { background: #334155; width: auto; padding: 8px 15px; }
+        .btn-cat.active { background: var(--info); }
+        .grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+        .item-grade { background: #0f172a; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #334155; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--accent); padding: 12px; border-bottom: 2px solid #334155; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        @media print { body * { display:none; } #reciboArea, #reciboArea * { display:block; } #reciboArea { width: 100%; font-family: monospace; } }
     </style>
 </head>
 <body>
@@ -38,30 +43,32 @@
     <div class="logo-area">BOTECO 934</div>
     <div class="menu-item active" onclick="show('view-mesas', this)"><i class="fas fa-chair"></i> Mesas</div>
     <div class="menu-item" onclick="show('view-estoque', this)"><i class="fas fa-boxes"></i> Estoque</div>
+    <div class="menu-item" onclick="show('view-clientes', this)"><i class="fas fa-users"></i> Clientes</div>
+    <div class="menu-item" onclick="show('view-financas', this)"><i class="fas fa-chart-line"></i> Finanças</div>
 </aside>
 
 <main class="main-content">
     <section id="view-mesas" class="view-section active">
-        <div style="display: grid; grid-template-columns: 1fr 350px; gap: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px;">
             <div>
                 <div class="mesa-grid" id="mapaMesas"></div>
                 <div class="glass-card">
                     <input type="text" id="barcodeMesa" placeholder="BIPAR PRODUTO..." onkeypress="handleBarcode(event)" autofocus>
-                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                        <button class="btn btn-cat" onclick="filtrarVenda('CERVEJA')">CERVEJAS</button>
-                        <button class="btn btn-cat" onclick="filtrarVenda('DESTILADO')">DESTILADOS</button>
-                        <button class="btn btn-cat" onclick="filtrarVenda('REFRIGERANTE')">REFRI</button>
-                        <button class="btn btn-cat" onclick="filtrarVenda('TIRA-GOSTO')">PETISCOS</button>
-                        <button class="btn btn-cat" onclick="filtrarVenda('TODOS')" style="background:var(--info)">TODOS</button>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;" id="filtrosCat">
+                        <button class="btn btn-cat" onclick="renderGrade('CERVEJA')">CERVEJAS</button>
+                        <button class="btn btn-cat" onclick="renderGrade('DESTILADO')">DESTILADOS</button>
+                        <button class="btn btn-cat" onclick="renderGrade('REFRIGERANTE')">REFRI</button>
+                        <button class="btn btn-cat" onclick="renderGrade('TIRA-GOSTO')">PETISCOS</button>
+                        <button class="btn btn-cat active" onclick="renderGrade('TODOS')">TODOS</button>
                     </div>
-                    <div id="gradeProdutosVenda" class="grade-produtos"></div>
+                    <div id="gradeVenda" class="grade-venda"></div>
                 </div>
             </div>
             <div id="detalheMesa" class="glass-card" style="display:none; border: 2px solid var(--accent);">
-                <h3 id="tituloMesa">Mesa --</h3>
-                <div id="consumoMesa"></div>
-                <h2 id="totalMesa" style="text-align:right; color:var(--accent)">R$ 0,00</h2>
-                <button class="btn btn-success" onclick="finalizarMesa()">FECHAR E IMPRIMIR</button>
+                <h3 id="tituloMesa" style="margin:0 0 15px 0">Mesa --</h3>
+                <div id="consumoMesa" style="max-height: 350px; overflow-y: auto; border-bottom: 1px solid #444; padding-bottom: 10px;"></div>
+                <h2 id="totalMesa" style="text-align:right; color:var(--accent); margin: 20px 0">R$ 0,00</h2>
+                <button class="btn btn-success" onclick="finalizarVenda()"><i class="fas fa-print"></i> FECHAR E IMPRIMIR</button>
             </div>
         </div>
     </section>
@@ -79,34 +86,48 @@
                     <option value="TIRA-GOSTO">TIRA-GOSTO</option>
                 </select>
                 <input type="number" id="eVenda" placeholder="Preço Venda R$">
-                <button class="btn btn-success" onclick="addEstoque()">SALVAR</button>
+                <button class="btn btn-success" onclick="addEstoque()">SALVAR PRODUTO</button>
             </div>
-            
             <div class="glass-card">
-                <h3>Importar / Exportar Excel</h3>
-                <button class="btn btn-excel" onclick="exportarExcel()">
-                    <i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL
-                </button>
-                <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:none" onchange="importarExcel(event)">
-                <button class="btn" style="background:#0369a1" onclick="document.getElementById('excelFile').click()">
-                    <i class="fas fa-file-upload"></i> IMPORTAR DO EXCEL
-                </button>
-                <p style="font-size: 10px; color: #94a3b8; margin-top: 10px;">* Use colunas: cod, nome, cat, val</p>
+                <h3>Importar / Exportar</h3>
+                <button class="btn btn-info" onclick="exportarExcel()"><i class="fas fa-file-export"></i> EXPORTAR PARA EXCEL</button>
+                <input type="file" id="excelFile" style="display:none" onchange="importarExcel(event)">
+                <button class="btn" style="background:#6366f1" onclick="document.getElementById('excelFile').click()"><i class="fas fa-file-import"></i> IMPORTAR DO EXCEL</button>
             </div>
         </div>
-
         <div class="glass-card">
             <table>
-                <thead><tr><th>Cat.</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="listaEstoqueTabela"></tbody>
+                <thead><tr><th>Categoria</th><th>Produto</th><th>Venda</th><th>Ação</th></tr></thead>
+                <tbody id="listaEstoque"></tbody>
             </table>
         </div>
     </section>
 
+    <section id="view-clientes" class="view-section">
+        <div class="glass-card">
+            <h3>Cadastrar Novo Cliente</h3>
+            <input type="text" id="cNome" placeholder="Nome Completo">
+            <button class="btn btn-success" onclick="addCliente()">CADASTRAR</button>
+        </div>
+        <div class="glass-card">
+            <table>
+                <thead><tr><th>Nome</th><th>Saldo (Pendura)</th><th>Ação</th></tr></thead>
+                <tbody id="listaClientes"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="view-financas" class="view-section">
+        <div class="glass-card" style="text-align: center;">
+            <p style="color: #94a3b8;">Vendas de Hoje</p>
+            <h1 id="fTotalHoje" style="color: var(--success); font-size: 48px;">R$ 0,00</h1>
+        </div>
+    </section>
+
     <div id="reciboArea" style="display:none">
-        <center><strong>BOTECO 934</strong></center>
-        <div id="reciboItens"></div>
-        <div id="reciboTotal" style="text-align:right; font-weight:bold"></div>
+        <center><strong>BOTECO 934</strong><br>RECIBO DE VENDA</center><br>
+        <div id="recItens"></div><hr>
+        <div id="recTotal" style="text-align:right; font-weight:bold"></div>
     </div>
 </main>
 
@@ -119,113 +140,85 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let estoque = [];
-    let mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [] }));
-    let mesaAtiva = null;
+    let estoque = [], clientes = [], vendas = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [] })), mesaAtiva = null;
 
-    db.ref('produtos').on('value', snap => { 
-        estoque = snap.val() ? Object.values(snap.val()) : [];
-        renderEstoque();
-        filtrarVenda('TODOS');
+    db.ref().on('value', snap => {
+        const data = snap.val() || {};
+        estoque = data.produtos ? Object.values(data.produtos) : [];
+        clientes = data.clientes ? Object.values(data.clientes) : [];
+        vendas = data.vendas ? Object.values(data.vendas) : [];
+        renderAll();
     });
 
-    // --- FUNÇÕES EXCEL ---
-    function exportarExcel() {
-        const ws = XLSX.utils.json_to_sheet(estoque);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Produtos");
-        XLSX.writeFile(wb, "estoque_boteco934.xlsx");
+    function renderAll() {
+        renderMesas();
+        renderEstoque();
+        renderClientes();
+        renderGrade('TODOS');
+        const hoje = new Date().toLocaleDateString();
+        const total = vendas.filter(v => v.data === hoje).reduce((s, v) => s + v.valor, 0);
+        document.getElementById('fTotalHoje').innerText = "R$ " + total.toFixed(2);
     }
 
-    function importarExcel(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
-            
-            if(confirm("Deseja importar " + json.length + " produtos?")) {
-                db.ref('produtos').set(json);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    // --- FUNÇÕES DE VENDA ---
-    function filtrarVenda(cat) {
+    function renderGrade(cat) {
         const lista = cat === 'TODOS' ? estoque : estoque.filter(p => p.cat === cat);
-        document.getElementById('gradeProdutosVenda').innerHTML = lista.map(p => `
-            <div class="prod-item" onclick="adicionarItem('${p.nome}')">${p.nome}<br><b>R$ ${parseFloat(p.val).toFixed(2)}</b></div>
+        document.getElementById('gradeVenda').innerHTML = lista.map(p => `
+            <div class="item-grade" onclick="adicionarItem('${p.nome}')">
+                ${p.nome}<br><b>R$ ${parseFloat(p.val).toFixed(2)}</b>
+            </div>
         `).join('');
     }
 
     function adicionarItem(nome) {
-        if(!mesaAtiva) return alert("Escolha uma mesa!");
+        if(!mesaAtiva) return alert("Selecione uma mesa primeiro!");
         const p = estoque.find(x => x.nome === nome);
         const item = mesaAtiva.itens.find(i => i.nome === p.nome);
         if(item) item.qtd++; else mesaAtiva.itens.push({nome: p.nome, val: p.val, qtd: 1});
-        renderDetalheMesa();
+        renderDetalhe();
     }
 
-    function handleBarcode(e) {
-        if(e.key === 'Enter') {
-            const p = estoque.find(x => x.cod === e.target.value.trim());
-            if(p) adicionarItem(p.nome);
-            e.target.value = '';
-        }
-    }
+    function handleBarcode(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value.trim()); if(p) adicionarItem(p.nome); e.target.value = ''; } }
 
     function abrirMesa(id) { 
         mesaAtiva = mesas.find(m => m.id === id); 
         document.getElementById('detalheMesa').style.display = 'block'; 
         document.getElementById('tituloMesa').innerText = "Mesa " + id; 
-        renderDetalheMesa(); 
+        renderDetalhe(); 
     }
 
-    function renderDetalheMesa() {
+    function renderDetalhe() {
         const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `
-            <div style="display:flex; justify-content:space-between; font-size:13px">
-                <span>${i.qtd}x ${i.nome}</span>
-                <b>R$ ${(i.val*i.qtd).toFixed(2)}</b>
-            </div>
-        `).join('');
+        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>`).join('');
         document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
         renderMesas();
     }
 
-    function finalizarMesa() {
-        if(mesaAtiva.itens.length > 0) {
-            window.print();
-            mesaAtiva.itens = [];
-            document.getElementById('detalheMesa').style.display = 'none';
-            renderMesas();
-        }
+    function finalizarVenda() {
+        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
+        vendas.push({ valor: total, data: new Date().toLocaleDateString() });
+        db.ref('vendas').set(vendas);
+        window.print();
+        mesaAtiva.itens = [];
+        document.getElementById('detalheMesa').style.display = 'none';
+        renderAll();
     }
 
-    function renderMesas() { 
-        document.getElementById('mapaMesas').innerHTML = mesas.map(m => `
-            <div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>
-        `).join(''); 
+    function addEstoque() { 
+        const novo = { cod: document.getElementById('eCod').value, nome: document.getElementById('eNome').value.toUpperCase(), cat: document.getElementById('eCat').value, val: parseFloat(document.getElementById('eVenda').value) };
+        if(novo.nome && novo.val) { estoque.push(novo); db.ref('produtos').set(estoque); }
     }
 
-    function renderEstoque() {
-        document.getElementById('listaEstoqueTabela').innerHTML = estoque.map((p, i) => `
-            <tr><td>${p.cat}</td><td>${p.nome}</td><td>R$ ${parseFloat(p.val).toFixed(2)}</td>
-            <td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td></tr>
-        `).join('');
+    function renderEstoque() { 
+        document.getElementById('listaEstoque').innerHTML = estoque.map((p, i) => `<tr><td>${p.cat}</td><td>${p.nome}</td><td>R$ ${parseFloat(p.val).toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td></tr>`).join(''); 
     }
 
-    function addEstoque() {
-        const n = document.getElementById('eNome').value.toUpperCase();
-        const v = parseFloat(document.getElementById('eVenda').value || 0);
-        if(n && v) {
-            estoque.push({ cod: document.getElementById('eCod').value, nome: n, cat: document.getElementById('eCat').value, val: v });
-            db.ref('produtos').set(estoque);
-        }
-    }
+    function addCliente() { const n = document.getElementById('cNome').value.toUpperCase(); if(n) { clientes.push({nome: n, saldo: 0}); db.ref('clientes').set(clientes); } }
+    function renderClientes() { document.getElementById('listaClientes').innerHTML = clientes.map((c, i) => `<tr><td>${c.nome}</td><td>R$ ${c.saldo.toFixed(2)}</td><td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="clientes.splice(${i},1);db.ref('clientes').set(clientes)"></i></td></tr>`).join(''); }
+
+    function exportarExcel() { const ws = XLSX.utils.json_to_sheet(estoque); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Estoque"); XLSX.writeFile(wb, "estoque_boteco934.xlsx"); }
+    function importarExcel(e) { const reader = new FileReader(); reader.onload = (ev) => { const data = new Uint8Array(ev.target.result); const wb = XLSX.read(data, {type:'array'}); const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); db.ref('produtos').set(json); }; reader.readAsArrayBuffer(e.target.files[0]); }
+
+    function renderMesas() { document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>`).join(''); }
 
     function show(id, el) { 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); 
@@ -233,8 +226,6 @@
         document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
         el.classList.add('active');
     }
-
-    renderMesas();
 </script>
 </body>
 </html>
