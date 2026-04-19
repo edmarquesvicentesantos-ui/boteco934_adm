@@ -3,131 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v55 Full</title>
+    <title>Boteco 934 - v56 XML Import</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --green: #10b981; --red: #ef4444; --blue: #3b82f6; --border: #1e293b; }
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.2s; }
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --border: #1e293b; --green: #10b981; }
+        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-
-        /* Menu Lateral */
-        .sidebar { width: 200px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
-        .brand { padding: 25px 10px; text-align: center; color: var(--accent); font-weight: 700; font-size: 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        
+        .sidebar { width: 200px; background: var(--card); border-right: 1px solid var(--border); padding: 10px; }
         .nav-btn { padding: 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--subtext); border-radius: 10px; margin-bottom: 5px; }
-        .nav-btn:hover, .nav-btn.active { background: var(--accent); color: var(--bg); font-weight: 600; }
+        .nav-btn.active { background: var(--accent); color: var(--bg); font-weight: bold; }
 
-        /* Área de Conteúdo */
         .main { flex: 1; padding: 20px; overflow-y: auto; }
         .view { display: none; }
         .view.active { display: block; }
-        .grid-caixa { display: grid; grid-template-columns: 1fr 380px; gap: 20px; height: 90vh; }
 
-        /* Mesas e Cards */
-        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
-        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
-        .card:hover { border-color: var(--accent); }
-        .card.ocupada { background: var(--blue); color: white; }
-        .card.produto { background: #1c212b; }
-
-        /* Painel Lateral de Venda */
-        .painel-checkout { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
-        .lista-venda { flex: 1; overflow-y: auto; margin: 15px 0; border-top: 1px solid var(--border); padding-top: 10px; }
-        
-        /* Formulários */
-        input, select { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 14px; }
-        .btn { border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn { border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
         .btn-gold { background: var(--accent); color: var(--bg); }
-        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); font-size: 11px; padding: 5px; }
+        .btn-xml { background: #3b82f6; color: white; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td, th { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        td, th { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
         th { color: var(--accent); font-size: 12px; }
     </style>
 </head>
 <body>
 
 <nav class="sidebar">
-    <div class="brand">BOTECO 934</div>
+    <div style="padding:20px; text-align:center; color:var(--accent); font-weight:700">BOTECO 934</div>
     <div class="nav-btn active" onclick="show('caixa', this)"><i class="fas fa-cash-register"></i> CAIXA</div>
-    <div class="nav-btn" onclick="show('clientes', this)"><i class="fas fa-user-plus"></i> CLIENTES</div>
     <div class="nav-btn" onclick="show('estoque', this)"><i class="fas fa-boxes-stacked"></i> ESTOQUE</div>
-    <div class="nav-btn" onclick="show('financas', this)"><i class="fas fa-chart-pie"></i> RELATÓRIOS</div>
 </nav>
 
 <main class="main">
     <section id="caixa" class="view active">
-        <div class="grid-caixa">
-            <div>
-                <div class="grid-items" id="mesaGrid" style="margin-bottom: 20px;"></div>
-                <div style="background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid var(--border);">
-                    <input type="text" id="codBarras" placeholder="Bipar código de barras..." onkeypress="bipar(event)">
-                    <div class="grid-items" id="gradeProdutos"></div>
-                </div>
-            </div>
-            <div id="checkout" class="painel-checkout" style="display:none">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <h3 id="mesaH" style="margin:0; color:var(--accent)">MESA --</h3>
-                    <button class="btn-outline" onclick="vincular()">VINCULAR CLIENTE</button>
-                </div>
-                <div id="cliNome" style="font-size:12px; color:var(--subtext); margin-top:5px"></div>
-                
-                <div class="lista-venda" id="itensVenda"></div>
-                
-                <div style="background:rgba(255,184,0,0.1); padding:10px; border-radius:10px; margin-bottom:10px">
-                    <h2 id="totalH" style="margin:0; text-align:right">R$ 0,00</h2>
-                </div>
-                
-                <select id="pagMetodo">
-                    <option value="PIX">PIX</option>
-                    <option value="DINHEIRO">DINHEIRO</option>
-                    <option value="DÉBITO">CARTÃO DÉBITO</option>
-                    <option value="CRÉDITO">CARTÃO CRÉDITO</option>
-                    <option value="PENDURA">PENDURA / CONTA</option>
-                </select>
-                <button class="btn btn-gold" onclick="finalizar()"><i class="fas fa-check"></i> FECHAR CONTA</button>
-                <button class="btn" style="background:#25d366; color:white" onclick="zap()"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="clientes" class="view">
-        <div style="display:grid; grid-template-columns: 350px 1fr; gap:20px">
-            <div class="card" style="text-align:left">
-                <h3>Novo Cadastro</h3>
-                <input type="text" id="cadCliNome" placeholder="Nome do Cliente">
-                <input type="text" id="cadCliZap" placeholder="WhatsApp (5587...)">
-                <button class="btn btn-gold" onclick="addCliente()">SALVAR CLIENTE</button>
-            </div>
-            <div class="card" style="text-align:left">
-                <h3>Lista de Clientes (A-Z)</h3>
-                <table id="tabCli"><thead><tr><th>Nome</th><th>WhatsApp</th></tr></thead><tbody></tbody></table>
-            </div>
-        </div>
+        <h2>PDV Ativo</h2>
+        <p>Use o menu para gerenciar produtos e clientes.</p>
     </section>
 
     <section id="estoque" class="view">
         <div style="display:grid; grid-template-columns: 350px 1fr; gap:20px">
-            <div class="card" style="text-align:left">
-                <h3>Adicionar Produto</h3>
-                <input type="text" id="pCod" placeholder="Código de Barras">
+            <div style="background:var(--card); padding:20px; border-radius:15px">
+                <h3>Entrada de Produtos</h3>
+                <input type="file" id="xmlInput" accept=".xml" style="display:none" onchange="lerXML(this)">
+                <button class="btn btn-xml" onclick="document.getElementById('xmlInput').click()">
+                    <i class="fas fa-file-code"></i> IMPORTAR NFe (XML)
+                </button>
+                <hr style="border:0; border-top:1px solid var(--border); margin:20px 0">
+                
                 <input type="text" id="pNome" placeholder="Nome do Produto">
                 <input type="number" id="pPreco" placeholder="Preço de Venda R$">
-                <button class="btn btn-gold" onclick="addProduto()">ADICIONAR AO ESTOQUE</button>
+                <button class="btn btn-gold" onclick="addManual()">SALVAR MANUAL</button>
             </div>
-            <div class="card" style="text-align:left">
-                <h3>Itens Cadastrados</h3>
-                <table id="tabProd"><thead><tr><th>Nome</th><th>Preço</th></tr></thead><tbody></tbody></table>
-            </div>
-        </div>
-    </section>
 
-    <section id="financas" class="view">
-        <div class="card" style="max-width:400px; text-align:left">
-            <h3>Vendas de Hoje</h3>
-            <div id="resumoCaixa" style="font-size:20px; line-height:2"></div>
+            <div style="background:var(--card); padding:20px; border-radius:15px">
+                <h3>Produtos Cadastrados</h3>
+                <table>
+                    <thead><tr><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
+                    <tbody id="listaEstoque"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 </main>
@@ -137,97 +76,56 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let estoque = [], clientes = [], vendas = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], cliente: null }));
-    let mesaAtiva = null;
+    let estoque = [];
 
-    db.ref().on('value', snap => {
-        const d = snap.val() || {};
-        estoque = d.produtos ? Object.values(d.produtos).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
-        clientes = d.clientes ? Object.values(d.clientes).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
-        vendas = d.vendas ? Object.values(d.vendas) : [];
+    db.ref('produtos').on('value', snap => {
+        estoque = snap.val() ? Object.values(snap.val()) : [];
         render();
     });
 
     function render() {
-        document.getElementById('mesaGrid').innerHTML = mesas.map(m => `
-            <div class="card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">
-                <b>MESA ${m.id}</b><br><small>${m.cliente ? m.cliente.nome : (m.itens.length > 0 ? 'Aberto' : 'Livre')}</small>
-            </div>
+        document.getElementById('listaEstoque').innerHTML = estoque.map(p => `
+            <tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:#ef4444; cursor:pointer" onclick="remover('${p.nome}')"></i></td></tr>
         `).join('');
-
-        document.getElementById('gradeProdutos').innerHTML = estoque.map(p => `
-            <div class="card produto" onclick="addVenda('${p.nome}')">${p.nome}<br><b>R$ ${p.val.toFixed(2)}</b></div>
-        `).join('');
-
-        document.getElementById('tabCli').querySelector('tbody').innerHTML = clientes.map(c => `<tr><td>${c.nome}</td><td>${c.zap}</td></tr>`).join('');
-        document.getElementById('tabProd').querySelector('tbody').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td></tr>`).join('');
-        
-        const h = new Date().toLocaleDateString();
-        const vH = vendas.filter(v => v.data === h);
-        const t = { PIX:0, DINHEIRO:0, DÉBITO:0, CRÉDITO:0, PENDURA:0 };
-        vH.forEach(v => t[v.metodo] += v.valor);
-        document.getElementById('resumoCaixa').innerHTML = Object.entries(t).map(([k,v]) => `<b>${k}:</b> R$ ${v.toFixed(2)}`).join('<br>');
     }
 
-    // FUNÇÕES CLIENTES
-    function addCliente() {
-        const n = document.getElementById('cadCliNome').value.toUpperCase();
-        const z = document.getElementById('cadCliZap').value;
-        if(n) db.ref('clientes/' + n).set({ nome: n, zap: z });
-        document.getElementById('cadCliNome').value = ''; document.getElementById('cadCliZap').value = '';
+    // FUNÇÃO PARA LER XML DA NOTA FISCAL
+    function lerXML(input) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(reader.result, "text/xml");
+            
+            // Busca as tags <det> que contêm os produtos na NFe
+            const itens = xmlDoc.getElementsByTagName("det");
+            
+            if(itens.length === 0) return alert("XML Inválido ou sem produtos!");
+
+            for (let i = 0; i < itens.length; i++) {
+                const nome = itens[i].getElementsByTagName("xProd")[0].textContent;
+                const precoCusto = itens[i].getElementsByTagName("vUnCom")[0].textContent;
+                
+                // Sugere um lucro de 50% em cima do custo do XML (você pode alterar depois)
+                const precoVenda = parseFloat(precoCusto) * 1.5;
+
+                // Adiciona ao Firebase
+                db.ref('produtos/' + nome.replace(/[.#$/[\]]/g, "")).set({
+                    nome: nome.toUpperCase(),
+                    val: precoVenda
+                });
+            }
+            alert(itens.length + " produtos importados com sucesso!");
+        };
+        reader.readAsText(input.files[0]);
     }
 
-    // FUNÇÕES ESTOQUE
-    function addProduto() {
+    function addManual() {
         const n = document.getElementById('pNome').value.toUpperCase();
         const v = parseFloat(document.getElementById('pPreco').value);
-        const c = document.getElementById('pCod').value;
-        if(n && v) db.ref('produtos/' + n).set({ nome: n, val: v, cod: c });
-        document.getElementById('pNome').value = ''; document.getElementById('pPreco').value = ''; document.getElementById('pCod').value = '';
+        if(n && v) db.ref('produtos/' + n).set({ nome: n, val: v });
     }
 
-    // FUNÇÕES CAIXA
-    function abrirMesa(id) {
-        mesaAtiva = mesas.find(m => m.id === id);
-        document.getElementById('checkout').style.display = 'flex';
-        document.getElementById('mesaH').innerText = "MESA " + id;
-        document.getElementById('cliNome').innerText = mesaAtiva.cliente ? "👤 " + mesaAtiva.cliente.nome : "";
-        upCheckout();
-    }
-
-    function addVenda(nome) {
-        if(!mesaAtiva) return;
-        const p = estoque.find(x => x.nome === nome);
-        const ex = mesaAtiva.itens.find(i => i.nome === p.nome);
-        if(ex) ex.qtd++; else mesaAtiva.itens.push({...p, qtd:1});
-        upCheckout(); render();
-    }
-
-    function upCheckout() {
-        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('itensVenda').innerHTML = mesaAtiva.itens.map(i => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>
-        `).join('');
-        document.getElementById('totalH').innerText = "R$ " + total.toFixed(2);
-    }
-
-    function vincular() {
-        const n = prompt("Nome do Cliente:");
-        const cli = clientes.find(c => c.nome === n.toUpperCase());
-        if(cli) { mesaAtiva.cliente = cli; abrirMesa(mesaAtiva.id); } else { alert("Não cadastrado!"); }
-    }
-
-    function bipar(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value); if(p) addVenda(p.nome); e.target.value = ''; } }
-    function finalizar() {
-        const total = parseFloat(document.getElementById('totalH').innerText.replace('R$ ',''));
-        if(total === 0) return;
-        vendas.push({ valor: total, metodo: document.getElementById('pagMetodo').value, data: new Date().toLocaleDateString() });
-        db.ref('vendas').set(vendas);
-        mesaAtiva.itens = []; mesaAtiva.cliente = null;
-        document.getElementById('checkout').style.display = 'none';
-        render();
-    }
-    function zap() { if(mesaAtiva.cliente) window.open(`https://wa.me/${mesaAtiva.cliente.zap}?text=Total: ${document.getElementById('totalH').innerText}`); }
+    function remover(nome) { if(confirm("Remover?")) db.ref('produtos/' + nome).remove(); }
     function show(id, b) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active')); b.classList.add('active'); }
 </script>
 </body>
