@@ -146,6 +146,47 @@
             document.getElementById('infoMesa').innerHTML = `<h3>SELECIONE UMA MESA</h3>`;
         }
     }
+    function carregarItensMesa(num) {
+        // Remove qualquer ouvinte antigo para não duplicar o processamento
+        db.ref(`mesas/Mesa${num}/itens`).off(); 
+
+        db.ref(`mesas/Mesa${num}/itens`).on('value', snap => {
+            const lista = document.getElementById('listaItens');
+            const totalTxt = document.getElementById('totalMesa');
+            
+            // LIMPA A LISTA COMPLETAMENTE ANTES DE DESENHAR
+            lista.innerHTML = ""; 
+            let total = 0;
+
+            if (snap.exists()) {
+                snap.forEach(item => {
+                    const i = item.val();
+                    const chaveItem = item.key; // Chave única do Firebase
+                    total += i.preco;
+
+                    // Cria a linha do item com um botão de excluir (opcional)
+                    lista.innerHTML += `
+                        <div class="item">
+                            <span>${i.nome}</span>
+                            <b>R$ ${i.preco.toFixed(2)}</b>
+                            <i class="fas fa-trash-alt" style="color:var(--red); cursor:pointer; font-size:0.7rem;" 
+                               onclick="removerItemMesa('${num}', '${chaveItem}')"></i>
+                        </div>`;
+                });
+            }
+            
+            totalTxt.innerText = `R$ ${total.toFixed(2)}`;
+            // Atualiza o total no banco de dados silenciosamente
+            db.ref(`mesas/Mesa${num}`).update({ total: total });
+        });
+    }
+
+    // Função extra para você poder apagar um item lançado errado:
+    function removerItemMesa(numMesa, chaveItem) {
+        if(confirm("Remover este item da comanda?")) {
+            db.ref(`mesas/Mesa${numMesa}/itens/${chaveItem}`).remove();
+        }
+    }
     carregarMesas();
 </script>
 </body>
