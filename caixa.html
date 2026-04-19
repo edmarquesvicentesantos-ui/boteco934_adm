@@ -1,1 +1,84 @@
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; }
+        
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+        h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase; }
+
+        /* Grid Centralizado */
+        .grid-mesas { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(70px, 70px)); 
+            gap: 12px; 
+            width: 100%;
+            max-width: 400px; 
+            justify-content: center;
+        }
+
+        .mesa-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 15px 5px; 
+            border-radius: 10px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+        .mesa-card:active { transform: scale(0.9); }
+        .mesa-card.ativa { border-color: var(--accent); background: rgba(255,184,0,0.05); }
+        
+        .mesa-card label { font-size: 0.55rem; color: #94a3b8; display: block; margin-bottom: 2px; }
+        .mesa-card span { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+
+        /* Scrollbar Invisível */
+        body::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+    <h2>Atendimento de Mesas</h2>
+    <div class="grid-mesas" id="mesasUI"></div>
+
+<script>
+    // Configurações do Firebase
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Gerar e Monitorar Mesas
+    function renderMesas() {
+        const container = document.getElementById('mesasUI');
+        container.innerHTML = "";
+        
+        for(let i=1; i<=12; i++) {
+            container.innerHTML += `
+                <div class="mesa-card" id="mesa-${i}" onclick="abrirMesa(${i})">
+                    <label>MESA</label>
+                    <span>${i}</span>
+                </div>
+            `;
+        }
+    }
+
+    function abrirMesa(num) {
+        alert("Abrindo detalhes da Mesa " + num);
+        // Aqui depois colocaremos a lógica de adicionar produtos
+    }
+
+    renderMesas();
+</script>
+</body>
+</html>
