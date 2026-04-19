@@ -3,173 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v53 Gold Edition</title>
+    <title>Boteco 934 - v55 Full</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
         :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --green: #10b981; --red: #ef4444; --blue: #3b82f6; --border: #1e293b; }
-        
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: all 0.2s ease; }
+        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.2s; }
         body { margin: 0; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Elegante */
-        .sidebar { width: 220px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
-        .brand { padding: 30px 10px; text-align: center; color: var(--accent); font-weight: 700; font-size: 22px; letter-spacing: 1px; }
-        .nav-btn { padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: var(--subtext); border-radius: 12px; margin-bottom: 5px; font-weight: 500; }
-        .nav-btn:hover { background: rgba(255, 184, 0, 0.1); color: var(--accent); }
-        .nav-btn.active { background: var(--accent); color: var(--bg); }
+        /* Menu Lateral */
+        .sidebar { width: 200px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
+        .brand { padding: 25px 10px; text-align: center; color: var(--accent); font-weight: 700; font-size: 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        .nav-btn { padding: 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: var(--subtext); border-radius: 10px; margin-bottom: 5px; }
+        .nav-btn:hover, .nav-btn.active { background: var(--accent); color: var(--bg); font-weight: 600; }
 
-        /* Layout de Caixa */
-        .main { flex: 1; padding: 25px; overflow-y: auto; }
+        /* Área de Conteúdo */
+        .main { flex: 1; padding: 20px; overflow-y: auto; }
         .view { display: none; }
         .view.active { display: block; }
-        .caixa-container { display: grid; grid-template-columns: 1fr 400px; gap: 25px; height: 88vh; }
+        .grid-caixa { display: grid; grid-template-columns: 1fr 380px; gap: 20px; height: 90vh; }
 
-        /* Mesas Estilizadas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .mesa-card { background: var(--card); border: 2px solid var(--border); border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; position: relative; }
-        .mesa-card.ocupada { background: var(--blue); border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-        .mesa-card.selecionada { border-color: var(--accent); scale: 1.05; }
-        .mesa-card h4 { margin: 0; font-size: 14px; }
-        .mesa-card span { font-size: 10px; color: var(--subtext); display: block; margin-top: 4px; }
-        .mesa-card.ocupada span { color: white; font-weight: bold; }
+        /* Mesas e Cards */
+        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
+        .card:hover { border-color: var(--accent); }
+        .card.ocupada { background: var(--blue); color: white; }
+        .card.produto { background: #1c212b; }
 
-        /* Painel de Vendas (Direita) - CORREÇÃO FINAL V50/V51 */
-        .panel-venda { background: var(--card); border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-        .cart-body { flex: 1; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
-        .cart-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; }
-
-        /* Botões Gold */
-        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-gold { background: var(--accent); color: var(--bg); }
-        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        /* Painel Lateral de Venda */
+        .painel-checkout { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
+        .lista-venda { flex: 1; overflow-y: auto; margin: 15px 0; border-top: 1px solid var(--border); padding-top: 10px; }
         
-        /* Grid de Produtos Compacto */
-        .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; max-height: 400px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 15px; }
-        .p-item { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; }
-        .p-item:hover { border-color: var(--accent); background: #1c212b; }
-        .p-item b { color: var(--accent); display: block; font-size: 16px; margin-top: 5px; }
+        /* Formulários */
+        input, select { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 14px; }
+        .btn { border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+        .btn-gold { background: var(--accent); color: var(--bg); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); font-size: 11px; padding: 5px; }
 
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 15px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-size: 16px; }
-        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(255,184,0,0.2); }
-
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        th { padding: 15px; text-align: left; color: var(--subtext); font-size: 12px; text-transform: uppercase; }
-        td { background: var(--card); padding: 15px; font-size: 14px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        td:first-child { border-radius: 12px 0 0 12px; border-left: 1px solid var(--border); }
-        td:last-child { border-radius: 0 12px 12px 0; border-right: 1px solid var(--border); }
-
-        #impresso { display: none; width: 80mm; padding: 15px; color: #000; background: #fff; font-family: 'Courier New', monospace; }
-        @media print { body * { display: none; } #impresso { display: block; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td, th { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--accent); font-size: 12px; }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
+<nav class="sidebar">
     <div class="brand">BOTECO 934</div>
-    <div class="nav-btn active" onclick="nav('v-caixa', this)"><i class="fas fa-desktop"></i> PDV CAIXA</div>
-    <div class="nav-btn" onclick="nav('v-estoque', this)"><i class="fas fa-warehouse"></i> ESTOQUE</div>
-    <div class="nav-btn" onclick="nav('v-clientes', this)"><i class="fas fa-address-book"></i> CLIENTES</div>
-    <div class="nav-btn" onclick="nav('v-financas', this)"><i class="fas fa-wallet"></i> FINANCEIRO</div>
-</aside>
+    <div class="nav-btn active" onclick="show('caixa', this)"><i class="fas fa-cash-register"></i> CAIXA</div>
+    <div class="nav-btn" onclick="show('clientes', this)"><i class="fas fa-user-plus"></i> CLIENTES</div>
+    <div class="nav-btn" onclick="show('estoque', this)"><i class="fas fa-boxes-stacked"></i> ESTOQUE</div>
+    <div class="nav-btn" onclick="show('financas', this)"><i class="fas fa-chart-pie"></i> RELATÓRIOS</div>
+</nav>
 
 <main class="main">
-    <section id="v-caixa" class="view active">
-        <div class="caixa-container">
+    <section id="caixa" class="view active">
+        <div class="grid-caixa">
             <div>
-                <div class="grid-mesas" id="mesasUI"></div>
-                <div style="background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border);">
-                    <input type="text" id="scanner" placeholder="🔍 Buscar por nome ou bipar código..." onkeypress="handleScan(event)">
-                    <div class="product-list" id="produtosUI"></div>
+                <div class="grid-items" id="mesaGrid" style="margin-bottom: 20px;"></div>
+                <div style="background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid var(--border);">
+                    <input type="text" id="codBarras" placeholder="Bipar código de barras..." onkeypress="bipar(event)">
+                    <div class="grid-items" id="gradeProdutos"></div>
                 </div>
             </div>
-
-            <div id="checkout" class="panel-venda" style="display:none">
-                <div class="cart-header">
-                    <h2 id="cartMesaTitle" style="margin:0; color:var(--accent)">MESA --</h2>
-                    <span id="cartUser" style="color:var(--subtext); font-size:12px"></span>
+            <div id="checkout" class="painel-checkout" style="display:none">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h3 id="mesaH" style="margin:0; color:var(--accent)">MESA --</h3>
+                    <button class="btn-outline" onclick="vincular()">VINCULAR CLIENTE</button>
+                </div>
+                <div id="cliNome" style="font-size:12px; color:var(--subtext); margin-top:5px"></div>
+                
+                <div class="lista-venda" id="itensVenda"></div>
+                
+                <div style="background:rgba(255,184,0,0.1); padding:10px; border-radius:10px; margin-bottom:10px">
+                    <h2 id="totalH" style="margin:0; text-align:right">R$ 0,00</h2>
                 </div>
                 
-                <div class="cart-body" id="cartItens"></div>
-                
-                <div style="background:rgba(255,184,0,0.05); padding:15px; border-radius:15px; margin-bottom:15px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px; color:var(--subtext)"><span>Soma parcial:</span><span id="parcial">R$ 0,00</span></div>
-                    <div style="display:flex; justify-content:space-between; align-items:center"><h3 style="margin:0">Total a Pagar:</h3><h2 id="totalFinal" style="margin:0; color:var(--accent)">R$ 0,00</h2></div>
-                </div>
-
-                <select id="pagForm">
-                    <option value="PIX">💠 PIX</option>
-                    <option value="DINHEIRO">💵 DINHEIRO</option>
-                    <option value="DÉBITO">💳 CARTÃO DÉBITO</option>
-                    <option value="CRÉDITO">💳 CARTÃO CRÉDITO</option>
-                    <option value="PENDURA">📝 PENDURA / CONTA</option>
+                <select id="pagMetodo">
+                    <option value="PIX">PIX</option>
+                    <option value="DINHEIRO">DINHEIRO</option>
+                    <option value="DÉBITO">CARTÃO DÉBITO</option>
+                    <option value="CRÉDITO">CARTÃO CRÉDITO</option>
+                    <option value="PENDURA">PENDURA / CONTA</option>
                 </select>
-
-                <button class="btn btn-green" onclick="fechar()"><i class="fas fa-check-circle"></i> FINALIZAR VENDA</button>
-                <button class="btn btn-outline" onclick="whatsapp()"><i class="fab fa-whatsapp"></i> ENVIAR COMANDA</button>
-                <button class="btn" style="background:var(--red); font-size:10px" onclick="cancelarMesa()">CANCELAR MESA</button>
+                <button class="btn btn-gold" onclick="finalizar()"><i class="fas fa-check"></i> FECHAR CONTA</button>
+                <button class="btn" style="background:#25d366; color:white" onclick="zap()"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
             </div>
         </div>
     </section>
 
-    <section id="v-estoque" class="view">
-        <div style="display:flex; gap:15px; margin-bottom:25px;">
-            <button class="btn btn-gold" style="width:200px" onclick="exportExcel()">EXPORTAR EXCEL</button>
-            <button class="btn btn-outline" style="width:200px" onclick="document.getElementById('imp').click()">IMPORTAR EXCEL</button>
-            <input type="file" id="imp" style="display:none" onchange="importExcel(event)">
+    <section id="clientes" class="view">
+        <div style="display:grid; grid-template-columns: 350px 1fr; gap:20px">
+            <div class="card" style="text-align:left">
+                <h3>Novo Cadastro</h3>
+                <input type="text" id="cadCliNome" placeholder="Nome do Cliente">
+                <input type="text" id="cadCliZap" placeholder="WhatsApp (5587...)">
+                <button class="btn btn-gold" onclick="addCliente()">SALVAR CLIENTE</button>
+            </div>
+            <div class="card" style="text-align:left">
+                <h3>Lista de Clientes (A-Z)</h3>
+                <table id="tabCli"><thead><tr><th>Nome</th><th>WhatsApp</th></tr></thead><tbody></tbody></table>
+            </div>
         </div>
-        <table><thead><tr><th>Produto</th><th>Categoria</th><th>Valor</th><th>Ação</th></tr></thead><tbody id="listaEstoque"></tbody></table>
     </section>
 
-    <section id="v-financas" class="view">
-        <div class="panel-venda" style="max-width:500px">
-            <h2 style="color:var(--accent)">Fechamento de Caixa</h2>
-            <div id="resumoFinal" style="font-size:20px; line-height:2.5"></div>
+    <section id="estoque" class="view">
+        <div style="display:grid; grid-template-columns: 350px 1fr; gap:20px">
+            <div class="card" style="text-align:left">
+                <h3>Adicionar Produto</h3>
+                <input type="text" id="pCod" placeholder="Código de Barras">
+                <input type="text" id="pNome" placeholder="Nome do Produto">
+                <input type="number" id="pPreco" placeholder="Preço de Venda R$">
+                <button class="btn btn-gold" onclick="addProduto()">ADICIONAR AO ESTOQUE</button>
+            </div>
+            <div class="card" style="text-align:left">
+                <h3>Itens Cadastrados</h3>
+                <table id="tabProd"><thead><tr><th>Nome</th><th>Preço</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+    </section>
+
+    <section id="financas" class="view">
+        <div class="card" style="max-width:400px; text-align:left">
+            <h3>Vendas de Hoje</h3>
+            <div id="resumoCaixa" style="font-size:20px; line-height:2"></div>
         </div>
     </section>
 </main>
-
-<div id="impresso"></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let estoque = [], vendas = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], cliente: null }));
-    let mesaSel = null;
+    let estoque = [], clientes = [], vendas = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], cliente: null }));
+    let mesaAtiva = null;
 
     db.ref().on('value', snap => {
         const d = snap.val() || {};
         estoque = d.produtos ? Object.values(d.produtos).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
+        clientes = d.clientes ? Object.values(d.clientes).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
         vendas = d.vendas ? Object.values(d.vendas) : [];
         render();
     });
 
     function render() {
-        document.getElementById('mesasUI').innerHTML = mesas.map(m => `
-            <div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''} ${mesaSel && mesaSel.id === m.id ? 'selecionada' : ''}" onclick="selMesa(${m.id})">
-                <h4>MESA ${m.id}</h4>
-                <span>${m.cliente || (m.itens.length > 0 ? 'Em aberto' : 'Livre')}</span>
+        document.getElementById('mesaGrid').innerHTML = mesas.map(m => `
+            <div class="card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">
+                <b>MESA ${m.id}</b><br><small>${m.cliente ? m.cliente.nome : (m.itens.length > 0 ? 'Aberto' : 'Livre')}</small>
             </div>
         `).join('');
 
-        document.getElementById('produtosUI').innerHTML = estoque.map(p => `
-            <div class="p-item" onclick="add('${p.nome}')">${p.nome}<b>R$ ${p.val.toFixed(2)}</b></div>
+        document.getElementById('gradeProdutos').innerHTML = estoque.map(p => `
+            <div class="card produto" onclick="addVenda('${p.nome}')">${p.nome}<br><b>R$ ${p.val.toFixed(2)}</b></div>
         `).join('');
 
-        document.getElementById('listaEstoque').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>${p.cat}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:var(--red); cursor:pointer"></i></td></tr>`).join('');
+        document.getElementById('tabCli').querySelector('tbody').innerHTML = clientes.map(c => `<tr><td>${c.nome}</td><td>${c.zap}</td></tr>`).join('');
+        document.getElementById('tabProd').querySelector('tbody').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>R$ ${p.val.toFixed(2)}</td></tr>`).join('');
         
         const h = new Date().toLocaleDateString();
         const vH = vendas.filter(v => v.data === h);
         const t = { PIX:0, DINHEIRO:0, DÉBITO:0, CRÉDITO:0, PENDURA:0 };
         vH.forEach(v => t[v.metodo] += v.valor);
-        document.getElementById('resumoFinal').innerHTML = Object.entries(t).map(([k,v]) => `<div style="display:flex; justify-content:space-between"><span>${k}</span><b>R$ ${v.toFixed(2)}</b></div>`).join('');
+        document.getElementById('resumoCaixa').innerHTML = Object.entries(t).map(([k,v]) => `<b>${k}:</b> R$ ${v.toFixed(2)}`).join('<br>');
     }
 
-    function selMesa(
+    // FUNÇÕES CLIENTES
+    function addCliente() {
+        const n = document.getElementById('cadCliNome').value.toUpperCase();
+        const z = document.getElementById('cadCliZap').value;
+        if(n) db.ref('clientes/' + n).set({ nome: n, zap: z });
+        document.getElementById('cadCliNome').value = ''; document.getElementById('cadCliZap').value = '';
+    }
+
+    // FUNÇÕES ESTOQUE
+    function addProduto() {
+        const n = document.getElementById('pNome').value.toUpperCase();
+        const v = parseFloat(document.getElementById('pPreco').value);
+        const c = document.getElementById('pCod').value;
+        if(n && v) db.ref('produtos/' + n).set({ nome: n, val: v, cod: c });
+        document.getElementById('pNome').value = ''; document.getElementById('pPreco').value = ''; document.getElementById('pCod').value = '';
+    }
+
+    // FUNÇÕES CAIXA
+    function abrirMesa(id) {
+        mesaAtiva = mesas.find(m => m.id === id);
+        document.getElementById('checkout').style.display = 'flex';
+        document.getElementById('mesaH').innerText = "MESA " + id;
+        document.getElementById('cliNome').innerText = mesaAtiva.cliente ? "👤 " + mesaAtiva.cliente.nome : "";
+        upCheckout();
+    }
+
+    function addVenda(nome) {
+        if(!mesaAtiva) return;
+        const p = estoque.find(x => x.nome === nome);
+        const ex = mesaAtiva.itens.find(i => i.nome === p.nome);
+        if(ex) ex.qtd++; else mesaAtiva.itens.push({...p, qtd:1});
+        upCheckout(); render();
+    }
+
+    function upCheckout() {
+        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
+        document.getElementById('itensVenda').innerHTML = mesaAtiva.itens.map(i => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>
+        `).join('');
+        document.getElementById('totalH').innerText = "R$ " + total.toFixed(2);
+    }
+
+    function vincular() {
+        const n = prompt("Nome do Cliente:");
+        const cli = clientes.find(c => c.nome === n.toUpperCase());
+        if(cli) { mesaAtiva.cliente = cli; abrirMesa(mesaAtiva.id); } else { alert("Não cadastrado!"); }
+    }
+
+    function bipar(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value); if(p) addVenda(p.nome); e.target.value = ''; } }
+    function finalizar() {
+        const total = parseFloat(document.getElementById('totalH').innerText.replace('R$ ',''));
+        if(total === 0) return;
+        vendas.push({ valor: total, metodo: document.getElementById('pagMetodo').value, data: new Date().toLocaleDateString() });
+        db.ref('vendas').set(vendas);
+        mesaAtiva.itens = []; mesaAtiva.cliente = null;
+        document.getElementById('checkout').style.display = 'none';
+        render();
+    }
+    function zap() { if(mesaAtiva.cliente) window.open(`https://wa.me/${mesaAtiva.cliente.zap}?text=Total: ${document.getElementById('totalH').innerText}`); }
+    function show(id, b) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active')); b.classList.add('active'); }
+</script>
+</body>
+</html>
