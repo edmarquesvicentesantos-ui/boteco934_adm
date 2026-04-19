@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v48 Master</title>
+    <title>Boteco 934 - v49 Master Order</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --primary: #020617; --sidebar: #0f172a; --accent: #fbbf24; --card: #1e293b; --text: #f8fafc; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; --f-13: 13px; }
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--primary); color: var(--text); overflow: hidden; font-size: var(--f-13); }
@@ -21,30 +22,26 @@
         .view-section.active { display: block; }
         .glass-card { background: var(--card); padding: 10px; border-radius: 8px; border: 1px solid #475569; margin-bottom: 10px; }
 
-        /* Módulos do Caixa */
         .mesa-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
         .mesa-card { padding: 8px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #334155; background: #0f172a; color: #94a3b8; font-size: 11px; font-weight: bold; }
         .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; }
 
-        .controles-caixa { display: flex; flex-direction: column; gap: 8px; }
-        input { background: #0f172a; border: 1px solid var(--accent); color: white; padding: 10px; border-radius: 6px; font-size: 14px; outline: none; }
-        .cat-row { display: flex; gap: 5px; flex-wrap: wrap; }
+        input, select { background: #0f172a; border: 1px solid var(--accent); color: white; padding: 10px; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 5px; width: 100%; box-sizing: border-box; }
+        
+        .cat-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
         .btn-cat { background: #334155; border: none; color: white; padding: 6px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
         .btn-cat.active { background: var(--info); }
 
-        .grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 10px; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.1); padding: 5px; }
+        .grade-venda { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 10px; max-height: 220px; overflow-y: auto; background: rgba(0,0,0,0.1); padding: 5px; }
         .item-grade { background: #1e293b; padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid #475569; font-size: 11px; }
 
-        .venda-lateral { border: 2px solid var(--accent) !important; display: flex; flex-direction: column; }
-        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; width: 100%; font-size: 11px; margin-top: 5px; }
-        .btn-whatsapp { background: #25d366; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; width: 100%; font-size: 11px; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-excel { background: #1d6f42; }
         
-        /* Tabelas */
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: var(--accent); padding: 8px; border-bottom: 1px solid #444; }
         td { padding: 8px; border-bottom: 1px solid #334155; }
 
-        /* Área de Impressão (Invisível na tela) */
         #reciboArea { display: none; width: 80mm; font-family: monospace; color: black; background: white; padding: 10px; }
         @media print { body * { display: none; } #reciboArea { display: block; } }
     </style>
@@ -64,34 +61,47 @@
         <div style="display: grid; grid-template-columns: 1fr 300px; gap: 10px;">
             <div>
                 <div class="mesa-grid" id="mapaMesas"></div>
-                <div class="glass-card controles-caixa">
-                    <input type="text" id="barcodeMesa" placeholder="CLIQUE AQUI E BIPE O CÓDIGO..." onkeypress="handleBarcode(event)" autofocus>
+                <div class="glass-card">
+                    <input type="text" id="barcodeMesa" placeholder="BIPAR CÓDIGO..." onkeypress="handleBarcode(event)" autofocus>
                     <div class="cat-row" id="catRow"></div>
                     <div id="gradeVenda" class="grade-venda"></div>
                 </div>
             </div>
-            <div id="detalheMesa" class="glass-card venda-lateral" style="display:none;">
-                <h3 id="tituloMesa" style="margin:0">Mesa --</h3>
-                <p id="clienteAtivo" style="font-size: 11px; color: var(--accent);"></p>
+            <div id="detalheMesa" class="glass-card" style="display:none; border: 2px solid var(--accent);">
+                <h3 id="tituloMesa">Mesa --</h3>
                 <div id="consumoMesa" style="flex:1; overflow-y:auto; border-top:1px solid #444; padding-top:10px;"></div>
                 <h2 id="totalMesa" style="text-align:right; color:var(--accent)">R$ 0,00</h2>
-                
                 <select id="metodoPagamento">
                     <option value="DINHEIRO">DINHEIRO</option>
                     <option value="CARTÃO CRÉDITO">CARTÃO CRÉDITO</option>
                     <option value="CARTÃO DÉBITO">CARTÃO DÉBITO</option>
                     <option value="PENDURA">PENDURA</option>
                 </select>
-                <button class="btn" style="background: var(--success)" onclick="finalizar('PAGO')">FINALIZAR E IMPRIMIR</button>
-                <button class="btn btn-whatsapp" onclick="enviarZap()"><i class="fab fa-whatsapp"></i> ENVIAR WHATSAPP</button>
+                <button class="btn" style="background: var(--success)" onclick="finalizar()">RECEBER E IMPRIMIR</button>
+                <button class="btn" style="background: #25d366" onclick="enviarZap()"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
             </div>
         </div>
     </section>
 
-    <section id="view-financas" class="view-section">
+    <section id="view-estoque" class="view-section">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="glass-card">
+                <h3>Novo Produto</h3>
+                <input type="text" id="eCod" placeholder="Código de Barras">
+                <input type="text" id="eNome" placeholder="Nome do Produto">
+                <input type="text" id="eCat" placeholder="Categoria">
+                <input type="number" id="eVal" placeholder="Preço R$">
+                <button class="btn" style="background:var(--success)" onclick="addEstoque()">SALVAR</button>
+            </div>
+            <div class="glass-card">
+                <h3>Importar / Exportar</h3>
+                <button class="btn btn-excel" onclick="exportarExcel()"><i class="fas fa-file-export"></i> EXPORTAR LISTA (EXCEL)</button>
+                <input type="file" id="excelInput" style="display:none" onchange="importarExcel(event)">
+                <button class="btn" style="background: #3b82f6" onclick="document.getElementById('excelInput').click()"><i class="fas fa-file-import"></i> IMPORTAR LISTA (EXCEL)</button>
+            </div>
+        </div>
         <div class="glass-card">
-            <h3>Resumo de Recebimentos - Hoje</h3>
-            <div id="resumoFinanceiro" style="font-size: 16px; line-height: 2;"></div>
+            <table><thead><tr><th>Produto (A-Z)</th><th>Cat.</th><th>Preço</th><th>Ação</th></tr></thead><tbody id="tabEstoque"></tbody></table>
         </div>
     </section>
 
@@ -103,19 +113,14 @@
             <button class="btn" style="background:var(--success)" onclick="addCliente()">SALVAR</button>
         </div>
         <div class="glass-card">
-            <table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Saldo Devedor</th></tr></thead><tbody id="tabClientes"></tbody></table>
+            <table><thead><tr><th>Nome (A-Z)</th><th>Zap</th><th>Dívida</th></tr></thead><tbody id="tabClientes"></tbody></table>
         </div>
     </section>
 
-    <section id="view-estoque" class="view-section">
+    <section id="view-financas" class="view-section">
         <div class="glass-card">
-            <input type="text" id="eNome" placeholder="Nome do Produto">
-            <input type="text" id="eCat" placeholder="Categoria (ex: DESTILADO)">
-            <input type="number" id="eVal" placeholder="Preço R$">
-            <button class="btn" style="background:var(--success)" onclick="addEstoque()">SALVAR</button>
-        </div>
-        <div class="glass-card">
-            <table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th></tr></thead><tbody id="tabEstoque"></tbody></table>
+            <h3>Fechamento de Hoje</h3>
+            <div id="resumoFinanceiro" style="font-size: 16px;"></div>
         </div>
     </section>
 </main>
@@ -132,17 +137,14 @@
 
     db.ref().on('value', snap => {
         const d = snap.val() || {};
-        estoque = d.produtos ? Object.values(d.produtos) : [];
-        clientes = d.clientes ? Object.values(d.clientes) : [];
+        estoque = d.produtos ? Object.values(d.produtos).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
+        clientes = d.clientes ? Object.values(d.clientes).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
         vendas = d.vendas ? Object.values(d.vendas) : [];
         renderAll();
     });
 
     function renderAll() {
-        renderMesas();
-        renderEstoque();
-        renderClientes();
-        renderFinancas();
+        renderMesas(); renderEstoque(); renderClientes(); renderFinancas();
         const cats = ['TODOS', ...new Set(estoque.map(p => p.cat))];
         document.getElementById('catRow').innerHTML = cats.map(c => `<button class="btn-cat" onclick="renderGrade('${c}')">${c}</button>`).join('');
         renderGrade('TODOS');
@@ -153,20 +155,8 @@
         document.getElementById('gradeVenda').innerHTML = lista.map(p => `<div class="item-grade" onclick="addItem('${p.nome}')">${p.nome}<br>R$ ${p.val.toFixed(2)}</div>`).join('');
     }
 
-    function abrirMesa(id) {
-        mesaAtiva = mesas.find(m => m.id === id);
-        if (!mesaAtiva.cliente && mesaAtiva.itens.length === 0) {
-            const idx = prompt("Vincular Cliente? Digite o Nº:\n" + clientes.map((c,i)=> i+"-"+c.nome).join("\n"));
-            if(idx !== null && clientes[idx]) mesaAtiva.cliente = clientes[idx];
-        }
-        document.getElementById('detalheMesa').style.display = 'flex';
-        document.getElementById('tituloMesa').innerText = "Mesa " + id;
-        document.getElementById('clienteAtivo').innerText = mesaAtiva.cliente ? "Cliente: " + mesaAtiva.cliente.nome : "Venda Avulsa";
-        renderDetalhe();
-    }
-
     function addItem(nome) {
-        if(!mesaAtiva) return alert("Selecione uma mesa!");
+        if(!mesaAtiva) return;
         const p = estoque.find(x => x.nome === nome);
         const it = mesaAtiva.itens.find(i => i.nome === p.nome);
         if(it) it.qtd++; else mesaAtiva.itens.push({...p, qtd: 1});
@@ -175,74 +165,31 @@
 
     function renderDetalhe() {
         const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>`).join('');
+        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div>${i.qtd}x ${i.nome} - R$ ${(i.val*i.qtd).toFixed(2)}</div>`).join('');
         document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
         renderMesas();
     }
 
-    function finalizar(tipo) {
+    function finalizar() {
         const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
         const met = document.getElementById('metodoPagamento').value;
-        const data = new Date().toLocaleString();
-
-        if (met === 'PENDURA' && mesaAtiva.cliente) {
+        if(met === 'PENDURA' && mesaAtiva.cliente) {
             const c = clientes.find(x => x.nome === mesaAtiva.cliente.nome);
             c.saldo = (c.saldo || 0) + total;
             db.ref('clientes').set(clientes);
         }
-
-        vendas.push({ valor: total, metodo: met, data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString() });
+        vendas.push({ valor: total, metodo: met, data: new Date().toLocaleDateString() });
         db.ref('vendas').set(vendas);
-
-        gerarImpressao(data, total, met);
+        gerarRecibo(total, met);
         mesaAtiva.itens = []; mesaAtiva.cliente = null;
         document.getElementById('detalheMesa').style.display = 'none';
         window.print();
     }
 
-    function gerarImpressao(data, total, met) {
-        const itensStr = mesaAtiva.itens.map(i => `${i.qtd}x ${i.nome.padEnd(15)} R$ ${(i.val*i.qtd).toFixed(2)}`).join('<br>');
-        document.getElementById('reciboArea').innerHTML = `
-            <center><b>BOTECO 934</b><br>Petrolina - PE<br>--------------------------<br>
-            ${data}<br>--------------------------<br></center>
-            ${itensStr}<br>--------------------------<br>
-            <b>TOTAL: R$ ${total.toFixed(2)}</b><br>PAGTO: ${met}<br><center>Obrigado!</center>
-        `;
-    }
-
-    function enviarZap() {
-        if(!mesaAtiva.cliente || !mesaAtiva.cliente.zap) return alert("Cliente sem WhatsApp cadastrado!");
-        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        const itens = mesaAtiva.itens.map(i => `${i.qtd}x ${i.nome} = R$${(i.val*i.qtd).toFixed(2)}`).join('%0A');
-        const msg = `*BOTECO 934*%0A------------------%0A${itens}%0A------------------%0A*TOTAL: R$ ${total.toFixed(2)}*`;
-        window.open(`https://wa.me/${mesaAtiva.cliente.zap}?text=${msg}`);
-    }
-
-    function renderFinancas() {
-        const hoje = new Date().toLocaleDateString();
-        const vH = vendas.filter(v => v.data === hoje);
-        const res = {};
-        ['DINHEIRO', 'CARTÃO CRÉDITO', 'CARTÃO DÉBITO', 'PENDURA'].forEach(m => {
-            res[m] = vH.filter(v => v.metodo === m).reduce((s,v) => s + v.valor, 0);
-        });
-        document.getElementById('resumoFinanceiro').innerHTML = Object.entries(res).map(([m, v]) => `<b>${m}:</b> R$ ${v.toFixed(2)}`).join('<br>');
+    function gerarRecibo(total, met) {
+        const itens = mesaAtiva.itens.map(i => `${i.qtd}x ${i.nome.substring(0,15)} R$${(i.val*i.qtd).toFixed(2)}`).join('<br>');
+        document.getElementById('reciboArea').innerHTML = `<center><b>BOTECO 934</b><br>${new Date().toLocaleString()}<br>---<br>${itens}<br>---<br>TOTAL: R$ ${total.toFixed(2)}<br>PAGTO: ${met}</center>`;
     }
 
     function addEstoque() {
-        estoque.push({ nome: document.getElementById('eNome').value.toUpperCase(), cat: document.getElementById('eCat').value.toUpperCase(), val: parseFloat(document.getElementById('eVal').value) });
-        db.ref('produtos').set(estoque);
-    }
-
-    function addCliente() {
-        clientes.push({ nome: document.getElementById('cNome').value.toUpperCase(), zap: document.getElementById('cZap').value, saldo: 0 });
-        db.ref('clientes').set(clientes);
-    }
-
-    function renderEstoque() { document.getElementById('tabEstoque').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>${p.cat}</td><td>R$ ${p.val.toFixed(2)}</td></tr>`).join(''); }
-    function renderClientes() { document.getElementById('tabClientes').innerHTML = clientes.map(c => `<tr><td>${c.nome}</td><td>${c.zap}</td><td>R$ ${c.saldo.toFixed(2)}</td></tr>`).join(''); }
-    function handleBarcode(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value.trim()); if(p) addItem(p.nome); e.target.value = ''; } }
-    function renderMesas() { document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>`).join(''); }
-    function show(id, el) { document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); el.classList.add('active'); }
-</script>
-</body>
-</html>
+        const n = document.getElementById('eNome').value.toUpperCase();
