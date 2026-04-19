@@ -1,20 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body { background: #05070a; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #12151c; border: 1px solid #1e293b; padding: 15px; border-radius: 10px; }
+        input { background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin: 5px; border-radius: 5px; }
+        button { background: #ffb800; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        td, th { padding: 10px; border-bottom: 1px solid #1e293b; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>CADASTRO DE CLIENTE (PENDURA)</h3>
+        <input type="text" id="nomeCli" placeholder="Nome do Cliente">
+        <button onclick="addCliente()">CADASTRAR</button>
+    </div>
+
+    <table id="tabClientes">
+        <thead>
+            <tr><th>NOME</th><th>DÍVIDA ATUAL</th><th>AÇÃO</th></tr>
+        </thead>
+        <tbody id="corpoCli"></tbody>
+    </table>
+
 <script>
-    function navegar(pagina, elemento) {
-        const iframe = document.getElementById('tela-principal');
-        
-        // Adiciona um pequeno carregamento para evitar o erro visual
-        iframe.style.opacity = '0.5';
-        
-        // Tenta carregar a página
-        iframe.src = pagina;
+    const config = { databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com" };
+    if (!firebase.apps.length) firebase.initializeApp(config);
+    const db = firebase.database();
 
-        iframe.onload = function() {
-            iframe.style.opacity = '1';
-        };
-
-        // Atualiza o visual do menu lateral
-        const itens = document.querySelectorAll('.nav-item');
-        itens.forEach(item => item.classList.remove('active'));
-        elemento.classList.add('active');
+    function addCliente() {
+        const nome = document.getElementById('nomeCli').value.toUpperCase();
+        if(nome) {
+            db.ref('clientes/' + nome).set({ nome: nome, saldo: 0 });
+            document.getElementById('nomeCli').value = "";
+        }
     }
+
+    db.ref('clientes').on('value', snap => {
+        const corpo = document.getElementById('corpoCli');
+        corpo.innerHTML = "";
+        snap.forEach(cli => {
+            const c = cli.val();
+            corpo.innerHTML += `<tr>
+                <td>${c.nome}</td>
+                <td style="color:${c.saldo > 0 ? '#ef4444' : '#10b981'}">R$ ${parseFloat(c.saldo).toFixed(2)}</td>
+                <td><button onclick="pagar('${c.nome}')">QUITAR</button></td>
+            </tr>`;
+        });
+    });
+
+    function pagar(n) { if(confirm("Zerar conta de "+n+"?")) db.ref('clientes/'+n).update({saldo: 0}); }
 </script>
+</body>
+</html>
