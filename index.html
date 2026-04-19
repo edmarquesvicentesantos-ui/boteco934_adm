@@ -3,235 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v52 Ultimate Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Boteco 934 - v53 Gold Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-        :root { --bg: #0b0e14; --card: #161b22; --accent: #fbbf24; --text: #e6edf3; --green: #238636; --blue: #1f6feb; --border: #30363d; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --subtext: #94a3b8; --green: #10b981; --red: #ef4444; --blue: #3b82f6; --border: #1e293b; }
         
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: all 0.2s ease; }
         body { margin: 0; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar */
-        .sidebar { width: 180px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .brand { padding: 25px 15px; text-align: center; color: var(--accent); font-weight: 700; font-size: 18px; border-bottom: 1px solid var(--border); }
-        .nav-btn { padding: 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #8b949e; transition: 0.3s; border-bottom: 1px solid var(--border); font-size: 14px; }
-        .nav-btn:hover, .nav-btn.active { background: #21262d; color: var(--accent); }
-        .nav-btn i { width: 20px; text-align: center; }
+        /* Sidebar Elegante */
+        .sidebar { width: 220px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; }
+        .brand { padding: 30px 10px; text-align: center; color: var(--accent); font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+        .nav-btn { padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: var(--subtext); border-radius: 12px; margin-bottom: 5px; font-weight: 500; }
+        .nav-btn:hover { background: rgba(255, 184, 0, 0.1); color: var(--accent); }
+        .nav-btn.active { background: var(--accent); color: var(--bg); }
 
-        /* Area Principal */
-        .main { flex: 1; padding: 20px; overflow-y: auto; }
-        .view { display: none; animation: fadeIn 0.3s; }
+        /* Layout de Caixa */
+        .main { flex: 1; padding: 25px; overflow-y: auto; }
+        .view { display: none; }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .caixa-container { display: grid; grid-template-columns: 1fr 400px; gap: 25px; height: 88vh; }
 
-        /* Caixa e Mesas */
-        .caixa-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; height: calc(100vh - 40px); }
-        .mesa-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .mesa { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .mesa:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .mesa.active { background: var(--blue); border-color: #fff; color: #fff; }
-        .mesa small { display: block; font-size: 10px; margin-top: 5px; opacity: 0.8; }
+        /* Mesas Estilizadas */
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .mesa-card { background: var(--card); border: 2px solid var(--border); border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; position: relative; }
+        .mesa-card.ocupada { background: var(--blue); border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .mesa-card.selecionada { border-color: var(--accent); scale: 1.05; }
+        .mesa-card h4 { margin: 0; font-size: 14px; }
+        .mesa-card span { font-size: 10px; color: var(--subtext); display: block; margin-top: 4px; }
+        .mesa-card.ocupada span { color: white; font-weight: bold; }
 
-        /* Checkout (Direita) */
-        .checkout { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .cart-list { flex: 1; overflow-y: auto; margin: 15px 0; border-top: 1px solid var(--border); padding-top: 15px; }
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        /* Painel de Vendas (Direita) - CORREÇÃO FINAL V50/V51 */
+        .panel-venda { background: var(--card); border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .cart-body { flex: 1; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
+        .cart-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; }
+
+        /* Botões Gold */
+        .btn { border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        .btn-green { background: var(--green); color: white; }
+        .btn-gold { background: var(--accent); color: var(--bg); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
         
-        /* Inputs e Botões */
-        input, select { background: #0d1117; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 14px; }
-        input:focus { border-color: var(--accent); outline: none; }
-        
-        .btn { border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; font-size: 14px; transition: 0.2s; }
-        .btn-pay { background: var(--green); color: white; }
-        .btn-zap { background: #25d366; color: white; }
-        .btn:active { transform: scale(0.98); }
+        /* Grid de Produtos Compacto */
+        .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; max-height: 400px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 15px; }
+        .p-item { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; }
+        .p-item:hover { border-color: var(--accent); background: #1c212b; }
+        .p-item b { color: var(--accent); display: block; font-size: 16px; margin-top: 5px; }
 
-        /* Grades de Produtos */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        .p-card { background: #21262d; border: 1px solid var(--border); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-size: 12px; }
-        .p-card:hover { border-color: var(--blue); }
-        .p-card b { color: var(--accent); display: block; margin-top: 5px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 15px; border-radius: 12px; width: 100%; margin-bottom: 15px; font-size: 16px; }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(255,184,0,0.2); }
 
-        /* Tabelas */
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; }
-        th { background: #21262d; padding: 15px; text-align: left; color: var(--accent); font-size: 13px; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        th { padding: 15px; text-align: left; color: var(--subtext); font-size: 12px; text-transform: uppercase; }
+        td { background: var(--card); padding: 15px; font-size: 14px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        td:first-child { border-radius: 12px 0 0 12px; border-left: 1px solid var(--border); }
+        td:last-child { border-radius: 0 12px 12px 0; border-right: 1px solid var(--border); }
 
-        #recibo { display: none; width: 80mm; padding: 20px; color: #000; background: #fff; font-family: monospace; }
-        @media print { body * { display: none; } #recibo { display: block; } }
+        #impresso { display: none; width: 80mm; padding: 15px; color: #000; background: #fff; font-family: 'Courier New', monospace; }
+        @media print { body * { display: none; } #impresso { display: block; } }
     </style>
 </head>
 <body>
 
-<nav class="sidebar">
+<aside class="sidebar">
     <div class="brand">BOTECO 934</div>
-    <div class="nav-btn active" onclick="nav('view-caixa', this)"><i class="fas fa-cash-register"></i> CAIXA</div>
-    <div class="nav-btn" onclick="nav('view-estoque', this)"><i class="fas fa-boxes"></i> ESTOQUE</div>
-    <div class="nav-btn" onclick="nav('view-clientes', this)"><i class="fas fa-users"></i> CLIENTES</div>
-    <div class="nav-btn" onclick="nav('view-financas', this)"><i class="fas fa-chart-line"></i> FINANÇAS</div>
-</nav>
+    <div class="nav-btn active" onclick="nav('v-caixa', this)"><i class="fas fa-desktop"></i> PDV CAIXA</div>
+    <div class="nav-btn" onclick="nav('v-estoque', this)"><i class="fas fa-warehouse"></i> ESTOQUE</div>
+    <div class="nav-btn" onclick="nav('v-clientes', this)"><i class="fas fa-address-book"></i> CLIENTES</div>
+    <div class="nav-btn" onclick="nav('v-financas', this)"><i class="fas fa-wallet"></i> FINANCEIRO</div>
+</aside>
 
 <main class="main">
-    <section id="view-caixa" class="view active">
-        <div class="caixa-grid">
+    <section id="v-caixa" class="view active">
+        <div class="caixa-container">
             <div>
-                <div class="mesa-container" id="gridMesas"></div>
-                <div style="background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border);">
-                    <input type="text" id="leitor" placeholder="Bipar produto ou digitar nome..." onkeypress="bipar(event)">
-                    <div class="product-grid" id="gridProdutos"></div>
+                <div class="grid-mesas" id="mesasUI"></div>
+                <div style="background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border);">
+                    <input type="text" id="scanner" placeholder="🔍 Buscar por nome ou bipar código..." onkeypress="handleScan(event)">
+                    <div class="product-list" id="produtosUI"></div>
                 </div>
             </div>
 
-            <div id="checkoutArea" class="checkout" style="visibility: hidden;">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <h3 id="labelMesa" style="margin:0">Mesa --</h3>
-                    <button onclick="vincularCliente()" style="background:none; border:1px solid var(--accent); color:var(--accent); border-radius:5px; padding:2px 8px; font-size:10px; cursor:pointer">VINCULAR CLIENTE</button>
+            <div id="checkout" class="panel-venda" style="display:none">
+                <div class="cart-header">
+                    <h2 id="cartMesaTitle" style="margin:0; color:var(--accent)">MESA --</h2>
+                    <span id="cartUser" style="color:var(--subtext); font-size:12px"></span>
                 </div>
-                <div id="clienteMesa" style="font-size:12px; color:var(--accent); margin-top:5px;"></div>
                 
-                <div class="cart-list" id="listaConsumo"></div>
+                <div class="cart-body" id="cartItens"></div>
                 
-                <div style="border-top:1px solid var(--border); padding-top:10px;">
-                    <div style="display:flex; justify-content:space-between; font-size:14px;"><span>Subtotal:</span><span id="subtotal">R$ 0,00</span></div>
-                    <h2 id="totalGeral" style="text-align:right; color:var(--accent); margin:10px 0;">R$ 0,00</h2>
+                <div style="background:rgba(255,184,0,0.05); padding:15px; border-radius:15px; margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px; color:var(--subtext)"><span>Soma parcial:</span><span id="parcial">R$ 0,00</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center"><h3 style="margin:0">Total a Pagar:</h3><h2 id="totalFinal" style="margin:0; color:var(--accent)">R$ 0,00</h2></div>
                 </div>
 
-                <select id="pagamento">
-                    <option value="PIX">PIX</option>
-                    <option value="DINHEIRO">DINHEIRO</option>
-                    <option value="DÉBITO">CARTÃO DÉBITO</option>
-                    <option value="CRÉDITO">CARTÃO CRÉDITO</option>
-                    <option value="PENDURA">PENDURA (CONTA)</option>
+                <select id="pagForm">
+                    <option value="PIX">💠 PIX</option>
+                    <option value="DINHEIRO">💵 DINHEIRO</option>
+                    <option value="DÉBITO">💳 CARTÃO DÉBITO</option>
+                    <option value="CRÉDITO">💳 CARTÃO CRÉDITO</option>
+                    <option value="PENDURA">📝 PENDURA / CONTA</option>
                 </select>
 
-                <button class="btn btn-pay" onclick="fecharConta()"><i class="fas fa-print"></i> PAGAR E IMPRIMIR</button>
-                <button class="btn btn-zap" onclick="whatsapp()"><i class="fab fa-whatsapp"></i> ENVIAR RECIBO</button>
+                <button class="btn btn-green" onclick="fechar()"><i class="fas fa-check-circle"></i> FINALIZAR VENDA</button>
+                <button class="btn btn-outline" onclick="whatsapp()"><i class="fab fa-whatsapp"></i> ENVIAR COMANDA</button>
+                <button class="btn" style="background:var(--red); font-size:10px" onclick="cancelarMesa()">CANCELAR MESA</button>
             </div>
         </div>
     </section>
 
-    <section id="view-estoque" class="view">
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <button class="btn btn-pay" onclick="exportar()">EXPORTAR EXCEL</button>
-            <button class="btn btn-zap" onclick="document.getElementById('fileIn').click()">IMPORTAR EXCEL</button>
-            <input type="file" id="fileIn" style="display:none" onchange="importar(event)">
+    <section id="v-estoque" class="view">
+        <div style="display:flex; gap:15px; margin-bottom:25px;">
+            <button class="btn btn-gold" style="width:200px" onclick="exportExcel()">EXPORTAR EXCEL</button>
+            <button class="btn btn-outline" style="width:200px" onclick="document.getElementById('imp').click()">IMPORTAR EXCEL</button>
+            <input type="file" id="imp" style="display:none" onchange="importExcel(event)">
         </div>
-        <table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th></tr></thead><tbody id="tabEstoque"></tbody></table>
+        <table><thead><tr><th>Produto</th><th>Categoria</th><th>Valor</th><th>Ação</th></tr></thead><tbody id="listaEstoque"></tbody></table>
     </section>
 
-    <section id="view-financas" class="view">
-        <div class="checkout" style="max-width:400px">
-            <h3>Resumo do Dia</h3>
-            <div id="resumo" style="font-size:18px; line-height:2"></div>
+    <section id="v-financas" class="view">
+        <div class="panel-venda" style="max-width:500px">
+            <h2 style="color:var(--accent)">Fechamento de Caixa</h2>
+            <div id="resumoFinal" style="font-size:20px; line-height:2.5"></div>
         </div>
     </section>
 </main>
 
-<div id="recibo"></div>
+<div id="impresso"></div>
 
 <script>
-    // FIREBASE
     const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let estoque = [], vendas = [], clientes = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], cliente: null }));
-    let mesaAtiva = null;
+    let estoque = [], vendas = [], mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], cliente: null }));
+    let mesaSel = null;
 
-    // SINCRONIZAÇÃO
     db.ref().on('value', snap => {
         const d = snap.val() || {};
         estoque = d.produtos ? Object.values(d.produtos).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
         vendas = d.vendas ? Object.values(d.vendas) : [];
-        clientes = d.clientes ? Object.values(d.clientes) : [];
         render();
     });
 
     function render() {
-        // Render Mesas
-        document.getElementById('gridMesas').innerHTML = mesas.map(m => `
-            <div class="mesa ${m.itens.length > 0 ? 'active' : ''}" onclick="abrirMesa(${m.id})">
-                MESA ${m.id}
-                <small>${m.cliente ? m.cliente.nome : (m.itens.length > 0 ? 'Em aberto' : 'Livre')}</small>
+        document.getElementById('mesasUI').innerHTML = mesas.map(m => `
+            <div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''} ${mesaSel && mesaSel.id === m.id ? 'selecionada' : ''}" onclick="selMesa(${m.id})">
+                <h4>MESA ${m.id}</h4>
+                <span>${m.cliente || (m.itens.length > 0 ? 'Em aberto' : 'Livre')}</span>
             </div>
         `).join('');
 
-        // Render Produtos
-        document.getElementById('gridProdutos').innerHTML = estoque.map(p => `
-            <div class="p-card" onclick="add('${p.nome}')">${p.nome}<b>R$ ${p.val.toFixed(2)}</b></div>
+        document.getElementById('produtosUI').innerHTML = estoque.map(p => `
+            <div class="p-item" onclick="add('${p.nome}')">${p.nome}<b>R$ ${p.val.toFixed(2)}</b></div>
         `).join('');
 
-        // Render Tabelas
-        document.getElementById('tabEstoque').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>${p.cat}</td><td>R$ ${p.val.toFixed(2)}</td></tr>`).join('');
+        document.getElementById('listaEstoque').innerHTML = estoque.map(p => `<tr><td>${p.nome}</td><td>${p.cat}</td><td>R$ ${p.val.toFixed(2)}</td><td><i class="fas fa-trash" style="color:var(--red); cursor:pointer"></i></td></tr>`).join('');
         
-        // Render Financeiro
-        const hoje = new Date().toLocaleDateString();
-        const vH = vendas.filter(v => v.data === hoje);
+        const h = new Date().toLocaleDateString();
+        const vH = vendas.filter(v => v.data === h);
         const t = { PIX:0, DINHEIRO:0, DÉBITO:0, CRÉDITO:0, PENDURA:0 };
         vH.forEach(v => t[v.metodo] += v.valor);
-        document.getElementById('resumo').innerHTML = Object.entries(t).map(([k,v]) => `<b>${k}:</b> R$ ${v.toFixed(2)}`).join('<br>');
+        document.getElementById('resumoFinal').innerHTML = Object.entries(t).map(([k,v]) => `<div style="display:flex; justify-content:space-between"><span>${k}</span><b>R$ ${v.toFixed(2)}</b></div>`).join('');
     }
 
-    function abrirMesa(id) {
-        mesaAtiva = mesas.find(m => m.id === id);
-        document.getElementById('checkoutArea').style.visibility = 'visible';
-        document.getElementById('labelMesa').innerText = "Mesa " + id;
-        document.getElementById('clienteMesa').innerText = mesaAtiva.cliente ? "👤 " + mesaAtiva.cliente.nome : "";
-        renderCarrinho();
-    }
-
-    function add(nome) {
-        if(!mesaAtiva) return alert("Selecione uma mesa primeiro!");
-        const p = estoque.find(x => x.nome === nome);
-        const exist = mesaAtiva.itens.find(i => i.nome === p.nome);
-        if(exist) exist.qtd++; else mesaAtiva.itens.push({...p, qtd:1});
-        renderCarrinho();
-        render();
-    }
-
-    function renderCarrinho() {
-        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('listaConsumo').innerHTML = mesaAtiva.itens.map(i => `
-            <div class="cart-item"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>
-        `).join('');
-        document.getElementById('totalGeral').innerText = "R$ " + total.toFixed(2);
-        document.getElementById('subtotal').innerText = "R$ " + total.toFixed(2);
-    }
-
-    function fecharConta() {
-        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        if(total === 0) return;
-        const met = document.getElementById('pagamento').value;
-        
-        vendas.push({ valor: total, metodo: met, data: new Date().toLocaleDateString() });
-        db.ref('vendas').set(vendas);
-
-        // Imprimir
-        document.getElementById('recibo').innerHTML = `<h2>BOTECO 934</h2><p>${new Date().toLocaleString()}</p><hr>` + 
-            mesaAtiva.itens.map(i => `<p>${i.qtd}x ${i.nome} - R$ ${(i.val*i.qtd).toFixed(2)}</p>`).join('') + 
-            `<hr><h3>TOTAL: R$ ${total.toFixed(2)}</h3><p>Pagto: ${met}</p>`;
-        
-        mesaAtiva.itens = []; mesaAtiva.cliente = null;
-        document.getElementById('checkoutArea').style.visibility = 'hidden';
-        window.print();
-        render();
-    }
-
-    function vincularCliente() {
-        const nome = prompt("Nome do Cliente:");
-        if(nome) mesaAtiva.cliente = { nome: nome.toUpperCase() };
-        render(); abrirMesa(mesaAtiva.id);
-    }
-
-    function bipar(e) { if(e.key === 'Enter') { const p = estoque.find(x => x.cod === e.target.value); if(p) add(p.nome); e.target.value = ''; } }
-    function nav(id, btn) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-    function exportar() { const ws = XLSX.utils.json_to_sheet(estoque); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Estoque"); XLSX.writeFile(wb, "boteco934_estoque.xlsx"); }
-    function importar(e) { const reader = new FileReader(); reader.onload = (evt) => { const data = XLSX.utils.sheet_to_json(XLSX.read(evt.target.result, {type:'binary'}).Sheets[XLSX.read(evt.target.result, {type:'binary'}).SheetNames[0]]); db.ref('produtos').set(data); }; reader.readAsBinaryString(e.target.files[0]); }
-    function whatsapp() { window.open(`https://wa.me/?text=BOTECO 934: Sua conta deu R$ ${document.getElementById('totalGeral').innerText}`); }
-</script>
-</body>
-</html>
+    function selMesa(
