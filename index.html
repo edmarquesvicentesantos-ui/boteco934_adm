@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v37 XML + Recibo</title>
+    <title>Boteco 934 - v39 Excel Full</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --primary: #020617; --sidebar: #0f172a; --accent: #fbbf24; --card: #1e293b; --text: #f8fafc; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; }
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--primary); color: var(--text); overflow: hidden; }
@@ -19,21 +20,16 @@
         .view-section.active { display: block; }
         .glass-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
         .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .mesa-card { padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border: 1px solid #334155; background: #0f172a; color: #94a3b8; transition: 0.3s; }
-        .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
-        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; width: 100%; text-transform: uppercase; margin-bottom: 5px; }
+        .mesa-card { padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border: 1px solid #334155; background: #0f172a; color: #94a3b8; }
+        .mesa-card.ocupada { background: var(--info); color: white; border-color: #fff; }
+        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; width: 100%; text-transform: uppercase; margin-bottom: 5px; font-size: 11px; }
         .btn-success { background: var(--success); }
-        .btn-info { background: var(--info); }
-        .btn-xml { background: #6366f1; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: var(--accent); padding: 12px; border-bottom: 2px solid #334155; }
-        td { padding: 12px; border-bottom: 1px solid #334155; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #334155; color: white; }
-
-        /* Estilo do Recibo Térmico */
-        #reciboArea { display:none; background:white; color:black; width:80mm; padding:10px; font-family:'Courier New', monospace; font-size:12px; }
-        @media print { body * { display:none; } #reciboArea, #reciboArea * { display:block; } #reciboArea { width: 100%; } }
+        .btn-excel { background: #166534; }
+        .btn-cat { background: #334155; font-size: 10px; padding: 8px; width: auto; }
+        .grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+        .prod-item { background: #0f172a; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #334155; font-size: 11px; }
+        @media print { body * { display:none; } #reciboArea, #reciboArea * { display:block; } }
     </style>
 </head>
 <body>
@@ -51,12 +47,20 @@
                 <div class="mesa-grid" id="mapaMesas"></div>
                 <div class="glass-card">
                     <input type="text" id="barcodeMesa" placeholder="BIPAR PRODUTO..." onkeypress="handleBarcode(event)" autofocus>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button class="btn btn-cat" onclick="filtrarVenda('CERVEJA')">CERVEJAS</button>
+                        <button class="btn btn-cat" onclick="filtrarVenda('DESTILADO')">DESTILADOS</button>
+                        <button class="btn btn-cat" onclick="filtrarVenda('REFRIGERANTE')">REFRI</button>
+                        <button class="btn btn-cat" onclick="filtrarVenda('TIRA-GOSTO')">PETISCOS</button>
+                        <button class="btn btn-cat" onclick="filtrarVenda('TODOS')" style="background:var(--info)">TODOS</button>
+                    </div>
+                    <div id="gradeProdutosVenda" class="grade-produtos"></div>
                 </div>
             </div>
             <div id="detalheMesa" class="glass-card" style="display:none; border: 2px solid var(--accent);">
-                <h3 id="tituloMesa" style="margin-top:0">Mesa --</h3>
-                <div id="consumoMesa" style="max-height: 300px; overflow-y: auto; margin: 10px 0; border-top: 1px solid #334155;"></div>
-                <h2 id="totalMesa" style="text-align:right; color:var(--accent); margin:15px 0">R$ 0,00</h2>
+                <h3 id="tituloMesa">Mesa --</h3>
+                <div id="consumoMesa"></div>
+                <h2 id="totalMesa" style="text-align:right; color:var(--accent)">R$ 0,00</h2>
                 <button class="btn btn-success" onclick="finalizarMesa()">FECHAR E IMPRIMIR</button>
             </div>
         </div>
@@ -79,35 +83,30 @@
             </div>
             
             <div class="glass-card">
-                <h3>Importar Nota Fiscal (XML)</h3>
-                <p style="font-size: 12px; color: #94a3b8;">Suba o arquivo .xml para cadastrar produtos automaticamente.</p>
-                <input type="file" id="xmlFile" accept=".xml" style="display:none" onchange="lerXML(event)">
-                <button class="btn btn-xml" onclick="document.getElementById('xmlFile').click()">
-                    <i class="fas fa-file-import"></i> SELECIONAR XML
+                <h3>Importar / Exportar Excel</h3>
+                <button class="btn btn-excel" onclick="exportarExcel()">
+                    <i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL
                 </button>
-                <div id="statusXML" style="margin-top: 10px; font-size: 11px; color: var(--accent);"></div>
+                <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:none" onchange="importarExcel(event)">
+                <button class="btn" style="background:#0369a1" onclick="document.getElementById('excelFile').click()">
+                    <i class="fas fa-file-upload"></i> IMPORTAR DO EXCEL
+                </button>
+                <p style="font-size: 10px; color: #94a3b8; margin-top: 10px;">* Use colunas: cod, nome, cat, val</p>
             </div>
         </div>
 
         <div class="glass-card">
             <table>
                 <thead><tr><th>Cat.</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="listaEstoque"></tbody>
+                <tbody id="listaEstoqueTabela"></tbody>
             </table>
         </div>
     </section>
 
-    <div id="reciboArea">
-        <center>
-            <strong>BOTECO 934</strong><br>
-            --------------------------------<br>
-            <strong>RECIBO DE VENDA</strong><br>
-            --------------------------------
-        </center>
+    <div id="reciboArea" style="display:none">
+        <center><strong>BOTECO 934</strong></center>
         <div id="reciboItens"></div>
-        --------------------------------<br>
         <div id="reciboTotal" style="text-align:right; font-weight:bold"></div>
-        <center><br>OBRIGADO!<br><span id="reciboData"></span></center>
     </div>
 </main>
 
@@ -121,73 +120,60 @@
     const db = firebase.database();
 
     let estoque = [];
-    let mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], totalPago: 0 }));
+    let mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [] }));
     let mesaAtiva = null;
 
     db.ref('produtos').on('value', snap => { 
-        const d = snap.val();
-        estoque = d ? Object.values(d) : [];
-        renderEstoque(); 
+        estoque = snap.val() ? Object.values(snap.val()) : [];
+        renderEstoque();
+        filtrarVenda('TODOS');
     });
 
-    // --- FUNÇÃO XML ---
-    function lerXML(event) {
+    // --- FUNÇÕES EXCEL ---
+    function exportarExcel() {
+        const ws = XLSX.utils.json_to_sheet(estoque);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Produtos");
+        XLSX.writeFile(wb, "estoque_boteco934.xlsx");
+    }
+
+    function importarExcel(event) {
         const file = event.target.files[0];
-        if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-            const prods = xmlDoc.getElementsByTagName("det");
-            let novos = 0;
-
-            for (let i = 0; i < prods.length; i++) {
-                const nome = prods[i].getElementsByTagName("xProd")[0].textContent.toUpperCase();
-                const cod = prods[i].getElementsByTagName("cEAN")[0]?.textContent || "S/C";
-                const valorUn = parseFloat(prods[i].getElementsByTagName("vUnCom")[0].textContent);
-                
-                // Sugere lucro de 30% se for novo
-                if (!estoque.find(p => p.nome === nome)) {
-                    estoque.push({ cod: cod, nome: nome, cat: "OUTROS", val: (valorUn * 1.3).toFixed(2) });
-                    novos++;
-                }
+        reader.onload = (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+            
+            if(confirm("Deseja importar " + json.length + " produtos?")) {
+                db.ref('produtos').set(json);
             }
-            db.ref('produtos').set(estoque);
-            document.getElementById('statusXML').innerText = novos + " novos produtos importados!";
         };
-        reader.readAsText(file);
+        reader.readAsArrayBuffer(file);
     }
 
-    function addEstoque() {
-        estoque.push({ 
-            cod: document.getElementById('eCod').value, 
-            nome: document.getElementById('eNome').value.toUpperCase(), 
-            cat: document.getElementById('eCat').value,
-            val: parseFloat(document.getElementById('eVenda').value || 0) 
-        });
-        db.ref('produtos').set(estoque);
-        document.getElementById('eCod').value = ''; document.getElementById('eNome').value = '';
+    // --- FUNÇÕES DE VENDA ---
+    function filtrarVenda(cat) {
+        const lista = cat === 'TODOS' ? estoque : estoque.filter(p => p.cat === cat);
+        document.getElementById('gradeProdutosVenda').innerHTML = lista.map(p => `
+            <div class="prod-item" onclick="adicionarItem('${p.nome}')">${p.nome}<br><b>R$ ${parseFloat(p.val).toFixed(2)}</b></div>
+        `).join('');
     }
 
-    function renderEstoque() {
-        document.getElementById('listaEstoque').innerHTML = estoque.map((p, i) => `
-            <tr>
-                <td><span class="badge">${p.cat || 'S/C'}</span></td>
-                <td>${p.nome}</td>
-                <td>R$ ${parseFloat(p.val || 0).toFixed(2)}</td>
-                <td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td>
-            </tr>`).join('');
+    function adicionarItem(nome) {
+        if(!mesaAtiva) return alert("Escolha uma mesa!");
+        const p = estoque.find(x => x.nome === nome);
+        const item = mesaAtiva.itens.find(i => i.nome === p.nome);
+        if(item) item.qtd++; else mesaAtiva.itens.push({nome: p.nome, val: p.val, qtd: 1});
+        renderDetalheMesa();
     }
 
-    function handleBarcode(event) {
-        if(event.key === 'Enter') {
-            const p = estoque.find(x => x.cod === event.target.value.trim());
-            if(p && mesaAtiva) {
-                const item = mesaAtiva.itens.find(i => i.nome === p.nome);
-                if(item) item.qtd++; else mesaAtiva.itens.push({nome: p.nome, val: p.val, qtd: 1});
-                renderDetalheMesa();
-            }
-            event.target.value = '';
+    function handleBarcode(e) {
+        if(e.key === 'Enter') {
+            const p = estoque.find(x => x.cod === e.target.value.trim());
+            if(p) adicionarItem(p.nome);
+            e.target.value = '';
         }
     }
 
@@ -200,30 +186,50 @@
 
     function renderDetalheMesa() {
         const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.qtd}x ${i.nome}</span><b>R$ ${(i.val*i.qtd).toFixed(2)}</b></div>`).join('');
+        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `
+            <div style="display:flex; justify-content:space-between; font-size:13px">
+                <span>${i.qtd}x ${i.nome}</span>
+                <b>R$ ${(i.val*i.qtd).toFixed(2)}</b>
+            </div>
+        `).join('');
         document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
         renderMesas();
     }
 
     function finalizarMesa() {
-        if (mesaAtiva.itens.length === 0) return;
-        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
-        document.getElementById('reciboItens').innerHTML = mesaAtiva.itens.map(i => `<div>${i.qtd}x ${i.nome} - R$ ${(i.val*i.qtd).toFixed(2)}</div>`).join('');
-        document.getElementById('reciboTotal').innerText = "TOTAL: R$ " + total.toFixed(2);
-        document.getElementById('reciboData').innerText = new Date().toLocaleString();
-        window.print();
-        mesaAtiva.itens = [];
-        document.getElementById('detalheMesa').style.display = 'none';
-        renderMesas();
+        if(mesaAtiva.itens.length > 0) {
+            window.print();
+            mesaAtiva.itens = [];
+            document.getElementById('detalheMesa').style.display = 'none';
+            renderMesas();
+        }
     }
 
     function renderMesas() { 
-        document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>`).join(''); 
+        document.getElementById('mapaMesas').innerHTML = mesas.map(m => `
+            <div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>
+        `).join(''); 
+    }
+
+    function renderEstoque() {
+        document.getElementById('listaEstoqueTabela').innerHTML = estoque.map((p, i) => `
+            <tr><td>${p.cat}</td><td>${p.nome}</td><td>R$ ${parseFloat(p.val).toFixed(2)}</td>
+            <td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td></tr>
+        `).join('');
+    }
+
+    function addEstoque() {
+        const n = document.getElementById('eNome').value.toUpperCase();
+        const v = parseFloat(document.getElementById('eVenda').value || 0);
+        if(n && v) {
+            estoque.push({ cod: document.getElementById('eCod').value, nome: n, cat: document.getElementById('eCat').value, val: v });
+            db.ref('produtos').set(estoque);
+        }
     }
 
     function show(id, el) { 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); 
-        document.getElementById(id).classList.add('active'); 
+        document.getElementById(id).classList.add('active');
         document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
         el.classList.add('active');
     }
