@@ -2,143 +2,128 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes - Boteco 934</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 40px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 700px; }
-        .back-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --red: #ef4444; --green: #10b981; }
         
-        .header { margin-bottom: 30px; }
-        h1 { font-size: 26px; font-weight: 700; }
-
-        /* Card de Cadastro */
-        .form-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #334155; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .grid-inputs { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
-        label { display: block; color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
-        input { background: #020617; border: 1px solid #334155; color: white; padding: 14px; border-radius: 12px; width: 100%; outline: none; font-size: 15px; transition: 0.3s; }
-        input:focus { border-color: var(--accent); }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         
-        .btn-salvar { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; text-transform: uppercase; }
-        .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
-
-        /* Tabela de Clientes */
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        th { text-align: left; padding: 10px 15px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
-        td { background: var(--card); padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; }
-        td:first-child { border-left: 1px solid #334155; border-radius: 12px 0 0 12px; font-weight: 600; }
-        td:last-child { border-right: 1px solid #334155; border-radius: 0 12px 12px 0; text-align: right; }
+        .form-cli { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; flex: 1; font-size: 0.9rem; }
         
-        .tel-link { color: var(--muted); text-decoration: none; font-size: 13px; }
-        .btn-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-del:hover { transform: scale(1.2); }
+        .btn-add { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #94a3b8; padding: 12px; border-bottom: 2px solid var(--border); font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        
+        .status-em-dia { color: var(--green); font-weight: bold; }
+        .status-devendo { color: var(--red); font-weight: bold; }
+        
+        .badge-debito { background: rgba(239, 68, 68, 0.1); color: var(--red); padding: 4px 8px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <a href="index.html" class="back-link">← VOLTAR AO PAINEL DE VENDAS</a>
-    
-    <div class="header">
-        <h1>👥 Gestão de Clientes</h1>
-        <p style="color:var(--muted); font-size:14px;">Cadastre seus clientes para o sistema de "Pendura" e identificação.</p>
-    </div>
-
-    <div class="form-card">
-        <div class="grid-inputs">
-            <div>
-                <label>Nome do Cliente / Apelido</label>
-                <input type="text" id="cli-nome" placeholder="Ex: João da Silva">
-            </div>
-            <div>
-                <label>WhatsApp / Telefone</label>
-                <input type="text" id="cli-tel" placeholder="(87) 9....">
-            </div>
+    <div class="card">
+        <h2 style="font-size:1rem; margin-bottom:15px;"><i class="fas fa-user-plus"></i> NOVO CLIENTE / PENDURA</h2>
+        <div class="form-cli">
+            <input type="text" id="nomeCliente" placeholder="Nome Completo do Cliente">
+            <input type="text" id="telCliente" placeholder="Telefone (Opcional)">
+            <button class="btn-add" onclick="salvarCliente()"><i class="fas fa-plus"></i> CADASTRAR</button>
         </div>
-        <button class="btn-salvar" onclick="salvarCliente()">CADASTRAR NOVO CLIENTE</button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>NOME DO CLIENTE (A-Z)</th>
-                <th>CONTATO</th>
-                <th>AÇÃO</th>
-            </tr>
-        </thead>
-        <tbody id="lista-clientes"></tbody>
-    </table>
-</div>
+    <div class="card">
+        <h3 style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">LISTA DE CLIENTES E SALDOS</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>NOME</th>
+                    <th>CONTATO</th>
+                    <th>SALDO DEVEDOR</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody id="listaClientes">
+                </tbody>
+        </table>
+    </div>
 
 <script>
-    // Busca a lista de clientes salva ou inicia uma vazia
-    let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+    // Configuração do Firebase
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
+    // Função para Salvar Cliente
     function salvarCliente() {
-        const nomeInput = document.getElementById('cli-nome');
-        const telInput = document.getElementById('cli-tel');
+        const nome = document.getElementById('nomeCliente').value.trim().toUpperCase();
+        const tel = document.getElementById('telCliente').value.trim();
 
-        const nome = nomeInput.value.trim();
-        const tel = telInput.value.trim();
+        if(!nome) return alert("Digite o nome do cliente!");
 
-        if (nome !== "") {
-            // Adiciona o novo cliente
-            clientes.push({
-                nome: nome.toUpperCase(), // Salva em maiúsculo para padronizar
-                tel: tel || "Não informado"
-            });
-
-            // Salva no banco de dados do navegador
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-
-            // Limpa os campos
-            nomeInput.value = '';
-            telInput.value = '';
-            nomeInput.focus();
-
-            // Atualiza a tabela na tela
-            render();
-        } else {
-            alert("Por favor, digite pelo menos o nome do cliente.");
-        }
+        db.ref('clientes/' + nome).set({
+            nome: nome,
+            telefone: tel,
+            saldoDevedor: 0 // Começa com zero
+        }).then(() => {
+            alert("Cliente cadastrado!");
+            document.getElementById('nomeCliente').value = "";
+            document.getElementById('telCliente').value = "";
+        });
     }
 
-    function render() {
-        const corpoTabela = document.getElementById('lista-clientes');
+    // Listar Clientes em Tempo Real
+    db.ref('clientes').on('value', (snapshot) => {
+        const corpo = document.getElementById('listaClientes');
+        corpo.innerHTML = "";
         
-        // ORDENAÇÃO A-Z: Aqui a mágica acontece
-        clientes.sort((a, b) => a.nome.localeCompare(b.nome));
+        if(snapshot.exists()){
+            const dados = [];
+            snapshot.forEach(item => { dados.push(item.val()); });
+            
+            // Ordenar por nome
+            dados.sort((a, b) => a.nome.localeCompare(b.nome));
 
-        if (clientes.length === 0) {
-            corpoTabela.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted)">Nenhum cliente cadastrado.</td></tr>`;
-            return;
+            dados.forEach(c => {
+                const statusClasse = c.saldoDevedor > 0 ? 'status-devendo' : 'status-em-dia';
+                corpo.innerHTML += `
+                    <tr>
+                        <td><b>${c.nome}</b></td>
+                        <td>${c.telefone || '---'}</td>
+                        <td><span class="${c.saldoDevedor > 0 ? 'badge-debito' : 'status-em-dia'}">
+                            R$ ${parseFloat(c.saldoDevedor).toFixed(2)}
+                        </span></td>
+                        <td>
+                            <button onclick="quitarMoeda('${c.nome}')" style="background:none; border:none; color:var(--green); cursor:pointer; margin-right:10px;" title="Quitar Dívida"><i class="fas fa-check-circle"></i></button>
+                            <button onclick="removerCliente('${c.nome}')" style="background:none; border:none; color:var(--red); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
         }
+    });
 
-        corpoTabela.innerHTML = clientes.map((c, i) => `
-            <tr>
-                <td>${c.nome}</td>
-                <td><span class="tel-link">${c.tel}</span></td>
-                <td>
-                    <button class="btn-del" onclick="remover(${i})">❌</button>
-                </td>
-            </tr>
-        `).join('');
+    function removerCliente(nome) {
+        if(confirm("Deseja excluir o cliente " + nome + "?")) {
+            db.ref('clientes/' + nome).remove();
+        }
     }
 
-    function remover(i) {
-        if (confirm("Deseja remover este cliente?")) {
-            clientes.splice(i, 1);
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            render();
+    function quitarMoeda(nome) {
+        if(confirm("O cliente " + nome + " pagou a conta?")) {
+            db.ref('clientes/' + nome).update({ saldoDevedor: 0 });
         }
     }
-
-    // Carrega a lista assim que a página abre
-    window.onload = render;
 </script>
-
 </body>
 </html>
