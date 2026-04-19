@@ -5,116 +5,157 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
         :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; }
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; }
-        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 0.9rem; }
-        .btn-acao { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; font-size: 1rem; }
-        .btn-xml { background: #3b82f6; color: #fff; padding: 10px; border-radius: 8px; display: block; text-align: center; cursor: pointer; margin-bottom: 15px; border: 1px dashed #fff; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        td, th { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.8rem; }
-        .status-badge { padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-weight: 700; display: none; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+        .btn-salvar { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
+        .btn-xml { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 2px dashed #3b82f6; padding: 15px; text-align: center; cursor: pointer; border-radius: 8px; display: block; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.7rem; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        #statusMsg { padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div id="statusNotificacao" class="status-badge"></div>
-
-        <label for="xmlArquivo" class="btn-xml">📁 CLIQUE AQUI PARA IMPORTAR XML</label>
-        <input type="file" id="xmlArquivo" accept=".xml" style="display:none" onchange="processarXML(this)">
-
-        <input type="text" id="nomeProd" placeholder="NOME DO PRODUTO (OU LEIA O XML)">
-        <input type="number" id="custoProd" placeholder="PREÇO DE CUSTO (DA NOTA)">
-        <input type="number" id="vendaProd" placeholder="PREÇO DE VENDA (SEU PREÇO)">
+        <h2 style="text-align:center; font-size:1rem; margin-bottom:15px;">GERENCIAR ESTOQUE</h2>
         
-        <button class="btn-acao" onclick="forcarSalvar()">💾 SALVAR AGORA NO SISTEMA</button>
+        <div id="statusMsg"></div>
+
+        <label for="inputXml" class="btn-xml">📁 CLIQUE PARA IMPORTAR XML</label>
+        <input type="file" id="inputXml" accept=".xml" style="display:none" onchange="lerNota(this)">
+
+        <input type="text" id="nome" placeholder="NOME DO PRODUTO">
+        <input type="number" id="custo" placeholder="PREÇO DE CUSTO">
+        <input type="number" id="venda" placeholder="PREÇO DE VENDA">
+        
+        <button class="btn-salvar" onclick="salvarNoFirebase()">💾 SALVAR NO SISTEMA</button>
     </div>
 
     <div class="card">
-        <table id="minhaTabela">
+        <h3 style="font-size:0.8rem; color:#94a3b8; margin-bottom:10px;">LISTA DE PRODUTOS (A-Z)</h3>
+        <table>
             <thead>
-                <tr><th>PRODUTO</th><th>CUSTO</th><th>VENDA</th><th>AÇÃO</th></tr>
+                <tr>
+                    <th>PRODUTO</th>
+                    <th>CUSTO</th>
+                    <th>VENDA</th>
+                    <th>AÇÃO</th>
+                </tr>
             </thead>
-            <tbody id="corpoTabela"></tbody>
+            <tbody id="tabelaCorpo">
+                </tbody>
         </table>
     </div>
 
 <script>
-    // Inicialização Blindada
-    const config = { 
+    // Configuração do seu Firebase
+    const firebaseConfig = { 
         apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
         databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
         projectId: "boteco934-afc3f" 
     };
-    if (!firebase.apps.length) firebase.initializeApp(config);
+    
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function avisar(texto, sucesso) {
-        const div = document.getElementById('statusNotificacao');
-        div.style.display = 'block';
-        div.style.background = sucesso ? '#10b98133' : '#ef444433';
-        div.style.color = sucesso ? '#10b981' : '#ef4444';
-        div.innerHTML = texto;
+    function mostrarStatus(texto, erro = false) {
+        const msg = document.getElementById('statusMsg');
+        msg.style.display = 'block';
+        msg.style.backgroundColor = erro ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)';
+        msg.style.color = erro ? '#ef4444' : '#10b981';
+        msg.innerHTML = texto;
+        setTimeout(() => { msg.style.display = 'none'; }, 3000);
     }
 
-    function processarXML(input) {
+    // Função para Ler XML
+    function lerNota(input) {
         const arquivo = input.files[0];
         const leitor = new FileReader();
         leitor.onload = function(e) {
             const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
-            const nome = xml.getElementsByTagName("xProd")[0]?.textContent || "";
-            const preco = xml.getElementsByTagName("vUnCom")[0]?.textContent || xml.getElementsByTagName("vProd")[0]?.textContent || "";
+            const prodNome = xml.getElementsByTagName("xProd")[0]?.textContent || "";
+            const prodPreco = xml.getElementsByTagName("vUnCom")[0]?.textContent || "";
             
-            if (nome) {
-                document.getElementById('nomeProd').value = nome.toUpperCase();
-                document.getElementById('custoProd').value = parseFloat(preco).toFixed(2);
-                avisar("✅ XML Lido! Agora coloque o preço de venda e salve.", true);
+            if(prodNome) {
+                document.getElementById('nome').value = prodNome.toUpperCase();
+                document.getElementById('custo').value = parseFloat(prodPreco).toFixed(2);
+                mostrarStatus("✅ XML Carregado!");
             }
         };
         leitor.readAsText(arquivo);
     }
 
-    function forcarSalvar() {
-        const n = document.getElementById('nomeProd').value.trim().toUpperCase();
-        const c = parseFloat(document.getElementById('custoProd').value) || 0;
-        const v = parseFloat(document.getElementById('vendaProd').value) || 0;
+    // FUNÇÃO PARA SALVAR (COM ATUALIZAÇÃO FORÇADA)
+    function salvarNoFirebase() {
+        const n = document.getElementById('nome').value.trim().toUpperCase();
+        const c = parseFloat(document.getElementById('custo').value) || 0;
+        const v = parseFloat(document.getElementById('venda').value) || 0;
 
-        if (!n || v <= 0) {
-            avisar("❌ Erro: Nome e Preço de Venda são obrigatórios!", false);
+        if(!n || v <= 0) {
+            mostrarStatus("❌ Preencha Nome e Venda!", true);
             return;
         }
 
+        // Salva no caminho 'produtos/NOMEDOPRODUTO'
         database.ref('produtos/' + n).set({
             nome: n,
             custo: c,
-            venda: v,
-            margem: v > 0 ? ((v - c) / v * 100).toFixed(1) : 0
+            venda: v
         }).then(() => {
-            avisar("✅ PRODUTO SALVO COM SUCESSO!", true);
-            document.getElementById('nomeProd').value = "";
-            document.getElementById('custoProd').value = "";
-            document.getElementById('vendaProd').value = "";
-        }).catch(err => avisar("❌ Erro no Banco: " + err.message, false));
+            mostrarStatus("✅ Salvo com Sucesso!");
+            document.getElementById('nome').value = "";
+            document.getElementById('custo').value = "";
+            document.getElementById('venda').value = "";
+        }).catch((e) => {
+            mostrarStatus("❌ Erro ao salvar: " + e.message, true);
+        });
     }
 
-    // Carregamento da Lista
-    database.ref('produtos').on('value', snapshot => {
-        const lista = snapshot.val() ? Object.values(snapshot.val()) : [];
-        lista.sort((a,b) => a.nome.localeCompare(b.nome));
-        document.getElementById('corpoTabela').innerHTML = lista.map(p => `
-            <tr>
-                <td><b>${p.nome}</b></td>
-                <td>R$ ${parseFloat(p.custo).toFixed(2)}</td>
-                <td style="color:var(--accent)">R$ ${parseFloat(p.venda).toFixed(2)}</td>
-                <td><i class="fas fa-trash" onclick="apagar('${p.nome}')" style="color:var(--red); cursor:pointer"></i></td>
-            </tr>
-        `).join('');
+    // FUNÇÃO QUE PUXA OS DADOS E MONTA A TABELA (REAL-TIME)
+    database.ref('produtos').on('value', (snapshot) => {
+        const corpo = document.getElementById('tabelaCorpo');
+        corpo.innerHTML = ""; // Limpa a tabela antes de carregar
+        
+        if (snapshot.exists()) {
+            const dados = [];
+            snapshot.forEach((item) => {
+                dados.push(item.val());
+            });
+
+            // Organiza de A a Z
+            dados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            // Cria as linhas da tabela
+            dados.forEach((p) => {
+                corpo.innerHTML += `
+                    <tr>
+                        <td><b>${p.nome}</b></td>
+                        <td>R$ ${p.custo.toFixed(2)}</td>
+                        <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
+                        <td>
+                            <i class="fas fa-trash" style="color:var(--red); cursor:pointer" 
+                               onclick="removerProduto('${p.nome}')"></i>
+                        </td>
+                    </tr>
+                `;
+            });
+        } else {
+            corpo.innerHTML = "<tr><td colspan='4' style='text-align:center'>Nenhum produto encontrado.</td></tr>";
+        }
     });
 
-    function apagar(nome) { if(confirm("Apagar " + nome + "?")) database.ref('produtos/'+nome).remove(); }
+    function removerProduto(nome) {
+        if(confirm("Deseja apagar " + nome + "?")) {
+            database.ref('produtos/' + nome).remove();
+        }
+    }
 </script>
 </body>
 </html>
