@@ -4,40 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Boteco 934 PDV</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; background: #05070a; color: white; font-family: sans-serif; display: flex; height: 100vh; flex-direction: row; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
         
-        /* Menu Lateral (Tablet/PC) */
-        .sidebar { width: 80px; background: #0f1218; border-right: 1px solid #1e293b; display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 100; }
-        .nav-item { color: #64748b; padding: 20px; cursor: pointer; text-align: center; width: 100%; transition: 0.3s; }
-        .nav-item i { font-size: 1.5rem; display: block; }
-        .nav-item span { font-size: 0.6rem; display: block; margin-top: 5px; font-weight: bold; }
-        .active { color: #ffb800; background: #1c222d; }
+        :root { 
+            --bg: #05070a; 
+            --sidebar-bg: #0f1218;
+            --accent: #ffb800; 
+            --text: #ffffff; 
+            --border: #1e293b; 
+        }
+        
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Outfit', sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden;
+        }
+        
+        /* Menu Lateral (Otimizado para Tablet) */
+        .sidebar { 
+            width: 85px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 15px; 
+            z-index: 100; 
+        }
+        
+        .nav-item { 
+            color: #64748b; 
+            padding: 15px 5px; 
+            cursor: pointer; 
+            text-align: center; 
+            width: 100%; 
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 5px; }
+        .nav-item span { font-size: 0.65rem; font-weight: 700; display: block; }
+        
+        .active { 
+            color: var(--accent); 
+            background: rgba(255, 184, 0, 0.05); 
+            border-left: 3px solid var(--accent);
+        }
 
-        .main-content { flex: 1; position: relative; overflow: hidden; }
+        /* Botão Especial da Calculadora */
+        .nav-calc {
+            color: #f59e0b !important;
+            margin-top: auto;
+            margin-bottom: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .main-content { flex: 1; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
 
         /* Ajuste para iPhone/Celular (Menu vira barra inferior) */
         @media (max-width: 600px) {
             body { flex-direction: column; }
             .sidebar { 
-                width: 100%; height: 70px; flex-direction: row; 
+                width: 100%; height: 75px; flex-direction: row; 
                 position: fixed; bottom: 0; border-right: none; 
-                border-top: 1px solid #1e293b; padding: 0; justify-content: space-around;
+                border-top: 1px solid var(--border); padding: 0; 
+                justify-content: space-around;
+                background: #0f1218;
             }
-            .nav-item { padding: 10px; }
-            .main-content { height: calc(100vh - 70px); }
+            .nav-item { padding: 10px 0; border-left: none; border-top: 3px solid transparent; }
+            .active { border-top: 3px solid var(--accent); border-left: none; }
+            .nav-calc { margin: 0; border-top: none; padding: 10px 0; }
+            .main-content { height: calc(100vh - 75px); }
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="nav-item active" onclick="ir('caixa.html', this)"><i class="fas fa-cash-register"></i><span>CAIXA</span></div>
-        <div class="nav-item" onclick="ir('estoque.html', this)"><i class="fas fa-boxes-stacked"></i><span>ESTOQUE</span></div>
-        <div class="nav-item" onclick="ir('clientes.html', this)"><i class="fas fa-users"></i><span>CLIENTES</span></div>
-        <div class="nav-item" onclick="ir('financas.html', this)"><i class="fas fa-chart-line"></i><span>FINANÇAS</span></div>
+        <div class="nav-item active" onclick="ir('caixa.html', this)">
+            <i class="fas fa-cash-register"></i><span>CAIXA</span>
+        </div>
+        <div class="nav-item" onclick="ir('estoque.html', this)">
+            <i class="fas fa-boxes-stacked"></i><span>ESTOQUE</span>
+        </div>
+        <div class="nav-item" onclick="ir('clientes.html', this)">
+            <i class="fas fa-users"></i><span>CLIENTES</span>
+        </div>
+        <div class="nav-item" onclick="ir('financas.html', this)">
+            <i class="fas fa-chart-line"></i><span>FINANÇAS</span>
+        </div>
+
+        <div class="nav-item nav-calc" onclick="ir('ferramentas.html', this)">
+            <i class="fas fa-calculator"></i><span>CALC</span>
+        </div>
     </div>
 
     <div class="main-content">
@@ -46,10 +116,18 @@
 
     <script>
         function ir(pagina, el) {
+            // Troca a página no iframe
             document.getElementById('tela').src = pagina;
+            
+            // Remove o estado ativo de todos e coloca no clicado
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             el.classList.add('active');
         }
+
+        // Previne o "puxar para atualizar" no iPhone que às vezes atrapalha o app
+        document.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
