@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Cal. Boteco934</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        
+        :root {
+            --bg: #020617;
+            --card: #111827;
+            --accent: #22c55e;
+            --gold: #f59e0b;
+            --text: #ffffff;
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .container { max-width: 600px; margin: auto; }
+
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 1.8rem; margin: 0; color: var(--gold); }
+        header p { opacity: 0.6; font-size: 0.9rem; margin-top: 5px; }
+
+        .box {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 { font-size: 1.1rem; color: var(--accent); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .result {
+            background: #020617;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid var(--gold);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fas fa-calculator"></i> Super Cal. Boteco934</h1>
+        <p>Inteligência Financeira para seu Negócio</p>
+    </header>
+
+    <div class="box">
+        <h2><i class="fas fa-percent"></i> Cálculos de Porcentagem</h2>
+        <select id="tipoPorc">
+            <option value="1">X% de Y (Valor)</option>
+            <option value="2">Quanto X representa de Y (%)</option>
+            <option value="3">Aumento Percentual entre Valores</option>
+            <option value="4">Redução Percentual entre Valores</option>
+            <option value="5">Valor Original antes do Aumento</option>
+        </select>
+        <input type="number" id="p1" placeholder="Valor 1 (ex: 100)">
+        <input type="number" id="p2" placeholder="Valor 2 (ex: 10)">
+        <button onclick="calcPorc()">CALCULAR %</button>
+        <div class="result" id="resPorc">Resultado aparecerá aqui...</div>
+    </div>
+
+    <div class="box">
+        <h2><i class="fas fa-glass-whiskey"></i> Precificação de Destilados</h2>
+        <input type="number" id="custoDest" placeholder="Custo da Garrafa (R$)">
+        <input type="number" id="markupDest" value="3.5" placeholder="Markup (Sugestão: 3.5)">
+        <input type="number" id="doseMl" value="50" placeholder="Tamanho da Dose (ml)">
+        <button onclick="calcDest()">CALCULAR DOSES</button>
+        <div class="result" id="resDest">...</div>
+    </div>
+
+    <div class="box">
+        <h2><i class="fas fa-tag"></i> Promoções de Mercado</h2>
+        <input type="number" id="promoCusto" placeholder="Custo Unitário">
+        <input type="number" id="promoVenda" placeholder="Preço de Venda Normal">
+        <select id="tipoPromo">
+            <option value="leve">Leve X Pague Y (Ex: 3 pague 2)</option>
+            <option value="segunda50">2ª Unidade com 50% de desc.</option>
+        </select>
+        <div id="camposLeve">
+            <input type="number" id="leveX" placeholder="Leve Quantos?">
+            <input type="number" id="pagueY" placeholder="Pague Quantos?">
+        </div>
+        <button onclick="calcPromo()">ANALISAR PROMOÇÃO</button>
+        <div class="result" id="resPromo">...</div>
+    </div>
+
+    <div class="box">
+        <h2><i class="fas fa-ice-cream"></i> Simulador de Combos/Kits</h2>
+        <input type="number" id="comboCusto" placeholder="Custo Total (Itens + Gelo + Copo)">
+        <input type="number" id="comboVenda" placeholder="Preço de Venda do Combo">
+        <button onclick="calcCombo()">CALCULAR MARGEM DO COMBO</button>
+        <div class="result" id="resCombo">...</div>
+    </div>
+
+    <footer>
+        Desenvolvido por <b>Boteco934</b><br>
+        © 2026 - Petrolina/PE
+    </footer>
+</div>
+
+<script>
+    const moeda = (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function calcPorc() {
+        let t = document.getElementById("tipoPorc").value;
+        let a = parseFloat(document.getElementById("p1").value);
+        let b = parseFloat(document.getElementById("p2").value);
+        let r = 0; let texto = "";
+
+        if(t=="1") { r = (a * b) / 100; texto = `Valor: ${moeda(r)}`; }
+        if(t=="2") { r = (a / b) * 100; texto = `Representa: ${r.toFixed(2)}%`; }
+        if(t=="3") { r = ((b - a) / a) * 100; texto = `Aumento de: ${r.toFixed(2)}%`; }
+        if(t=="4") { r = ((a - b) / a) * 100; texto = `Redução de: ${r.toFixed(2)}%`; }
+        if(t=="5") { r = a / (1 + b/100); texto = `Valor Original: ${moeda(r)}`; }
+
+        document.getElementById("resPorc").innerHTML = texto;
+    }
+
+    function calcDest() {
+        let custo = parseFloat(document.getElementById("custoDest").value);
+        let markup = parseFloat(document.getElementById("markupDest").value);
+        let dose = parseFloat(document.getElementById("doseMl").value);
+        let dosesPorGarrafa = 1000 / dose;
+        let custoDose = custo / dosesPorGarrafa;
+        let vendaDose = custoDose * markup;
+
+        document.getElementById("resDest").innerHTML = 
+            `<b>Doses por Garrafa:</b> ${dosesPorGarrafa}<br>` +
+            `<b>Custo por Dose:</b> ${moeda(custoDose)}<br>` +
+            `<b>Sugerido p/ Dose:</b> <span style="color:var(--accent)">${moeda(vendaDose)}</span><br>` +
+            `<b>Lucro Bruto/Garrafa:</b> ${moeda((vendaDose - custoDose) * dosesPorGarrafa)}`;
+    }
+
+    function calcPromo() {
+        let custo = parseFloat(document.getElementById("promoCusto").value);
+        let venda = parseFloat(document.getElementById("promoVenda").value);
+        let tipo = document.getElementById("tipoPromo").value;
+        let r = "";
+
+        if(tipo === "leve") {
+            let x = parseFloat(document.getElementById("leveX").value);
+            let y = parseFloat(document.getElementById("pagueY").value);
+            let precoReal = (venda * y) / x;
+            let desc = (1 - (precoReal / venda)) * 100;
+            r = `<b>Preço Real Unid:</b> ${moeda(precoReal)}<br><b>Desconto Real:</b> ${desc.toFixed(1)}%<br><b>Lucro Unid:</b> ${moeda(precoReal - custo)}`;
+        } else {
+            let precoReal = (venda + (venda * 0.5)) / 2;
+            let desc = (1 - (precoReal / venda)) * 100;
+            r = `<b>Preço Médio Unid:</b> ${moeda(precoReal)}<br><b>Desconto Real:</b> ${desc.toFixed(1)}%<br><b>Lucro Unid:</b> ${moeda(precoReal - custo)}`;
+        }
+        document.getElementById("resPromo").innerHTML = r;
+    }
+
+    function calcCombo() {
+        let custo = parseFloat(document.getElementById("comboCusto").value);
+        let venda = parseFloat(document.getElementById("comboVenda").value);
+        let lucro = venda - custo;
+        let margem = (lucro / venda) * 100;
+        document.getElementById("resCombo").innerHTML = `<b>Lucro Líquido:</b> ${moeda(lucro)}<br><b>Margem de Lucro:</b> ${margem.toFixed(1)}%`;
+    }
+</script>
+
+</body>
+</html>
