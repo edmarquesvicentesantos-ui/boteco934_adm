@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --red: #ef4444; }
+        
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body::-webkit-scrollbar { display: none; }
+
+        .container { width: 100%; max-width: 450px; }
+        h2 { font-size: 0.8rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
+
+        /* Card de Cadastro */
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 0.8rem; }
+        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; background: var(--accent); color: var(--bg); font-size: 0.8rem; }
+
+        /* Tabela de Produtos */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
+        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.65rem; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); }
+        .btn-del { color: var(--red); cursor: pointer; background: none; border: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Gerenciar Estoque</h2>
+
+        <div class="card">
+            <input type="text" id="pNome" placeholder="Nome do Produto (Ex: Heineken)">
+            <input type="number" id="pVal" placeholder="Preço de Venda (R$)">
+            <button class="btn" onclick="salvarProduto()">SALVAR PRODUTO</button>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="listaEstoque"></tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", 
+        databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", 
+        projectId: "boteco934-afc3f" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function salvarProduto() {
+        const nome = document.getElementById('pNome').value.trim().toUpperCase();
+        const preco = parseFloat(document.getElementById('pVal').value);
+
+        if(!nome || isNaN(preco)) return alert("Preencha nome e preço corretamente!");
+
+        db.ref('produtos/' + nome).set({ nome: nome, val: preco })
+        .then(() => {
+            document.getElementById('pNome').value = "";
+            document.getElementById('pVal').value = "";
+        });
+    }
+
+    // Escuta o Banco de Dados e atualiza a tabela
+    db.ref('produtos').on('value', snap => {
+        const produtos = snap.val() ? Object.values(snap.val()) : [];
+        const tbody = document.getElementById('listaEstoque');
+        
+        tbody.innerHTML = produtos.map(p => `
+            <tr>
+                <td>${p.nome}</td>
+                <td>R$ ${(p.val || 0).toFixed(2)}</td>
+                <td><button class="btn-del" onclick="remover('${p.nome}')"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    });
+
+    function remover(nome) {
+        if(confirm("Deseja remover " + nome + "?")) {
+            db.ref('produtos/' + nome).remove();
+        }
+    }
+</script>
+</body>
+</html>
