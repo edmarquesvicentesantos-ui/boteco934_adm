@@ -3,76 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v60.7 Fix</title>
+    <title>Boteco 934 - Sistema Modular</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+        :root { 
+            --bg: #05070a; --card: #12151c; --accent: #ffb800; --border: #1e293b; 
+        }
 
-        /* Sidebar Fina */
-        .sidebar { width: 70px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 15px; flex-shrink: 0; }
-        .nav-btn { background: none; border: none; color: #64748b; padding: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.5rem; width: 100%; gap: 4px; }
-        .nav-btn i { font-size: 1.2rem; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            display: flex; 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden; 
+        }
+
+        /* Menu Lateral Fixo */
+        .sidebar { 
+            width: 75px; 
+            background: var(--card); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-btn { 
+            background: none; border: none; color: #64748b; 
+            padding: 15px 5px; cursor: pointer; 
+            display: flex; flex-direction: column; 
+            align-items: center; font-size: 0.55rem; 
+            width: 100%; gap: 5px;
+            transition: 0.3s;
+        }
+
+        .nav-btn i { font-size: 1.3rem; }
         .nav-btn.active { color: var(--accent); background: rgba(255,184,0,0.1); }
 
-        /* Centralizador de Conteúdo */
-        .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-        .container { width: 100%; max-width: 400px; text-align: center; }
+        /* O PALCO CENTRAL (Onde as páginas vão aparecer) */
+        .main-stage { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: var(--bg);
+        }
 
-        /* Caixas das Mesas Pequenas e Centralizadas */
-        .grid-mesas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
-        .mesa-card { background: var(--card); border: 1px solid var(--border); padding: 15px 5px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
-        .mesa-card:active { transform: scale(0.9); }
-        .mesa-card label { font-size: 0.55rem; color: #94a3b8; display: block; text-transform: uppercase; }
-        .mesa-card span { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-
-        .view { display: none; }
-        .view.active { display: block; }
-        
-        h2 { font-size: 0.8rem; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; }
+        /* Moldura que carrega as páginas externas */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            max-width: 1200px; /* Limite para não espalhar demais em telas grandes */
+        }
     </style>
 </head>
 <body>
 
 <nav class="sidebar">
-    <button class="nav-btn active" onclick="nav('caixa', this)"><i class="fas fa-th"></i>CAIXA</button>
-    <button class="nav-btn" onclick="nav('estoque', this)"><i class="fas fa-box"></i>ESTOQUE</button>
-    <button class="nav-btn" onclick="nav('financas', this)"><i class="fas fa-wallet"></i>FINANÇAS</button>
+    <div style="color:var(--accent); font-weight:700; font-size:0.7rem; margin-bottom:20px">B934</div>
+    
+    <button class="nav-btn active" onclick="mudarPagina('caixa.html', this)">
+        <i class="fas fa-cash-register"></i>CAIXA
+    </button>
+    
+    <button class="nav-btn" onclick="mudarPagina('estoque.html', this)">
+        <i class="fas fa-boxes-stacked"></i>ESTOQUE
+    </button>
+    
+    <button class="nav-btn" onclick="mudarPagina('clientes.html', this)">
+        <i class="fas fa-user-friends"></i>CLIENTES
+    </button>
+    
+    <button class="nav-btn" onclick="mudarPagina('financas.html', this)">
+        <i class="fas fa-chart-pie"></i>FINANÇAS
+    </button>
 </nav>
 
-<main class="main">
-    <div class="container">
-        <section id="caixa" class="view active">
-            <h2>PAINEL DE MESAS</h2>
-            <div class="grid-mesas" id="mesasUI"></div>
-        </section>
-        
-        <section id="estoque" class="view">
-            <h2 style="margin-bottom:20px">ESTOQUE CENTRAL</h2>
-            <div style="background:var(--card); padding:20px; border-radius:10px; border:1px solid var(--border)">
-                <p style="font-size:0.8rem">Módulo carregado com sucesso.</p>
-            </div>
-        </section>
-    </div>
+<main class="main-stage">
+    <iframe src="caixa.html" id="conteudo"></iframe>
 </main>
 
 <script>
-    const grid = document.getElementById('mesasUI');
-    for(let i=1; i<=12; i++) {
-        grid.innerHTML += `<div class="mesa-card"><label>MESA</label><span>${i}</span></div>`;
-    }
-
-    function nav(id, btn) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+    function mudarPagina(url, btn) {
+        // Troca o link do iframe
+        document.getElementById('conteudo').src = url;
+        
+        // Atualiza o visual dos botões
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 </script>
+
 </body>
 </html>
