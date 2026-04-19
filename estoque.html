@@ -10,63 +10,90 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
         :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; }
         
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; font-size: 0.8rem; }
-        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 1100px; margin: 0 auto; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; font-size: 0.75rem; }
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 1000px; margin: 0 auto; }
         
         .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 10px; }
         
-        input, select { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; width: 100%; font-size: 0.75rem; }
-        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 700; color: var(--bg); background: var(--accent); transition: 0.2s; }
-        .btn-excel { background: var(--green); color: white; margin-left: 5px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 0.75rem; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 700; color: var(--bg); background: var(--accent); }
+        .btn-xml { background: #3b82f6; color: white; }
+        .btn-excel { background: var(--green); color: white; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #94a3b8; padding: 8px; border-bottom: 2px solid var(--border); font-size: 0.65rem; text-transform: uppercase; cursor: pointer; }
-        td { padding: 8px; border-bottom: 1px solid var(--border); }
+        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.6rem; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); }
         
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; }
-        .pos { color: var(--green); } .neg { color: var(--red); }
+        .pos { color: var(--green); font-weight: 700; }
+        .neg { color: var(--red); font-weight: 700; }
+        .info-txt { font-size: 0.6rem; color: #94a3b8; display: block; margin-top: -8px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
 <div class="grid-layout">
     <div class="card">
-        <h2 style="font-size:0.9rem; margin-bottom:15px"><i class="fas fa-file-import"></i> Entrada de Produtos (XML ou Manual)</h2>
+        <h2 style="font-size:0.8rem; margin-bottom:15px"> ENTRADA DE PRODUTOS</h2>
         
         <div class="form-row">
-            <input type="file" id="xmlInput" accept=".xml" style="grid-column: span 2">
-            <button class="btn" onclick="processarXML()" style="background:#3b82f6; color:white">LER XML</button>
+            <div style="grid-column: span 2">
+                <label class="info-txt">Importar Nota Fiscal (XML)</label>
+                <input type="file" id="xmlInput" accept=".xml" class="btn-xml">
+            </div>
+            <button class="btn btn-xml" onclick="lerXML()" style="align-self: end; height: 40px;">CARREGAR XML</button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
+
+        <div class="form-row">
+            <input type="text" id="pNome" placeholder="Nome / AED">
+            <input type="number" id="pQtd" placeholder="Qtd na Caixa" value="1" oninput="calcTudo()">
+            <input type="number" id="pCustoCx" placeholder="Custo Caixa R$" oninput="calcTudo()">
         </div>
 
         <div class="form-row">
-            <input type="text" id="pNome" placeholder="Nome do Produto / AED">
-            <input type="number" id="pQtd" placeholder="Qtd Caixa">
-            <input type="number" id="pCustoCx" placeholder="Custo Caixa (R$)" oninput="calcUnitario()">
-            <input type="number" id="pImposto" placeholder="Imposto (%)" value="10">
+            <div>
+                <label class="info-txt">Custo Unitário</label>
+                <input type="number" id="pUnit" readonly style="background:#1e293b">
+            </div>
+            <div>
+                <label class="info-txt">Venda Praticada</label>
+                <input type="number" id="pVenda" placeholder="Venda R$" oninput="calcTudo()">
+            </div>
+            <div>
+                <label class="info-txt">Imposto %</label>
+                <input type="number" id="pImposto" value="10" oninput="calcTudo()">
+            </div>
         </div>
 
-        <div class="form-row">
-            <input type="number" id="pUnit" placeholder="Custo Unitário" readonly style="background:#1e293b">
-            <input type="number" id="pVenda" placeholder="Preço de Venda (R$)" oninput="calcLucro()">
-            <button class="btn" onclick="salvarProduto()">SALVAR NO SISTEMA</button>
-            <button class="btn btn-excel" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> EXCEL</button>
+        <div class="form-row" style="background: rgba(255,184,0,0.05); padding: 10px; border-radius: 8px;">
+            <div style="text-align: center;">
+                <label class="info-txt">Lucro Real</label>
+                <span id="resLucro" class="pos" style="font-size: 1rem;">R$ 0,00</span>
+            </div>
+            <div style="text-align: center;">
+                <label class="info-txt">Margem Real</label>
+                <span id="resMargem" class="pos" style="font-size: 1rem;">0%</span>
+            </div>
+            <button class="btn" onclick="salvar()">SALVAR ITEM</button>
         </div>
+        <button class="btn btn-excel" onclick="exportar()" style="margin-top:10px; width: 100%">EXPORTAR PARA EXCEL</button>
     </div>
 
-    <div class="card" style="overflow-x: auto;">
+    <div class="card">
         <table id="tabelaEstoque">
             <thead>
                 <tr>
-                    <th onclick="ordenar(0)">Produto <i class="fas fa-sort"></i></th>
+                    <th>Item (A-Z)</th>
                     <th>Custo Un.</th>
                     <th>Venda</th>
-                    <th>Margem Real</th>
                     <th>Lucro R$</th>
+                    <th>Margem</th>
                     <th>Ação</th>
                 </tr>
             </thead>
-            <tbody id="listaEstoque"></tbody>
+            <tbody id="lista"></tbody>
         </table>
     </div>
 </div>
@@ -76,64 +103,84 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function calcUnitario() {
+    function lerXML() {
+        const file = document.getElementById('xmlInput').files[0];
+        if(!file) return alert("Selecione um arquivo XML");
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(e.target.result, "text/xml");
+            
+            // Tenta pegar o primeiro produto da nota como exemplo
+            const nome = xml.getElementsByTagName('xProd')[0]?.textContent || "";
+            const valorCx = xml.getElementsByTagName('vUnCom')[0]?.textContent || 0;
+            
+            document.getElementById('pNome').value = nome.toUpperCase();
+            document.getElementById('pCustoCx').value = valorCx;
+            calcTudo();
+        };
+        reader.readAsText(file);
+    }
+
+    function calcTudo() {
         const cx = parseFloat(document.getElementById('pCustoCx').value) || 0;
         const qtd = parseFloat(document.getElementById('pQtd').value) || 1;
-        document.getElementById('pUnit').value = (cx / qtd).toFixed(2);
-        calcLucro();
-    }
-
-    function calcLucro() {
-        const unit = parseFloat(document.getElementById('pUnit').value) || 0;
         const venda = parseFloat(document.getElementById('pVenda').value) || 0;
         const impostoPerc = parseFloat(document.getElementById('pImposto').value) || 0;
-        
-        const valorImposto = venda * (impostoPerc / 100);
-        const lucroBruto = venda - unit;
-        const lucroReal = venda - unit - valorImposto;
-        const margemReal = venda > 0 ? (lucroReal / venda) * 100 : 0;
 
-        return { lucroReal, margemReal };
+        const unit = cx / qtd;
+        document.getElementById('pUnit').value = unit.toFixed(2);
+
+        const impostoR$ = venda * (impostoPerc / 100);
+        const lucroReal = venda - unit - impostoR$;
+        const margem = venda > 0 ? (lucroReal / venda) * 100 : 0;
+
+        document.getElementById('resLucro').innerText = "R$ " + lucroReal.toFixed(2);
+        document.getElementById('resMargem').innerText = margem.toFixed(1) + "%";
+        
+        document.getElementById('resLucro').className = lucroReal > 0 ? "pos" : "neg";
+        document.getElementById('resMargem').className = margem > 15 ? "pos" : "neg";
+
+        return { unit, lucroReal, margem };
     }
 
-    function salvarProduto() {
+    function salvar() {
         const nome = document.getElementById('pNome').value.trim().toUpperCase();
-        const info = calcLucro();
-        const dados = {
-            nome: nome,
-            custoUnit: parseFloat(document.getElementById('pUnit').value),
-            venda: parseFloat(document.getElementById('pVenda').value),
-            lucroReal: info.lucroReal,
-            margemReal: info.margemReal,
-            timestamp: Date.now()
-        };
-        if(nome) db.ref('produtos/' + nome).set(dados);
+        const res = calcTudo();
+        if(nome) {
+            db.ref('produtos/' + nome).set({
+                nome: nome,
+                custoUnit: res.unit,
+                venda: parseFloat(document.getElementById('pVenda').value),
+                lucroReal: res.lucroReal,
+                margem: res.margem
+            }).then(() => alert("Produto Atualizado!"));
+        }
     }
 
     db.ref('produtos').on('value', snap => {
-        const produtos = snap.val() ? Object.values(snap.val()) : [];
-        produtos.sort((a, b) => a.nome.localeCompare(b.nome)); // Ordem A-Z automática
+        const dados = snap.val() ? Object.values(snap.val()) : [];
+        dados.sort((a, b) => a.nome.localeCompare(b.nome)); // ORDEM A-Z
         
-        const tbody = document.getElementById('listaEstoque');
-        tbody.innerHTML = produtos.map(p => `
+        document.getElementById('lista').innerHTML = dados.map(p => `
             <tr>
-                <td style="font-weight:700">${p.nome}</td>
+                <td><b>${p.nome}</b></td>
                 <td>R$ ${p.custoUnit.toFixed(2)}</td>
                 <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
-                <td class="${p.margemReal > 20 ? 'pos' : 'neg'}">${p.margemReal.toFixed(1)}%</td>
                 <td class="pos">R$ ${p.lucroReal.toFixed(2)}</td>
-                <td><button class="btn-del" onclick="remover('${p.nome}')" style="background:none; border:none; color:var(--red); cursor:pointer"><i class="fas fa-trash"></i></button></td>
+                <td class="${p.margem > 15 ? 'pos' : 'neg'}">${p.margem.toFixed(1)}%</td>
+                <td><i class="fas fa-trash" onclick="remover('${p.nome}')" style="color:var(--red); cursor:pointer"></i></td>
             </tr>
         `).join('');
     });
 
-    function exportarExcel() {
-        const table = document.getElementById("tabelaEstoque");
-        const wb = XLSX.utils.table_to_book(table);
+    function exportar() {
+        const wb = XLSX.utils.table_to_book(document.getElementById("tabelaEstoque"));
         XLSX.writeFile(wb, "Estoque_Boteco934.xlsx");
     }
 
-    function remover(id) { if(confirm("Remover?")) db.ref('produtos/'+id).remove(); }
+    function remover(id) { if(confirm("Apagar?")) db.ref('produtos/'+id).remove(); }
 </script>
 </body>
 </html>
