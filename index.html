@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boteco 934 - v34 Categorias</title>
+    <title>Boteco 934 - v35 Recibo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -18,13 +18,26 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
         .glass-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; width: 100%; font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .mesa-card { padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 11px; border: 1px solid #334155; background: #0f172a; color: #94a3b8; }
+        .mesa-card.ocupada { background: var(--accent); color: #000; border-color: #fff; }
+        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
+        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; width: 100%; font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
         .btn-success { background: var(--success); }
+        .btn-info { background: var(--info); }
+        .btn-danger { background: var(--danger); }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; color: var(--accent); padding: 12px; border-bottom: 2px solid #334155; font-size: 12px; }
         td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
-        input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #334155; color: white; }
+
+        /* ESTILO DO RECIBO PARA IMPRESSÃO */
+        #reciboArea { display:none; background:white; color:black; width:80mm; padding:10px; font-family:'Courier New', monospace; font-size:12px; }
+        @media print {
+            body * { display:none; }
+            #reciboArea, #reciboArea * { display:block; }
+            #reciboArea { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -37,81 +50,98 @@
 </aside>
 
 <main class="main-content">
-    <section id="view-estoque" class="view-section">
-        <div class="glass-card">
-            <h3>Cadastrar Produto</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="eCod" placeholder="Cód. Barras">
-                <input type="text" id="eNome" placeholder="Nome do Produto">
+    <section id="view-mesas" class="view-section active">
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px;">
+            <div class="mesa-grid" id="mapaMesas"></div>
+            <div id="detalheMesa" class="glass-card" style="display:none; border: 2px solid var(--accent);">
+                <h3 id="tituloMesa">Mesa --</h3>
+                <div id="consumoMesa" style="max-height: 200px; overflow-y: auto; border-bottom: 1px solid #444;"></div>
+                <h2 id="totalMesa" style="text-align:right; color:var(--accent)">R$ 0,00</h2>
+                <button class="btn btn-success" onclick="finalizarMesa()">FECHAR E IMPRIMIR</button>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                <select id="eCat">
-                    <option value="CERVEJA">CERVEJA</option>
-                    <option value="DESTILADO">DESTILADO</option>
-                    <option value="REFRIGERANTE">REFRIGERANTE</option>
-                    <option value="TIRA-GOSTO">TIRA-GOSTO</option>
-                    <option value="OUTROS">OUTROS</option>
-                </select>
-                <input type="number" id="pCusto" placeholder="Custo R$">
-                <input type="number" id="eVenda" placeholder="Venda R$" step="0.01">
-            </div>
-            <button class="btn btn-success" onclick="addEstoque()">SALVAR NO FIREBASE</button>
-        </div>
-        <div class="glass-card">
-            <table>
-                <thead><tr><th>Cat.</th><th>Produto</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="listaEstoque"></tbody>
-            </table>
         </div>
     </section>
+
+    <div id="reciboArea">
+        <center>
+            <strong>BOTECO 934</strong><br>
+            BEBIDAS E PETISCOS<br>
+            --------------------------------<br>
+            <strong>RECIBO DE VENDA</strong><br>
+            --------------------------------
+        </center>
+        <div id="reciboItens"></div>
+        --------------------------------<br>
+        <div id="reciboTotal" style="text-align:right; font-weight:bold"></div>
+        <center>
+            <br>OBRIGADO PELA PREFERENCIA!<br>
+            <span id="reciboData"></span>
+        </center>
+    </div>
 </main>
 
 <script>
-    // Configurações do Firebase (Use as suas chaves aqui)
+    // Mantenha suas configurações do Firebase aqui (apenas resumi para o código caber)
     const firebaseConfig = {
         apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks",
-        authDomain: "boteco934-afc3f.firebaseapp.com",
         databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com",
         projectId: "boteco934-afc3f",
-        storageBucket: "boteco934-afc3f.firebasestorage.app",
-        messagingSenderId: "182023728304",
-        appId: "1:182023728304:web:040a13bb6f61c9fff35f75"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
     let estoque = [];
+    let mesas = Array(12).fill(null).map((_, i) => ({ id: i+1, itens: [], totalPago: 0 }));
+    let mesaAtiva = null;
 
     db.ref('produtos').on('value', snap => { 
-        const d = snap.val();
-        estoque = d ? (Array.isArray(d) ? d : Object.values(d)) : [];
-        renderEstoque(); 
+        estoque = snap.val() ? Object.values(snap.val()) : [];
     });
 
-    function addEstoque() {
-        estoque.push({ 
-            cod: document.getElementById('eCod').value, 
-            nome: document.getElementById('eNome').value.toUpperCase(), 
-            cat: document.getElementById('eCat').value,
-            val: parseFloat(document.getElementById('eVenda').value || 0) 
-        });
-        db.ref('produtos').set(estoque);
-        document.getElementById('eCod').value = ''; document.getElementById('eNome').value = '';
+    function finalizarMesa() {
+        if (mesaAtiva.itens.length === 0) return;
+
+        // Preenche o recibo
+        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
+        document.getElementById('reciboItens').innerHTML = mesaAtiva.itens.map(i => 
+            `<div>${i.qtd}x ${i.nome.substring(0,15)}... R$ ${(i.val*i.qtd).toFixed(2)}</div>`
+        ).join('');
+        document.getElementById('reciboTotal').innerText = "TOTAL: R$ " + total.toFixed(2);
+        document.getElementById('reciboData').innerText = new Date().toLocaleString();
+
+        // Comando de impressão
+        window.print();
+
+        // Limpa a mesa após imprimir
+        mesaAtiva.itens = [];
+        document.getElementById('detalheMesa').style.display = 'none';
+        renderMesas();
     }
 
-    function renderEstoque() {
-        document.getElementById('listaEstoque').innerHTML = estoque.map((p, i) => `
-            <tr>
-                <td><span class="badge">${p.cat || 'S/C'}</span></td>
-                <td>${p.nome}</td>
-                <td>R$ ${parseFloat(p.val || 0).toFixed(2)}</td>
-                <td><i class="fas fa-trash" style="color:red; cursor:pointer" onclick="estoque.splice(${i},1);db.ref('produtos').set(estoque)"></i></td>
-            </tr>`).join('');
+    // Funções de abrir mesa e renderizar mapa permanecem as mesmas
+    function abrirMesa(id) { 
+        mesaAtiva = mesas.find(m => m.id === id); 
+        document.getElementById('detalheMesa').style.display = 'block'; 
+        document.getElementById('tituloMesa').innerText = "Mesa " + id; 
+        renderDetalheMesa(); 
     }
-    
+
+    function renderDetalheMesa() {
+        const total = mesaAtiva.itens.reduce((s, i) => s + (i.val * i.qtd), 0);
+        document.getElementById('consumoMesa').innerHTML = mesaAtiva.itens.map(i => `<div>${i.qtd}x ${i.nome} - R$ ${(i.val*i.qtd).toFixed(2)}</div>`).join('');
+        document.getElementById('totalMesa').innerText = "R$ " + total.toFixed(2);
+    }
+
+    function renderMesas() { 
+        document.getElementById('mapaMesas').innerHTML = mesas.map(m => `<div class="mesa-card ${m.itens.length > 0 ? 'ocupada' : ''}" onclick="abrirMesa(${m.id})">MESA ${m.id}</div>`).join(''); 
+    }
+
     function show(id, el) { 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); 
         document.getElementById(id).classList.add('active'); 
     }
+
+    renderMesas();
 </script>
 </body>
 </html>
