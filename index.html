@@ -28,6 +28,13 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
         }
+        // Substitua a parte que mostra a dívida por esta:
+const saldo = parseFloat(c.saldo) || 0; // Se não existir, vira 0
+corpo.innerHTML += `<tr>
+    <td>${c.nome}</td>
+    <td style="color:${saldo > 0 ? '#ef4444' : '#10b981'}">R$ ${saldo.toFixed(2)}</td>
+    <td><button onclick="pagar('${c.nome}')">QUITAR</button></td>
+</tr>;
     </script>
 </body>
 </html>
