@@ -7,61 +7,61 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
-        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --blue: #3b82f6; }
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --blue: #3b82f6; --red: #ef4444; }
         
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; display: grid; grid-template-columns: 1fr 380px; gap: 15px; height: 95vh; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; display: grid; grid-template-columns: 1fr 320px; gap: 10px; height: 98vh; margin: 0; }
         
-        /* Área das Mesas */
-        .mesas-area { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; overflow-y: auto; }
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
-        .mesa-card { background: #1c222d; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; position: relative; }
-        .mesa-card.ocupada { border-color: var(--accent); background: rgba(255, 184, 0, 0.05); }
-        .mesa-card i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        .mesa-card b { font-size: 0.8rem; color: var(--accent); }
-        .mesa-card span { display: block; font-size: 0.6rem; color: #94a3b8; margin-top: 5px; }
+        /* Área das Mesas Pequenas */
+        .mesas-area { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-y: auto; }
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
+        
+        .mesa-card { 
+            background: #1c222d; padding: 10px 5px; border-radius: 6px; text-align: center; 
+            cursor: pointer; border: 1px solid var(--border); transition: 0.2s; 
+        }
+        .mesa-card.ocupada { border-color: var(--accent); background: rgba(255, 184, 0, 0.1); }
+        .mesa-card i { font-size: 1rem; display: block; margin-bottom: 3px; color: #64748b; }
+        .mesa-card.ocupada i { color: var(--accent); }
+        .mesa-card b { font-size: 0.7rem; display: block; }
+        .mesa-card span { display: block; font-size: 0.55rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-        /* Carrinho/Comanda Lateral */
-        .comanda-area { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; }
-        .header-comanda { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
-        .lista-itens { flex: 1; overflow-y: auto; }
-        .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 0.8rem; }
+        /* Comanda Lateral */
+        .comanda-area { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; border-left: 2px solid var(--border); }
+        .header-comanda { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px; }
+        .header-comanda h3 { font-size: 0.85rem; margin: 0; color: var(--accent); }
         
-        /* Seleção de Produtos */
-        .select-prod { background: #0a0c10; color: white; border: 1px solid var(--border); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 10px; }
+        .lista-itens { flex: 1; overflow-y: auto; margin: 10px 0; border-bottom: 1px solid var(--border); }
+        .item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #1e293b; font-size: 0.75rem; }
         
-        .btn { border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 5px; }
+        .select-prod { background: #0a0c10; color: white; border: 1px solid var(--border); padding: 8px; width: 100%; border-radius: 6px; font-size: 0.75rem; margin-bottom: 5px; }
+        
+        .btn { border: none; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.75rem; }
         .btn-add { background: var(--blue); color: white; }
-        .btn-fechar { background: var(--green); color: black; margin-top: 15px; font-size: 1rem; }
+        .btn-fechar { background: var(--green); color: black; margin-top: 10px; }
         
-        .total-box { font-size: 1.8rem; text-align: center; color: var(--accent); font-weight: 700; margin: 15px 0; }
+        .total-box { font-size: 1.4rem; text-align: center; color: var(--accent); font-weight: 700; padding: 5px 0; }
     </style>
 </head>
 <body>
 
     <div class="mesas-area">
-        <h2 style="font-size: 0.9rem; margin-bottom: 15px;"><i class="fas fa-chair"></i> MAPA DE MESAS</h2>
-        <div class="grid-mesas" id="gridMesas">
-            </div>
+        <h2 style="font-size: 0.75rem; margin-bottom: 10px; color: #64748b;">MAPA DE MESAS</h2>
+        <div class="grid-mesas" id="gridMesas"></div>
     </div>
 
     <div class="comanda-area">
         <div class="header-comanda" id="infoMesa">
-            <h3 style="font-size: 1rem;">SELECIONE UMA MESA</h3>
-            <span style="font-size: 0.7rem; color: #94a3b8;">Clique em uma mesa para abrir a comanda</span>
+            <h3>SELECIONE UMA MESA</h3>
         </div>
 
         <div id="areaPedido" style="display: none;">
-            <label style="font-size: 0.7rem; color: #94a3b8;">ADICIONAR DO ESTOQUE:</label>
-            <select id="selectEstoque" class="select-prod">
-                </select>
+            <select id="selectEstoque" class="select-prod"></select>
             <button class="btn btn-add" onclick="adicionarItem()"><i class="fas fa-plus"></i> LANÇAR ITEM</button>
 
-            <div class="lista-itens" id="listaItens">
-                </div>
+            <div class="lista-itens" id="listaItens"></div>
 
             <div class="total-box" id="totalMesa">R$ 0,00</div>
-            
-            <button class="btn btn-fechar" onclick="finalizarMesa()">FECHAR MESA / PAGAR</button>
+            <button class="btn btn-fechar" onclick="finalizarMesa()">FECHAR CONTA</button>
         </div>
     </div>
 
@@ -72,65 +72,55 @@
 
     let mesaAtiva = null;
 
-    // 1. Criar 12 Mesas iniciais
     function carregarMesas() {
         const grid = document.getElementById('gridMesas');
-        grid.innerHTML = "";
         for (let i = 1; i <= 12; i++) {
             db.ref('mesas/Mesa' + i).on('value', snap => {
                 const dados = snap.val() || { status: 'Livre', cliente: '' };
-                const div = document.createElement('div');
+                let div = document.getElementById('card-m'+i);
+                if(!div) {
+                    div = document.createElement('div');
+                    div.id = 'card-m'+i;
+                    grid.appendChild(div);
+                }
                 div.className = `mesa-card ${dados.status === 'Ocupada' ? 'ocupada' : ''}`;
                 div.onclick = () => abrirMesa(i, dados);
                 div.innerHTML = `
-                    <i class="fas fa-utensils"></i>
+                    <i class="fas fa-wine-glass-alt"></i>
                     <b>MESA ${i}</b>
-                    <span>${dados.status === 'Ocupada' ? dados.cliente : 'Disponível'}</span>
+                    <span>${dados.status === 'Ocupada' ? dados.cliente : 'Livre'}</span>
                 `;
-                grid.appendChild(div);
             });
         }
     }
 
-    // 2. Carregar Produtos do Estoque no Select
     db.ref('produtos').on('value', snap => {
         const select = document.getElementById('selectEstoque');
-        select.innerHTML = '<option value="">--- Selecione um Produto ---</option>';
+        select.innerHTML = '<option value="">--- PRODUTO ---</option>';
         snap.forEach(p => {
             const prod = p.val();
             select.innerHTML += `<option value='${JSON.stringify(prod)}'>${prod.nome} - R$ ${prod.venda.toFixed(2)}</option>`;
         });
     });
 
-    // 3. Abrir Comanda da Mesa
     function abrirMesa(num, dados) {
         mesaAtiva = num;
         document.getElementById('areaPedido').style.display = 'block';
-        document.getElementById('infoMesa').innerHTML = `<h3>MESA ${num}</h3><span>Status: ${dados.status}</span>`;
+        document.getElementById('infoMesa').innerHTML = `<h3>MESA ${num} - ${dados.cliente || 'NOVA'}</h3>`;
         
         if (dados.status === 'Livre') {
-            const nomeCli = prompt("Nome do Cliente para Check-in:");
-            if (nomeCli) {
-                db.ref('mesas/Mesa' + num).set({ status: 'Ocupada', cliente: nomeCli.toUpperCase(), total: 0 });
-            }
+            const nomeCli = prompt("Nome do Cliente:");
+            if (nomeCli) db.ref('mesas/Mesa' + num).set({ status: 'Ocupada', cliente: nomeCli.toUpperCase(), total: 0 });
+            else document.getElementById('areaPedido').style.display = 'none';
         }
         carregarItensMesa(num);
     }
 
-    // 4. Lançar Item do Estoque na Mesa
     function adicionarItem() {
         const select = document.getElementById('selectEstoque');
-        if (!select.value || !mesaAtiva) return alert("Selecione um produto!");
-
+        if (!select.value || !mesaAtiva) return;
         const produto = JSON.parse(select.value);
-        const refItens = db.ref(`mesas/Mesa${mesaAtiva}/itens`);
-        
-        refItens.push({
-            nome: produto.nome,
-            preco: produto.venda
-        }).then(() => {
-            atualizarTotalMesa();
-        });
+        db.ref(`mesas/Mesa${mesaAtiva}/itens`).push({ nome: produto.nome, preco: produto.venda });
     }
 
     function carregarItensMesa(num) {
@@ -139,7 +129,6 @@
             const totalTxt = document.getElementById('totalMesa');
             lista.innerHTML = "";
             let total = 0;
-
             snap.forEach(item => {
                 const i = item.val();
                 total += i.preco;
@@ -151,13 +140,12 @@
     }
 
     function finalizarMesa() {
-        if(confirm(`Fechar conta da Mesa ${mesaAtiva}?`)) {
+        if(confirm(`Fechar Mesa ${mesaAtiva}?`)) {
             db.ref(`mesas/Mesa${mesaAtiva}`).set({ status: 'Livre', cliente: '', total: 0, itens: null });
             document.getElementById('areaPedido').style.display = 'none';
             document.getElementById('infoMesa').innerHTML = `<h3>SELECIONE UMA MESA</h3>`;
         }
     }
-
     carregarMesas();
 </script>
 </body>
