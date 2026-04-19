@@ -9,59 +9,67 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
         :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --blue: #3b82f6; --red: #ef4444; }
         
-        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; display: grid; grid-template-columns: 1fr 320px; gap: 10px; height: 98vh; margin: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 10px; display: grid; grid-template-columns: 1fr 340px; gap: 10px; height: 98vh; margin: 0; }
         
-        /* Área das Mesas Pequenas */
+        /* Mapa de Mesas Compacto */
         .mesas-area { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-y: auto; }
-        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
-        
-        .mesa-card { 
-            background: #1c222d; padding: 10px 5px; border-radius: 6px; text-align: center; 
-            cursor: pointer; border: 1px solid var(--border); transition: 0.2s; 
-        }
+        .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; }
+        .mesa-card { background: #1c222d; padding: 10px 5px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; min-height: 70px; }
         .mesa-card.ocupada { border-color: var(--accent); background: rgba(255, 184, 0, 0.1); }
-        .mesa-card i { font-size: 1rem; display: block; margin-bottom: 3px; color: #64748b; }
-        .mesa-card.ocupada i { color: var(--accent); }
-        .mesa-card b { font-size: 0.7rem; display: block; }
-        .mesa-card span { display: block; font-size: 0.55rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .mesa-card b { font-size: 0.75rem; display: block; color: var(--accent); }
+        .mesa-card span { display: block; font-size: 0.65rem; color: #ffffff; font-weight: bold; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Comanda Lateral */
-        .comanda-area { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; border-left: 2px solid var(--border); }
+        .comanda-area { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; overflow-y: auto; }
         .header-comanda { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px; }
-        .header-comanda h3 { font-size: 0.85rem; margin: 0; color: var(--accent); }
-        
-        .lista-itens { flex: 1; overflow-y: auto; margin: 10px 0; border-bottom: 1px solid var(--border); }
+        .lista-itens { flex: 1; overflow-y: auto; margin-bottom: 10px; }
         .item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #1e293b; font-size: 0.75rem; }
         
-        .select-prod { background: #0a0c10; color: white; border: 1px solid var(--border); padding: 8px; width: 100%; border-radius: 6px; font-size: 0.75rem; margin-bottom: 5px; }
+        .total-box { font-size: 1.6rem; text-align: center; color: var(--accent); font-weight: 700; margin: 10px 0; }
         
-        .btn { border: none; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.75rem; }
-        .btn-add { background: var(--blue); color: white; }
-        .btn-fechar { background: var(--green); color: black; margin-top: 10px; }
+        .grid-pagamento { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+        .btn { border: none; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-dinheiro { background: #22c55e; color: #000; }
+        .btn-pix { background: #00fdca; color: #000; }
+        .btn-cartao { background: #6366f1; color: #fff; }
+        .btn-pendura { background: #ef4444; color: #fff; grid-column: span 2; margin-top: 5px; }
         
-        .total-box { font-size: 1.4rem; text-align: center; color: var(--accent); font-weight: 700; padding: 5px 0; }
+        select, input { background: #0a0c10; color: white; border: 1px solid var(--border); padding: 8px; width: 100%; border-radius: 6px; font-size: 0.75rem; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="mesas-area">
-        <h2 style="font-size: 0.75rem; margin-bottom: 10px; color: #64748b;">MAPA DE MESAS</h2>
+        <h2 style="font-size: 0.75rem; margin-bottom: 10px; color: #64748b;">MAPA DE MESAS (CLIQUE PARA ABRIR)</h2>
         <div class="grid-mesas" id="gridMesas"></div>
     </div>
 
     <div class="comanda-area">
-        <div class="header-comanda" id="infoMesa">
-            <h3>SELECIONE UMA MESA</h3>
-        </div>
+        <div class="header-comanda" id="infoMesa"><h3>SELECIONE UMA MESA</h3></div>
 
         <div id="areaPedido" style="display: none;">
-            <select id="selectEstoque" class="select-prod"></select>
-            <button class="btn btn-add" onclick="adicionarItem()"><i class="fas fa-plus"></i> LANÇAR ITEM</button>
+            <select id="selectEstoque"></select>
+            <button class="btn" style="background:var(--blue); color:white; width:100%;" onclick="adicionarItem()"><i class="fas fa-plus"></i> LANÇAR ITEM</button>
 
             <div class="lista-itens" id="listaItens"></div>
 
+            <div style="background: rgba(255,184,0,0.05); padding: 8px; border-radius: 6px; margin-bottom: 5px; border: 1px dashed var(--border);">
+                <label style="font-size: 0.6rem; color: #94a3b8;">DIVIDIR POR PESSOAS:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="number" id="numPessoas" value="1" min="1" oninput="calcularDivisao()" style="width: 50px; margin:0;">
+                    <span style="font-size: 0.75rem; font-weight: bold; color: var(--green);" id="valorDividido">R$ 0,00 cada</span>
+                </div>
+            </div>
+
             <div class="total-box" id="totalMesa">R$ 0,00</div>
-            <button class="btn btn-fechar" onclick="finalizarMesa()">FECHAR CONTA</button>
+            
+            <div class="grid-pagamento">
+                <button class="btn btn-dinheiro" onclick="fecharConta('DINHEIRO')"><i class="fas fa-money-bill-wave"></i> DINHEIRO</button>
+                <button class="btn btn-pix" onclick="fecharConta('PIX')"><i class="fas fa-qrcode"></i> PIX</button>
+                <button class="btn btn-cartao" onclick="fecharConta('DÉBITO')"><i class="fas fa-credit-card"></i> DÉBITO</button>
+                <button class="btn btn-cartao" onclick="fecharConta('CRÉDITO')"><i class="fas fa-credit-card"></i> CRÉDITO</button>
+                <button class="btn btn-pendura" onclick="fecharConta('PENDURA')"><i class="fas fa-hand-holding-usd"></i> LANÇAR NO PENDURA</button>
+            </div>
         </div>
     </div>
 
@@ -71,32 +79,27 @@
     const db = firebase.database();
 
     let mesaAtiva = null;
+    let clienteAtivo = "";
+    let itensAtuais = [];
 
     function carregarMesas() {
         const grid = document.getElementById('gridMesas');
+        grid.innerHTML = "";
         for (let i = 1; i <= 12; i++) {
             db.ref('mesas/Mesa' + i).on('value', snap => {
                 const dados = snap.val() || { status: 'Livre', cliente: '' };
                 let div = document.getElementById('card-m'+i);
-                if(!div) {
-                    div = document.createElement('div');
-                    div.id = 'card-m'+i;
-                    grid.appendChild(div);
-                }
+                if(!div) { div = document.createElement('div'); div.id = 'card-m'+i; grid.appendChild(div); }
                 div.className = `mesa-card ${dados.status === 'Ocupada' ? 'ocupada' : ''}`;
                 div.onclick = () => abrirMesa(i, dados);
-                div.innerHTML = `
-                    <i class="fas fa-wine-glass-alt"></i>
-                    <b>MESA ${i}</b>
-                    <span>${dados.status === 'Ocupada' ? dados.cliente : 'Livre'}</span>
-                `;
+                div.innerHTML = `<b>MESA ${i}</b><span>${dados.status === 'Ocupada' ? dados.cliente : 'LIVRE'}</span>`;
             });
         }
     }
 
     db.ref('produtos').on('value', snap => {
         const select = document.getElementById('selectEstoque');
-        select.innerHTML = '<option value="">--- PRODUTO ---</option>';
+        select.innerHTML = '<option value="">--- SELECIONAR PRODUTO ---</option>';
         snap.forEach(p => {
             const prod = p.val();
             select.innerHTML += `<option value='${JSON.stringify(prod)}'>${prod.nome} - R$ ${prod.venda.toFixed(2)}</option>`;
@@ -105,13 +108,16 @@
 
     function abrirMesa(num, dados) {
         mesaAtiva = num;
+        clienteAtivo = dados.cliente || "";
         document.getElementById('areaPedido').style.display = 'block';
-        document.getElementById('infoMesa').innerHTML = `<h3>MESA ${num} - ${dados.cliente || 'NOVA'}</h3>`;
+        document.getElementById('infoMesa').innerHTML = `<h3>MESA ${num} - ${clienteAtivo || 'NOVA'}</h3>`;
         
         if (dados.status === 'Livre') {
             const nomeCli = prompt("Nome do Cliente:");
-            if (nomeCli) db.ref('mesas/Mesa' + num).set({ status: 'Ocupada', cliente: nomeCli.toUpperCase(), total: 0 });
-            else document.getElementById('areaPedido').style.display = 'none';
+            if (nomeCli) {
+                clienteAtivo = nomeCli.toUpperCase();
+                db.ref('mesas/Mesa' + num).set({ status: 'Ocupada', cliente: clienteAtivo, total: 0 });
+            } else document.getElementById('areaPedido').style.display = 'none';
         }
         carregarItensMesa(num);
     }
@@ -124,69 +130,52 @@
     }
 
     function carregarItensMesa(num) {
+        db.ref(`mesas/Mesa${num}/itens`).off();
         db.ref(`mesas/Mesa${num}/itens`).on('value', snap => {
             const lista = document.getElementById('listaItens');
-            const totalTxt = document.getElementById('totalMesa');
             lista.innerHTML = "";
             let total = 0;
+            itensAtuais = [];
             snap.forEach(item => {
                 const i = item.val();
                 total += i.preco;
+                itensAtuais.push(i);
                 lista.innerHTML += `<div class="item"><span>${i.nome}</span><b>R$ ${i.preco.toFixed(2)}</b></div>`;
             });
-            totalTxt.innerText = `R$ ${total.toFixed(2)}`;
-            db.ref(`mesas/Mesa${num}`).update({ total: total });
+            document.getElementById('totalMesa').innerText = `R$ ${total.toFixed(2)}`;
+            calcularDivisao();
         });
     }
 
-    function finalizarMesa() {
-        if(confirm(`Fechar Mesa ${mesaAtiva}?`)) {
-            db.ref(`mesas/Mesa${mesaAtiva}`).set({ status: 'Livre', cliente: '', total: 0, itens: null });
-            document.getElementById('areaPedido').style.display = 'none';
-            document.getElementById('infoMesa').innerHTML = `<h3>SELECIONE UMA MESA</h3>`;
+    function calcularDivisao() {
+        const totalNum = parseFloat(document.getElementById('totalMesa').innerText.replace('R$ ', '')) || 0;
+        const pessoas = parseInt(document.getElementById('numPessoas').value) || 1;
+        document.getElementById('valorDividido').innerText = `R$ ${(totalNum / pessoas).toFixed(2)} cada`;
+    }
+
+    function fecharConta(metodo) {
+        const totalFinal = document.getElementById('totalMesa').innerText;
+        if(!confirm(`Fechar Mesa ${mesaAtiva} (${metodo})?`)) return;
+
+        if(metodo === 'PENDURA') {
+            db.ref('clientes/' + clienteAtivo).once('value', s => {
+                const saldo = (s.val()?.saldo || 0) + parseFloat(totalFinal.replace('R$ ',''));
+                db.ref('clientes/' + clienteAtivo).update({ saldo: saldo });
+            });
         }
-    }
-    function carregarItensMesa(num) {
-        // Remove qualquer ouvinte antigo para não duplicar o processamento
-        db.ref(`mesas/Mesa${num}/itens`).off(); 
 
-        db.ref(`mesas/Mesa${num}/itens`).on('value', snap => {
-            const lista = document.getElementById('listaItens');
-            const totalTxt = document.getElementById('totalMesa');
-            
-            // LIMPA A LISTA COMPLETAMENTE ANTES DE DESENHAR
-            lista.innerHTML = ""; 
-            let total = 0;
+        // WhatsApp
+        let msg = `*🍻 BOTECO 934 - RECIBO *\n\n*Cliente:* ${clienteAtivo}\n*Mesa:* ${mesaAtiva}\n------------------\n`;
+        itensAtuais.forEach(it => msg += `${it.nome}: R$ ${it.preco.toFixed(2)}\n`);
+        msg += `------------------\n*TOTAL: ${totalFinal}*\n*PAGO VIA:* ${metodo}\n\nObrigado!`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
 
-            if (snap.exists()) {
-                snap.forEach(item => {
-                    const i = item.val();
-                    const chaveItem = item.key; // Chave única do Firebase
-                    total += i.preco;
-
-                    // Cria a linha do item com um botão de excluir (opcional)
-                    lista.innerHTML += `
-                        <div class="item">
-                            <span>${i.nome}</span>
-                            <b>R$ ${i.preco.toFixed(2)}</b>
-                            <i class="fas fa-trash-alt" style="color:var(--red); cursor:pointer; font-size:0.7rem;" 
-                               onclick="removerItemMesa('${num}', '${chaveItem}')"></i>
-                        </div>`;
-                });
-            }
-            
-            totalTxt.innerText = `R$ ${total.toFixed(2)}`;
-            // Atualiza o total no banco de dados silenciosamente
-            db.ref(`mesas/Mesa${num}`).update({ total: total });
-        });
+        // Reset
+        db.ref(`mesas/Mesa${mesaAtiva}`).set({ status: 'Livre', cliente: '', total: 0, itens: null });
+        document.getElementById('areaPedido').style.display = 'none';
+        document.getElementById('numPessoas').value = 1;
     }
 
-    // Função extra para você poder apagar um item lançado errado:
-    function removerItemMesa(numMesa, chaveItem) {
-        if(confirm("Remover este item da comanda?")) {
-            db.ref(`mesas/Mesa${numMesa}/itens/${chaveItem}`).remove();
-        }
-    }
     carregarMesas();
 </script>
 </body>
