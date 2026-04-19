@@ -1,5 +1,141 @@
 <!DOCTYPE html>
+<html lang="pt-br"><!DOCTYPE html>
 <html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        :root { --bg: #05070a; --card: #12151c; --accent: #ffb800; --text: #ffffff; --border: #1e293b; --green: #10b981; --red: #ef4444; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 15px; font-size: 0.75rem; }
+        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 15px; max-width: 1000px; margin: 0 auto; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        input { background: #0a0c10; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; width: 100%; font-size: 0.75rem; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 700; color: var(--bg); background: var(--accent); }
+        .btn-xml { background: #3b82f6; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #94a3b8; padding: 10px; border-bottom: 2px solid var(--border); font-size: 0.6rem; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); }
+        .pos { color: var(--green); font-weight: 700; }
+        .neg { color: var(--red); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="grid-layout">
+    <div class="card">
+        <h2 style="font-size:0.8rem; margin-bottom:15px"><i class="fas fa-file-invoice"></i> IMPORTAR XML DA NOTA</h2>
+        
+        <div class="form-row">
+            <input type="file" id="xmlInput" accept=".xml">
+            <button class="btn btn-xml" onclick="lerXML()">PROCESSAR XML</button>
+        </div>
+
+        <div class="form-row" style="margin-top:20px">
+            <input type="text" id="pNome" placeholder="Nome do Produto">
+            <input type="number" id="pQtd" placeholder="Qtd na Caixa" value="1" oninput="calcTudo()">
+            <input type="number" id="pCustoCx" placeholder="Custo Unit. XML" oninput="calcTudo()">
+        </div>
+
+        <div class="form-row">
+            <input type="number" id="pVenda" placeholder="Preço de Venda" oninput="calcTudo()">
+            <input type="number" id="pImposto" value="10" oninput="calcTudo()">
+            <button class="btn" onclick="salvar()">SALVAR NO ESTOQUE</button>
+        </div>
+
+        <div id="status" style="margin-top:10px; text-align:center; font-weight:bold"></div>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr><th>Item (A-Z)</th><th>Custo</th><th>Venda</th><th>Margem</th><th>Ação</th></tr>
+            </thead>
+            <tbody id="lista"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyAxjhzLPeqBqJ18S8m7lagxuvF9LX7OJks", databaseURL: "https://boteco934-afc3f-default-rtdb.firebaseio.com", projectId: "boteco934-afc3f" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function lerXML() {
+        const fileInput = document.getElementById('xmlInput');
+        if (!fileInput.files.length) return alert("Por favor, selecione um arquivo XML primeiro!");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+
+            // Busca Nome do Produto (xProd)
+            const nome = xmlDoc.getElementsByTagName("xProd")[0]?.textContent || "";
+            // Busca Valor Unitário (vUnCom)
+            const valorUnit = xmlDoc.getElementsByTagName("vUnCom")[0]?.textContent || 0;
+
+            if (nome) {
+                document.getElementById('pNome').value = nome.toUpperCase();
+                document.getElementById('pCustoCx').value = parseFloat(valorUnit).toFixed(2);
+                document.getElementById('status').innerHTML = "✅ XML lido com sucesso!";
+                calcTudo();
+            } else {
+                alert("Não encontrei as tags de produto nesse XML. Verifique se é uma NF-e válida.");
+            }
+        };
+        reader.readAsText(fileInput.files[0]);
+    }
+
+    function calcTudo() {
+        const custoUnit = parseFloat(document.getElementById('pCustoCx').value) || 0;
+        const qtdCx = parseFloat(document.getElementById('pQtd').value) || 1;
+        const venda = parseFloat(document.getElementById('pVenda').value) || 0;
+        const imposto = parseFloat(document.getElementById('pImposto').value) || 0;
+
+        const custoFinal = custoUnit / qtdCx;
+        const lucro = venda - custoFinal - (venda * (imposto / 100));
+        const margem = venda > 0 ? (lucro / venda) * 100 : 0;
+
+        document.getElementById('status').innerHTML = `Margem Real: <span class="${margem > 15 ? 'pos' : 'neg'}">${margem.toFixed(1)}%</span>`;
+        return { custoFinal, lucro, margem };
+    }
+
+    function salvar() {
+        const nome = document.getElementById('pNome').value.trim();
+        const res = calcTudo();
+        if(nome) {
+            db.ref('produtos/' + nome).set({
+                nome: nome,
+                custo: res.custoFinal,
+                venda: parseFloat(document.getElementById('pVenda').value),
+                margem: res.margem
+            }).then(() => alert("Salvo!"));
+        }
+    }
+
+    db.ref('produtos').on('value', snap => {
+        const items = snap.val() ? Object.values(snap.val()) : [];
+        items.sort((a,b) => a.nome.localeCompare(b.nome));
+        document.getElementById('lista').innerHTML = items.map(p => `
+            <tr>
+                <td>${p.nome}</td>
+                <td>R$ ${p.custo.toFixed(2)}</td>
+                <td style="color:var(--accent)">R$ ${p.venda.toFixed(2)}</td>
+                <td class="${p.margem > 15 ? 'pos' : 'neg'}">${p.margem.toFixed(1)}%</td>
+                <td><i class="fas fa-trash" onclick="remover('${p.nome}')" style="color:var(--red); cursor:pointer"></i></td>
+            </tr>
+        `).join('');
+    });
+
+    function remover(n) { if(confirm("Apagar?")) db.ref('produtos/'+n).remove(); }
+</script>
+</body>
+</html>
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
